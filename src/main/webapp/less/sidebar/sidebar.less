@@ -1,0 +1,73 @@
+.sidebar-container {
+    position: fixed;
+    top:0;
+    bottom: 0;
+    overflow-y: scroll;
+    width: 300px;
+    border-right: 1px solid @color-border;
+    background: #fff;
+    margin-left: -15px;
+    display: inline-block;
+    transition: 0.5s;
+}
+
+.sidebar-container--hidden {
+    margin-left: -265px;
+    margin-right: 75px;
+
+    overflow-y: hidden;
+    .sidebar-container__widget,
+    .sidebar-container__divider {
+        opacity: 0;
+    };
+    .sidebar-container__header__hyperon-hamburger {
+        margin-left: 12px;
+    }
+}
+
+.sidebar-container__widget,
+.sidebar-container__divider {
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.sidebar-container__header {
+    box-shadow: 0 3px 2px 0 rgba(0, 0, 0, 0.25);
+    padding: 20px 15px 15px 15px;
+}
+
+.sidebar-container__header__hyperon-logo {
+    background: url('../../imgs/hyperon_logo.png');
+    width: 206px;
+    height: 38px;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.sidebar-container__header__hyperon-hamburger {
+    cursor: pointer;
+    color: @color-blue;
+    float: right;
+    font-size: 26px;
+    padding-top: 2px;
+}
+
+.sidebar-container__divider {
+    width: 100%;
+    border-bottom: 1px solid @color-border;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar-container__divider__icon {
+    width: 100%;
+    font-size: 26px;
+    color: @color-blue;
+    padding-bottom: 5px;
+}
+
+.sidebar-container__widget {
+    padding: 0 15px;
+}
+

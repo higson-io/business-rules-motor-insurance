@@ -1,0 +1,27 @@
+{
+  "name": "hyperon-demo-app",
+  "version": "0.0.1",
+  "description": "hyperon demo app",
+  "keywords": [
+    "Hyperon"
+  ],
+  "author": "Decerto",
+  "dependencies": {
+    "angular": "1.6.2",
+    "angular-ui-bootstrap": "^2.5.0",
+    "angular-tooltips": "1.1.10",
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
+    "npm-font-open-sans": "^1.0.3",
+    "angular-loading-spinner": "0.0.3",
+    "angular-spinner": "1.0.1",
+    "spin.js": "2.3.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.3.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0"
+  }
+}

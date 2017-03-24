@@ -1,0 +1,141 @@
+.common-subsection-heading {
+    font-size: 11px;
+}
+
+.common-subsection-divider {
+    height: 1px;
+    background: @color-border;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.common-input-default {
+    position: relative;
+}
+
+.common-input-default__label {
+    color: @color-blue;
+    font-size: 9px;
+    text-transform: uppercase;
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    padding-left: 5px;
+    padding-right: 10px;
+    background: #fff;
+}
+
+.common-input-default__input {
+    width: 100%;
+    border-radius: @border-radius;
+    border: 1px solid @color-border;
+    padding: 12px 15px 10px 15px;
+    margin-bottom: 20px;
+}
+
+.common-input-default--small {
+    width: 50%;
+}
+
+.common-input-default__select {
+    width: 100%;
+    border-radius: @border-radius;
+    border: 1px solid @color-border;
+    padding: 12px 39px 10px 15px;
+    margin-bottom: 20px;
+	cursor: pointer;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	text-indent: 1px;
+	text-overflow: '';
+	background-color: #fff;
+	background-image: url('../../imgs/select-arrow.png');
+	background-size: 1.7rem 1.1rem;
+	background-position: right 1.1rem bottom 1.4rem;
+	background-repeat: no-repeat;
+}
+
+.common-btn-group {
+    width: 100%;
+    border-radius: @border-radius;
+    border: 1px solid @color-border;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+
+    & button:not(:first-child) {
+        border-left: 1px solid @color-border;
+    }
+
+    .active {
+        background: @color-gray-light;
+    }
+}
+
+.common-btn-group__btn {
+    width: 100%;
+    text-align: center;
+    background: none;
+    border: none;
+    padding: 9px 0;
+    font-size: 14px;
+
+    .fa {
+        font-size: 26px;
+        margin-right: 20px;
+        color: @color-border;
+    }
+
+    .fa,
+    span {
+        vertical-align: middle;
+    }
+
+    &:hover {
+        background: @color-blue;
+        color: #fff;
+        font-weight: bold;
+    }
+}
+
+.common-checkbox {
+    position: relative;
+    margin-bottom: 10px;
+
+    input[type=checkbox] {
+        display:none;
+
+        & + label:before {
+            content: "";
+            border: 1px solid @color-border;
+            width: 25px;
+            height: 25px;
+            margin-bottom: -7px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        &:checked + label:before {
+            font-family: FontAwesome;
+            content: "\f00c";
+            padding-left: 4px;
+            color: @color-border;
+            color: @color-gray-dark;
+        }
+
+        & + label {
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: normal;
+            margin-left: 35px;
+            margin-top: 1px;
+        }
+    }
+}
+
+.common-tooltip {
+    width: 300px;
+}

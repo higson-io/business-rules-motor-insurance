@@ -1,0 +1,71 @@
+.variants {
+    position: relative;
+    margin-left: 30%;
+    padding-top: 40px;
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 40px;
+}
+
+.variants__column {
+    cursor: pointer;
+    background: #fff;
+    box-shadow: 3px 3px 5px 0 rgba(0,0,0,0.25);
+    border-radius: @border-radius;
+    padding: 20px 0;
+    width: 300px;
+    margin: 0 15px;
+    display: inline-block;
+    vertical-align: top;
+    transition: 0.5s;
+
+    &:hover {
+        background: #f0fcff
+    }
+}
+
+.variants__column__header {
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    color: #c0c0c0;
+    padding-bottom: 50px;
+}
+
+.variants__column__final-price {
+    padding: 0 15px;
+}
+
+.variants__column__price-before-discount {
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.variants__column__final-price__label {
+    display: inline-block;
+    font-size: 25px;
+}
+
+.variants__column__final-price__value {
+    font-size: 25px;
+    font-weight: bold;
+    float: right;
+}
+
+.variants__column__price-before-discounts__label {
+    display: inline-block;
+}
+
+.variants__column__price-before-discounts__value {
+    font-size: 16px;
+    font-weight: bold;
+    float: right;
+}
+
+.variants__error_text {
+    width: 1000px;
+    text-align: center;
+    font-size: 16px;
+}

@@ -1,0 +1,43 @@
+<div class="common-input-default">
+    <div class="common-input-default__label">Production year</div>
+    <select
+        class="common-input-default__select"
+        ng-model="ctrl.vehicle.productionYear"
+        ng-change="ctrl.updateVehicleProductionYear()"
+        ng-options="+(element.code) as element.name for element in ctrl.productionYearDictionary">
+        <option value=''>Production Year</option>
+    </select>
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Make</div>
+    <select
+        class="common-input-default__select"
+        ng-model="ctrl.vehicle.makeId"
+        ng-change="ctrl.updateVehicleMake()"
+        ng-options="+(element.code) as element.name for element in ctrl.makeDictionary">
+        <option value=''>Make</option>
+    </select>
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Type</div>
+    <select
+        class="common-input-default__select"
+        ng-model="ctrl.vehicle.typeId"
+        ng-change="ctrl.updateVehicleType()"
+        ng-options="+(element.code) as element.name for element in ctrl.typeDictionary">
+        <option value=''>Type</option>
+    </select>
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Model</div>
+    <select
+        class="common-input-default__select"
+        ng-model="ctrl.vehicle.modelId"
+        ng-change="ctrl.updateVehicleModel()"
+        ng-options="+(element.code) as element.name for element in ctrl.modelDictionary">
+        <option value=''>Model</option>
+    </select>
+</div>

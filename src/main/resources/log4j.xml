@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOGGER" "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <!-- Appenders -->
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-5p %d (%5.5t)[%c{1}] - %m%n"/>
+        </layout>
+    </appender>
+
+	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="/var/mpp.log"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Threshold" value="trace"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %d (%5.5t)[%c{1}] - %m%n"/>
+		</layout>
+	</appender>
+
+
+    <logger name="org.apache">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="org.springframework">
+        <level value="info"/>
+    </logger>
+
+	<logger name="pl.decerto">
+		<level value="debug"/>
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="pl.decerto.mpp.runtime">
+		<level value="debug"/>
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="jdbc_profiler">
+		<level value="warn"/>
+		<appender-ref ref="CONSOLE" />
+	</logger>
+
+    <!-- Root Logger -->
+    <root>
+        <priority value="INFO"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</log4j:configuration>

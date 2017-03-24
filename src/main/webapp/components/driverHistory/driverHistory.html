@@ -1,0 +1,28 @@
+<div class="common-input-default">
+    <div class="common-input-default__label">Number of accidents in the last 5 years</div>
+    <input
+        type="number"
+        min="0"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.numberOfAccidents"
+        ng-change="ctrl.updateDriverAccidentCount()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Number of traffic tickets in the last 5 years</div>
+    <input
+        type="number"
+        min="0"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.numberOfTickets"
+        ng-change="ctrl.updateDriverTrafficTicketsCount()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Driver's age when driver licence was obtained</div>
+    <input type="number"
+        min="16"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.licenceObtainedAtAge"
+        ng-change="ctrl.updateDriverLicenceObtainedAtAge()">
+</div>

@@ -1,0 +1,80 @@
+<div class="common-input-default">
+    <div class="common-input-default__label">First name</div>
+    <input
+        type="text"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.firstName"
+        ng-model-options="{updateOn: 'blur'}"
+        ng-change="ctrl.updateDriverFirstName()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Last name</div>
+    <input
+        type="text"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.lastName"
+        ng-model-options="{updateOn: 'blur'}"
+        ng-change="ctrl.updateDriverLastName()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Date of birth</div>
+    <input
+        type="date"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.dateOfBirth"
+        ng-change="ctrl.updateDriverBirthDate()">
+</div>
+
+<div class="common-btn-group">
+    <button
+        ng-click="ctrl.updateDriverGender()"
+        type="button"
+        class="common-btn-group__btn"
+        ng-model="ctrl.driver.gender" uib-btn-radio="'M'">
+        <i class="fa fa-mars" aria-hidden="true"></i>
+        <span>Male</span>
+    </button>
+    <button
+        ng-click="ctrl.updateDriverGender()"
+        type="button"
+        class="common-btn-group__btn"
+        ng-model="ctrl.driver.gender" uib-btn-radio="'F'">
+        <i class="fa fa-venus" aria-hidden="true"></i>
+        <span>Female</span>
+    </button>
+</div>
+
+<div class="common-subsection-heading">Address</div>
+<div class="common-subsection-divider"></div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Zip code</div>
+    <input
+        type="text"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.address.zipCode"
+        ng-model-options="{updateOn: 'blur'}"
+        ng-change="ctrl.updateAddressZipCode()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">City</div>
+    <input
+        type="text"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.address.city"
+        ng-model-options="{updateOn: 'blur'}"
+        ng-change="ctrl.updateAddressCity()">
+</div>
+
+<div class="common-input-default">
+    <div class="common-input-default__label">Street</div>
+    <input
+        type="text"
+        class="common-input-default__input"
+        ng-model="ctrl.driver.address.street"
+        ng-model-options="{updateOn: 'blur'}"
+        ng-change="ctrl.updateAddressStreet()">
+</div>

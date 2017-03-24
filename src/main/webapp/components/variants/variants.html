@@ -1,0 +1,29 @@
+<div class="variants">
+    <div ng-show="ctrl.errorOccured" class="alert alert-danger variants__error_text">
+        {{ctrl.errorMessage}}
+    </div>
+    <div class="variants__column" ng-repeat="variant in ctrl.variants | orderBy: 'order'">
+        <div class="variants__column__header">{{variant.code}}</div>
+
+        <coverage ng-repeat="coverage in variant.coverages | orderBy: position"
+            code="coverage.code"
+            name="coverage.name"
+            description="coverage.description"
+            limit-left="coverage.limitLeft"
+            limit-right="coverage.limitRight"
+            premium="coverage.premium"></coverage>
+        <div class="variants__column__price-before-discount">
+            <div class="variants__column__price-before-discounts__label">PRICE BEFORE DISCOUNTS</div>
+            <div class="variants__column__price-before-discounts__value">{{variant.premiumBeforeDiscounts}}</div>
+        </div>
+        <discount ng-repeat="discount in variant.discounts | orderBy: position"
+            name="discount.name"
+            value="discount.value"
+            price-before-discount="discount.priceBeforeDiscount"></discount>
+
+        <div class="variants__column__final-price">
+            <div class="variants__column__final-price__label">FINAL PRICE</div>
+            <div class="variants__column__final-price__value">{{variant.premium}}</div>
+        </div>
+    </div>
+</div>

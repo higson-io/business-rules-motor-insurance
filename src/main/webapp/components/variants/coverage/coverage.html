@@ -1,0 +1,16 @@
+<div class="coverage"
+    tooltips
+    tooltip-template="{{ctrl.description}}"
+    tooltip-class="common-tooltip"
+    tooltip-side="right"
+    tooltip-size="large">
+    <div class="coverage__header">
+        {{ctrl.name}} ({{ctrl.code}})
+    </div>
+
+    <div class="coverage__divider"></div>
+
+    <div class="coverage__text">{{ctrl.limitLeft | number: 2}} <span ng-if="ctrl.limitRight">/ {{ctrl.limitRight | number: 2}}</span></div>
+
+    <div class="coverage__sum">{{ctrl.premium | number: 2}}</div>
+</div>

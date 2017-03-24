@@ -1,0 +1,33 @@
+.discounts {
+    border-top: 1px solid @color-gray-light;
+    border-bottom: 1px solid @color-gray-light;
+}
+
+.discounts__table-container {
+    padding: 10px 15px;
+}
+
+.discounts__table-container__table {
+    width: 100%;
+
+    th {
+        font-weight: normal;
+    }
+
+    tr th:nth-child(2),
+    tr td:nth-child(2) {
+        font-size: 16px;
+        text-align: right;
+        font-weight: bold;
+    }
+
+    th,
+    td {
+        padding-bottom: 10px;
+    }
+
+    &:last-child td {
+        padding-bottom: 0;
+    }
+}
+
