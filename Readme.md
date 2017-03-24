@@ -8,9 +8,9 @@ Hyperon.io tutorials are availble [here](http://hyperon.io/tutorials/getting-sta
 
 Make sure you have at least:
 
-1. Java 1.8
+#### Java 1.8
 
-2. Maven 3.3 
+#### Maven 3.3 
 
 To install go to:
 
@@ -18,26 +18,26 @@ https://maven.apache.org/download.cgi
 
 Previous Maven versions might work as well but this was not checked. 
 
-3. NodeJS 4.4.1
+#### NodeJS 4.4.1
 
 To install go to:
 
-a) [Windows or Mac OS](https://nodejs.org/en/download/current/)
+1. [Windows or Mac OS](https://nodejs.org/en/download/current/)
 
-b) [Linux](https://github.com/nodesource/distributions)
+2. [Linux](https://github.com/nodesource/distributions)
 
 To update:
 ```text
 npm install npm@latest -g
 ```
 
-4. Hyperon Studio 1.5.22
+#### Hyperon Studio 1.5.22
 
-a) Go to:
+1. Go to:
 
 http://hyperon.io/download
  
-b) download bundle, unpack it to the directory of your choice and run it as described [here](http://hyperon.io/tutorials/deploying-hyperon-studio). 
+2. download bundle, unpack it to the directory of your choice and run it as described [here](http://hyperon.io/tutorials/deploying-hyperon-studio). 
 
 ## Setup
 
