@@ -121,6 +121,7 @@ public class Motor {
 				}
 			}
 
+			option.getDiscounts().sort(Comparator.comparingInt(Discount::getPosition));
 		}
 
 		log.info("quote after calculation: {}", quote.print());
@@ -180,13 +181,17 @@ public class Motor {
 				.filter(cov -> cov.getCode().equals(c.getCode()))
 				.findFirst();
 
-			// add coverage only if available for this option
-			if (isAvailable && !optionCoverage.isPresent()) {
-				Coverage cover = new Coverage(c.getCode(), c.getName());
-				cover.setPosition(c.getAttr("POSITION").intValue(ctx));
-				HyperonDomainAttribute description = c.getAttr("DESCRIPTION");
-				cover.setDescription(description != null ? description.getString(ctx) : null);
-				option.addCoverage(cover);
+			// add/update coverage only if available for this option
+			if (isAvailable) {
+				 if (optionCoverage.isPresent()) {
+				 	// update
+					 setCoverData(c, optionCoverage.get(), ctx);
+				 } else {
+					 // add new
+					 Coverage cover = new Coverage(c.getCode());
+					 setCoverData(c, cover, ctx);
+					 option.addCoverage(cover);
+				 }
 			}
 
 			// remove not available existing coverage
@@ -197,6 +202,12 @@ public class Motor {
 
 		// sort coverages according to position attribute
 		option.getCoverages().sort(Comparator.comparingInt(Coverage::getPosition));
+	}
 
+	private void setCoverData(HyperonDomainObject domainDataCover, Coverage cover, HyperonContext ctx) {
+		cover.setName(domainDataCover.getName());
+		cover.setPosition(domainDataCover.getAttr("POSITION").intValue(ctx));
+		HyperonDomainAttribute description = domainDataCover.getAttr("DESCRIPTION");
+		cover.setDescription(description != null ? description.getString(ctx) : null);
 	}
 }

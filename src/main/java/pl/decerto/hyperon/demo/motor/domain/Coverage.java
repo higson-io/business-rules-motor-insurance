@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class Coverage {
 
 	private final String code;
-	private final String name;
+	private String name;
 
 	private int position;
 	private BigDecimal limit1;
@@ -16,8 +16,16 @@ public class Coverage {
 
 	private Option option;
 
+	public Coverage(String code) {
+		this.code = code;
+	}
+
 	public Coverage(String code, String name) {
 		this.code = code;
+		this.name = name;
+	}
+
+	public void setName(String name) {
 		this.name = name;
 	}
 
