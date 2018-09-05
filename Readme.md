@@ -45,11 +45,11 @@ Make sure that both commands ```mvn``` and ```npm``` are accesible through syste
 
 In file ```app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
 ```text
-hyperon.database.url=jdbc:h2:/srv/hyperon-studio-1.5.22/database/hyperon.demo.motor;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+hyperon.database.url=jdbc:h2:/srv/hyperon-studio-1.5.88/database/hyperon.demo.motor;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
 ```
 or on Windows
 ```text
-hyperon.database.url=jdbc:h2:c:/hyperon-studio-1.5.22/database/hyperon.demo.motor;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+hyperon.database.url=jdbc:h2:c:/hyperon-studio-1.5.88/database/hyperon.demo.motor;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
 ```
 
 ## Running
