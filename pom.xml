@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>pl.decerto</groupId>
 			<artifactId>hyperon-runtime</artifactId>
-			<version>1.5.88</version>
+			<version>1.6.15</version>
 		</dependency>
 
 		<!-- Spring Framework -->
