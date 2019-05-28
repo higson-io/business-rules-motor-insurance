@@ -67,7 +67,7 @@ public class Quote {
 
 
 	private static void line(StringBuilder sb, String str) {
-		sb.append(str).append(Formatter.NL);
+		sb.append(str).append(System.getProperty("line.separator"));
 	}
 
 }

@@ -1,11 +1,11 @@
 package pl.decerto;
 
-import static java.util.stream.Stream.of;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
-import org.apache.commons.dbcp.BasicDataSource;
+
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +21,10 @@ import pl.decerto.hyperon.runtime.profiler.jdbc.proxy.DataSourceProxy;
 import pl.decerto.hyperon.runtime.sql.DialectRegistry;
 import pl.decerto.hyperon.runtime.sql.DialectTemplate;
 
+import static java.util.stream.Stream.of;
+
 @Configuration
-@PropertySource("classpath:app.properties")
+@PropertySource(value = {"classpath:hyperon-demo-app.properties", "file:${user.home}/conf/hyperon-demo-app.properties"}, ignoreResourceNotFound = true)
 public class HyperonIntegrationConfiguration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HyperonIntegrationConfiguration.class);
@@ -35,7 +37,7 @@ public class HyperonIntegrationConfiguration {
 
 	@Autowired
 	public HyperonIntegrationConfiguration(Environment env, @Value("${hyperon.dev.mode}") Boolean hyperonDevMode,
-	                                       @Value("${hyperon.dev.user}") String hyperonDevUser) {
+										   @Value("${hyperon.dev.user}") String hyperonDevUser) {
 		this.env = env;
 		this.hyperonDevMode = hyperonDevMode;
 		this.hyperonDevUser = hyperonDevUser;
@@ -54,13 +56,11 @@ public class HyperonIntegrationConfiguration {
 	}
 
 	@Bean(destroyMethod = "close")
-	public DataSource getDataSource() {
-		BasicDataSource dataSource = new BasicDataSource();
+	public HikariDataSource getDataSource() {
+		HikariDataSource dataSource = new HikariDataSource();
 		dataSource.setUsername(env.getProperty("hyperon.database.username"));
 		dataSource.setPassword(env.getProperty("hyperon.database.password"));
-		dataSource.setUrl(env.getProperty("hyperon.database.url"));
-		dataSource.setInitialSize(4);
-		dataSource.setMaxActive(8);
+		dataSource.setJdbcUrl(env.getProperty("hyperon.database.url"));
 		dataSource.setDriverClassName(getDialectTemplate().getJdbcDriverClassName());
 		return dataSource;
 	}

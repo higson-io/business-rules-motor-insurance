@@ -1,4 +1,5 @@
 target
 .idea
-src/main/webapp/node_modules/
+node_modules/
+src/main/webapp/vendors/
 *.iml
