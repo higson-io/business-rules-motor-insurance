@@ -20,7 +20,7 @@ services:
       - db
   web:
     container_name: demo
-    image: motor-demo:latest
+    image: hyperonio/motor-demo:latest
     environment:
       - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
     ports:
