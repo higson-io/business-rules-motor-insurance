@@ -2,7 +2,7 @@ FROM openjdk:8-jdk
 MAINTAINER Maciej Główka <maciej.glowka@decerto.pl>
 MAINTAINER Piotr Marciniak <piotr.marciniak@decerto.pl>
 
-ENV JAVA_OPTS="$JAVA_OPTS -Duser.language=pl -Duser.region=PL -Dlog4j.configurationFile=root/conf/log4j2.xml"
+ENV JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=root/conf/log4j2.xml"
 
 COPY ./target/motor-insurance-1.0-SNAPSHOT.war /app/motor-insurance.war
 COPY ./docker/app.properties /root/conf/hyperon-demo-app.properties
