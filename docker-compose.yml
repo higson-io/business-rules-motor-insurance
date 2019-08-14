@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  db:
+    container_name: db
+    image: hyperonio/bundle-h2-demo:latest
+    ports:
+      - 8082:8082
+      - 9092:9092
+  studio:
+    container_name: studio
+    image: hyperonio/studio:latest
+    environment:
+      - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - mpp.database.dialect=h2
+      - mpp.database.username=sa
+      - mpp.database.password=sa
+    ports:
+      - 38080:8080
+    depends_on:
+      - db
+  web:
+    container_name: demo
+    image: hyperonio/motor-demo:latest
+    environment:
+      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+    ports:
+      - 48080:48080
+    depends_on:
+      - db
