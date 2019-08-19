@@ -77,7 +77,7 @@ URL: [http://localhost:48080/](http://localhost:48080/)
 This demo application can be run in docker container based on provided Dockerfile.
 For building image execute code below:
 ```text
-docker build -t motor-demo .
+docker build -t hyperonio/motor-demo .
 ```
 Build is optional since motor-demo is available on docker hub:
 ```text
@@ -91,7 +91,7 @@ docker run -p 38080:8080
     -e mpp.database.username=<db_username>
     -e mpp.database.password=<db_password>
     -e mpp.environment.id=hyperon_docker
-    motor-demo
+    hyperonio/motor-demo
 ```
 OR application can be run with bundle-h2-demo and hyperon-studio images
 using docker-compose based on docker-compose.yml. Simply run:
