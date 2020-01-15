@@ -1,11 +1,11 @@
 package pl.decerto;
 
-import java.util.List;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 import javax.sql.DataSource;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +15,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+
 import pl.decerto.hyperon.runtime.core.HyperonEngine;
 import pl.decerto.hyperon.runtime.core.HyperonEngineFactory;
 import pl.decerto.hyperon.runtime.profiler.jdbc.proxy.DataSourceProxy;
 import pl.decerto.hyperon.runtime.sql.DialectRegistry;
 import pl.decerto.hyperon.runtime.sql.DialectTemplate;
-
-import static java.util.stream.Stream.of;
 
 @Configuration
 @PropertySource(value = {"classpath:hyperon-demo-app.properties", "file:${user.home}/conf/hyperon-demo-app.properties"}, ignoreResourceNotFound = true)
@@ -84,21 +83,12 @@ public class HyperonIntegrationConfiguration {
 			hyperonEngineFactory.setUsername(hyperonDevUser);
 		}
 
-		List<String> paramsToPrefetch = getParametersToPrefetch();
-		hyperonEngineFactory.setParamsToPrefetch(paramsToPrefetch);
-
 		return hyperonEngineFactory;
 	}
 
 	@Bean
 	public HyperonEngine getHyperonEngine(HyperonEngineFactory hyperonEngineFactory) {
 		return hyperonEngineFactory.create();
-	}
-
-	private List<String> getParametersToPrefetch() {
-		return of(PrefetchParameters.values())
-				.map(PrefetchParameters::getCode)
-				.collect(Collectors.toList());
 	}
 
 }
