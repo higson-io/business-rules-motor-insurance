@@ -7,7 +7,7 @@ Each change in the input data on left panel (eg. Drivers age/Drivers Sex/Number 
 all coverages in 3 pricing options (Bronze/Silver/Gold).
 There is no need for **"Re-Calculate"** button as calculations are made instantly which significantly improves UX for final customer.  
 
-Hyperon.io tutorials are availble [here](http://hyperon.io/tutorials/getting-started).
+Hyperon.io tutorials are available [here](https://www.hyperon.io/docs/tutorials).
 
 ## On-line demo
 
@@ -46,7 +46,7 @@ npm install npm@latest -g
 
 http://hyperon.io/download
  
-2. download bundle, unpack it to the directory of your choice and run it as described [here](http://hyperon.io/tutorials/deploying-hyperon-studio). 
+2. download bundle, unpack it to the directory of your choice and run it as described [here](https://www.hyperon.io/tutorial/installing-hyperon-studio). 
 
 ## Setup
 
