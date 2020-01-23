@@ -44,7 +44,7 @@ npm install npm@latest -g
 
 1. Go to:
 
-http://hyperon.io/download
+https://www.hyperon.io/docs/download
  
 2. download bundle, unpack it to the directory of your choice and run it as described [here](https://www.hyperon.io/tutorial/installing-hyperon-studio). 
 
