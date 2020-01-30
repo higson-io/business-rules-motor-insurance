@@ -50,7 +50,7 @@ https://www.hyperon.io/docs/download
 
 ## Setup
 
-Make sure that both commands ```mvn``` and ```npm``` are accesible through system path. If not, add them.
+Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
 
 In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
 ```text

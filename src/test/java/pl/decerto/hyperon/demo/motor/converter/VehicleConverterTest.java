@@ -30,6 +30,7 @@ public class VehicleConverterTest {
 		//then
 		Assert.assertNotNull(result);
 		Assert.assertEquals(vehicle.getMakeId(), result.getMakeId());
+		Assert.assertEquals(vehicle.getMake(), result.getMake());
 		Assert.assertEquals(vehicle.getTypeId(), result.getTypeId());
 		Assert.assertEquals(vehicle.getModelId(), result.getModelId());
 		Assert.assertEquals(vehicle.getProductionYear(), result.getProductionYear());
@@ -38,6 +39,7 @@ public class VehicleConverterTest {
 	private Vehicle createVehicle() {
 		Vehicle vehicle = new Vehicle();
 		vehicle.setModelId(123);
+		vehicle.setMake("TOYOTA");
 		vehicle.setTypeId(213);
 		vehicle.setMakeId(321);
 		vehicle.setProductionYear(1990);

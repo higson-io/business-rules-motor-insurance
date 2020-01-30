@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import pl.decerto.hyperon.demo.motor.api.dto.UpdateMakeDto;
+import pl.decerto.hyperon.demo.motor.api.dto.VehicleDto;
 import pl.decerto.hyperon.demo.motor.converter.VehicleConverter;
 import pl.decerto.hyperon.demo.motor.domain.Vehicle;
-import pl.decerto.hyperon.demo.motor.api.dto.VehicleDto;
 import pl.decerto.hyperon.demo.motor.service.VehicleService;
 
 @RestController
@@ -39,9 +41,10 @@ public class VehicleApi {
 	}
 
 	@PutMapping("/make")
-	public void setMake(@RequestBody Integer makeId) {
+	public void setMake(@RequestBody UpdateMakeDto makeDto) {
 		Vehicle vehicle = vehicleService.getVehicle();
-		vehicle.setMakeId(makeId);
+		vehicle.setMake(makeDto.getMake());
+		vehicle.setMakeId(makeDto.getMakeId());
 		vehicle.setTypeId(0);
 		vehicle.setModelId(0);
 	}

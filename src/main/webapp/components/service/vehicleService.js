@@ -18,8 +18,9 @@
 			return $http.get('/vehicle');
 		}
 
-		function updateVehicleMake(makeId) {
-			return $http.put("/vehicle/make", makeId);
+		function updateVehicleMake(makeId, make) {
+			var data = {makeId: makeId, make: make};
+			return $http.put("/vehicle/make", data);
 		}
 
 		function updateVehicleModel(modelId) {

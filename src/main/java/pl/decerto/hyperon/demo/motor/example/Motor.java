@@ -148,6 +148,7 @@ public class Motor {
 		Vehicle vehicle = new Vehicle();
 		vehicle.setProductionYear(2010);
 		vehicle.setMakeId(217);
+		vehicle.setMake("TOYOTA");
 		vehicle.setTypeId(28654);
 		vehicle.setModelId(218915);
 
