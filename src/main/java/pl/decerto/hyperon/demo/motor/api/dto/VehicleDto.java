@@ -4,9 +4,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class VehicleDto {
 	private int makeId;
+	private String make;
 	private int modelId;
 	private int typeId;
 	private int productionYear;
+
+	public String getMake() {
+		return make;
+	}
+
+	public void setMake(String make) {
+		this.make = make;
+	}
 
 	public void setMakeId(int makeId) {
 		this.makeId = makeId;
@@ -44,6 +53,7 @@ public class VehicleDto {
 	public String toString() {
 		return new ToStringBuilder(this)
 				.append("makeId", makeId)
+				.append("make", make)
 				.append("modelId", modelId)
 				.append("typeId", typeId)
 				.append("productionYear", productionYear)

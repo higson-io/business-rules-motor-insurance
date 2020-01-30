@@ -14,6 +14,7 @@ public class VehicleConverter implements Converter<Vehicle, VehicleDto> {
 		Objects.requireNonNull(vehicle, "Vehicle can not be null.");
 		VehicleDto dto = new VehicleDto();
 		dto.setMakeId(vehicle.getMakeId());
+		dto.setMake(vehicle.getMake());
 		dto.setModelId(vehicle.getModelId());
 		dto.setTypeId(vehicle.getTypeId());
 		dto.setProductionYear(vehicle.getProductionYear());

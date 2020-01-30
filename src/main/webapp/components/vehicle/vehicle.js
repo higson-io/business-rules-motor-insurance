@@ -58,7 +58,11 @@
 			}
 
 			function updateVehicleMake() {
-				VehicleService.updateVehicleMake(ctrl.vehicle.makeId)
+				ctrl.vehicle.make = ctrl.makeDictionary.filter(function(entry) {
+					return parseInt(entry.code) === ctrl.vehicle.makeId
+				})[0].name;
+
+				VehicleService.updateVehicleMake(ctrl.vehicle.makeId, ctrl.vehicle.make)
 					.then(function () {
 						ctrl.vehicle.typeId = null;
 						ctrl.vehicle.modelId = null;
@@ -97,6 +101,7 @@
 
 			function clearDependantsVehicleFields() {
 				ctrl.vehicle.makeId = null;
+				ctrl.vehicle.make = null;
 				ctrl.vehicle.typeId = null;
 				ctrl.vehicle.modelId = null;
 			}

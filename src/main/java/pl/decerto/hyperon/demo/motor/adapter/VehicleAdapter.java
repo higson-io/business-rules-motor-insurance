@@ -16,6 +16,7 @@ public class VehicleAdapter extends Adapter {
 	protected Mapping getMapping() {
 		return new Mapping()
 			.add("makeId", vehicle.getMakeId())
+			.add("make", vehicle.getMake())
 			.add("typeId", vehicle.getTypeId())
 			.add("modelId", vehicle.getModelId())
 			.add("productionYear", vehicle.getProductionYear());
