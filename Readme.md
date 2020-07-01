@@ -71,7 +71,7 @@ mvn spring-boot:run
 ```
 
 Application will be accessible on port 48080. If you need to use other port change it in ```hyperon-demo-app.properties``` -> ```server.port```.
-URL: [http://localhost:48080/](http://localhost:48080/)
+URL: [http://localhost:48080/](http://localhost:48080/demo)
 
 ## Running with Docker
 This demo application can be run in docker container based on provided Dockerfile.
@@ -99,7 +99,7 @@ using docker-compose based on docker-compose.yml. Simply run:
 docker-compose up
 ```
 * By default Hyperon Studio will be available at: [host]:38080/hyperon/app
-* By default Demo application will be available at: [host]:48080
+* By default Demo application will be available at: [host]:48080/demo
 
 ## Executable war
 

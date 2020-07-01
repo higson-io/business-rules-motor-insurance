@@ -21,47 +21,47 @@
 		return service;
 
 		function getDriver() {
-			return $http.get("/driver");
+			return $http.get("driver");
 		}
 
 		function updateAddressZipCode(zipCode) {
-			return $http.put("/driver/address/zipCode", zipCode);
+			return $http.put("driver/address/zipCode", zipCode);
 		}
 
 		function updateAddressCity(city) {
-			return $http.put("/driver/address/city", city);
+			return $http.put("driver/address/city", city);
 		}
 
 		function updateAddressStreet(street) {
-			return $http.put("/driver/address/street", street);
+			return $http.put("driver/address/street", street);
 		}
 
 		function updateDriverBirthDate(birthDate) {
-			return $http.put("/driver/birthDate", birthDate);
+			return $http.put("driver/birthDate", birthDate);
 		}
 
 		function updateDriverFirstName(firstName) {
-			return $http.put("/driver/firstName", firstName);
+			return $http.put("driver/firstName", firstName);
 		}
 
 		function updateDriverGender(gender) {
-			return $http.put("/driver/gender", gender);
+			return $http.put("driver/gender", gender);
 		}
 
 		function updateDriverLastName(lastName) {
-			return $http.put("/driver/lastName", lastName);
+			return $http.put("driver/lastName", lastName);
 		}
 
 		function updateDriverAccidentCount(accidentCount) {
-			return $http.put("/driver/accidentCount", accidentCount);
+			return $http.put("driver/accidentCount", accidentCount);
 		}
 
 		function updateDriverTrafficTicketsCount(trafficTicketsCount) {
-			return $http.put("/driver/trafficTicketsCount", trafficTicketsCount);
+			return $http.put("driver/trafficTicketsCount", trafficTicketsCount);
 		}
 
 		function updateDriverLicenceObtainedAtAge(licenceObtainedAtAge) {
-			return $http.put("/driver/licenceObtainedAtAge", licenceObtainedAtAge);
+			return $http.put("driver/licenceObtainedAtAge", licenceObtainedAtAge);
 		}
 	}
 })();

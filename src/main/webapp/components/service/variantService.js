@@ -11,7 +11,7 @@
 		return service;
 
 		function getQuote() {
-			return $http.get("/quote");
+			return $http.get("quote");
 		}
 	}
 })();
