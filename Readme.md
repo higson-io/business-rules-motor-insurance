@@ -11,7 +11,7 @@ Hyperon.io tutorials are available [here](https://www.hyperon.io/docs/tutorials)
 
 ## On-line demo
 
-This application can be accessed on-line at: [http://motor-insurance-demo.hyperon.io/](http://motor-insurance-demo.hyperon.io/)
+This application can be accessed on-line at: [https://motor-insurance-demo.hyperon.io/](https://motor-insurance-demo.hyperon.io/)
 
 ## Prerequisites
 
