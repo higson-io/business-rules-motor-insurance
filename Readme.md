@@ -1,11 +1,18 @@
-# Hyperon Motor-Insurance Demo App
+# Business Rules for Motor Insurance / demo app
 
 This is a sample application to demonstrate capabilities of [Hyperon.io](https://hyperon.io) library (Java Business Rules Engine (BRE)/Java Pricing Engine). 
 
-The application demonstrates responsive quotations for Car/Motor Insurance based on decision tables and Rhino functions (for math calculations).
-Each change in the input data on left panel (eg. Drivers age/Drivers Sex/Number of accidents in the last 5 years) triggers recalculations for 
-all coverages in 3 pricing options (Bronze/Silver/Gold).
-There is no need for **"Re-Calculate"** button as calculations are made instantly which significantly improves UX for final customer.  
+The application demonstrates a typical sales path of insurance products, in this particular case Car/Motor insurance. The first step (left panel in this example) customer or agent provides all data required to calculate quotations. Each change in the input data on the left panel (eg. Drivers age/Drivers Sex/Number of accidents in the last 5 years) triggers recalculations for all coverages in 3 pricing options (Bronze/Silver/Gold). There is no need for the "Re-Calculate" button as calculations are made instantly which significantly improves UX for the final customer.
+
+The right panel is completely configured in Hyperon, all the rules dictating what to offer in that case and for what price. 
+It's done in different ways to show all capabilities of Hyperon. 
+
+You can see an example of making a decision based on parameters (decision tables), simple ones, and also forwarding decision to the next decision table - because this rule engine allows you to stack decision tables onto each other. 
+There are also examples of making a decision based on functions.  The Hyperon allows you to implement functions in Rhino (JavaScript) and Groovy languages. 
+Although everything in the right panel needs to be calculated after a change in the left panel, it works smoothly because of the very high performance of Hyperon. 
+All the configuration is clear and easy to understand because it is organized in the business domain. Each visible element is modeled as a business object with attributes. These attributes are rules. The sample application calls them and get's a ready decision about what to show in that particular case. After downloading this demo you should start with browsing "Domain configuration" in Hyperon and all the configuration should be clear for you within minutes. 
+
+There is a second similar demo of Hyperon built around vehicle insurance subject link it differs with data storage implementation. It uses GMO - Hyperon dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Hyperon without GMO. 
 
 Hyperon.io tutorials are available [here](https://www.hyperon.io/docs/tutorials).
 
