@@ -1,6 +1,6 @@
 # Business Rules for Motor Insurance / demo app
 
-This is a sample application to demonstrate capabilities of [Hyperon.io](https://hyperon.io) library (Java Business Rules Engine (BRE)/Java Pricing Engine). 
+This is a sample application to demonstrate capabilities of Hyperon.io library (Java [Business Rules Engine](https://www.hyperon.io/usecase/business-rules-management-system) (BRE)/Java Pricing Engine). 
 
 The application demonstrates a typical sales path of insurance products, in this particular case Car/Motor insurance. The first step (left panel in this example) customer or agent provides all data required to calculate quotations. Each change in the input data on the left panel (eg. Drivers age/Drivers Sex/Number of accidents in the last 5 years) triggers recalculations for all coverages in 3 pricing options (Bronze/Silver/Gold). There is no need for the "Re-Calculate" button as calculations are made instantly which significantly improves UX for the final customer.
 
@@ -14,7 +14,7 @@ All the configuration is clear and easy to understand because it is organized in
 
 There is a second similar demo of Hyperon built around vehicle insurance subject link it differs with data storage implementation. It uses GMO - Hyperon dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Hyperon without GMO. 
 
-Hyperon.io tutorials are available [here](https://www.hyperon.io/docs/tutorials).
+If want to learn more about how to use Hyperon, check the [Hyperon tutorials](https://www.hyperon.io/docs/tutorials).
 
 ## On-line demo
 
@@ -132,4 +132,4 @@ Configuration files are searched for properties in following order (last matchin
 
 # Feedback
 
-If you have any feedback regarding this App or Hyperon.io library do not hesitate to contact: [hyperon@decerto.pl](mailto:hyperon@decerto.pl).
+If you have any feedback regarding this App or Hyperon.io library do not hesitate to contact: [hyperon@decerto.com](mailto:hyperon@decerto.com).
