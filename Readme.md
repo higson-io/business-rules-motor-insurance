@@ -12,7 +12,7 @@ There are also examples of making a decision based on functions.  The Hyperon al
 Although everything in the right panel needs to be calculated after a change in the left panel, it works smoothly because of the very high performance of Hyperon. 
 All the configuration is clear and easy to understand because it is organized in the business domain. Each visible element is modeled as a business object with attributes. These attributes are rules. The sample application calls them and get's a ready decision about what to show in that particular case. After downloading this demo you should start with browsing "Domain configuration" in Hyperon and all the configuration should be clear for you within minutes. 
 
-There is a second similar demo of Hyperon built around vehicle insurance subject link it differs with data storage implementation. It uses GMO - Hyperon dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Hyperon without GMO. 
+There is a second similar demo of Hyperon built around vehicle insurance subject link it differs with data storage implementation. It uses Hyperon Persistance - dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Hyperon without hyperon persistance. 
 
 If want to learn more about how to use Hyperon, check the [Hyperon tutorials](https://www.hyperon.io/docs/tutorials).
 
