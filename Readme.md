@@ -81,15 +81,20 @@ Application will be accessible on port 48080. If you need to use other port chan
 URL: [http://localhost:48080/](http://localhost:48080/demo)
 
 ## Running with Docker
-This demo application can be run in docker container based on provided Dockerfile.
-For building image execute code below:
-```text
-docker build -t hyperonio/motor-demo .
-```
-Build is optional since motor-demo is available on docker hub:
+Motor-demo docker image is available on docker hub:
 ```text
 hyperonio/motor-demo:latest
 ```
+However, if you want to build this app on your own, we've provided a necessary Dockerfile.
+Before building the docker image, you need to create an executable war by using the command:
+```text
+mvn clean package -Pall_in_one
+```
+Then, to build a docker image execute the code below:
+```text
+docker build -t hyperonio/motor-demo .
+```
+
 If image is build, then application can be run in docker container like:
 ```text
 docker run -p 38080:8080 
