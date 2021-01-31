@@ -18,6 +18,18 @@ services:
       - 38080:8080
     depends_on:
       - db
+  runtime-rest:
+    container_name: runtime-rest
+    image: hyperonio/runtime-rest
+    environment:
+      - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - mpp.database.dialect=h2
+      - mpp.database.username=sa
+      - mpp.database.password=sa
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
   web:
     container_name: demo
     image: hyperonio/motor-demo:latest

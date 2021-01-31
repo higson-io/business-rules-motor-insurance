@@ -112,6 +112,7 @@ docker-compose up
 ```
 * By default Hyperon Studio will be available at: [host]:38080/hyperon/app
 * By default Demo application will be available at: [host]:48080/demo
+* By default Runtime REST will be available at: [host]:8081/api
 
 ## Executable war
 
