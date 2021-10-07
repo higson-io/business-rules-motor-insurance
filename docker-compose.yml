@@ -14,6 +14,7 @@ services:
       - mpp.database.dialect=h2
       - mpp.database.username=sa
       - mpp.database.password=sa
+      - hyperon.studio.setup.password-force-change.enabled=false
     ports:
       - 38080:8080
     depends_on:
