@@ -10,11 +10,17 @@ services:
     container_name: studio
     image: hyperonio/studio:latest
     environment:
+      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - hyperon.database.dialect=h2
+      - hyperon.database.username=sa
+      - hyperon.database.password=sa
+      - hyperon.studio.setup.password-force-change.enabled=false
+
+#     before 2.0.0
       - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - mpp.database.dialect=h2
       - mpp.database.username=sa
       - mpp.database.password=sa
-      - hyperon.studio.setup.password-force-change.enabled=false
     ports:
       - 38080:8080
     depends_on:
@@ -23,6 +29,12 @@ services:
     container_name: runtime-rest
     image: hyperonio/runtime-rest
     environment:
+      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - hyperon.database.dialect=h2
+      - hyperon.database.username=sa
+      - hyperon.database.password=sa
+
+#     before 2.0.0
       - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - mpp.database.dialect=h2
       - mpp.database.username=sa

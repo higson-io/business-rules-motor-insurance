@@ -12,7 +12,7 @@
     </appender>
 
 	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="/var/mpp.log"/>
+		<param name="file" value="/var/hyperon.log"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="trace"/>
 		<layout class="org.apache.log4j.PatternLayout">
@@ -34,7 +34,13 @@
 		<appender-ref ref="FILE" />
 	</logger>
 
+<!--	before 2.0.0 -->
 	<logger name="pl.decerto.mpp.runtime">
+		<level value="debug"/>
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="pl.decerto.hyperon.runtime">
 		<level value="debug"/>
 		<appender-ref ref="FILE" />
 	</logger>
