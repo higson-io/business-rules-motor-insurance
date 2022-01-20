@@ -33,6 +33,7 @@ services:
       - hyperon.database.dialect=h2
       - hyperon.database.username=sa
       - hyperon.database.password=sa
+      - hyperon.runtime.function.validate-arguments=true
 
 #     before 2.0.0
       - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE

@@ -13,8 +13,9 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.smartparam.engine.types.date.DateType;
+import org.smartparam.engine.types.date.LocalDateType;
 import org.smartparam.engine.types.datetime.DatetimeType;
-import org.smartparam.engine.types.integer.IntegerType;
+import org.smartparam.engine.types.datetime.LocalDateTimeType;
 import org.smartparam.engine.types.number.NumberType;
 import org.smartparam.engine.types.string.StringType;
 
@@ -28,12 +29,15 @@ import pl.decerto.hyperon.runtime.core.AdhocContext;
 import pl.decerto.hyperon.runtime.core.HyperonContext;
 import pl.decerto.hyperon.runtime.core.HyperonSubContext;
 import pl.decerto.hyperon.runtime.type.BooleanType;
+import pl.decerto.hyperon.runtime.type.IntegerType;
+import pl.decerto.hyperon.runtime.type.TypesDto;
 
 public class MotorContextTest {
 
 	@Before
 	public void before() {
-		HyperonContext.initialize(new StringType(), new NumberType(), new IntegerType(), new BooleanType(), new DateType(), new DatetimeType());
+		HyperonContext.initialize(new TypesDto(new StringType(), new NumberType(), new IntegerType(), new BooleanType(), new DateType(), new DatetimeType(),
+			new LocalDateType(), new LocalDateTimeType()));
 	}
 
 	@Test

@@ -88,6 +88,7 @@ public class HyperonIntegrationConfiguration {
 
 	@Bean
 	public HyperonEngine getHyperonEngine(HyperonEngineFactory hyperonEngineFactory) {
+		hyperonEngineFactory.setValidateFunctionArgumentsDataTypes(true);
 		return hyperonEngineFactory.create();
 	}
 
