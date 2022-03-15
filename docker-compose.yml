@@ -8,7 +8,7 @@ services:
       - 9092:9092
   studio:
     container_name: studio
-    image: hyperonio/studio:latest
+    image: hyperonio/studio:2.0.2
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - hyperon.database.dialect=h2
@@ -27,7 +27,7 @@ services:
       - db
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest
+    image: hyperonio/runtime-rest:2.0.2
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - hyperon.database.dialect=h2
