@@ -84,7 +84,7 @@ docker build -t hyperonio/motor-demo .
 
 If image is build, then application can be run in docker container like:
 ```shell
-docker run -p 38080:8080 \ 
+docker run -p 48080:8080 \ 
     -e hyperon.database.url=<jdbc_url_to_running_db> \
     -e hyperon.database.dialect=<choose> \
     -e hyperon.database.username=<db_username> \
