@@ -38,7 +38,7 @@ gulp.task('less', function() {
         .pipe(gulp.dest(paths.less_dest))
 });
 
-gulp.task('default', ['less', 'prepare:libs']);
+gulp.task('default', gulp.series('less', 'prepare:libs'));
 
 gulp.task('watch', function() {
     gulp.watch(paths.less, ['less']);

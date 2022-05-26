@@ -7,7 +7,7 @@
   ],
   "author": "Decerto",
   "dependencies": {
-    "angular": "1.8.0",
+    "angular": "1.8.3",
     "angular-loading-spinner": "0.0.3",
     "angular-spinner": "1.0.1",
     "angular-tooltips": "1.1.10",
@@ -19,11 +19,10 @@
     "spin.js": "2.3.2"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-less": "^3.3.0",
+    "gulp": "^4.0.2",
+    "gulp-less": "^4.0.1",
     "gulp-plumber": "^1.1.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.1.0"
+    "gulp-rename": "^1.2.2"
   },
 
   "scripts": {

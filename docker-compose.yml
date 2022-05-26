@@ -4,52 +4,55 @@ services:
     container_name: db
     image: hyperonio/bundle-h2-demo:latest
     ports:
-      - 8082:8082
-      - 9092:9092
+      - "8082:8082"
+      - "9092:9092"
+    networks:
+      - hyperon-net
+
   studio:
     container_name: studio
-    image: hyperonio/studio:2.0.2
+    image: hyperonio/studio:2.1.3
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - hyperon.database.dialect=h2
       - hyperon.database.username=sa
       - hyperon.database.password=sa
       - hyperon.studio.setup.password-force-change.enabled=false
-
-#     before 2.0.0
-      - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
-      - mpp.database.dialect=h2
-      - mpp.database.username=sa
-      - mpp.database.password=sa
     ports:
-      - 38080:8080
+      - "38080:8080"
     depends_on:
       - db
+    networks:
+      - hyperon-net
+
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest:2.0.2
+    image: hyperonio/runtime-rest:2.1.3
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
       - hyperon.database.dialect=h2
       - hyperon.database.username=sa
       - hyperon.database.password=sa
       - hyperon.runtime.function.validate-arguments=true
-
-#     before 2.0.0
-      - mpp.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
-      - mpp.database.dialect=h2
-      - mpp.database.username=sa
-      - mpp.database.password=sa
     ports:
-      - 8081:8081
+      - "8081:8081"
     depends_on:
       - db
+    networks:
+      - hyperon-net
+
   web:
     container_name: demo
     image: hyperonio/motor-demo:latest
     environment:
       - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
     ports:
-      - 48080:48080
+      - "48080:48080"
     depends_on:
       - db
+    networks:
+      - hyperon-net
+
+networks:
+  hyperon-net:
+    driver: bridge

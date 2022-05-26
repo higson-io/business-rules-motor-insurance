@@ -1,6 +1,5 @@
-FROM openjdk:8-jdk
-MAINTAINER Maciej Główka <maciej.glowka@decerto.pl>
-MAINTAINER Piotr Marciniak <piotr.marciniak@decerto.pl>
+FROM openjdk:11-slim
+MAINTAINER Marcin Michalak <marcin.michalak@decerto.pl>
 
 ENV JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=root/conf/log4j2.xml"
 

@@ -24,9 +24,9 @@ This application can be accessed on-line at: [https://motor-insurance-demo.hyper
 
 Make sure you have at least:
 
-#### Java 1.8
+### Java 11
 
-#### Maven 3.3 
+### Maven 
 
 To install go to:
 
@@ -34,12 +34,10 @@ https://maven.apache.org/download.cgi
 
 Previous Maven versions might work as well but this was not checked. 
 
-#### NodeJS 4.4.1
+#### NodeJS 
 
 To install go to:
-
 1. [Windows or Mac OS](https://nodejs.org/en/download/current/)
-
 2. [Linux](https://github.com/nodesource/distributions)
 
 To update:
@@ -47,106 +45,81 @@ To update:
 npm install npm@latest -g
 ```
 
-#### Hyperon Studio 1.5.22
-
-1. Go to:
-
-https://www.hyperon.io/docs/download
- 
+#### Hyperon Studio 2.1.3
+1. Go to:  https://www.hyperon.io/docs/download
 2. download bundle, unpack it to the directory of your choice and run it as described [here](https://www.hyperon.io/tutorial/installing-hyperon-studio). 
 
 ## Setup
-
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
-
 In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
-```text
+```properties
 hyperon.database.url=jdbc:h2:/srv/hyperon-studio-1.6.50/database/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
 ```
 or on Windows
-```text
+```properties
 hyperon.database.url=jdbc:h2:c:/hyperon-studio-1.6.50/database/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
 ```
 
 ## Running
-
 Execute below maven command to run Spring Boot.
-
-```text
+```shell
 mvn clean package
 mvn spring-boot:run
 ```
-
-Application will be accessible on port 48080. If you need to use other port change it in ```hyperon-demo-app.properties``` -> ```server.port```.
+Application will be accessible on port 48080. If you need to use other port change it in `hyperon-demo-app.properties` -> `server.port`.
 URL: [http://localhost:48080/](http://localhost:48080/demo)
 
 ## Running with Docker
-Motor-demo docker image is available on docker hub:
-```text
-hyperonio/motor-demo:latest
-```
-However, if you want to build this app on your own, we've provided a necessary Dockerfile.
-Before building the docker image, you need to create an executable war by using the command:
-```text
+Assuming you have docker and docker compose installed, motor-demo docker image is available on a [dockerhub](https://hub.docker.
+com/r/hyperonio/motor-demo) as `hyperonio/motor-demo:latest`.   
+However, if you want to build this app on your own, we've provided a necessary [Dockerfile](./Dockerfile).
+Before building the docker image, you need to build the app using the command:
+```shell
 mvn clean package -Pall_in_one
 ```
 Then, to build a docker image execute the code below:
-```text
+```shell
 docker build -t hyperonio/motor-demo .
 ```
 
 If image is build, then application can be run in docker container like:
-* since version 2.0.0
-```text
-docker run -p 38080:8080 
-    -e hyperon.database.url=<jdbc_url_to_running_db>
-    -e hyperon.database.dialect=<choose>
-    -e hyperon.database.username=<db_username>
-    -e hyperon.database.password=<db_password>
-    -e hyperon.studio.instance-name=hyperon_docker
+```shell
+docker run -p 38080:8080 \ 
+    -e hyperon.database.url=<jdbc_url_to_running_db> \
+    -e hyperon.database.dialect=<choose> \
+    -e hyperon.database.username=<db_username> \
+    -e hyperon.database.password=<db_password> \
+    -e hyperon.studio.instance-name=hyperon_docker \
     hyperonio/motor-demo
 ```
-* before version 2.0.0
-```text
-docker run -p 38080:8080 
-    -e mpp.database.url=<jdbc_url_to_running_db>
-    -e mpp.database.dialect=<choose>
-    -e mpp.database.username=<db_username>
-    -e mpp.database.password=<db_password>
-    -e mpp.environment.id=hyperon_docker
-    hyperonio/motor-demo
-```
+
 OR application can be run with bundle-h2-demo and hyperon-studio images
-using docker-compose based on docker-compose.yml. Simply run:
-```text
-docker-compose up
+using docker-compose based on [docker-compose.yml](./docker-compose.yml). Simply run:
+```shell
+docker-compose up   
+# or (regarding to docker version)
+docker compose up
 ```
 * By default Hyperon Studio will be available at: [host]:38080/hyperon/app
 * By default Demo application will be available at: [host]:48080/demo
-* By default Runtime REST will be available at: [host]:8081/api
+* By default Runtime REST will be available at: [host]:8081/api ([host]:8081/swagger-ui.html)
 
 ## Executable war
-
 Enable maven profile "all_in_one" to build fully executable war archive, eg.
-
-```text
+```shell
 mvn clean package -Pall_in_one
 ```
-
 The resulting war archive can be executed from shell:
-
-```text
+```shell
 ./target/motor-insurance-1.0-SNAPSHOT.war
 ```
 For more details about Spring Boot executables refer to 
 [https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html](https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html)
 
 ## Configuration files locations 
-
 Configuration files are searched for properties in following order (last matching overrides):
 1. classpath:hyperon-demo-app.properties 
 2. file:${user.home}/conf/hyperon-demo-app.properties
 
 # Feedback
-
 If you have any feedback regarding this App or Hyperon.io library do not hesitate to contact: [hyperon@decerto.com](mailto:hyperon@decerto.com).
