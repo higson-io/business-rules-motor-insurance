@@ -53,11 +53,11 @@ npm install npm@latest -g
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
 In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
 ```properties
-hyperon.database.url=jdbc:h2:/srv/hyperon-studio-1.6.50/database/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+hyperon.database.url=jdbc:h2:/srv/hyperon-studio-1.6.50/database/hyperon.demo
 ```
 or on Windows
 ```properties
-hyperon.database.url=jdbc:h2:c:/hyperon-studio-1.6.50/database/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+hyperon.database.url=jdbc:h2:c:/hyperon-studio-1.6.50/database/hyperon.demo
 ```
 
 ## Running
@@ -92,9 +92,9 @@ docker run -p 48080:48080 \
     -e hyperon.studio.instance-name=hyperon_docker \
     hyperonio/motor-demo
 ```
-
-OR application can be run with bundle-h2-demo and hyperon-studio images
-using docker-compose based on [docker-compose.yml](./docker-compose.yml). Simply run:
+## Running with Docker compose
+Application can be run with bundle-h2-demo and hyperon-studio images using docker-compose based on [docker-compose.yml](./docker-compose.
+yml)
 ```shell
 docker-compose up   
 # or (regarding to docker version)
