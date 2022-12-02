@@ -2,7 +2,7 @@ version: "3.7"
 services:
   db:
     container_name: db
-    image: hyperonio/bundle-h2-demo:latest
+    image: hyperonio/bundle-h2-demo:2.0.2
     ports:
       - "8082:8082"
       - "9092:9092"
@@ -11,9 +11,9 @@ services:
 
   studio:
     container_name: studio
-    image: hyperonio/studio:2.1.3
+    image: hyperonio/studio:2.2.2
     environment:
-      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo
       - hyperon.database.dialect=h2
       - hyperon.database.username=sa
       - hyperon.database.password=sa
@@ -27,9 +27,9 @@ services:
 
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest:2.1.3
+    image: hyperonio/runtime-rest:2.2.2
     environment:
-      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo
       - hyperon.database.dialect=h2
       - hyperon.database.username=sa
       - hyperon.database.password=sa
@@ -45,7 +45,7 @@ services:
     container_name: demo
     image: hyperonio/motor-demo:latest
     environment:
-      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;AUTO_SERVER=TRUE;MVCC=TRUE;IFEXISTS=TRUE
+      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo
     ports:
       - "48080:48080"
     depends_on:
