@@ -45,7 +45,7 @@ services:
     container_name: demo
     image: hyperonio/motor-demo:latest
     environment:
-      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo
     ports:
       - "48080:48080"
     depends_on:
