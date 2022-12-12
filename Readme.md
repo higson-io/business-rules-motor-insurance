@@ -53,11 +53,11 @@ npm install npm@latest -g
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
 In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
 ```properties
-hyperon.database.url=jdbc:h2:/hyperon-studio/database/hyperon.demo
+hyperon.database.url=jdbc:h2:/hyperon-studio/database/hyperon.demo;NON_KEYWORDS=VALUE
 ```
 or on Windows
 ```properties
-hyperon.database.url=jdbc:h2:c:/hyperon-studio/database/hyperon.demo
+hyperon.database.url=jdbc:h2:c:/hyperon-studio/database/hyperon.demo;NON_KEYWORDS=VALUE
 ```
 
 ## Running
