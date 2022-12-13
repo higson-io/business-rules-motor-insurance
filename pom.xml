@@ -70,6 +70,7 @@
 
 
     <build>
+        <finalName>motor-insurance</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

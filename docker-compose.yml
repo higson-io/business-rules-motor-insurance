@@ -2,7 +2,7 @@ version: "3.7"
 services:
   db:
     container_name: db
-    image: hyperonio/bundle-h2-demo:2.0.2
+    image: hyperonio/bundle-h2-demo:2.0.3
     ports:
       - "8082:8082"
       - "9092:9092"
