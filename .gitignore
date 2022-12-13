@@ -1,5 +1,10 @@
 target
 .idea
+.classpath
+.vim
+.project
+.DS_Store
+.settings/
 node_modules/
 src/main/webapp/vendors/
 *.iml
