@@ -1,4 +1,4 @@
-!#/usr/bin/env bash
+#!/usr/bin/env bash
 
 IMAGE_NAME=hyperonio/motor-demo
 VERSION=2.0
