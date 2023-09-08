@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: studio
-    image: hyperonio/studio:2.2.3
+    image: hyperonio/studio:2.3.0
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
       - hyperon.database.dialect=h2
@@ -27,7 +27,7 @@ services:
 
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest:2.2.3
+    image: hyperonio/runtime-rest:2.3.0
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
       - hyperon.database.dialect=h2

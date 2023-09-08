@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-IMAGE_NAME=hyperonio/motor-demo
-VERSION=2.0
+IMAGE_NAME=decerto/business-rules-motor-insurance-hyperon-demo-application
+VERSION=4.0.0
 
 USER=$1
 PASS=$2
