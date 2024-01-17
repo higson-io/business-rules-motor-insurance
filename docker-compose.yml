@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: studio
-    image: hyperonio/studio:2.3.0
+    image: hyperonio/studio:2.3.2
     environment:
       - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
       - hyperon.database.dialect=h2
@@ -27,12 +27,12 @@ services:
 
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest:2.3.0
+    image: decerto/higson-runtime-rest:4.0.0
     environment:
-      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
-      - hyperon.database.dialect=h2
-      - hyperon.database.username=sa
-      - hyperon.database.password=sa
+      - higson.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - higson.database.dialect=h2
+      - higson.database.username=sa
+      - higson.database.password=sa
       - hyperon.runtime.function.validate-arguments=true
     ports:
       - "8081:8081"
