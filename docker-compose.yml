@@ -11,15 +11,15 @@ services:
 
   studio:
     container_name: studio
-    image: hyperonio/studio:2.3.0
+    image: decerto/higson-studio:4.0.1
     environment:
-      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
-      - hyperon.database.dialect=h2
-      - hyperon.database.username=sa
-      - hyperon.database.password=sa
-      - hyperon.studio.setup.password-force-change.enabled=false
+      - HIGSON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - HIGSON_DATABASE_DIALECT=h2
+      - HIGSON_DATABASE_USERNAME=sa
+      - HIGSON_DATABASE_PASSWORD=sa
+      - HIGSON_STUDIO_SETUP_PASSWORD_FORCE_CHANGE_ENABLED=false
     ports:
-      - "38080:8080"
+      - "38080:38080"
     depends_on:
       - db
     networks:
@@ -27,12 +27,12 @@ services:
 
   runtime-rest:
     container_name: runtime-rest
-    image: hyperonio/runtime-rest:2.3.0
+    image: decerto/higson-runtime-rest:4.0.1
     environment:
-      - hyperon.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
-      - hyperon.database.dialect=h2
-      - hyperon.database.username=sa
-      - hyperon.database.password=sa
+      - higson.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - higson.database.dialect=h2
+      - higson.database.username=sa
+      - higson.database.password=sa
       - hyperon.runtime.function.validate-arguments=true
     ports:
       - "8081:8081"

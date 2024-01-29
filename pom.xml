@@ -26,11 +26,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Hyperon Runtime Component -->
+		<!-- Higson Runtime Component -->
 		<dependency>
-			<groupId>pl.decerto</groupId>
-			<artifactId>hyperon-runtime</artifactId>
-			<version>2.3.0</version>
+			<groupId>io.higson</groupId>
+			<artifactId>higson-runtime</artifactId>
+			<version>4.0.1</version>
 		</dependency>
 
 		<!-- Spring Framework -->
