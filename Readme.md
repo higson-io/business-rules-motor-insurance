@@ -1,30 +1,26 @@
 # Business Rules for Motor Insurance / demo app
 
-This is a sample application to demonstrate capabilities of Hyperon.io library (Java [Business Rules Engine](https://www.hyperon.io/usecase/business-rules-management-system) (BRE)/Java Pricing Engine). 
+This is a sample application to demonstrate capabilities of Higson.io library (Java [Business Rules Engine](https://www.higson.io/usecase/business-rules-management-system) (BRE)/Java Pricing Engine). 
 
 The application demonstrates a typical sales path of insurance products, in this particular case Car/Motor insurance. The first step (left panel in this example) customer or agent provides all data required to calculate quotations. Each change in the input data on the left panel (eg. Drivers age/Drivers Sex/Number of accidents in the last 5 years) triggers recalculations for all coverages in 3 pricing options (Bronze/Silver/Gold). There is no need for the "Re-Calculate" button as calculations are made instantly which significantly improves UX for the final customer.
 
-The right panel is completely configured in Hyperon, all the rules dictating what to offer in that case and for what price. 
-It's done in different ways to show all capabilities of Hyperon. 
+The right panel is completely configured in Higson, all the rules dictating what to offer in that case and for what price. 
+It's done in different ways to show all capabilities of Higson. 
 
 You can see an example of making a decision based on parameters (decision tables), simple ones, and also forwarding decision to the next decision table - because this rule engine allows you to stack decision tables onto each other. 
-There are also examples of making a decision based on functions.  The Hyperon allows you to implement functions in Rhino (JavaScript) and Groovy languages. 
-Although everything in the right panel needs to be calculated after a change in the left panel, it works smoothly because of the very high performance of Hyperon. 
-All the configuration is clear and easy to understand because it is organized in the business domain. Each visible element is modeled as a business object with attributes. These attributes are rules. The sample application calls them and get's a ready decision about what to show in that particular case. After downloading this demo you should start with browsing "Domain configuration" in Hyperon and all the configuration should be clear for you within minutes. 
+There are also examples of making a decision based on functions.  The Higson allows you to implement functions in Rhino (JavaScript) and Groovy languages. 
+Although everything in the right panel needs to be calculated after a change in the left panel, it works smoothly because of the very high performance of Higson. 
+All the configuration is clear and easy to understand because it is organized in the business domain. Each visible element is modeled as a business object with attributes. These attributes are rules. The sample application calls them and get's a ready decision about what to show in that particular case. After downloading this demo you should start with browsing "Domain configuration" in Higson and all the configuration should be clear for you within minutes. 
 
-There is a second similar demo of Hyperon built around vehicle insurance subject link it differs with data storage implementation. It uses Hyperon Persistance - dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Hyperon without hyperon persistance. 
+There is a second similar demo of Higson built around vehicle insurance subject link it differs with data storage implementation. It uses Higson Persistance - dynamic data model. It's another layer of flexibility you can add to your Java application but it is completely optional as you can see in this example and you can use Higson without higson persistance. 
 
-If want to learn more about how to use Hyperon, check the [Hyperon tutorials](https://www.hyperon.io/docs/tutorials).
-
-## On-line demo
-
-This application can be accessed on-line at: [https://motor-insurance-demo.hyperon.io/](https://motor-insurance-demo.hyperon.io/)
+If want to learn more about how to use Higson, check the [Higson documentation](https://www.higson.io/docs/start-documentation).
 
 ## Prerequisites
 
 Make sure you have at least:
 
-### Java 11
+### Java 17
 
 ### Maven 
 
@@ -45,19 +41,19 @@ To update:
 npm install npm@latest -g
 ```
 
-#### Hyperon Studio 2.2.2
-1. Go to:  https://www.hyperon.io/docs/download
-2. download bundle, unpack it to the directory of your choice and run it as described [here](https://www.hyperon.io/tutorial/installing-hyperon-studio). 
+#### Higson Studio 4.0.2
+1. Go to:  https://www.higson.io/docs/download
+2. download zip, unpack it to the directory of your choice and run it as described [here](https://www.higson.io/docs/start-documentation). 
 
 ## Setup
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
-In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Hyperon Studio H2 database file, e.g.:
+In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Higson Studio H2 database file, e.g.:
 ```properties
-hyperon.database.url=jdbc:h2:/hyperon-studio/database/hyperon.demo;NON_KEYWORDS=VALUE
+hyperon.database.url=jdbc:h2:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
 ```
 or on Windows
 ```properties
-hyperon.database.url=jdbc:h2:c:/hyperon-studio/database/hyperon.demo;NON_KEYWORDS=VALUE
+hyperon.database.url=jdbc:h2:c:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
 ```
 
 ## Running
@@ -89,18 +85,18 @@ docker run -p 48080:48080 \
     -e hyperon.database.dialect=<choose> \
     -e hyperon.database.username=<db_username> \
     -e hyperon.database.password=<db_password> \
-    -e hyperon.studio.instance-name=hyperon_docker \
+    -e hyperon.studio.instance-name=higson_docker \
     hyperonio/motor-demo
 ```
 ## Running with Docker compose
-Application can be run with bundle-h2-demo and hyperon-studio images using docker-compose based on [docker-compose.yml](./docker-compose.
+Application can be run with bundle-h2-demo and higson-studio images using docker-compose based on [docker-compose.yml](./docker-compose.
 yml)
 ```shell
 docker-compose up   
 # or (regarding to docker version)
 docker compose up
 ```
-* By default Hyperon Studio will be available at: [host]:38080/higson/app
+* By default Higson Studio will be available at: [host]:38080/higson/app
 * By default Demo application will be available at: [host]:48080/demo
 * By default Runtime REST will be available at: [host]:8081/api ([host]:8081/swagger-ui.html)
 
@@ -122,4 +118,4 @@ Configuration files are searched for properties in following order (last matchin
 2. file:${user.home}/conf/hyperon-demo-app.properties
 
 # Feedback
-If you have any feedback regarding this App or Hyperon.io library do not hesitate to contact: [hyperon@decerto.com](mailto:hyperon@decerto.com).
+If you have any feedback regarding this App or Higson.io library do not hesitate to contact: [higson@decerto.com](mailto:higson@decerto.com).
