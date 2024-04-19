@@ -1,9 +1,9 @@
 {
-  "name": "hyperon-motor-insurance-demo-app",
+  "name": "higson-motor-insurance-demo-app",
   "version": "0.0.1",
-  "description": "Hyperon Motor Insurance Demo App",
+  "description": "Higson Motor Insurance Demo App",
   "keywords": [
-    "Hyperon"
+    "Higson"
   ],
   "author": "Decerto",
   "dependencies": {

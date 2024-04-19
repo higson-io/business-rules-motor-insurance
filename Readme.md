@@ -47,13 +47,13 @@ npm install npm@latest -g
 
 ## Setup
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
-In file ```hyperon-demo-app.properties``` set ```hyperon.database.url``` to point Higson Studio H2 database file, e.g.:
+In file ```higson-demo-app.properties``` set ```higson.database.url``` to point Higson Studio H2 database file, e.g.:
 ```properties
-hyperon.database.url=jdbc:h2:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
+higson.database.url=jdbc:h2:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
 ```
 or on Windows
 ```properties
-hyperon.database.url=jdbc:h2:c:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
+higson.database.url=jdbc:h2:c:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
 ```
 
 ## Running
@@ -62,12 +62,11 @@ Execute below maven command to run Spring Boot.
 mvn clean package
 mvn spring-boot:run
 ```
-Application will be accessible on port 48080. If you need to use other port change it in `hyperon-demo-app.properties` -> `server.port`.
+Application will be accessible on port 48080. If you need to use other port change it in `higson-demo-app.properties` -> `server.port`.
 URL: [http://localhost:48080/](http://localhost:48080/demo)
 
 ## Running with Docker
-Assuming you have docker and docker compose installed, motor-demo docker image is available on a [dockerhub](https://hub.docker.
-com/r/hyperonio/motor-demo) as `hyperonio/motor-demo:latest`.   
+Assuming you have docker and docker compose installed, motor-demo docker image is available on a [dockerhub](https://hub.docker.com/r/decerto/higson-motor-insurance-demo) as `decerto/higson-motor-insurance-demo:latest`.   
 However, if you want to build this app on your own, we've provided a necessary [Dockerfile](./Dockerfile).
 Before building the docker image, you need to build the app using the command:
 ```shell
@@ -75,18 +74,18 @@ mvn clean package -Pall_in_one
 ```
 Then, to build a docker image execute the code below:
 ```shell
-docker build -t hyperonio/motor-demo .
+docker build -t decerto/higson-motor-insurance-demo .
 ```
 
 If image is build, then application can be run in docker container like:
 ```shell
 docker run -p 48080:48080 \ 
-    -e hyperon.database.url=<jdbc_url_to_running_db> \
-    -e hyperon.database.dialect=<choose> \
-    -e hyperon.database.username=<db_username> \
-    -e hyperon.database.password=<db_password> \
-    -e hyperon.studio.instance-name=higson_docker \
-    hyperonio/motor-demo
+    -e higson.database.url=<jdbc_url_to_running_db> \
+    -e higson.database.dialect=<choose> \
+    -e higson.database.username=<db_username> \
+    -e higson.database.password=<db_password> \
+    -e higson.studio.instance-name=higson_docker \
+    decerto/higson-motor-insurance-demo
 ```
 ## Running with Docker compose
 Application can be run with bundle-h2-demo and higson-studio images using docker-compose based on [docker-compose.yml](./docker-compose.
@@ -114,8 +113,8 @@ For more details about Spring Boot executables refer to
 
 ## Configuration files locations 
 Configuration files are searched for properties in following order (last matching overrides):
-1. classpath:hyperon-demo-app.properties 
-2. file:${user.home}/conf/hyperon-demo-app.properties
+1. classpath:higson-demo-app.properties 
+2. file:${user.home}/conf/higson-demo-app.properties
 
 # Feedback
 If you have any feedback regarding this App or Higson.io library do not hesitate to contact: [higson@decerto.com](mailto:higson@decerto.com).

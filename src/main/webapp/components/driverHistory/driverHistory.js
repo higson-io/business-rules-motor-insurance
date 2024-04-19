@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').directive('driverHistory', driverHistory);
+	angular.module('higsonDemoApp').directive('driverHistory', driverHistory);
 
 	function driverHistory() {
 		var directive = {

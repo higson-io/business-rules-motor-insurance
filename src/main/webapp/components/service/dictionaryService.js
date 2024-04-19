@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').factory('DictionaryService', DictionaryService);
+	angular.module('higsonDemoApp').factory('DictionaryService', DictionaryService);
 
 	function DictionaryService($http) {
 		var service = {

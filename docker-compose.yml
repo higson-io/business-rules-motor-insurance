@@ -2,18 +2,18 @@ version: "3.7"
 services:
   db:
     container_name: db
-    image: hyperonio/bundle-h2-demo:2.0.3
+    image: decerto/higson-demo-database:4.0.0
     ports:
       - "8082:8082"
       - "9092:9092"
     networks:
-      - hyperon-net
+      - higson-net
 
   studio:
     container_name: studio
-    image: decerto/higson-studio:4.0.1
+    image: decerto/higson-studio:4.0.2
     environment:
-      - HIGSON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - HIGSON_DATABASE_URL=jdbc:h2:tcp://db/higson.demo;NON_KEYWORDS=VALUE
       - HIGSON_DATABASE_DIALECT=h2
       - HIGSON_DATABASE_USERNAME=sa
       - HIGSON_DATABASE_PASSWORD=sa
@@ -23,36 +23,36 @@ services:
     depends_on:
       - db
     networks:
-      - hyperon-net
+      - higson-net
 
   runtime-rest:
     container_name: runtime-rest
-    image: decerto/higson-runtime-rest:4.0.1
+    image: decerto/higson-runtime-rest:4.0.2
     environment:
-      - higson.database.url=jdbc:h2:tcp://db/hyperon.demo;NON_KEYWORDS=VALUE
+      - higson.database.url=jdbc:h2:tcp://db/higson.demo;NON_KEYWORDS=VALUE
       - higson.database.dialect=h2
       - higson.database.username=sa
       - higson.database.password=sa
-      - hyperon.runtime.function.validate-arguments=true
+      - higson.runtime.function.validate-arguments=true
     ports:
       - "8081:8081"
     depends_on:
       - db
     networks:
-      - hyperon-net
+      - higson-net
 
   web:
     container_name: demo
-    image: hyperonio/motor-demo:latest
+    image: decerto/higson-motor-insurance-demo:latest
     environment:
-      - HYPERON_DATABASE_URL=jdbc:h2:tcp://db/hyperon.demo
+      - HIGSON_DATABASE_URL=jdbc:h2:tcp://db/higson.demo
     ports:
       - "48080:48080"
     depends_on:
       - db
     networks:
-      - hyperon-net
+      - higson-net
 
 networks:
-  hyperon-net:
+  higson-net:
     driver: bridge

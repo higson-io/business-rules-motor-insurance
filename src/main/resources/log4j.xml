@@ -12,7 +12,7 @@
     </appender>
 
 	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="/var/hyperon.log"/>
+		<param name="file" value="/var/higson.log"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="trace"/>
 		<layout class="org.apache.log4j.PatternLayout">
@@ -40,7 +40,7 @@
 		<appender-ref ref="FILE" />
 	</logger>
 
-	<logger name="pl.decerto.hyperon.runtime">
+	<logger name="io.higson.runtime">
 		<level value="debug"/>
 		<appender-ref ref="FILE" />
 	</logger>

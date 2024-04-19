@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').directive('coverage', coverage);
+	angular.module('higsonDemoApp').directive('coverage', coverage);
 
 	function coverage() {
 		var directive = {

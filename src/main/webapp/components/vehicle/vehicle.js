@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').directive('vehicle', vehicle);
+	angular.module('higsonDemoApp').directive('vehicle', vehicle);
 
 	function vehicle() {
 		var directive = {
