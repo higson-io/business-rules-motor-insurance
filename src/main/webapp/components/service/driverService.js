@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').factory('DriverService', DriverService);
+	angular.module('higsonDemoApp').factory('DriverService', DriverService);
 
 	function DriverService($http) {
 		var service = {

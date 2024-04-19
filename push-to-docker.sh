@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-IMAGE_NAME=decerto/business-rules-motor-insurance-hyperon-demo-application
+IMAGE_NAME=decerto/higson-motor-insurance-demo
 VERSION=4.0.0
 
 USER=$1

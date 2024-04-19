@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').factory('VehicleService', VehicleService);
+	angular.module('higsonDemoApp').factory('VehicleService', VehicleService);
 
 	function VehicleService($http) {
 		var service = {

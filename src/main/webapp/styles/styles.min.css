@@ -2566,7 +2566,7 @@ body {
 .sidebar-container--hidden .sidebar-container__divider {
   opacity: 0;
 }
-.sidebar-container--hidden .sidebar-container__header__hyperon-hamburger {
+.sidebar-container--hidden .sidebar-container__header__higson-hamburger {
   margin-left: 12px;
 }
 .sidebar-container__widget,
@@ -2578,7 +2578,7 @@ body {
   box-shadow: 0 3px 2px 0 rgba(0, 0, 0, 0.25);
   padding: 20px 15px 15px 15px;
 }
-.sidebar-container__header__hyperon-logo {
+.sidebar-container__header__higson-logo {
   background: url('../imgs/logo-insurance-app.svg');
   background-size: 206px 38px;
   width: 206px;
@@ -2586,7 +2586,7 @@ body {
   background-repeat: no-repeat;
   display: inline-block;
 }
-.sidebar-container__header__hyperon-hamburger {
+.sidebar-container__header__higson-hamburger {
   cursor: pointer;
   color: #1b8ccc;
   float: right;

@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').directive('discount', discount);
+	angular.module('higsonDemoApp').directive('discount', discount);
 
 	function discount() {
 		var directive = {

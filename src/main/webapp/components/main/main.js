@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	angular.module('hyperonDemoApp').directive('main', main);
+	angular.module('higsonDemoApp').directive('main', main);
 
 	function main() {
 		var directive = {
