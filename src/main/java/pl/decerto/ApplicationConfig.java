@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @Import(HigsonIntegrationConfiguration.class)
-@ComponentScan({"io.higson.runtime.demo.motor"})
+@ComponentScan({"pl.decerto.higson.demo.motor"})
 @EnableAutoConfiguration
 public class ApplicationConfig implements WebMvcConfigurer {
 
