@@ -7,6 +7,10 @@ COPY ./target/motor-insurance.war /app/motor-insurance.war
 COPY ./docker/app.properties /root/conf/higson-demo-app.properties
 COPY ./src/main/resources/log4j.xml /root/conf/log4j.xml
 
+RUN chmod 777 /app/motor-insurance.war \
+    && chmod 777 /root/conf/higson-demo-app.properties \
+    && chmod 777 /root/conf/log4j.xml
+
 EXPOSE 48080
 
 WORKDIR /app
