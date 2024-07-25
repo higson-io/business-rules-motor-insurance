@@ -15,4 +15,4 @@ EXPOSE 48080
 
 WORKDIR /app
 
-CMD ./motor-insurance.war
+CMD ["/bin/sh",  "-c",  "motor-insurance.war"]
