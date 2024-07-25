@@ -1,4 +1,4 @@
-FROM openjdk:11-slim
+FROM openjdk:17-slim-buster
 MAINTAINER Marcin Michalak <marcin.michalak@decerto.pl>
 
 ENV JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=root/conf/log4j2.xml"
