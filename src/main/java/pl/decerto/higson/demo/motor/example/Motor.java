@@ -1,5 +1,15 @@
 package pl.decerto.higson.demo.motor.example;
 
+import io.higson.runtime.core.HigsonContext;
+import io.higson.runtime.core.HigsonEngine;
+import io.higson.runtime.model.DomainAttribute;
+import io.higson.runtime.model.DomainObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pl.decerto.higson.demo.motor.context.MotorContext;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -8,23 +18,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import pl.decerto.higson.demo.motor.domain.Discount;
 import pl.decerto.higson.demo.motor.domain.Driver;
 import pl.decerto.higson.demo.motor.domain.Quote;
-import pl.decerto.higson.demo.motor.context.MotorContext;
 import pl.decerto.higson.demo.motor.domain.Address;
 import pl.decerto.higson.demo.motor.domain.Coverage;
 import pl.decerto.higson.demo.motor.domain.Option;
 import pl.decerto.higson.demo.motor.domain.Vehicle;
-import io.higson.runtime.core.HigsonContext;
-import io.higson.runtime.core.HigsonEngine;
-import io.higson.runtime.model.DomainAttribute;
-import io.higson.runtime.model.DomainObject;
 
 @Component
 public class Motor {
@@ -84,7 +84,7 @@ public class Motor {
 		// for each option and each coverage
 		for (Option option : quote.getOptions()) {
 
-			rebuildCoverages(plan.getChildren("COVERAGES"), option);
+			rebuildCoverages(plan.getChildren("COVERAGES"), option, quote.getVehicle());
 			// calculate premium for each coverage
 			for (Coverage coverage : option.getCoverages()) {
 
@@ -136,44 +136,34 @@ public class Motor {
 	private Quote buildQuote(DomainObject plan, List<DomainObject> options, List<DomainObject> coverages) {
 
 		// sample driver's data
-		Address adr = new Address("Lake Jackson", "Allwood St", "77566");
-		Driver driver = new Driver()
-			.setFirstName("John")
-			.setLastName("Potter")
-			.setGender("M")
-			.setDateOfBirth(Date.from(LocalDate.now().minusYears(40).atStartOfDay(ZoneId.systemDefault()).toInstant()))
-			.setLicenceObtainedAtAge(18)
-			.setAddress(adr);
+		Address adr = createAddress();
+		Driver driver = createDriver(adr);
+		Vehicle vehicle = createVehicle();
+		Quote quote = new Quote(plan.getCode(), driver);
+		quote.setVehicle(vehicle);
 
+		for (DomainObject o : options) {
+			Option option = new Option(o.getCode(), o.getAttr("ORDER").intValue(new HigsonContext()));
+			quote.addOption(option);
+
+			rebuildCoverages(coverages, option, vehicle);
+		}
+		return quote;
+	}
+
+	private static Vehicle createVehicle() {
 		Vehicle vehicle = new Vehicle();
 		vehicle.setProductionYear(2010);
 		vehicle.setMakeId(217);
 		vehicle.setMake("TOYOTA");
 		vehicle.setTypeId(28654);
 		vehicle.setModelId(218915);
-
-		Quote q = new Quote(plan.getCode(), driver);
-		q.setVehicle(vehicle);
-
-
-		for (DomainObject o : options) {
-
-			Option option = new Option(o.getCode(), o.getAttr("ORDER").intValue(new HigsonContext()));
-			q.addOption(option);
-
-			rebuildCoverages(coverages, option);
-		}
-		return q;
+		return vehicle;
 	}
 
-	private void rebuildCoverages(List<DomainObject> coverages, Option option) {
+	private void rebuildCoverages(List<DomainObject> coverages, Option option, Vehicle vehicle) {
 		for (DomainObject c : coverages) {
-
-			HigsonContext ctx = new HigsonContext(
-				"option.code", option.getCode(),
-				"coverage.code", c.getCode()
-			);
-
+			HigsonContext ctx = getHigsonContext(option, vehicle, c);
 			// get IS_AVAILABLE attribute's value
 			boolean isAvailable = c.getAttrBoolean("IS_AVAILABLE", ctx);
 
@@ -205,10 +195,33 @@ public class Motor {
 		option.getCoverages().sort(Comparator.comparingInt(Coverage::getPosition));
 	}
 
+	private static HigsonContext getHigsonContext(Option option, Vehicle vehicle, DomainObject coverage) {
+		return new HigsonContext(
+				"option.code", option.getCode(),
+				"coverage.code", coverage.getCode(),
+				"vehicle.make", vehicle.getMake(),
+				"vehicle.makeId", vehicle.getMakeId()
+		);
+	}
+
 	private void setCoverData(DomainObject domainDataCover, Coverage cover, HigsonContext ctx) {
 		cover.setName(domainDataCover.getName());
 		cover.setPosition(domainDataCover.getAttr("POSITION").intValue(ctx));
 		DomainAttribute description = domainDataCover.getAttr("DESCRIPTION");
 		cover.setDescription(description != null ? description.getString(ctx) : null);
 	}
+
+    private static Address createAddress() {
+        return new Address("Lake Jackson", "Allwood St", "77566");
+    }
+
+    private static Driver createDriver(Address adr) {
+        return new Driver()
+                .setFirstName("John")
+                .setLastName("Potter")
+                .setGender("M")
+                .setDateOfBirth(Date.from(LocalDate.now().minusYears(40).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .setLicenceObtainedAtAge(18)
+                .setAddress(adr);
+    }
 }
