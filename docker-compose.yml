@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: studio
-    image: decerto/higson-studio:4.0.2
+    image: decerto/higson-studio:4.0.11
     environment:
       - HIGSON_DATABASE_URL=jdbc:h2:tcp://db/higson.demo;NON_KEYWORDS=VALUE
       - HIGSON_DATABASE_DIALECT=h2
@@ -27,7 +27,7 @@ services:
 
   runtime-rest:
     container_name: runtime-rest
-    image: decerto/higson-runtime-rest:4.0.2
+    image: decerto/higson-runtime-rest:4.0.11
     environment:
       - higson.database.url=jdbc:h2:tcp://db/higson.demo;NON_KEYWORDS=VALUE
       - higson.database.dialect=h2
