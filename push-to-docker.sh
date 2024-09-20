@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGE_NAME=decerto/higson-motor-insurance-demo
-VERSION=4.0.0
+VERSION=4.0.1
 
 USER=$1
 PASS=$2
