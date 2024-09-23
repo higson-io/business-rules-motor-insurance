@@ -200,7 +200,8 @@ public class Motor {
 				"option.code", option.getCode(),
 				"coverage.code", coverage.getCode(),
 				"vehicle.make", vehicle.getMake(),
-				"vehicle.makeId", vehicle.getMakeId()
+				"vehicle.makeId", vehicle.getMakeId(),
+				"option.quote.address.zipCode", option.getQuote().getDriver().getAddress().getZipCode()
 		);
 	}
 
