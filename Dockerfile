@@ -11,4 +11,4 @@ EXPOSE 48080
 
 WORKDIR /app
 
-CMD ./motor-insurance.war
+CMD ["sh", "-c", "java -jar motor-insurance.war"]
