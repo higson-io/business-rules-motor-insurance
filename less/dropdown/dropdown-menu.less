@@ -1,0 +1,72 @@
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  list-style: none;
+  background-clip: padding-box;
+  border: 1px solid @color-border-block;
+  border-radius: @border-radius;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+
+  li:focus-visible,
+  td:focus-visible,
+  .uib-datepicker,
+  .btn:focus {
+    outline: none;
+
+    div {
+      outline: none;
+    }
+  }
+
+  .btn {
+    border: unset;
+  }
+
+  .btn-default {
+    color: @color-gray-dark;
+    background-color: unset;
+    border-color: unset;
+
+    &.active {
+      background-color: @color-primary;
+      color: @color-white;
+
+      .text-info {
+        color: @color-gray-dark;
+      }
+    }
+
+    &:active {
+      &:hover {
+        background-color: @color-primary;
+        color: @color-white;
+      }
+    }
+  }
+
+  .btn-default[disabled]:hover {
+    background-color: @color-white;
+    color: @color-gray-dark;
+    border-color: @color-border;
+  }
+
+  .btn-sm {
+    padding: 8px 13px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+  }
+
+  .text-muted {
+    color: @color-border-block;
+  }
+}
