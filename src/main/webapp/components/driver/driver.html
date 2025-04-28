@@ -20,11 +20,19 @@
 
 <div class="common-input-default">
     <div class="common-input-default__label">Date of birth</div>
-    <input
-        type="date"
-        class="common-input-default__input"
-        ng-model="ctrl.driver.dateOfBirth"
-        ng-change="ctrl.updateDriverBirthDate()">
+    <input type="text"
+           class="common-input-default__input"
+           uib-datepicker-popup="yyyy-MM-dd"
+           show-button-bar="false"
+           ng-model="ctrl.driver.dateOfBirth"
+           ng-change="ctrl.updateDriverBirthDate()"
+           is-open="popup.opened"
+           datepicker-options="dateOptions"
+           close-text="Close"
+           alt-input-formats="['yyyy/MM/dd']" />
+    <span class="common-input-icon">
+        <i class="glyphicon glyphicon-calendar" ng-click="ctrl.openPopup()"></i>
+    </span>
 </div>
 
 <div class="common-btn-group">
@@ -33,7 +41,6 @@
         type="button"
         class="common-btn-group__btn"
         ng-model="ctrl.driver.gender" uib-btn-radio="'M'">
-        <i class="fa fa-mars" aria-hidden="true"></i>
         <span>Male</span>
     </button>
     <button
@@ -41,13 +48,16 @@
         type="button"
         class="common-btn-group__btn"
         ng-model="ctrl.driver.gender" uib-btn-radio="'F'">
-        <i class="fa fa-venus" aria-hidden="true"></i>
         <span>Female</span>
     </button>
 </div>
 
-<div class="common-subsection-heading">Address</div>
-<div class="common-subsection-divider"></div>
+<div class="sidebar-container__divider address">
+    <div class="sidebar-container__divider__icon">
+        <i class="address"></i>
+        <div class="sidebar-container__divider__text">Address</div>
+    </div>
+</div>
 
 <div class="common-input-default">
     <div class="common-input-default__label">Zip code</div>

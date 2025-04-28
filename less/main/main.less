@@ -1,18 +1,70 @@
 .main {
-    min-width: 1330px;
+    padding-top: 3rem;
 }
 
-::-webkit-scrollbar
-{
-    width: 12px;
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 56%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
 }
 
-::-webkit-scrollbar-track
-{
-    background: @color-gray-light;
+::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
 }
 
-::-webkit-scrollbar-thumb
-{
-    background: @color-gray-dark;
+::-webkit-scrollbar-track {
+    background-color: rgba(236, 236, 236, 1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(181, 181, 181, 1);
+    cursor: pointer;
+    outline: none;
+    border-radius: 10px;
+}
+
+input:focus-visible,
+select:focus-visible {
+    outline: none;
+}
+
+li:focus-visible,
+td:focus-visible,
+.uib-datepicker,
+.btn:focus {
+    outline: none;
+
+    div {
+        outline: none;
+    }
+}
+
+.logo {
+    background: url('../imgs/logo-insurance-app.svg');
+    background-size: 206px 38px;
+    width: 206px;
+    height: 38px;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.menubar {
+    height: 65px;
+    border: 1px solid @color-border-block;
+    border-radius: @border-radius;
+    margin-right: 13px;
+    margin-bottom: 26px;
+    background-color: @color-white;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding-right: 15px;
 }

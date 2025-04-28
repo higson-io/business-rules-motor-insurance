@@ -15,7 +15,7 @@
 }
 
 .common-input-default__label {
-    color: @color-blue;
+    color: @color-gray;
     font-size: 9px;
     text-transform: uppercase;
     position: absolute;
@@ -32,6 +32,7 @@
     border: 1px solid @color-border;
     padding: 12px 15px 10px 15px;
     margin-bottom: 20px;
+    height: 56px;
 }
 
 .common-input-default--small {
@@ -50,24 +51,22 @@
 	appearance: none;
 	text-indent: 1px;
 	text-overflow: '';
+    height: 56px;
 	background-color: #fff;
-	background-image: url('../imgs/select-arrow.png');
-	background-size: 1.7rem 1.1rem;
-	background-position: right 1.1rem bottom 1.4rem;
+	background-image: url('../imgs/arrow.svg');
+	background-size: 24px 24px;
+	background-position: right .8rem bottom 1.4rem;
 	background-repeat: no-repeat;
 }
 
 .common-btn-group {
     width: 100%;
-    border-radius: @border-radius;
+    border-radius: 3rem;
     border: 1px solid @color-border;
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
-
-    & button:not(:first-child) {
-        border-left: 1px solid @color-border;
-    }
+    padding: 3px;
 
     .active {
         background: @color-gray-light;
@@ -81,6 +80,7 @@
     border: none;
     padding: 9px 0;
     font-size: 14px;
+    border-radius: 3rem;
 
     .fa {
         font-size: 26px;
@@ -93,11 +93,6 @@
         vertical-align: middle;
     }
 
-    &:hover {
-        background: @color-blue;
-        color: #fff;
-        font-weight: bold;
-    }
 }
 
 .common-checkbox {
@@ -137,5 +132,13 @@
 }
 
 .common-tooltip {
-    width: 300px;
+   min-width: 340px;
+}
+
+.common-input-icon {
+    position: absolute;
+    top: 19px;
+    right: 13px;
+    color: @color-border;
+    cursor: pointer;
 }

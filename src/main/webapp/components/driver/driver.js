@@ -26,8 +26,25 @@
 			ctrl.updateDriverFirstName = updateDriverFirstName;
 			ctrl.updateDriverGender = updateDriverGender;
 			ctrl.updateDriverLastName = updateDriverLastName;
+			ctrl.openPopup = openPopup;
 
 			init();
+
+			$scope.selectedDate = new Date();
+
+			$scope.dateOptions = {
+				formatYear: 'yyyy',
+				startingDay: 1,
+				showWeeks: false
+			};
+
+			function openPopup() {
+				$scope.popup.opened = true;
+			};
+
+			$scope.popup = {
+				opened: false
+			};
 
 			function init() {
 				reloadDriverData();

@@ -1,11 +1,43 @@
 @import '../node_modules/npm-font-open-sans/open-sans';
+
 @FontPathOpenSans: "../fonts/open-sans";
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 @import "../node_modules/font-awesome/less/font-awesome";
 @FontFontAwesome: "../fonts/font-awesome";
 
 body {
-    font-family: "Open Sans";
-    background: @color-gray-light;
-    color: @color-gray-dark;
-    font-size: 13px;
+  font-family: "Manrope", sans-serif;
+  color: @color-gray-dark;
+  font-size: 13px;
+  background: linear-gradient(to bottom right, rgba(76, 76, 222, 1), rgba(41, 41, 120, 1));
+  min-height: 100vh;
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1440px;
+  }
+}
+
+tooltip {
+  width: 100%;
+  &._right {
+    tip {
+      background-color: @color-white;
+      border: 1px solid @color-tooltip-border;
+      padding: 15px;
+      color: @color-text;
+      border-radius: 4px;
+      text-align: left;
+
+      tip-arrow{
+        border-right: unset;
+        background-image: url('../imgs/arrow-tooltip.svg');
+        background-repeat: no-repeat;
+        background-position: right center;
+        width: 19px;
+        height: 19px;
+      }
+    }
+  }
 }
