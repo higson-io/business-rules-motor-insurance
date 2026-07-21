@@ -37,14 +37,18 @@ public class HigsonIntegrationConfiguration {
 
 	private final String higsonInstanceName;
 
+	private final Boolean higsonProfilerEnabled;
+
 	@Autowired
 	public HigsonIntegrationConfiguration(Environment env, @Value("${higson.dev.mode}") Boolean higsonDevMode,
 										   @Value("${higson.dev.user}") String higsonDevUser,
-										   @Value("${higson.instance.name:}") String higsonInstanceName) {
+										   @Value("${higson.instance.name:}") String higsonInstanceName,
+										   @Value("${higson.runtime.diagnostic.profiler.enabled:false}") Boolean higsonProfilerEnabled) {
 		this.env = env;
 		this.higsonDevMode = higsonDevMode;
 		this.higsonDevUser = higsonDevUser;
 		this.higsonInstanceName = higsonInstanceName;
+		this.higsonProfilerEnabled = higsonProfilerEnabled;
 	}
 
 	@Bean
@@ -84,6 +88,11 @@ public class HigsonIntegrationConfiguration {
 		if (StringUtils.isNotBlank(higsonInstanceName)) {
 			LOG.info("Higson instance name set to '{}' - diagnostic runtime info will be saved to the database", higsonInstanceName);
 			higsonEngineFactory.setInstanceName(higsonInstanceName);
+		}
+
+		if (BooleanUtils.toBoolean(higsonProfilerEnabled)) {
+			LOG.info("Higson diagnostic profiler enabled - per-invocation diagnostics will be collected and flushed to the database");
+			higsonEngineFactory.setProfilerEnabled(true);
 		}
 
 		if (BooleanUtils.toBoolean(higsonDevMode)) {
