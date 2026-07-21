@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,16 @@ public class HigsonIntegrationConfiguration {
 
 	private final String higsonDevUser;
 
+	private final String higsonInstanceName;
+
 	@Autowired
 	public HigsonIntegrationConfiguration(Environment env, @Value("${higson.dev.mode}") Boolean higsonDevMode,
-										   @Value("${higson.dev.user}") String higsonDevUser) {
+										   @Value("${higson.dev.user}") String higsonDevUser,
+										   @Value("${higson.instance.name:}") String higsonInstanceName) {
 		this.env = env;
 		this.higsonDevMode = higsonDevMode;
 		this.higsonDevUser = higsonDevUser;
+		this.higsonInstanceName = higsonInstanceName;
 	}
 
 	@Bean
@@ -75,6 +80,11 @@ public class HigsonIntegrationConfiguration {
 	public HigsonEngineFactory getHigsonEngineFactory() {
 		HigsonEngineFactory higsonEngineFactory = new HigsonEngineFactory();
 		higsonEngineFactory.setDataSource(getDataSourceProxy());
+
+		if (StringUtils.isNotBlank(higsonInstanceName)) {
+			LOG.info("Higson instance name set to '{}' - diagnostic runtime info will be saved to the database", higsonInstanceName);
+			higsonEngineFactory.setInstanceName(higsonInstanceName);
+		}
 
 		if (BooleanUtils.toBoolean(higsonDevMode)) {
 			LOG.info("Higson factory set in developer mode!");
