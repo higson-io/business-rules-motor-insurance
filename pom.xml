@@ -26,10 +26,10 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Higson Runtime Component -->
+		<!-- Higson Runtime Spring Boot Starter (auto-configures HigsonEngine, DataSource, dialect) -->
 		<dependency>
 			<groupId>io.higson</groupId>
-			<artifactId>higson-runtime</artifactId>
+			<artifactId>spring-boot-starter-higson-runtime</artifactId>
 			<version>4.3.0</version>
 		</dependency>
 

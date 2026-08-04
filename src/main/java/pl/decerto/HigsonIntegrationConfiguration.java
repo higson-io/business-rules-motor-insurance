@@ -1,105 +1,55 @@
 package pl.decerto;
 
-import com.zaxxer.hikari.HikariDataSource;
-
-import java.util.Objects;
-
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 
-import io.higson.runtime.core.HigsonEngine;
-import io.higson.runtime.core.HigsonEngineFactory;
 import io.higson.runtime.profiler.jdbc.proxy.DataSourceProxy;
-import io.higson.runtime.sql.DialectRegistry;
-import io.higson.runtime.sql.DialectTemplate;
 
+/**
+ * Higson runtime (engine, data source, dialect, dev mode, instance name, diagnostic profiler)
+ * is auto-configured by {@code spring-boot-starter-higson-runtime}, driven by {@code higson.*}
+ * properties loaded below.
+ *
+ * <p>The starter builds a plain data source, so the only piece we still wire manually is the
+ * Higson {@link DataSourceProxy}: it wraps the starter's {@code higsonDataSource} bean so that
+ * JDBC-level profiling statistics keep flowing to {@code /profilers/jdbc}.
+ */
 @Configuration
 @PropertySource(value = {"classpath:higson-demo-app.properties", "file:${user.home}/conf/higson-demo-app.properties"}, ignoreResourceNotFound = true)
 public class HigsonIntegrationConfiguration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HigsonIntegrationConfiguration.class);
 
-	private final Environment env;
+	private static final String HIGSON_DATASOURCE_BEAN = "higsonDataSource";
 
-	private final Boolean higsonDevMode;
-
-	private final String higsonDevUser;
-
-	private final String higsonInstanceName;
-
-	@Autowired
-	public HigsonIntegrationConfiguration(Environment env, @Value("${higson.dev.mode}") Boolean higsonDevMode,
-										   @Value("${higson.dev.user}") String higsonDevUser,
-										   @Value("${higson.instance.name:}") String higsonInstanceName) {
-		this.env = env;
-		this.higsonDevMode = higsonDevMode;
-		this.higsonDevUser = higsonDevUser;
-		this.higsonInstanceName = higsonInstanceName;
-	}
-
+	/**
+	 * Wraps the starter-provided {@code higsonDataSource} in a Higson {@link DataSourceProxy}
+	 * before it is injected into the engine, preserving JDBC profiling (/profilers/jdbc).
+	 * Declared {@code static} so it is registered early, before the beans it post-processes.
+	 */
 	@Bean
-	public DialectRegistry getDialectRegistry() {
-		DialectRegistry registry = new DialectRegistry();
-		registry.setDialect(env.getProperty("higson.database.dialect"));
-		return registry;
-	}
-
-	@Bean
-	public DialectTemplate getDialectTemplate() {
-		return getDialectRegistry().create();
-	}
-
-	@Bean(destroyMethod = "close")
-	public HikariDataSource getDataSource() {
-		HikariDataSource dataSource = new HikariDataSource();
-		dataSource.setUsername(env.getProperty("higson.database.username"));
-		dataSource.setPassword(env.getProperty("higson.database.password"));
-		dataSource.setJdbcUrl(env.getProperty("higson.database.url"));
-		dataSource.setDriverClassName(getDialectTemplate().getJdbcDriverClassName());
-		return dataSource;
-	}
-
-	@Bean
-	public DataSource getDataSourceProxy() {
-		DataSourceProxy dsp = new DataSourceProxy();
-		dsp.setDataSource(getDataSource());
-		return dsp;
-	}
-
-	@Bean(destroyMethod = "destroy")
-	public HigsonEngineFactory getHigsonEngineFactory() {
-		HigsonEngineFactory higsonEngineFactory = new HigsonEngineFactory();
-		higsonEngineFactory.setDataSource(getDataSourceProxy());
-
-		if (StringUtils.isNotBlank(higsonInstanceName)) {
-			LOG.info("Higson instance name set to '{}' - diagnostic runtime info will be saved to the database", higsonInstanceName);
-			higsonEngineFactory.setInstanceName(higsonInstanceName);
-		}
-
-		if (BooleanUtils.toBoolean(higsonDevMode)) {
-			LOG.info("Higson factory set in developer mode!");
-			higsonEngineFactory.setDeveloperMode(true);
-			String higsonDevUser = Objects.requireNonNull(this.higsonDevUser, "Higson dev user not supplied");
-			higsonEngineFactory.setUsername(higsonDevUser);
-		}
-
-		return higsonEngineFactory;
-	}
-
-	@Bean
-	public HigsonEngine getHigsonEngine(HigsonEngineFactory higsonEngineFactory) {
-		higsonEngineFactory.setValidateFunctionArgumentsDataTypes(true);
-		return higsonEngineFactory.create();
+	public static BeanPostProcessor higsonJdbcProfilerDataSourceProxy() {
+		return new BeanPostProcessor() {
+			@Override
+			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+				if (HIGSON_DATASOURCE_BEAN.equals(beanName)
+						&& bean instanceof DataSource dataSource
+						&& !(bean instanceof DataSourceProxy)) {
+					LOG.info("Wrapping Higson '{}' in DataSourceProxy to enable JDBC profiling (/profilers/jdbc)", beanName);
+					DataSourceProxy proxy = new DataSourceProxy();
+					proxy.setDataSource(dataSource);
+					return proxy;
+				}
+				return bean;
+			}
+		};
 	}
 
 }
