@@ -1,0 +1,28 @@
+{
+	"flow": "error-paths",
+	"stage": "pre",
+	"timezone": "UTC",
+	"observations": {
+		"errorPaths": {
+			"failedPut": {
+				"bannerVisible": false,
+				"bannerText": null,
+				"requests": [
+					"PUT driver/address/city"
+				]
+			},
+			"failedQuote": {
+				"responses": [
+					{
+						"method": "GET",
+						"path": "quote",
+						"status": 404
+					}
+				],
+				"cardsAfter": 3,
+				"bannerVisible": true,
+				"bannerText": ""
+			}
+		}
+	}
+}

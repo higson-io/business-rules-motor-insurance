@@ -1,0 +1,47 @@
+{
+	"flow": "driver-history",
+	"stage": "pre",
+	"timezone": "UTC",
+	"observations": {
+		"interactions": {
+			"accidentCount:type-12": [
+				"PUT driver/accidentCount",
+				"PUT driver/accidentCount",
+				"GET quote",
+				"GET quote"
+			],
+			"accidentCount:cleared": {
+				"puts": 1,
+				"requests": [
+					"PUT driver/accidentCount"
+				],
+				"responses": [
+					{
+						"method": "PUT",
+						"path": "driver/accidentCount",
+						"status": 500
+					}
+				]
+			},
+			"licenceObtainedAtAge:below-min": {
+				"puts": 2,
+				"requests": [
+					"PUT driver/licenceObtainedAtAge",
+					"PUT driver/licenceObtainedAtAge"
+				],
+				"responses": [
+					{
+						"method": "PUT",
+						"path": "driver/licenceObtainedAtAge",
+						"status": 500
+					},
+					{
+						"method": "PUT",
+						"path": "driver/licenceObtainedAtAge",
+						"status": 500
+					}
+				]
+			}
+		}
+	}
+}

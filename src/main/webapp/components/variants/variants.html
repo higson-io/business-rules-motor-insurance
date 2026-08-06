@@ -1,9 +1,9 @@
 <div class="variants">
-    <div ng-show="ctrl.errorOccured" class="alert alert-danger variants__error_text">
+    <div ng-show="ctrl.errorOccured" data-testid="quote-error-banner" class="alert alert-danger variants__error_text">
         {{ctrl.errorMessage}}
     </div>
-    <div class="variants__column" ng-repeat="variant in ctrl.variants | orderBy: 'order'">
-        <div class="variants__column__header">{{variant.code}}</div>
+    <div class="variants__column" data-testid="variant-card" ng-repeat="variant in ctrl.variants | orderBy: 'order'">
+        <div class="variants__column__header" data-testid="variant-code">{{variant.code}}</div>
 
         <coverage ng-repeat="coverage in variant.coverages | orderBy: position"
                   code="coverage.code"
@@ -16,7 +16,7 @@
             <div class="variants__column__border"></div>
             <div class="variants__column__price-before-discount">
                 <div class="variants__column__price-before-discounts__label">Price before discounts</div>
-                <div class="variants__column__price-before-discounts__value">{{variant.premiumBeforeDiscounts}}</div>
+                <div class="variants__column__price-before-discounts__value" data-testid="variant-premium-before-discounts">{{variant.premiumBeforeDiscounts}}</div>
             </div>
             <discount ng-repeat="discount in variant.discounts | orderBy: position"
                       name="discount.name"
@@ -25,7 +25,7 @@
 
             <div class="variants__column__final-price">
                 <div class="variants__column__final-price__label">FINAL PRICE</div>
-                <div class="variants__column__final-price__value">{{variant.premium}}</div>
+                <div class="variants__column__final-price__value" data-testid="variant-premium">{{variant.premium}}</div>
             </div>
         </div>
     </div>

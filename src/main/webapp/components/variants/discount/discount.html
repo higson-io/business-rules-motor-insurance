@@ -1,4 +1,4 @@
-<div class="discounts">
+<div class="discounts" data-testid="discount-row">
     <div class="discounts__table-container">
         <table class="discounts__table-container__table">
             <thead>
@@ -7,8 +7,8 @@
             </thead>
             <tbody>
             <tr>
-                <td>{{::ctrl.name}}</td>
-                <td>-{{::ctrl.value}}</td>
+                <td data-testid="discount-name">{{::ctrl.name}}</td>
+                <td data-testid="discount-value">-{{::ctrl.value}}</td>
             </tr>
             </tbody>
         </table>

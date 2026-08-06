@@ -18,6 +18,17 @@
 
 	<properties>
 		<maven.compiler.release>17</maven.compiler.release>
+
+		<!-- Higson CLI (snapshot push/pull) -->
+		<higson.studio.url>http://localhost:38088/studio</higson.studio.url>
+		<!-- Single source of truth for the snapshot: shared by the CLI (pull/push) and the
+		     SnapshotDataSourceDemoTest. 'pull' rewrites this directory, 'push' uploads it. -->
+		<higson.snapshot.dir>${project.basedir}/src/main/higson</higson.snapshot.dir>
+		<!-- Studio integration token. Intentionally empty - never commit a real one.
+		     Supply it per invocation instead:
+		       mvn higson-cli:push -Dhigson.studio.token=$HIGSON_STUDIO_TOKEN
+		     or via a <server>/<profile> entry in ~/.m2/settings.xml. -->
+		<higson.studio.token></higson.studio.token>
 	</properties>
 
 	<dependencies>
@@ -30,7 +41,7 @@
 		<dependency>
 			<groupId>io.higson</groupId>
 			<artifactId>spring-boot-starter-higson-runtime</artifactId>
-			<version>4.3.0</version>
+			<version>4.3.1</version>
 		</dependency>
 
 		<!-- Spring Framework -->
@@ -58,11 +69,11 @@
 			<version>4.4</version>
 		</dependency>
 
-		<!-- Testing -->
+		<!-- Testing: JUnit 5 (Jupiter), AssertJ and spring-test/MockMvc.
+		     Version inherited from spring-boot-starter-parent - do not pin. -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -121,6 +132,34 @@
 								<followSymlinks>false</followSymlinks>
 							</fileset>
 						</filesets>
+					</configuration>
+				</plugin>
+				<!-- Higson CLI: push/pull the snapshot in ${higson.snapshot.dir} to/from Higson Studio.
+				     No executions bound => run on demand:
+				       mvn higson-cli:pull   (download Studio -> src/main/higson)
+				       mvn higson-cli:push   (upload src/main/higson -> Studio; add -Dautocommit=true to commit)
+				     Push/pull use safe defaults (nothing deleted, no auto-commit);
+				     add <pullOptions>/<pushOptions> here to narrow scope. -->
+				<plugin>
+					<groupId>io.higson</groupId>
+					<artifactId>higson-cli-maven-plugin</artifactId>
+					<version>4.3.1</version>
+					<configuration>
+						<higsonUrl>${higson.studio.url}</higsonUrl>
+						<higsonToken>${higson.studio.token}</higsonToken>
+						<higsonSnapshotDir>${higson.snapshot.dir}</higsonSnapshotDir>
+						<logFilePath>${project.basedir}/higson-cli.log</logFilePath>
+					</configuration>
+				</plugin>
+				<!-- Pin the test JVM timezone. Motor.createDriver seeds dateOfBirth as
+				     "today - 40 years, start-of-day, system TZ", so an unpinned zone makes every
+				     date-carrying test result machine-dependent (+00:00 in the container,
+				     +02:00 on a Europe/Warsaw box).
+				     Version inherited from spring-boot-starter-parent - do not pin. -->
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<argLine>-Duser.timezone=UTC</argLine>
 					</configuration>
 				</plugin>
             </plugins>

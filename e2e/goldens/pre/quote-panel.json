@@ -1,0 +1,177 @@
+{
+	"flow": "quote-panel",
+	"stage": "pre",
+	"timezone": "UTC",
+	"observations": {
+		"popover": {
+			"coverage": "BI",
+			"descriptionContainsMarkup": false
+		},
+		"quote": {
+			"options": [
+				{
+					"code": "BRONZE",
+					"order": 1,
+					"premium": 264.78,
+					"premiumBeforeDiscounts": 284.78,
+					"coverages": [
+						{
+							"position": 1,
+							"code": "BI",
+							"limitLeft": 30000,
+							"limitRight": 50000,
+							"premium": 129.78
+						},
+						{
+							"position": 2,
+							"code": "PD",
+							"limitLeft": 25000,
+							"limitRight": null,
+							"premium": 100
+						},
+						{
+							"position": 3,
+							"code": "MED",
+							"limitLeft": 2000,
+							"limitRight": null,
+							"premium": 55
+						}
+					],
+					"discounts": [
+						{
+							"position": 2,
+							"code": "GD",
+							"value": 20
+						}
+					]
+				},
+				{
+					"code": "SILVER",
+					"order": 2,
+					"premium": 674.02,
+					"premiumBeforeDiscounts": 694.02,
+					"coverages": [
+						{
+							"position": 1,
+							"code": "BI",
+							"limitLeft": 50000,
+							"limitRight": 100000,
+							"premium": 180.25
+						},
+						{
+							"position": 2,
+							"code": "PD",
+							"limitLeft": 40000,
+							"limitRight": null,
+							"premium": 100
+						},
+						{
+							"position": 4,
+							"code": "PIP",
+							"limitLeft": 5000,
+							"limitRight": null,
+							"premium": 95
+						},
+						{
+							"position": 5,
+							"code": "UMBI",
+							"limitLeft": 50000,
+							"limitRight": 100000,
+							"premium": 55.11
+						},
+						{
+							"position": 8,
+							"code": "COLL",
+							"limitLeft": 1000,
+							"limitRight": null,
+							"premium": 263.66
+						}
+					],
+					"discounts": [
+						{
+							"position": 2,
+							"code": "GD",
+							"value": 20
+						}
+					]
+				},
+				{
+					"code": "GOLD",
+					"order": 3,
+					"premium": 1381.19,
+					"premiumBeforeDiscounts": 1401.19,
+					"coverages": [
+						{
+							"position": 1,
+							"code": "BI",
+							"limitLeft": 60000,
+							"limitRight": 120000,
+							"premium": 201.88
+						},
+						{
+							"position": 2,
+							"code": "PD",
+							"limitLeft": 60000,
+							"limitRight": null,
+							"premium": 100
+						},
+						{
+							"position": 4,
+							"code": "PIP",
+							"limitLeft": 10000,
+							"limitRight": null,
+							"premium": 200
+						},
+						{
+							"position": 5,
+							"code": "UMBI",
+							"limitLeft": 100000,
+							"limitRight": 200000,
+							"premium": 110.11
+						},
+						{
+							"position": 6,
+							"code": "UMPD",
+							"limitLeft": 100000,
+							"limitRight": null,
+							"premium": 310
+						},
+						{
+							"position": 7,
+							"code": "COMP",
+							"limitLeft": 1500,
+							"limitRight": null,
+							"premium": 95.21
+						},
+						{
+							"position": 8,
+							"code": "COLL",
+							"limitLeft": 3000,
+							"limitRight": null,
+							"premium": 366.19
+						},
+						{
+							"position": 9,
+							"code": "ERS",
+							"limitLeft": 0,
+							"limitRight": null,
+							"premium": 17.8
+						}
+					],
+					"discounts": [
+						{
+							"position": 2,
+							"code": "GD",
+							"value": 20
+						}
+					]
+				}
+			]
+		},
+		"renderedVariantCards": [
+			"BRONZE\nBodily Injury Liability (BI)\n30,000.00 / 50,000.00\n129.78\nBodily injury liability provides protection if you injure or kill someone while operating your car.\nProperty Damage Liability (PD)\n25,000.00\n100.00\nMedical Payments (MED)\n2,000.00\n55.00\nPrice before discounts\n284.78\n\nGood Driver\t-20\nFINAL PRICE\n264.78",
+			"SILVER\nBodily Injury Liability (BI)\n50,000.00 / 100,000.00\n180.25\nProperty Damage Liability (PD)\n40,000.00\n100.00\nPersonal Injury Protection (PIP)\n5,000.00\n95.00\nUninsured Motorist Bodily Injury (UMBI)\n50,000.00 / 100,000.00\n55.11\nCollision (COLL)\n1,000.00\n263.66\nPrice before discounts\n694.02\n\nGood Driver\t-20\nFINAL PRICE\n674.02",
+			"GOLD\nBodily Injury Liability (BI)\n60,000.00 / 120,000.00\n201.88\nProperty Damage Liability (PD)\n60,000.00\n100.00\nPersonal Injury Protection (PIP)\n10,000.00\n200.00\nUninsured Motorist Bodily Injury (UMBI)\n100,000.00 / 200,000.00\n110.11\nUninsured Motorist Property Damage (UMPD)\n100,000.00\n310.00\nComprehensive (COMP)\n1,500.00\n95.21\nCollision (COLL)\n3,000.00\n366.19\nEmergency Road Service (ERS)\n0.00\n17.80\nPrice before discounts\n1401.19\n\nGood Driver\t-20\nFINAL PRICE\n1381.19"
+		]
+	}
+}

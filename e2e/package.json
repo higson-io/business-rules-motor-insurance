@@ -1,0 +1,15 @@
+{
+  "name": "motor-insurance-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Frontend-agnostic Playwright golden capture / replay harness for the AngularJS -> Angular migration",
+  "scripts": {
+    "capture:pre": "MIGRATION_STAGE=pre TZ=UTC playwright test",
+    "capture:post": "MIGRATION_STAGE=post TZ=UTC playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@types/node": "22.19.1",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,7 @@
+# Generated and vendored assets are never committed (standards/frontend/build.md).
+node_modules/
+test-results/
+playwright-report/
+
+# goldens/ is deliberately NOT ignored - it is captured evidence, not build output
+# (spec.md 5.4). A git revert restores code; it cannot recreate a runtime capture.

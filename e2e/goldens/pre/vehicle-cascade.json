@@ -1,0 +1,41 @@
+{
+	"flow": "vehicle-cascade",
+	"stage": "pre",
+	"timezone": "UTC",
+	"observations": {
+		"cascade": {
+			"productionYear": [
+				"PUT vehicle/productionYear",
+				"GET dictionaries/make?productionYear=2012"
+			],
+			"dictionariesAfterYearChange": {
+				"typeCount": 305,
+				"modelCount": 17
+			},
+			"make": [
+				"PUT vehicle/make",
+				"GET dictionaries/type?makeId=110"
+			],
+			"type": {
+				"chosen": "100 1.8 44",
+				"requests": [
+					"PUT vehicle/type",
+					"GET dictionaries/model?typeId=12360"
+				]
+			},
+			"model": {
+				"chosen": "100 1.8 44 (sed, 66hp)",
+				"requests": [
+					"PUT vehicle/model",
+					"GET quote"
+				]
+			},
+			"blankMake": {
+				"requests": [],
+				"consoleErrors": [
+					"console.error: TypeError: Cannot read properties of undefined (reading 'name')\n    at vehicleCtrl.updateVehicleMake (http://localhost:48080/demo/components/vehicle/vehicle.js:63:10)\n    at fn (eval at compile (http://localhost:48080/demo/vendors/angular/angular.min.js:253:164), <anonymous>:4:179)\n    at m.$eval (http://localhost:48080/demo/vendors/angular/angular.min.js:156:180)\n    at http://localhost:48080/demo/vendors/angular/angular.min.js:299:418\n    at Object.<anonymous> (http://localhost:48080/demo/vendors/angular/angular.min.js:312:183)\n    at r (http://localhost:48080/demo/vendors/angular/angular.min.js:8:76)\n    at Object.$$writeModelToScope (http://localhost:48080/demo/vendors/angular/angular.min.js:312:139)\n    at http://localhost:48080/demo/vendors/angular/angular.min.js:312:33\n    at g (http://localhost:48080/demo/vendors/angular/angular.min.js:309:301)\n    at e (http://localhost:48080/demo/vendors/angular/angular.min.js:309:181)"
+				]
+			}
+		}
+	}
+}

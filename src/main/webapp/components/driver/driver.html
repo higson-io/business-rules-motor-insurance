@@ -3,6 +3,7 @@
     <input
         type="text"
         class="common-input-default__input"
+        data-testid="driver-first-name"
         ng-model="ctrl.driver.firstName"
         ng-model-options="{updateOn: 'blur'}"
         ng-change="ctrl.updateDriverFirstName()">
@@ -13,6 +14,7 @@
     <input
         type="text"
         class="common-input-default__input"
+        data-testid="driver-last-name"
         ng-model="ctrl.driver.lastName"
         ng-model-options="{updateOn: 'blur'}"
         ng-change="ctrl.updateDriverLastName()">
@@ -24,6 +26,7 @@
            class="common-input-default__input"
            uib-datepicker-popup="yyyy-MM-dd"
            show-button-bar="false"
+           data-testid="driver-date-of-birth"
            ng-model="ctrl.driver.dateOfBirth"
            ng-change="ctrl.updateDriverBirthDate()"
            is-open="popup.opened"
@@ -31,7 +34,7 @@
            close-text="Close"
            alt-input-formats="['yyyy/MM/dd']" />
     <span class="common-input-icon">
-        <i class="glyphicon glyphicon-calendar" ng-click="ctrl.openPopup()"></i>
+        <i class="glyphicon glyphicon-calendar" data-testid="driver-date-of-birth-toggle" ng-click="ctrl.openPopup()"></i>
     </span>
 </div>
 
@@ -40,6 +43,7 @@
         ng-click="ctrl.updateDriverGender()"
         type="button"
         class="common-btn-group__btn"
+        data-testid="driver-gender-male"
         ng-model="ctrl.driver.gender" uib-btn-radio="'M'">
         <span>Male</span>
     </button>
@@ -47,6 +51,7 @@
         ng-click="ctrl.updateDriverGender()"
         type="button"
         class="common-btn-group__btn"
+        data-testid="driver-gender-female"
         ng-model="ctrl.driver.gender" uib-btn-radio="'F'">
         <span>Female</span>
     </button>
@@ -64,6 +69,7 @@
     <input
         type="text"
         class="common-input-default__input"
+        data-testid="driver-zip-code"
         ng-model="ctrl.driver.address.zipCode"
         ng-model-options="{updateOn: 'blur'}"
         ng-change="ctrl.updateAddressZipCode()">
@@ -74,6 +80,7 @@
     <input
         type="text"
         class="common-input-default__input"
+        data-testid="driver-city"
         ng-model="ctrl.driver.address.city"
         ng-model-options="{updateOn: 'blur'}"
         ng-change="ctrl.updateAddressCity()">
@@ -84,6 +91,7 @@
     <input
         type="text"
         class="common-input-default__input"
+        data-testid="driver-street"
         ng-model="ctrl.driver.address.street"
         ng-model-options="{updateOn: 'blur'}"
         ng-change="ctrl.updateAddressStreet()">

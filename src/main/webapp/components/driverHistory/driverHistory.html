@@ -4,6 +4,7 @@
         type="number"
         min="0"
         class="common-input-default__input"
+        data-testid="driver-accidents"
         ng-model="ctrl.driver.numberOfAccidents"
         ng-change="ctrl.updateDriverAccidentCount()">
 </div>
@@ -14,6 +15,7 @@
         type="number"
         min="0"
         class="common-input-default__input"
+        data-testid="driver-tickets"
         ng-model="ctrl.driver.numberOfTickets"
         ng-change="ctrl.updateDriverTrafficTicketsCount()">
 </div>
@@ -23,6 +25,7 @@
     <input type="number"
         min="16"
         class="common-input-default__input"
+        data-testid="driver-licence-age"
         ng-model="ctrl.driver.licenceObtainedAtAge"
         ng-change="ctrl.updateDriverLicenceObtainedAtAge()">
 </div>
