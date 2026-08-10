@@ -26,6 +26,12 @@
 		way back out of a demo, which is new and unavoidable: without a router there is no browser
 		affordance for leaving one. It appears only inside a demo, so the landing screen is
 		unchanged from what the parity checklist describes.
+
+		⛔ The shell is INDUSTRY-NEUTRAL. It used to carry the "Insurance App" wordmark, which was
+		true when the application was one insurance calculator and became wrong the moment it
+		started hosting several lines of business. The brand here is the product; a demo says what
+		it is through its own screen — the picker tile, the sidebar heading, the demo's own title.
+		Nothing insurance-shaped belongs above this line.
 	-->
 	<div class="menubar">
 		@if (demo()) {
@@ -39,7 +45,11 @@
 			</button>
 		}
 
-		<div class="logo" role="img" aria-label="Insurance app"></div>
+		<!--
+			A text wordmark rather than an image: it is neutral by construction, needs no asset, and
+			cannot go stale the way a drawn logo did when the second industry arrived.
+		-->
+		<div class="wordmark" data-testid="app-wordmark">Higson Demos</div>
 	</div>
 
 	<!--

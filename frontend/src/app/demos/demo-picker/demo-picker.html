@@ -8,8 +8,14 @@
 	Manrope), and two small glyphs do not justify pulling one back in.
 -->
 <section class="demo-picker" aria-labelledby="demo-picker-title">
-	<h1 id="demo-picker-title" class="demo-picker__title">Higson demos</h1>
-	<p class="demo-picker__subtitle">Pick a line of business to explore</p>
+	<!--
+		The brand is in the menubar, so the heading says what to DO rather than repeating it. It
+		also stays industry-neutral: the tiles name the lines of business, this screen does not.
+	-->
+	<h1 id="demo-picker-title" class="demo-picker__title">Choose a demo</h1>
+	<p class="demo-picker__subtitle">
+		Each one is a working application whose decisions are driven by Higson business rules.
+	</p>
 
 	<ul class="demo-picker__grid">
 		@for (demo of demos; track demo.code) {

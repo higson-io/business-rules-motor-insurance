@@ -19,6 +19,10 @@ describe('App shell', () => {
 		return [...(fixture.nativeElement as HTMLElement).querySelectorAll(selector)];
 	}
 
+	function el(selector: string): Element | null {
+		return (fixture.nativeElement as HTMLElement).querySelector(selector);
+	}
+
 	// G8 test 1 — `main.js:21-23` is DELETED, not ported.
 	it('renders layout only and contains no event-relay logic', () => {
 		// ⚠️ The quote screen does not exist until a demo is opened; without this the assertions
@@ -31,9 +35,21 @@ describe('App shell', () => {
 			1,
 		);
 		expect(
-			elements('.menubar .logo').length,
-			'the menubar carries the logo (parity checklist §1)',
-		).toBe(1);
+			el('.menubar [data-testid="app-wordmark"]')?.textContent?.trim(),
+			'the menubar carries the product wordmark (parity checklist §1, now industry-neutral)',
+		).toBe('Higson Demos');
+
+		// ⛔ The shell is the PRODUCT, not a line of business. It carried an "Insurance App"
+		// wordmark while this was one insurance calculator; that became wrong the moment it started
+		// hosting several industries, and would be wrong again for whichever one comes next.
+		//
+		// Asserted from inside the motor demo deliberately — that is where the pull to brand the
+		// chrome is strongest, and where a stray "Insurance" in the menubar would look plausible.
+		// What the DEMO says about itself is its own business; this is only about the shell.
+		expect(
+			el('.menubar')?.textContent ?? '',
+			'the menubar names no industry — the demo identifies itself, the shell does not',
+		).not.toMatch(/insurance|motor|vehicle|life|health|travel/i);
 
 		// ⚠️ The parity checklist says the menubar has "no nav, no buttons, no interactivity", and
 		// that still holds on the landing screen — see `demo-picker.spec.ts`. Inside a demo it now

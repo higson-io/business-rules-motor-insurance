@@ -51,14 +51,20 @@
 	outline-offset: 2px;
 }
 
-// Decorative and named by `aria-label` on the element itself (`app.html`), so the image is a
-// background rather than an `<img>`. The 206×38 box matches the SVG's intrinsic size.
-.logo {
-	display: inline-block;
-	width: 206px;
-	height: 38px;
-	background: url('imgs/logo-insurance-app.svg') no-repeat;
-	background-size: 206px 38px;
+// The product wordmark, replacing `less/main/main.less:51-58`'s `.logo`.
+//
+// ⛔ That rule painted `imgs/logo-insurance-app.svg` — a drawn "Insurance App" wordmark, 53 kB of
+// it. Accurate while this was one insurance calculator; wrong once the shell started hosting
+// several lines of business, and wrong again for whichever industry comes after. Real text costs
+// no asset, is neutral by construction, scales, and is selectable and searchable. The SVG is
+// deleted rather than left unreferenced (`minimal-implementation.md`); it is one `git checkout` out
+// of history if a demo ever wants its own mark.
+.wordmark {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--mat-sys-primary);
+	letter-spacing: 0.01em;
+	white-space: nowrap;
 }
 
 // `main.less:13-32`, carried verbatim. WebKit-only and purely cosmetic: every browser that ignores
