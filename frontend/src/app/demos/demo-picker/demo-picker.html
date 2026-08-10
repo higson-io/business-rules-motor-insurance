@@ -1,0 +1,53 @@
+<!--
+	The tiles are <button>s, not clickable <div>s: they do something rather than go somewhere, and a
+	button is keyboard-reachable and announced correctly without any ARIA (`accessibility.md`).
+	`disabled` carries the unavailable state, so it needs no separate aria-disabled either.
+
+	Icons are inline SVG rather than an icon font. Angular Material's icon component needs a
+	ligature font that this application does not ship (C-10 dropped Font Awesome and self-hosts only
+	Manrope), and two small glyphs do not justify pulling one back in.
+-->
+<section class="demo-picker" aria-labelledby="demo-picker-title">
+	<h1 id="demo-picker-title" class="demo-picker__title">Higson demos</h1>
+	<p class="demo-picker__subtitle">Pick a line of business to explore</p>
+
+	<ul class="demo-picker__grid">
+		@for (demo of demos; track demo.code) {
+			<li>
+				<button
+					type="button"
+					class="demo-picker__tile"
+					[attr.data-testid]="'demo-tile-' + demo.code"
+					[disabled]="!demo.available"
+					(click)="open(demo)"
+				>
+					<span class="demo-picker__icon" aria-hidden="true">
+						@switch (demo.code) {
+							@case ('moto') {
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+									<path d="M3 13l1.8-5A2 2 0 0 1 6.7 6.6h10.6A2 2 0 0 1 19.2 8L21 13" />
+									<path d="M3 13h18v4a1 1 0 0 1-1 1h-1.5" />
+									<path d="M6.5 18H4a1 1 0 0 1-1-1v-4" />
+									<circle cx="7" cy="18" r="1.8" />
+									<circle cx="17" cy="18" r="1.8" />
+								</svg>
+							}
+							@case ('life') {
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+									<path d="M12 20.5S3.8 15.4 3.8 9.7A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 8.2 2.1c0 5.7-8.2 10.8-8.2 10.8z" />
+								</svg>
+							}
+						}
+					</span>
+
+					<span class="demo-picker__name">{{ demo.name }}</span>
+					<span class="demo-picker__summary">{{ demo.summary }}</span>
+
+					@if (!demo.available) {
+						<span class="demo-picker__badge">Coming soon</span>
+					}
+				</button>
+			</li>
+		}
+	</ul>
+</section>

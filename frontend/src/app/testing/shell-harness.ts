@@ -5,6 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
+import { DemoSelection } from '../core/demo-selection';
 import { IsoDateAdapter, MOTOR_DATE_FORMATS } from '../core/iso-date.adapter';
 import { mutationErrorInterceptor } from '../core/mutation-error.interceptor';
 import { pendingRequestsInterceptor } from '../core/pending-requests.interceptor';
@@ -75,6 +76,22 @@ export const QUOTE: QuoteDto = {
 };
 
 const DICTIONARY: DictionaryEntryDto[] = [{ code: '1', name: 'Entry' }];
+
+/**
+ * Opens the motor demo, which is what mounts the quote screen.
+ *
+ * ⚠️ Call this before asserting anything about that screen. The shell now starts on the landing
+ * screen, and the motor components — and therefore every startup request — do not exist until a
+ * demo is opened. A spec that skips this is asserting against the picker.
+ *
+ * It deliberately drives `DemoSelection` rather than clicking a tile: the specs that use it are
+ * about the assembled quote screen, not about the picker's markup. `demo-picker.spec.ts` covers
+ * the click.
+ */
+export function openMoto(): void {
+	TestBed.inject(DemoSelection).open('moto');
+	TestBed.tick();
+}
 
 /**
  * Answers every request the mounted screen has in flight, repeatedly, until it goes quiet — the

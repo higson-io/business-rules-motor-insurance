@@ -3,7 +3,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 
 import { App } from './app';
 import { appConfig } from './app.config';
-import { settleShell, SHELL_PROVIDERS } from './testing/shell-harness';
+import { openMoto, settleShell, SHELL_PROVIDERS } from './testing/shell-harness';
 
 describe('App shell', () => {
 	let httpTesting: HttpTestingController;
@@ -21,6 +21,9 @@ describe('App shell', () => {
 
 	// G8 test 1 — `main.js:21-23` is DELETED, not ported.
 	it('renders layout only and contains no event-relay logic', () => {
+		// ⚠️ The quote screen does not exist until a demo is opened; without this the assertions
+		// below would be run against the landing screen.
+		openMoto();
 		const startup = settleShell(httpTesting);
 
 		expect(elements('app-sidebar').length, 'the shell composes exactly one sidebar').toBe(1);
@@ -29,27 +32,36 @@ describe('App shell', () => {
 		);
 		expect(
 			elements('.menubar .logo').length,
-			'the menubar carries the logo (parity checklist §1: no nav, no buttons, no interactivity)',
+			'the menubar carries the logo (parity checklist §1)',
 		).toBe(1);
+
+		// ⚠️ The parity checklist says the menubar has "no nav, no buttons, no interactivity", and
+		// that still holds on the landing screen — see `demo-picker.spec.ts`. Inside a demo it now
+		// carries exactly one control, the way back out, because without a router the browser
+		// offers none. That is a deliberate addition and is pinned here so a second one cannot
+		// arrive unnoticed.
 		expect(
-			elements('.menubar button, .menubar a, .menubar input').length,
-			'the menubar has no interactive element — it never had one',
-		).toBe(0);
+			elements('.menubar button, .menubar a, .menubar input').map((el) =>
+				el.getAttribute('data-testid'),
+			),
+			'inside a demo the menubar carries exactly one control: the way back to the picker',
+		).toEqual(['back-to-demos']);
 
 		// The AngularJS shell existed ONLY to relay `recalculate` → `reloadQuote` between siblings
-		// (`main.js:21-23`). `QuoteStore` replaced that bus in G4, so the shell has no behaviour
-		// left at all: no methods, and no state beyond the counter the spinner reads.
+		// (`main.js:21-23`). `QuoteStore` replaced that bus in G4, so no relay survives. The one
+		// method the shell now declares closes the demo — it touches `DemoSelection` and nothing
+		// else, and in particular nothing quote-shaped.
 		expect(
 			Object.getOwnPropertyNames(App.prototype),
-			'the shell declares no methods — a ported relay handler would show up here',
-		).toEqual(['constructor']);
+			'the shell declares no methods beyond closing a demo — a ported relay handler would show up here',
+		).toEqual(['constructor', 'backToDemos']);
 		expect(
 			// `__ngContext__` is stamped onto every component instance by the framework itself.
 			Object.getOwnPropertyNames(fixture.componentInstance).filter(
 				(name) => !name.startsWith('__'),
 			),
-			'the shell holds no state of its own — only the injected pending-request counter',
-		).toEqual(['pendingRequests']);
+			'the shell holds no state of its own — the counter, the selection service and the signal it exposes',
+		).toEqual(['pendingRequests', 'selection', 'demo']);
 
 		// DR-09, asserted from the ASSEMBLED screen rather than from one component in isolation:
 		// the shell mounts driver, driver-history and variants together and the shared `QuoteStore`
@@ -61,8 +73,9 @@ describe('App shell', () => {
 		).toBe(1);
 	});
 
-	// G8 test 4 — ND-7. The screen is single and non-routed, by design.
+	// G8 test 4 — ND-7. There are several screens now, but still no router: the switch is a signal.
 	it('declares no router provider and renders no router-outlet', () => {
+		openMoto();
 		settleShell(httpTesting);
 
 		expect(

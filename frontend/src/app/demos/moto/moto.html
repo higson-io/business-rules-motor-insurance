@@ -1,0 +1,17 @@
+<!--
+	Moved verbatim from `app.html` when the landing screen was added — same class names, same
+	structure, so G9's CSS Grid port (`_layout.less`, `sidebar.less`) lands on the same elements and
+	the 992px collapse point is unchanged.
+
+	⛔ Pure layout. No handlers, no bindings. `main.js:21-23`'s recalculate relay was deleted rather
+	than ported; `QuoteStore` replaced the whole bus.
+-->
+<div class="app-shell__layout">
+	<aside class="app-shell__sidebar">
+		<app-sidebar />
+	</aside>
+
+	<div class="app-shell__content">
+		<app-variants />
+	</div>
+</div>

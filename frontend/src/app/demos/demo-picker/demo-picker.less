@@ -1,0 +1,110 @@
+// The landing screen. It sits on the same blue gradient as everything else, so the tiles are the
+// familiar white panels — same 8px radius and hairline border as the sidebar and the variant cards.
+//
+// `_variables` resolves through `stylePreprocessorOptions.includePaths` in angular.json. It declares
+// variables and nothing else, so importing it into a component stylesheet emits no duplicate rules.
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+.demo-picker {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 2rem 0 3rem;
+	text-align: center;
+}
+
+.demo-picker__title {
+	margin: 0 0 0.5rem;
+	font-size: 2rem;
+	font-weight: 700;
+	color: #fff;
+}
+
+.demo-picker__subtitle {
+	margin: 0 0 2.5rem;
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+// `auto-fit` with a floor rather than a fixed column count: the row simply grows as industries are
+// added, and collapses on a narrow screen without a media query (`responsive.md`).
+.demo-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 24px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.demo-picker__tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	height: 100%;
+	padding: 2rem 1.5rem;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-white;
+	font: inherit;
+	color: @color-text;
+	text-align: center;
+	cursor: pointer;
+	transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+// ⚠️ Unlike the variant cards — which look clickable and are not (DR-15) — these genuinely are, so
+// the hover affordance is correct here rather than a false promise.
+.demo-picker__tile:hover:not(:disabled) {
+	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.25);
+	transform: translateY(-2px);
+}
+
+.demo-picker__tile:focus-visible {
+	outline: 2px solid @color-white;
+	outline-offset: 3px;
+}
+
+.demo-picker__tile:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.demo-picker__icon {
+	display: block;
+	width: 56px;
+	height: 56px;
+	color: var(--mat-sys-primary);
+
+	svg {
+		width: 100%;
+		height: 100%;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+}
+
+.demo-picker__name {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--mat-sys-primary);
+}
+
+.demo-picker__summary {
+	font-size: 0.875rem;
+	line-height: 1.4;
+}
+
+.demo-picker__badge {
+	padding: 0.15rem 0.6rem;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-gray-light;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}

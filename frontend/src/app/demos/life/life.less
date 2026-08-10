@@ -1,0 +1,34 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+.life {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 3rem 2rem;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-white;
+	text-align: center;
+}
+
+.life__title {
+	margin: 0 0 1rem;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--mat-sys-primary);
+}
+
+.life__body {
+	margin: 0;
+	line-height: 1.6;
+}
+
+.life__body code {
+	padding: 0.1rem 0.35rem;
+	border-radius: 4px;
+	background: @color-gray-light;
+	font-size: 0.9em;
+}

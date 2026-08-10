@@ -60,18 +60,39 @@ export const TESTID = {
 
 	discountRow: 'discount-row',
 	discountName: 'discount-name',
-	discountValue: 'discount-value'
+	discountValue: 'discount-value',
+
+	// The landing screen. Not part of the captured goldens — it did not exist when they were
+	// recorded — but every flow passes through it to reach the quote screen.
+	demoTileMoto: 'demo-tile-moto',
+	backToDemos: 'back-to-demos'
 } as const;
 
 export const BASE_URL = process.env.APP_BASE_URL ?? 'http://localhost:48080/demo/';
 
 /**
- * Opens the application on a fresh browser context and returns a request log that is already
+ * Opens the motor quote screen on a fresh browser context and returns a request log that is already
  * attached, so the startup traffic (which DR-09 asserts on) is captured from the first byte.
+ *
+ * ⚠️ The application now opens on a landing screen that chooses between demos, so reaching the
+ * quote screen takes a click. The log is attached BEFORE the navigation and therefore before that
+ * click, so every request the quote screen makes is still counted from the first byte — the
+ * request-volume assertions (DR-09's single `GET driver`, DR-13's four zero-counts) are unaffected
+ * in value, only in when they happen.
+ *
+ * The landing screen itself issues no request; `demo-picker.spec.ts` in the frontend workspace
+ * asserts that, which is why nothing here has to account for one.
  */
 export async function openApp(page: Page): Promise<RequestLog> {
 	const log = RequestLog.attach(page, BASE_URL);
 	await page.goto(BASE_URL);
+
+	await expect(
+		page.getByTestId(TESTID.demoTileMoto),
+		'the application opens on the demo picker'
+	).toBeVisible();
+	await page.getByTestId(TESTID.demoTileMoto).click();
+
 	await expect(
 		page.getByTestId(TESTID.variantCard).first(),
 		'the quote panel must render before any flow starts'

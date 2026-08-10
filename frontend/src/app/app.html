@@ -1,16 +1,15 @@
 <!--
-	⛔ Pure layout. No handlers, no bindings other than the spinner's visibility — `main.js:21-23`
-	was deleted, not ported.
+	The shell: menubar, spinner, and the switch between the landing screen and a demo.
 
 	The Bootstrap 3 grid of `main.html:1-22` (`.container` → `.row` → `.col-md-3` + `.col-md-9`) is
-	gone with Bootstrap itself (C-9). What replaces it is CSS Grid over the class names below,
-	written in G9 and preserving Bootstrap's own 992px collapse point so the layout does not start
-	stacking at a different width than it does today (`responsive.md`).
+	gone with Bootstrap itself (C-9). CSS Grid over the class names below replaces it, preserving
+	Bootstrap's own 992px collapse point (`responsive.md`). The grid itself moved into `moto.html`
+	along with the screen it lays out.
 -->
 <div class="app-shell">
 	<!--
 		The one loading indicator in the application, driven by the interceptor-fed counter and by
-		nothing else. It sits outside the layout grid because it is positioned over the viewport.
+		nothing else. It sits outside the layout so it can be positioned over the viewport.
 
 		⛔ ND-6 — this spinner used to FLASH at startup, because the eight AngularJS `templateUrl`
 		fetches passed through the same `$http` interceptor that drove it. Compiled templates issue
@@ -22,23 +21,44 @@
 		<app-spinner />
 	}
 
-	<div class="app-shell__layout">
-		<aside class="app-shell__sidebar">
-			<app-sidebar />
-		</aside>
+	<!--
+		The menubar carried the logo and nothing else (parity checklist §1). It now also carries the
+		way back out of a demo, which is new and unavoidable: without a router there is no browser
+		affordance for leaving one. It appears only inside a demo, so the landing screen is
+		unchanged from what the parity checklist describes.
+	-->
+	<div class="menubar">
+		@if (demo()) {
+			<button
+				type="button"
+				class="menubar__back"
+				data-testid="back-to-demos"
+				(click)="backToDemos()"
+			>
+				<span aria-hidden="true">&#8592;</span> All demos
+			</button>
+		}
 
-		<div class="app-shell__content">
-			<!--
-				The menubar: a white bar carrying the logo, right-aligned, and nothing else — no
-				navigation, no buttons, no interactivity (parity checklist §1). `.menubar` and
-				`.logo` keep their names so G9's port of `less/main/main.less:51-69` lands on the
-				same elements; the logo is a CSS background image there, as it is today.
-			-->
-			<div class="menubar">
-				<div class="logo" role="img" aria-label="Insurance app"></div>
-			</div>
-
-			<app-variants />
-		</div>
+		<div class="logo" role="img" aria-label="Insurance app"></div>
 	</div>
+
+	<!--
+		⛔ Each demo is created only once it is opened. That is what keeps the landing screen free of
+		requests: `QuoteStore` is `providedIn: 'root'` and its resources load when it is first
+		injected, which happens no earlier than the first motor component being constructed.
+
+		Adding an industry means one more `@case` here, one entry in `demo-catalog.ts` and one
+		component — nothing else in the application changes.
+	-->
+	@switch (demo()) {
+		@case ('moto') {
+			<app-moto />
+		}
+		@case ('life') {
+			<app-life />
+		}
+		@default {
+			<app-demo-picker />
+		}
+	}
 </div>

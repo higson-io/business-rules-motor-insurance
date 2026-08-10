@@ -3,7 +3,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 
 import { App } from '../../app';
 import { QuoteStore } from '../../core/quote-store';
-import { QUOTE, settleShell, SHELL_PROVIDERS } from '../../testing/shell-harness';
+import { openMoto, QUOTE, settleShell, SHELL_PROVIDERS } from '../../testing/shell-harness';
 
 /**
  * AC-F5 — the spinner is global and interceptor-driven.
@@ -36,6 +36,10 @@ describe('Global spinner', () => {
 	}
 
 	it('is visible while any request is in flight and hidden at zero, on success and on error', () => {
+		// ⚠️ Opening the demo is what mounts the quote screen and therefore what issues any request
+		// at all. The landing screen makes none — that is asserted in `demo-picker.spec.ts`.
+		openMoto();
+
 		// Startup: the screen mounts and its GETs go out before anything can answer them.
 		//
 		// ⚠️ Nothing may call `httpTesting.match()` here. It REMOVES what it matches from the open

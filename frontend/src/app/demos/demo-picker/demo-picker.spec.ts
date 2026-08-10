@@ -1,0 +1,94 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
+
+import { App } from '../../app';
+import { DEMOS } from '../demo-catalog';
+import { settleShell, SHELL_PROVIDERS } from '../../testing/shell-harness';
+
+/**
+ * The landing screen and the switch between demos.
+ *
+ * Asserted through the assembled shell rather than the picker in isolation, because the behaviour
+ * that matters is the wiring — which demo the `@switch` in `app.html` mounts, and, above all, that
+ * nothing is mounted until one is chosen.
+ */
+describe('Demo picker', () => {
+	let httpTesting: HttpTestingController;
+	let fixture: ComponentFixture<App>;
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({ providers: SHELL_PROVIDERS });
+		httpTesting = TestBed.inject(HttpTestingController);
+		fixture = TestBed.createComponent(App);
+	});
+
+	function el(selector: string): Element | null {
+		return (fixture.nativeElement as HTMLElement).querySelector(selector);
+	}
+
+	function elements(selector: string): Element[] {
+		return [...(fixture.nativeElement as HTMLElement).querySelectorAll(selector)];
+	}
+
+	function click(selector: string): void {
+		(el(selector) as HTMLElement).click();
+		TestBed.tick();
+	}
+
+	it('opens on the landing screen and issues no request at all', () => {
+		TestBed.tick();
+
+		expect(el('app-demo-picker'), 'the shell starts on the landing screen').not.toBeNull();
+		expect(el('app-moto'), 'no demo is mounted before one is chosen').toBeNull();
+		expect(el('app-life'), 'no demo is mounted before one is chosen').toBeNull();
+
+		// ⛔ The point of mounting demos behind an `@if`. `QuoteStore` is `providedIn: 'root'` and
+		// its resources load the moment it is first injected — which must not happen here. A
+		// regression that mounts the motor components eagerly would show up as startup traffic on
+		// a screen that has nothing to fetch.
+		httpTesting.verify();
+
+		expect(
+			elements('.menubar button, .menubar a, .menubar input').length,
+			'parity checklist §1: on the landing screen the menubar carries no interactive element',
+		).toBe(0);
+	});
+
+	it('renders one tile per catalogue entry', () => {
+		TestBed.tick();
+
+		expect(
+			elements('[data-testid^="demo-tile-"]').map((e) => e.getAttribute('data-testid')),
+			'every catalogue entry gets a tile, in catalogue order',
+		).toEqual(DEMOS.map((demo) => `demo-tile-${demo.code}`));
+
+		// An unavailable demo is shown but not selectable — the catalogue doubles as the roadmap.
+		for (const demo of DEMOS) {
+			expect(
+				(el(`[data-testid="demo-tile-${demo.code}"]`) as HTMLButtonElement).disabled,
+				`the ${demo.code} tile is selectable exactly when the catalogue says it is available`,
+			).toBe(!demo.available);
+		}
+	});
+
+	it('opens the chosen demo and comes back to the picker', () => {
+		TestBed.tick();
+
+		click('[data-testid="demo-tile-moto"]');
+		settleShell(httpTesting);
+		expect(el('app-moto'), 'choosing the motor tile mounts the motor demo').not.toBeNull();
+		expect(el('app-demo-picker'), 'the picker gives way to the demo').toBeNull();
+
+		click('[data-testid="back-to-demos"]');
+		expect(el('app-demo-picker'), 'the back control returns to the picker').not.toBeNull();
+		expect(el('app-moto'), 'leaving a demo unmounts it').toBeNull();
+
+		click('[data-testid="demo-tile-life"]');
+		expect(el('app-life'), 'the life tile mounts its own screen, not the motor one').not.toBeNull();
+		expect(el('app-moto'), 'the two demos are never mounted together').toBeNull();
+
+		// The life screen is a placeholder and fetches nothing; nothing is left open from the motor
+		// demo either, which is what makes leaving and re-entering safe.
+		httpTesting.verify();
+	});
+});

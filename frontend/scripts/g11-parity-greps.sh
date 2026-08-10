@@ -79,7 +79,10 @@ absent  'AC-C2  no JSON.stringify (corrupts string PUT bodies)' 'JSON\.stringify
 absent  'AC-C4  no leading-slash HTTP URLs'                     "http\.(get|put)\('/"                "$ALL_SRC"
 # RESCOPED (AC-C5): production component TypeScript only — see PROD_COMPONENT_TS above.
 absent  'AC-C5  no component injects HttpClient'                'HttpClient'                         "$PROD_COMPONENT_TS"
-absent  'AC-C6  no leftover `response.data` unwraps'            '\.data\b'                           "$ALL_SRC"
+# RESCOPED (AC-C6): a trailing hyphen is excluded, so `[attr.data-testid]` does not read as an
+# unwrap. The criterion is about `HttpClient` returning the body directly where `$http` returned an
+# envelope; a template binding that happens to spell `.data-` is not that.
+absent  'AC-C6  no leftover `response.data` unwraps'            '\.data([^-]|$)'                     "$ALL_SRC"
 
 echo
 echo "--- AC-S7: the documented single-Sass-file exception ---"

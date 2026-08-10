@@ -15,13 +15,40 @@
 .menubar {
 	display: flex;
 	align-items: center;
-	justify-content: end;
+	// `space-between` rather than `end`: the back control sits at the left, the logo stays at the
+	// right where it has always been. With no back control the logo is the only child, and a lone
+	// flex item under `space-between` still lands at the end — so the landing screen's bar is
+	// pixel-for-pixel what `justify-content: end` produced.
+	justify-content: space-between;
 	height: 65px;
 	margin-bottom: 26px;
-	padding-right: 15px;
+	padding: 0 15px;
 	border: 1px solid @color-border-block;
 	border-radius: var(--mat-sys-corner-medium);
 	background-color: @color-white;
+}
+
+// The way out of a demo. New with the landing screen and unavoidable: without a router there is no
+// browser affordance for leaving one (see `DemoSelection`). Styled as a quiet text button so the
+// menubar stays the near-empty bar the parity checklist describes.
+.menubar__back {
+	padding: 0.4rem 0.6rem;
+	border: 0;
+	border-radius: var(--mat-sys-corner-medium);
+	background: none;
+	font: inherit;
+	font-weight: 500;
+	color: var(--mat-sys-primary);
+	cursor: pointer;
+}
+
+.menubar__back:hover {
+	background: @color-gray-light;
+}
+
+.menubar__back:focus-visible {
+	outline: 2px solid var(--mat-sys-primary);
+	outline-offset: 2px;
 }
 
 // Decorative and named by `aria-label` on the element itself (`app.html`), so the image is a
