@@ -1,0 +1,3 @@
+# Keeps src/main/webapp/ in git. It is the maven-war-plugin's warSourceDirectory and must exist,
+# but it is now empty: the UI is built from frontend/ and packed into the WAR root by the
+# <webResources> block in pom.xml. Do not put application sources here.
