@@ -1,0 +1,38 @@
+{
+	"flow": "startup",
+	"stage": "post",
+	"timezone": "UTC",
+	"observations": {
+		"driver": {
+			"firstName": "John",
+			"lastName": "Potter",
+			"dateOfBirth": "<today-40y>",
+			"zipCode": "77566",
+			"city": "Lake Jackson",
+			"street": "Allwood St",
+			"accidents": "0",
+			"tickets": "0",
+			"licenceAge": "18"
+		},
+		"vehicle": {
+			"productionYear": "2010",
+			"make": "TOYOTA",
+			"type": "Avensis Wagon MR/09",
+			"model": "Avensis Wagon MR/09 (Sol, cb, 112hp)"
+		},
+		"variantCodes": [
+			"BRONZE",
+			"SILVER",
+			"GOLD"
+		],
+		"startupRequests": {
+			"GET dictionaries/make?productionYear=2010": 1,
+			"GET dictionaries/model?typeId=28654": 1,
+			"GET dictionaries/productionYear": 1,
+			"GET dictionaries/type?makeId=217": 1,
+			"GET driver": 1,
+			"GET quote": 1,
+			"GET vehicle": 1
+		}
+	}
+}

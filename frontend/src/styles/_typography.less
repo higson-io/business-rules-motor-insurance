@@ -1,0 +1,60 @@
+// The port of `less/config.less:1-14` — three font families in, one out.
+//
+// C-10 deleted two of them:
+//   `npm-font-open-sans` (90 vendored files) was @imported at `config.less:1` and then overridden
+//   for the whole document by the Manrope rule below, so not one glyph of it ever reached a screen.
+//   Font Awesome (6 files) existed for one checkbox tick in dead CSS and one calendar glyph that
+//   `<mat-datepicker-toggle>` now draws itself.
+//
+// The third, Manrope, is SELF-HOSTED here instead of being pulled from the Google Fonts CDN at
+// `config.less:4`. Two things that cost: a build-time network fetch on every `mvn package` — which
+// is also what kept re-dirtying the tracked `styles.min.css` when Google moved the family from v15
+// to v20 — and a runtime dependency on a third-party host at application start.
+//
+// ⚠️ DEVIATION FROM PLAN STEP 9.5, which specified ONE file. Two are committed, not one: Google
+// itself serves Manrope as unicode-range subsets, and `index.html` declares `lang="pl"`. The Polish
+// diacritics (ą ć ę ł ń ó ś ź ż) live in latin-ext, so a latin-only file would silently fall back to
+// a system font for exactly the language the document claims to be in. `unicode-range` means the
+// second file is only ever downloaded if a page actually needs it. Net against the 96 deleted
+// binaries: −96 / +2.
+//
+// Both files are byte-identical to what `fonts.gstatic.com` serves for the v20 `wght@200..800`
+// query — the same axis range `config.less:4` asked for.
+
+@font-face {
+	font-family: 'Manrope';
+	font-style: normal;
+	font-weight: 200 800;
+	font-display: swap;
+	src: url('fonts/manrope/manrope-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+		U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+		U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+	font-family: 'Manrope';
+	font-style: normal;
+	font-weight: 200 800;
+	font-display: swap;
+	src: url('fonts/manrope/manrope-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+		U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// `less/config.less:8-14`, carried. Two changes, both of them restorations rather than redesign:
+//
+//   `margin: 0` — Bootstrap's normalize used to zero it. Without that reset the user-agent's 8px
+//   body margin would frame the full-bleed gradient in white, so removing Bootstrap without this
+//   line would have CHANGED the background, not preserved it.
+//
+//   font-size in rem — 13px at the 16px default root, expressed relatively so a reader who raises
+//   their browser's base font size scales the whole application with it (`responsive.md`).
+body {
+	margin: 0;
+	font-family: 'Manrope', sans-serif;
+	color: @color-text;
+	font-size: 0.8125rem;
+	background: linear-gradient(to bottom right, rgba(76, 76, 222, 1), rgba(41, 41, 120, 1));
+	min-height: 100vh;
+}

@@ -1,0 +1,4 @@
+# Generated and vendored assets are never committed (standards/frontend/build.md).
+node_modules/
+dist/
+.angular/

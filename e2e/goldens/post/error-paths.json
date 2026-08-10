@@ -1,0 +1,28 @@
+{
+	"flow": "error-paths",
+	"stage": "post",
+	"timezone": "UTC",
+	"observations": {
+		"errorPaths": {
+			"failedPut": {
+				"bannerVisible": true,
+				"bannerText": "Http failure response for http://localhost:48080/demo/driver/address/city: 500 Internal Server Error",
+				"requests": [
+					"PUT driver/address/city"
+				]
+			},
+			"failedQuote": {
+				"responses": [
+					{
+						"method": "GET",
+						"path": "quote",
+						"status": 400
+					}
+				],
+				"cardsAfter": 0,
+				"bannerVisible": true,
+				"bannerText": "Driver first name not supplied."
+			}
+		}
+	}
+}

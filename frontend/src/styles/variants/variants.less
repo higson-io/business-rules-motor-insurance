@@ -1,0 +1,98 @@
+// The port of `less/variants/variants.less`.
+//
+// ⛔ DR-15 — `cursor: pointer` (`:9`) and the `:hover` block (`:21-24`) are DELETED. The variant
+// column has never had a click handler: `variants.html` binds nothing to it, and neither did the
+// AngularJS template. The pointer cursor and the lift-on-hover promised an action that does not
+// exist, and on a page whose whole job is choosing between three options that is a genuinely
+// misleading affordance rather than a cosmetic one. `transition: 0.5s` (`:16`) goes with them —
+// it existed only to animate that hover.
+//
+// The negative `margin-left: -15px` (`:3`) is also gone: it cancelled the padding Bootstrap's
+// `.col-md-9` added, and there is no such padding in the CSS Grid layout to cancel.
+
+.variants {
+	position: relative;
+	display: flex;
+	// Mobile-first (`responsive.md`): the three cards sit side by side when there is room and wrap
+	// onto their own rows when there is not, instead of being crushed to an unreadable width. The
+	// original fixed `width: 329px` could do neither.
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: 26px;
+}
+
+.variants__column {
+	display: flex;
+	flex: 1 1 280px;
+	flex-direction: column;
+	padding: 20px 0;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-white;
+}
+
+// 26px at the 16px root. The colour is the brand primary, ~6.2:1 against the white card —
+// comfortably past the 4.5:1 WCAG AA floor for body text, and this is display size
+// (`accessibility.md`).
+.variants__column__header {
+	width: 100%;
+	padding-bottom: 50px;
+	font-size: 1.625rem;
+	font-weight: bold;
+	text-align: center;
+	color: var(--mat-sys-primary);
+}
+
+.variants__column__footer {
+	margin-top: auto;
+}
+
+.variants__column__border {
+	margin: 0 15px;
+	border-top: 1px solid @color-border-block;
+}
+
+.variants__column__price-before-discount {
+	padding: 15px 15px 0;
+}
+
+.variants__column__price-before-discounts__label {
+	display: inline-block;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.variants__column__price-before-discounts__value {
+	font-size: 1rem;
+	font-weight: bold;
+	float: right;
+}
+
+.variants__column__final-price {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	padding: 0 15px;
+}
+
+.variants__column__final-price__label {
+	display: inline-block;
+	font-size: 1.125rem;
+}
+
+.variants__column__final-price__value {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: var(--mat-sys-primary);
+}
+
+// `less/variants/variants.less:79-84`'s `.variants__error_text`, renamed to the class the Angular
+// template actually emits. G5 replaced the Bootstrap `.alert-danger` div with a `<mat-card>`, so
+// the surface, elevation and radius come from Material; only the placement is set here. It takes a
+// full row of the flex container so the cards below it keep their own line.
+.variants__error {
+	flex: 1 1 100%;
+	padding: 15px;
+	font-size: 1rem;
+	text-align: center;
+}

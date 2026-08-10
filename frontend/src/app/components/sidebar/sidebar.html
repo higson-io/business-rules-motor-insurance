@@ -1,0 +1,62 @@
+<!--
+	`sidebar.html` carried over structurally: the class names are unchanged so G9's port of
+	`less/sidebar/sidebar.less` lands on the same elements.
+
+	The two copy elements become real headings — `<h1>` for the panel title and `<h2>` for each
+	section — where the AngularJS build used `<div>`s throughout and left the screen with no
+	heading structure at all (`accessibility.md`). The `<i>` icons stay purely decorative
+	background-image carriers, styled in G9, and are hidden from assistive technology because the
+	heading beside each one already says what the section is.
+-->
+<div class="sidebar-container">
+	<div class="sidebar-container__header">
+		<h1 class="sidebar-container__header__title">Get a Quote</h1>
+		<div class="sidebar-container__header__subtitle">fill in the details to get a quote</div>
+	</div>
+
+	<div class="sidebar-container__content">
+		<div class="sidebar-container__divider">
+			<div class="sidebar-container__divider__icon">
+				<i class="person" aria-hidden="true"></i>
+				<h2 class="sidebar-container__divider__text">Personal information</h2>
+			</div>
+		</div>
+
+		<!--
+			⛔ ND-3 — recorded non-deviation: the "Address" divider that visually belongs to this
+			list is emitted from INSIDE `<app-driver>` (`driver.html:55-60`), not from here.
+		-->
+		<div class="sidebar-container__widget">
+			<app-driver />
+		</div>
+
+		<div class="sidebar-container__divider">
+			<div class="sidebar-container__divider__icon">
+				<i class="vehicle" aria-hidden="true"></i>
+				<h2 class="sidebar-container__divider__text">Vehicle</h2>
+			</div>
+		</div>
+
+		<div class="sidebar-container__widget">
+			<app-vehicle />
+		</div>
+
+		<!--
+			⛔ ND-2 — the label is literally "Documents" while the section below it holds CLAIM
+			HISTORY: number of accidents, traffic tickets and the age at which the licence was
+			obtained. The copy is wrong and it stays wrong. Rewording it is a product decision, out
+			of scope for a migration (`spec.md` §7.3), and it would surface in G11 as an
+			unexplainable golden diff.
+		-->
+		<div class="sidebar-container__divider">
+			<div class="sidebar-container__divider__icon">
+				<i class="documents" aria-hidden="true"></i>
+				<h2 class="sidebar-container__divider__text">Documents</h2>
+			</div>
+		</div>
+
+		<div class="sidebar-container__widget">
+			<app-driver-history />
+		</div>
+	</div>
+</div>

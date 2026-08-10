@@ -1,0 +1,39 @@
+{
+	"flow": "vehicle-cascade",
+	"stage": "post",
+	"timezone": "UTC",
+	"observations": {
+		"cascade": {
+			"productionYear": [
+				"PUT vehicle/productionYear",
+				"GET dictionaries/make?productionYear=2012"
+			],
+			"dictionariesAfterYearChange": {
+				"typeCount": 0,
+				"modelCount": 0
+			},
+			"make": [
+				"PUT vehicle/make",
+				"GET dictionaries/type?makeId=110"
+			],
+			"type": {
+				"chosen": "100 1.8 44",
+				"requests": [
+					"PUT vehicle/type",
+					"GET dictionaries/model?typeId=12360"
+				]
+			},
+			"model": {
+				"chosen": "100 1.8 44 (sed, 66hp)",
+				"requests": [
+					"PUT vehicle/model",
+					"GET quote"
+				]
+			},
+			"blankMake": {
+				"requests": [],
+				"consoleErrors": []
+			}
+		}
+	}
+}

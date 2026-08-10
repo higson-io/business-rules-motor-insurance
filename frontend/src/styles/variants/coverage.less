@@ -1,0 +1,41 @@
+// The port of `less/variants/coverage.less`.
+//
+// ⛔ DR-25 — `.coverage__divider` (`:11-16`) is DELETED, not ported. No template has ever emitted
+// the class: it is absent from the AngularJS `coverage.html` and from the Angular one.
+
+.coverage {
+	margin-bottom: 30px;
+	padding: 0 15px;
+}
+
+.coverage__header {
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.coverage__content {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+.coverage__text {
+	display: inline-block;
+	font-size: 0.75rem;
+}
+
+.coverage__sum {
+	font-size: 1rem;
+	font-weight: bold;
+	float: right;
+}
+
+// The row carries the description popover, and C-8 made it reachable from the keyboard where
+// `angular-tooltips` was hover-only — which means it is now a tab stop and must show where the
+// focus is (`accessibility.md`). The directive only puts the row in the tab order when it actually
+// has a description to show, so this never marks an inert element.
+.coverage:focus-visible {
+	outline: 2px solid var(--mat-sys-primary);
+	outline-offset: 2px;
+	border-radius: var(--mat-sys-corner-medium);
+}

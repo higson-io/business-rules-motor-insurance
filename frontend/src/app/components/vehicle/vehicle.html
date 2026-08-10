@@ -1,0 +1,65 @@
+<!--
+	`data-testid` is the sanctioned selector fallback for the Playwright suite (spec.md §8.3) and
+	the goldens were captured against these exact ids — they are part of the contract, not a hint.
+	Unlike the AngularJS templates, whose labels were sibling `div`s with no `for`, `<mat-label>`
+	gives every control a real accessible name.
+
+	The blank first option reproduces `<option value=''>` from the AngularJS templates: its label is
+	what the dropdown shows while the level is unset, and the E2E helpers filter it out of the
+	dictionary reads by that exact text.
+-->
+<mat-form-field class="vehicle__field">
+	<mat-label>Production year</mat-label>
+	<mat-select
+		data-testid="vehicle-production-year"
+		[value]="selected().productionYear"
+		(selectionChange)="onProductionYearChange($event.value)"
+	>
+		<mat-option [value]="null">Production Year</mat-option>
+		@for (entry of productionYearDictionary(); track entry.code) {
+			<mat-option [value]="numericCode(entry)">{{ entry.name }}</mat-option>
+		}
+	</mat-select>
+</mat-form-field>
+
+<mat-form-field class="vehicle__field">
+	<mat-label>Make</mat-label>
+	<mat-select
+		data-testid="vehicle-make"
+		[value]="selected().makeId"
+		(selectionChange)="onMakeChange($event.value)"
+	>
+		<mat-option [value]="null">Make</mat-option>
+		@for (entry of makeDictionary(); track entry.code) {
+			<mat-option [value]="numericCode(entry)">{{ entry.name }}</mat-option>
+		}
+	</mat-select>
+</mat-form-field>
+
+<mat-form-field class="vehicle__field">
+	<mat-label>Type</mat-label>
+	<mat-select
+		data-testid="vehicle-type"
+		[value]="selected().typeId"
+		(selectionChange)="onTypeChange($event.value)"
+	>
+		<mat-option [value]="null">Type</mat-option>
+		@for (entry of typeDictionary(); track entry.code) {
+			<mat-option [value]="numericCode(entry)">{{ entry.name }}</mat-option>
+		}
+	</mat-select>
+</mat-form-field>
+
+<mat-form-field class="vehicle__field">
+	<mat-label>Model</mat-label>
+	<mat-select
+		data-testid="vehicle-model"
+		[value]="selected().modelId"
+		(selectionChange)="onModelChange($event.value)"
+	>
+		<mat-option [value]="null">Model</mat-option>
+		@for (entry of modelDictionary(); track entry.code) {
+			<mat-option [value]="numericCode(entry)">{{ entry.name }}</mat-option>
+		}
+	</mat-select>
+</mat-form-field>

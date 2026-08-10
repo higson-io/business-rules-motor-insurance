@@ -98,6 +98,11 @@
                     <version>3.0.0</version>
 					<configuration>
 						<executable>npm</executable>
+						<!-- The Angular workspace lives in frontend/; without this the plugin runs at
+						     ${project.basedir} and would pick up the wrong package.json.
+						     "npm run build" there is "npm ci && ng build" - lockfile-deterministic,
+						     self-bootstrapping, and independent of Vitest and Playwright. -->
+						<workingDirectory>${project.basedir}/frontend</workingDirectory>
 						<arguments>
 							<argument>run</argument>
 							<argument>build</argument>
@@ -112,26 +117,47 @@
                         </execution>
                     </executions>
                 </plugin>
+				<!-- Everything the frontend build generates lives under frontend/ and is wiped here.
+				     Nothing is emitted into src/main/webapp: that directory is version-controlled and
+				     is not touched by "mvn clean", so hashed bundles would accumulate there forever. -->
 				<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.2.0</version>
 					<configuration>
 						<filesets>
+							<!-- No <includes>: with one, the plugin deletes the contents and leaves an
+							     empty directory behind. These filesets remove the directories outright,
+							     so "mvn clean" really does return the tree to a clean-clone state. -->
 							<fileset>
-								<directory>node_modules</directory>
-								<includes>
-									<include>**/*</include>
-								</includes>
+								<directory>frontend/node_modules</directory>
 								<followSymlinks>false</followSymlinks>
 							</fileset>
 							<fileset>
-								<directory>src/main/webapp/vendors</directory>
-								<includes>
-									<include>**/*</include>
-								</includes>
+								<directory>frontend/dist</directory>
+								<followSymlinks>false</followSymlinks>
+							</fileset>
+							<fileset>
+								<!-- Angular CLI build cache -->
+								<directory>frontend/.angular</directory>
 								<followSymlinks>false</followSymlinks>
 							</fileset>
 						</filesets>
+					</configuration>
+				</plugin>
+				<!-- Pack the Angular bundle at the WAR root, which is exactly where the previous
+				     frontend lived, so ApplicationConfig's forward:/index.html needs no change.
+				     Version deliberately omitted: spring-boot-starter-parent manages this plugin at
+				     3.4.0 and its pluginManagement entry also supplies an <archive> block that an
+				     explicit <version> here would clobber. Do NOT pin it. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<configuration>
+						<webResources>
+							<resource>
+								<directory>${project.basedir}/frontend/dist/motor-insurance/browser</directory>
+							</resource>
+						</webResources>
 					</configuration>
 				</plugin>
 				<!-- Higson CLI: push/pull the snapshot in ${higson.snapshot.dir} to/from Higson Studio.

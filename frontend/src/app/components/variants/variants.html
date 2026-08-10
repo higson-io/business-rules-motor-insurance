@@ -1,0 +1,54 @@
+<div class="variants">
+	@if (errorMessage(); as message) {
+		<mat-card role="alert" data-testid="quote-error-banner" class="variants__error">
+			{{ message }}
+		</mat-card>
+	}
+
+	<!-- ⛔ DR-05 — NO CLIENT-SIDE SORT, on any of the three loops.
+	     The backend already returns options by ascending `order` and coverages and discounts by
+	     ascending `position` (pinned by the G1 contract test). The AngularJS ordering filter at
+	     `variants.html:8,21` took an UNQUOTED predicate, so it resolved to `undefined` on the scope
+	     and sorted nothing — a no-op that only looked like a sort. Adding a real one "to be safe"
+	     would be an unsanctioned deviation. -->
+	@for (variant of options(); track variant.code) {
+		<div class="variants__column" data-testid="variant-card">
+			<div class="variants__column__header" data-testid="variant-code">{{ variant.code }}</div>
+
+			@for (coverage of variant.coverages; track coverage.code) {
+				<app-coverage
+					[code]="coverage.code"
+					[name]="coverage.name"
+					[description]="coverage.description"
+					[limitLeft]="coverage.limitLeft"
+					[limitRight]="coverage.limitRight"
+					[premium]="coverage.premium"
+				/>
+			}
+
+			<div class="variants__column__footer">
+				<div class="variants__column__border"></div>
+				<div class="variants__column__price-before-discount">
+					<div class="variants__column__price-before-discounts__label">Price before discounts</div>
+					<div
+						class="variants__column__price-before-discounts__value"
+						data-testid="variant-premium-before-discounts"
+					>
+						{{ variant.premiumBeforeDiscounts | number: '1.2-2' }}
+					</div>
+				</div>
+
+				@for (discount of variant.discounts; track discount.code) {
+					<app-discount [name]="discount.name" [value]="discount.value" />
+				}
+
+				<div class="variants__column__final-price">
+					<div class="variants__column__final-price__label">FINAL PRICE</div>
+					<div class="variants__column__final-price__value" data-testid="variant-premium">
+						{{ variant.premium | number: '1.2-2' }}
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</div>

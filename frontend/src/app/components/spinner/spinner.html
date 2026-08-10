@@ -1,0 +1,10 @@
+<!--
+	`us-spinner="{radius: 30, width: 8, length: 16}"` (`main.html:2`) mapped onto Material:
+	radius 30 → diameter 60, width 8 → strokeWidth 8. `length` described the individual bars of
+	the angular-spinner rotor and has no counterpart in an arc-based spinner.
+
+	C-1 / C-9 replace the widget outright, so exact visual reproduction is explicitly NOT a parity
+	requirement — appearance is out of scope. Position and stacking are, and they live in
+	`spinner.less`.
+-->
+<mat-progress-spinner mode="indeterminate" [diameter]="60" [strokeWidth]="8" />

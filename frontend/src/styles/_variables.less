@@ -1,0 +1,29 @@
+// The trimmed survivors of `less/variables.less` (14 declarations → 3).
+//
+// The rule applied here is the one from plan step 9.3: where Angular Material already publishes a
+// system token, reference the token instead of re-declaring the hex, so the brand seed in
+// `theme.scss` stays the single place a brand colour is defined.
+//
+//   @color-primary        → var(--mat-sys-primary)          (#4C4CDE, set in theme.scss)
+//   @color-tooltip-border → var(--mat-sys-primary)          it WAS rgba(76,76,222,1) — the same colour
+//   @border-radius        → var(--mat-sys-corner-medium)    (8px, set in theme.scss)
+//
+// Dropped outright, because every rule that referenced them is deleted rather than ported:
+//   @color-border      only the `.common-input-*` controls that `mat-form-field` replaces (C-9)
+//   @color-gray        only `.common-input-default__label`, replaced by `<mat-label>`
+//   @color-gray-light  only `.common-btn-group .active` and `.coverage__divider` (DR-25)
+//   @color-gray-dark   folded into @color-text, which held the identical #333
+//   @color-blue        never referenced by anything, in nine years
+//   @color-background  never referenced by anything, in nine years
+
+// The hairline that separates the white panels from each other. Material's `--mat-sys-outline`
+// family is derived from the primary hue and comes out visibly violet; this border is neutral
+// grey by design, so it stays a literal.
+@color-border-block: #ECECEC;
+
+// The panels are deliberately PURE white against the blue gradient. Material's `--mat-sys-surface`
+// is hue-tinted in M3 and would tint them towards the background they are supposed to sit on top of.
+@color-white: #fff;
+
+// Body copy. `--mat-sys-on-surface` is likewise hue-tinted; this is neutral near-black.
+@color-text: #333;

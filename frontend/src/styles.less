@@ -1,0 +1,39 @@
+/* The global LESS entry point — the single one, as `standards/frontend/css.md` requires. It is the
+   direct descendant of `less/styles.less` and keeps that file's job: import the partials, declare
+   nothing itself.
+
+   Loaded AFTER `src/theme.scss` (see the `styles` array in `angular.json`), so where a rule here
+   and a Material generated rule address the same property, this one wins. `theme.scss` is the only
+   Sass file in the workspace and exists solely because `mat.theme()` has no LESS equivalent.
+
+   ⚠️ url() RESOLUTION. Angular's LESS pipeline rewrites `url()` relative to the file that WROTE it,
+   then resolves it at build time — an unresolvable path is a hard build error, not a warning. That
+   is why `imgs/` and `fonts/` sit next to these partials under `src/styles/` rather than in
+   `public/`: the bundler then emits them into `media/` and rewrites each reference to `./media/…`,
+   which is relative to the emitted stylesheet and therefore correct at `/demo`, at `/app` and at
+   the root alike. `public/` assets are copied verbatim and are NOT resolvable from a stylesheet;
+   `favicon.ico` lives there because `index.html`, not the CSS, refers to it.
+
+   Deleted rather than carried, each for a reason recorded in the partial that replaced it:
+     less/dropdown/dropdown-menu.less   re-skinned the Bootstrap 3 `.dropdown-menu` for the uib
+                                        datepicker popup. `MatDatepicker` (G7) has no such DOM.
+     less/common/common.less            `.common-input-*` and `.common-btn-group` are what
+                                        `mat-form-field` and `mat-button-toggle` now draw (C-9);
+                                        `.common-checkbox`, `.common-subsection-heading` and
+                                        `.common-subsection-divider` were never emitted by any
+                                        template (DR-25); `.common-input-icon` wrapped the Font
+                                        Awesome calendar glyph that `<mat-datepicker-toggle>`
+                                        replaced. Its one surviving line, `.common-tooltip`'s
+                                        `min-width: 340px`, is in `popover.less`. */
+
+@import '_variables';
+@import '_typography';
+@import '_layout';
+
+@import 'main';
+@import 'sidebar';
+@import 'popover';
+
+@import 'variants/variants';
+@import 'variants/coverage';
+@import 'variants/discounts';

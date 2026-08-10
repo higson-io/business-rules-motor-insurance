@@ -1,0 +1,35 @@
+{
+	"name": "motor-insurance",
+	"version": "0.0.0",
+	"private": true,
+	"engines": {
+		"node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+	},
+	"scripts": {
+		"build": "npm ci && ng build",
+		"start": "ng serve --proxy-config proxy.conf.json",
+		"test": "ng test"
+	},
+	"dependencies": {
+		"@angular/animations": "22.1.0",
+		"@angular/cdk": "22.1.1",
+		"@angular/common": "22.1.0",
+		"@angular/compiler": "22.1.0",
+		"@angular/core": "22.1.0",
+		"@angular/forms": "22.1.0",
+		"@angular/material": "22.1.1",
+		"@angular/platform-browser": "22.1.0",
+		"rxjs": "~7.8.2",
+		"tslib": "^2.3.0"
+	},
+	"devDependencies": {
+		"@angular/build": "22.1.3",
+		"@angular/cli": "22.1.3",
+		"@angular/compiler-cli": "22.1.0",
+		"jsdom": "^28.0.0",
+		"less": "^4.2.0",
+		"prettier": "^3.8.1",
+		"typescript": "~6.0.3",
+		"vitest": "^4.0.8"
+	}
+}

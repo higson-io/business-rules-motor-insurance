@@ -1,0 +1,16 @@
+// A custom element is inline by default, which would stop the panel from filling its grid column.
+// The panel's appearance — the header shadow, the scrolling content area, the icon backgrounds —
+// is the port of `less/sidebar/sidebar.less` and belongs to the global LESS (G9).
+:host {
+	display: block;
+	height: 100%;
+}
+
+// The AngularJS markup used `<div>`s for both copy elements, so it inherited no user-agent
+// heading margins. Promoting them to real headings (`accessibility.md`) brings those margins with
+// them; neutralising them here keeps the change semantic rather than visual. Sizes and weights
+// stay with the ported rules in G9 — nothing here sets one.
+.sidebar-container__header__title,
+.sidebar-container__divider__text {
+	margin: 0;
+}

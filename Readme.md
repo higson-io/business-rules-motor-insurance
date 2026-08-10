@@ -30,20 +30,46 @@ https://maven.apache.org/download.cgi
 
 Previous Maven versions might work as well but this was not checked. 
 
-#### NodeJS 
+#### NodeJS — version matters
+
+The frontend is an Angular 22 application, which accepts only these Node versions:
+
+```
+^22.22.3 || ^24.15.0 || >=26.0.0
+```
+
+Note that Node 23.x is **newer** than 22.22.3 and is still rejected — Angular supports even-numbered (LTS) majors only.
 
 To install go to:
-1. [Windows or Mac OS](https://nodejs.org/en/download/current/)
+1. [Windows or Mac OS](https://nodejs.org/en/download/)
 2. [Linux](https://github.com/nodesource/distributions)
 
-To update:
-```text
-npm install npm@latest -g
+Check what you have before building:
+
+```shell
+node -v
+```
+
+⚠️ **If the version is out of range, `mvn package` fails inside the `prepare-package` phase and the error does not mention Node.** The build stops at `exec-maven-plugin` with a non-zero exit from `npm ci`; the actual `engines` rejection is buried further up the output. Nothing in this repository installs or pins a Node version for you — there is no `.nvmrc` and no `frontend-maven-plugin` — so getting the right one onto your PATH is a manual, local step.
+
+If Node is installed side-by-side (for example Homebrew's keg-only `node@22`), prepend it to your PATH for the session before building:
+
+```shell
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"   # macOS / Homebrew example
 ```
 
 #### Higson Studio 4.0.2
 1. Go to:  https://www.higson.io/docs/download
 2. download zip, unpack it to the directory of your choice and run it as described [here](https://www.higson.io/docs/start-documentation). 
+
+## Project layout
+
+| Path | Contents |
+|---|---|
+| `src/main/java/` | Spring Boot backend — REST API, domain model, Higson adapters |
+| `src/main/higson/` | Higson rules snapshot. **Not tracked in git** — run `mvn higson-cli:pull` after a fresh clone |
+| `frontend/` | Angular 22 single-page application (see `frontend/README.md`) |
+| `e2e/` | Playwright behavioural test harness |
 
 ## Setup
 Make sure that both commands ```mvn``` and ```npm``` are accessible through system path. If not, add them.
@@ -56,14 +82,43 @@ or on Windows
 higson.database.url=jdbc:h2:c:/higson-studio/database/higson.demo;NON_KEYWORDS=VALUE
 ```
 
-## Running
+## Building and running
+
 Execute below maven command to run Spring Boot.
 ```shell
 mvn clean package
 mvn spring-boot:run
 ```
 Application will be accessible on port 48080. If you need to use other port change it in `higson-demo-app.properties` -> `server.port`.
-URL: [http://localhost:48080/](http://localhost:48080/demo)
+URL: [http://localhost:48080/demo](http://localhost:48080/demo)
+
+A plain `mvn clean package` builds the frontend too: `exec-maven-plugin` runs `npm ci && ng build` in `frontend/` during the `prepare-package` phase, and `maven-war-plugin` copies the result into the WAR. There is no separate frontend build step to remember, and no generated asset is committed. `mvn clean` removes `frontend/node_modules/`, `frontend/dist/` and the Angular CLI cache, so the first build after a clean re-downloads npm dependencies and takes noticeably longer.
+
+The application is served under the `/demo` context path by default. The bundle ships **no HTML base element**, so the same WAR also works unchanged at the server root or under any other context path — the published container image serves it at `/app`.
+
+### Frontend development server
+
+For frontend work, run the Angular dev server with hot reload against a locally running backend:
+
+```shell
+# terminal 1 — backend at the ROOT context, so JSESSIONID gets Path=/ and needs no rewriting
+SERVER_SERVLET_CONTEXT_PATH=/ mvn spring-boot:run
+
+# terminal 2
+cd frontend
+npm start          # http://localhost:4200/
+```
+
+See `frontend/README.md` for details, including the cookie-path caveat if you run the backend under `/demo` instead.
+
+### Tests
+
+```shell
+mvn test                                 # Java: MockMvc contract tests + Higson snapshot test
+cd frontend && npx ng test --watch=false # Angular unit tests (Vitest)
+```
+
+Frontend tests are deliberately **not** part of `mvn package`. End-to-end Playwright flows live in `e2e/` and require a running application — see `e2e/README.md`.
 
 ## Running with Docker
 Assuming you have docker and docker compose installed, motor-demo docker image is available on a [dockerhub](https://hub.docker.com/r/decerto/higson-motor-insurance-demo) as `decerto/higson-motor-insurance-demo:latest`.   
@@ -106,8 +161,9 @@ mvn clean package -Pall_in_one
 ```
 The resulting war archive can be executed from shell:
 ```shell
-./target/motor-insurance-1.0-SNAPSHOT.war
+./target/motor-insurance.war
 ```
+The artifact name is version-free by design (`<finalName>motor-insurance</finalName>`), so scripts and the `Dockerfile` reference the same path across releases.
 For more details about Spring Boot executables refer to 
 [https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html](https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html)
 

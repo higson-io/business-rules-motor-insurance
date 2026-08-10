@@ -1,0 +1,13 @@
+// The overlay placement of `less/main/main.less:6-12`, carried verbatim. It is the spinner's own
+// concern, so it lives with the spinner rather than in the global sheet.
+//
+// ⚠️ G9 — do NOT port the `.spinner` block of `less/main/main.less` into `styles/main.less` as
+// well. It is already here, and a second copy targeting the same element would be dead CSS at
+// best and a divergence at worst.
+:host {
+	position: absolute;
+	top: 50%;
+	left: 56%;
+	transform: translate(-50%, -50%);
+	z-index: 9999;
+}

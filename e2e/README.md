@@ -69,16 +69,31 @@ the step-2.5 expected-delta table or to C-9, or it is a regression.
 | **Timezone** | **UTC**, pinned in all three places required by P-4 (`spec.md` §8.6): `use.timezoneId` in `playwright.config.ts`, `TZ=UTC` in the run command, and `TZ=UTC -Duser.timezone=UTC` on the application JVM |
 | Branch | `migration/angularjs-to-angular-22` |
 | Base commit | `31ec808` (`spring boot starter`) |
-| Capture commit | ⚠️ **pending** — see below |
+| Capture commit | **`d09c201`**, tagged **`pre-angular-migration`** |
 | Backend | `target/motor-insurance.war`, `-Pall_in_one`, context path `/demo`, port 48080 |
 | Rules | Higson snapshot in `src/main/higson` (171 files), served through the H2 demo database. **The snapshot is not in git** — a fresh clone cannot reproduce this capture without `mvn higson-cli:pull` (P-2) |
 | Node / Playwright | Node 22.23.2 · `@playwright/test` 1.62.1 · Chromium 151 |
 
-⚠️ **The capture commit hash is not yet recorded.** The goldens were captured against a working
-tree in which the `data-testid` hooks and this harness were still uncommitted. `spec.md` §13
-item 3 requires the golden to be identifiable as "captured against a build touched only by
-additive test hooks", and that must be stated honestly: fill this row in — and create the
-`pre-angular-migration` tag — as part of the commit that lands this directory.
+**Provenance, stated honestly.** The goldens were captured against a working tree in which the
+`data-testid` hooks and this harness were still uncommitted; commit `d09c201` is the commit that
+landed exactly that tree, and the `pre-angular-migration` tag points at it. `spec.md` §13 item 3
+requires the golden to be identifiable as *"captured against a build touched only by additive
+test hooks"* — `d09c201` is that build, and the paragraph below is the evidence.
+
+To rebuild the captured application from scratch:
+
+```bash
+git checkout pre-angular-migration
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"   # Node 22.23.2 is keg-only on this machine
+mvn clean package -Pall_in_one
+```
+
+⚠️ Two caveats on reproducing it. The Higson snapshot is **not in git** (P-2), so a fresh clone
+needs `mvn higson-cli:pull` first. And `mvn package` re-dirties the tracked
+`src/main/webapp/styles/styles.min.css`, because the LESS build inlines Google Fonts CSS over the
+network at build time and Manrope has moved `v15` → `v20` since that file was last committed —
+discard it with `git checkout -- src/main/webapp/styles/styles.min.css`. DR-21 removes the problem
+permanently by untracking the file.
 
 **Why the build is trustworthy despite that.** The only modification to any AngularJS
 production file is the 29 additive `data-testid` attributes described below. Stripping every
@@ -169,6 +184,35 @@ request counts in `vehicle-cascade.spec.ts`:
 > and type deliberately do not. An idiomatic reactive rewrite reconnects them *by accident*, and
 > nothing else in this suite would notice. If one of those four assertions ever fails, the
 > migration has failed — not the test.
+
+---
+
+## DR-14 / C-6 — the one golden that changes deliberately
+
+`GlobalExceptionHandler` was a plain `@ControllerAdvice` whose handlers returned a `String`
+**without `@ResponseBody`**, so Spring MVC read the `QuoteValidator` message as a **view name**;
+view resolution failed and the resulting 404 overrode the `@ResponseStatus(BAD_REQUEST)`. The body
+carried no `message` key at all, which is why the AngularJS banner rendered **empty**.
+G10 makes it a `@RestControllerAdvice` returning the new `ErrorDto` (`spec.md` §6.4).
+
+**`DR-14` is the authority for this delta**, and it is the *only* golden change in the migration
+that is not a regression. Verified live against `target/motor-insurance.war` at
+`http://localhost:48080/demo/`, blanking the driver's first name and re-requesting the quote:
+
+| | Before (`goldens/pre/error-paths.json`) | After (`goldens/post/error-paths.json`) |
+|---|---|---|
+| Status | `404` | `400` |
+| Body | `{"timestamp":…,"status":404,"error":"Not Found","path":"/demo/quote"}` | `{"message":"Driver first name not supplied."}` |
+| `bannerText` | `""` | `"Driver first name not supplied."` |
+
+`error-paths.spec.ts` needs **no edit** for this: both halves were already written as
+`byStage('DR-14', …)` branches in G2, so the spec file stays byte-identical across stages and the
+`post` run simply takes the other branch. `spring.error.include-message` stays at its default
+(`never`) — the message comes from the handler, not from Spring's `/error` machinery.
+
+The other two differing keys in that file are also delta rows: `failedPut.bannerVisible`
+(**DR-06** — a failed mutation is no longer swallowed) and `failedQuote.cardsAfter`
+(**DR-07** — the stale variant cards no longer survive the failure).
 
 ---
 

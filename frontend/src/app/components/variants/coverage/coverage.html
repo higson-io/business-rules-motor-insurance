@@ -1,0 +1,14 @@
+<div class="coverage" data-testid="coverage-row" [appHtmlPopover]="description()">
+	<div class="coverage__header" data-testid="coverage-header">{{ name() }} ({{ code() }})</div>
+	<div class="coverage__content">
+		<div class="coverage__text" data-testid="coverage-limit">
+			{{ limitLeft() | number: '1.2-2' }}
+			@if (limitRight(); as right) {
+				<span>/ {{ right | number: '1.2-2' }}</span>
+			}
+		</div>
+		<div class="coverage__sum" data-testid="coverage-premium">
+			{{ premium() | number: '1.2-2' }}
+		</div>
+	</div>
+</div>

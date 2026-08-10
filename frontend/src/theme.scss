@@ -1,0 +1,50 @@
+// The single, deliberate Sass file in this workspace, and the single place a brand value is
+// declared. Angular Material's theming API (`mat.theme`) is Sass-only and has no LESS equivalent;
+// every other stylesheet is LESS (`standards/frontend/css.md`). `@angular/build` already bundles
+// `sass`, so this costs no new dependency — it is a scoped, documented exception to that standard,
+// not a second styling language for the application to author in. AC-S7 asserts there is exactly
+// one `.scss` file; keep it that way.
+//
+// Listed FIRST in angular.json's `styles` array so `src/styles.less` wins the cascade over the
+// generated Material theme.
+//
+// ⚠️ Recognisability, not parity. C-9 replaced every control on the screen, so nothing here is
+// trying to reproduce the old appearance — the brand seed simply keeps the application looking
+// like itself. A visual difference is never, on its own, a finding.
+@use '@angular/material' as mat;
+
+html {
+	@include mat.theme(
+		(
+			// Material generates a full tonal palette from a hue. `$violet-palette` is the stock
+			// palette closest to the brand's #4C4CDE, which the override below then pins exactly;
+			// the palette supplies the surrounding tones (containers, hovers, focus rings) that a
+			// single hex cannot.
+			color: (
+					primary: mat.$violet-palette,
+					tertiary: mat.$violet-palette,
+				),
+			// Manrope, self-hosted in `styles/_typography.less`. Material's typography tokens are
+			// independent of the `body` font rule, so without this every control on the screen —
+			// every field label, option and button — would render in Roboto while the surrounding
+			// copy rendered in Manrope.
+			typography: (
+					brand-family: 'Manrope, sans-serif',
+					plain-family: 'Manrope, sans-serif',
+				),
+			density: 0,
+		)
+	);
+
+	// The two brand constants of `less/variables.less`: @color-primary and @border-radius.
+	// Everything downstream references these tokens rather than re-declaring the values —
+	// `var(--mat-sys-primary)` and `var(--mat-sys-corner-medium)` appear throughout the LESS.
+	//
+	// #4C4CDE measures ~6.2:1 against white, past the 4.5:1 WCAG AA floor for body text at any
+	// size (`accessibility.md`), so it is safe as a text colour and not only as a fill.
+	--mat-sys-primary: #4c4cde;
+	--mat-sys-corner-extra-small: 8px;
+	--mat-sys-corner-small: 8px;
+	--mat-sys-corner-medium: 8px;
+	--mat-sys-corner-large: 8px;
+}

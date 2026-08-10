@@ -1,0 +1,129 @@
+<!--
+	The `data-testid` hooks are the ones the goldens were captured against (spec.md §8.3) and
+	`<mat-label>` gives each control the accessible name the AngularJS build never had — every
+	label there was a sibling `<div>` with no `for`, so no form control on the screen had an
+	accessible name at all.
+
+	⛔ ND-4 / ND-5 — this screen carries no form element, no validator list, no required flags, no
+	error display and no zip-code mask, because it carries none today. Adding any of it is a new
+	feature, not a migration.
+-->
+<mat-form-field class="driver__field">
+	<mat-label>First name</mat-label>
+	<input
+		#firstNameInput
+		matInput
+		type="text"
+		data-testid="driver-first-name"
+		[value]="firstName()"
+		(blur)="commitFirstName(firstNameInput.value)"
+	/>
+</mat-form-field>
+
+<mat-form-field class="driver__field">
+	<mat-label>Last name</mat-label>
+	<input
+		#lastNameInput
+		matInput
+		type="text"
+		data-testid="driver-last-name"
+		[value]="lastName()"
+		(blur)="commitLastName(lastNameInput.value)"
+	/>
+</mat-form-field>
+
+<!--
+	⛔ DR-04 — `(closed)` and `(blur)` are the ONLY commit points. Nothing is bound to
+	`(dateInput)`, which is what fires per keystroke.
+
+	DR-27: the open state lives entirely inside `<mat-datepicker>`, driven by its own toggle. The
+	AngularJS build kept it in `$scope.popup.opened` — a two-way binding into `$scope` while every
+	other member of the component sat on `ctrl` — plus an `openPopup()` relay. Both are gone; no
+	dual-scope binding and no open-state field survive.
+
+	⛔ DR-19: the uib close-button caption is not carried over. The button bar was disabled
+	(`show-button-bar="false"`), so the caption was unreachable — and Material renders no button
+	bar at all unless one is declared.
+-->
+<mat-form-field class="driver__field">
+	<mat-label>Date of birth</mat-label>
+	<input
+		#birthDateControl="matDatepickerInput"
+		matInput
+		data-testid="driver-date-of-birth"
+		[matDatepicker]="birthDatePicker"
+		[value]="birthDate()"
+		(blur)="commitBirthDate(birthDateControl.value)"
+	/>
+	<mat-datepicker-toggle
+		matIconSuffix
+		data-testid="driver-date-of-birth-toggle"
+		[for]="birthDatePicker"
+	/>
+	<mat-datepicker #birthDatePicker (closed)="commitBirthDate(birthDateControl.value)" />
+</mat-form-field>
+
+<!--
+	⛔ DR-08 — a real toggle group, not two buttons each carrying both `ng-click` and
+	`uib-btn-radio`. `MatButtonToggleGroup` emits `change` only when the selection actually changes,
+	so re-clicking the active choice costs nothing; it also exposes the selected state through
+	`role="radio"` + `aria-checked`, where the AngularJS build signalled it with a CSS class alone.
+-->
+<mat-button-toggle-group
+	class="driver__gender"
+	name="gender"
+	aria-label="Gender"
+	[value]="gender()"
+	(change)="onGender($event)"
+>
+	<mat-button-toggle value="M" data-testid="driver-gender-male">Male</mat-button-toggle>
+	<mat-button-toggle value="F" data-testid="driver-gender-female">Female</mat-button-toggle>
+</mat-button-toggle-group>
+
+<!--
+	⛔ ND-3 — recorded non-deviation. The "Address" divider is emitted from INSIDE the driver
+	component (`driver.html:55-60`) rather than from the sidebar that owns every other divider. It
+	is odd structure with zero user impact; moving it risks layout drift for no gain.
+-->
+<div class="sidebar-container__divider address">
+	<div class="sidebar-container__divider__icon">
+		<i class="address"></i>
+		<div class="sidebar-container__divider__text">Address</div>
+	</div>
+</div>
+
+<mat-form-field class="driver__field">
+	<mat-label>Zip code</mat-label>
+	<input
+		#zipCodeInput
+		matInput
+		type="text"
+		data-testid="driver-zip-code"
+		[value]="zipCode()"
+		(blur)="commitZipCode(zipCodeInput.value)"
+	/>
+</mat-form-field>
+
+<mat-form-field class="driver__field">
+	<mat-label>City</mat-label>
+	<input
+		#cityInput
+		matInput
+		type="text"
+		data-testid="driver-city"
+		[value]="city()"
+		(blur)="commitCity(cityInput.value)"
+	/>
+</mat-form-field>
+
+<mat-form-field class="driver__field">
+	<mat-label>Street</mat-label>
+	<input
+		#streetInput
+		matInput
+		type="text"
+		data-testid="driver-street"
+		[value]="street()"
+		(blur)="commitStreet(streetInput.value)"
+	/>
+</mat-form-field>

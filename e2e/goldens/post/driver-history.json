@@ -1,0 +1,23 @@
+{
+	"flow": "driver-history",
+	"stage": "post",
+	"timezone": "UTC",
+	"observations": {
+		"interactions": {
+			"accidentCount:type-12": [
+				"PUT driver/accidentCount",
+				"GET quote"
+			],
+			"accidentCount:cleared": {
+				"puts": 0,
+				"requests": [],
+				"responses": []
+			},
+			"licenceObtainedAtAge:below-min": {
+				"puts": 0,
+				"requests": [],
+				"responses": []
+			}
+		}
+	}
+}

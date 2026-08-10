@@ -1,0 +1,44 @@
+<!--
+	⛔ Pure layout. No handlers, no bindings other than the spinner's visibility — `main.js:21-23`
+	was deleted, not ported.
+
+	The Bootstrap 3 grid of `main.html:1-22` (`.container` → `.row` → `.col-md-3` + `.col-md-9`) is
+	gone with Bootstrap itself (C-9). What replaces it is CSS Grid over the class names below,
+	written in G9 and preserving Bootstrap's own 992px collapse point so the layout does not start
+	stacking at a different width than it does today (`responsive.md`).
+-->
+<div class="app-shell">
+	<!--
+		The one loading indicator in the application, driven by the interceptor-fed counter and by
+		nothing else. It sits outside the layout grid because it is positioned over the viewport.
+
+		⛔ ND-6 — this spinner used to FLASH at startup, because the eight AngularJS `templateUrl`
+		fetches passed through the same `$http` interceptor that drove it. Compiled templates issue
+		no such requests, so the flash disappears by construction. That is a sanctioned
+		disappearance (OD-13), not a regression: do NOT add an artificial delay to reproduce it,
+		and do not assert it.
+	-->
+	@if (pendingRequests.count() > 0) {
+		<app-spinner />
+	}
+
+	<div class="app-shell__layout">
+		<aside class="app-shell__sidebar">
+			<app-sidebar />
+		</aside>
+
+		<div class="app-shell__content">
+			<!--
+				The menubar: a white bar carrying the logo, right-aligned, and nothing else — no
+				navigation, no buttons, no interactivity (parity checklist §1). `.menubar` and
+				`.logo` keep their names so G9's port of `less/main/main.less:51-69` lands on the
+				same elements; the logo is a CSS background image there, as it is today.
+			-->
+			<div class="menubar">
+				<div class="logo" role="img" aria-label="Insurance app"></div>
+			</div>
+
+			<app-variants />
+		</div>
+	</div>
+</div>

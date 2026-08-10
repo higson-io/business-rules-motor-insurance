@@ -1,0 +1,10 @@
+// A custom element is inline by default; the shell has to be a block for anything inside it to
+// take the full width.
+//
+// Everything else about this layout is global and lives in `styles/_layout.less` — `.app-shell`,
+// `.app-shell__layout`, `.app-shell__sidebar` and `.app-shell__content`, plus the 992px collapse
+// point. It cannot live here: the same stylesheet has to reach `.menubar` and `.logo`, which sit
+// in this template, and the sidebar and variant panels, which do not.
+:host {
+	display: block;
+}

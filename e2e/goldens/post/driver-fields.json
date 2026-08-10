@@ -1,0 +1,41 @@
+{
+	"flow": "driver-fields",
+	"stage": "post",
+	"timezone": "UTC",
+	"observations": {
+		"perFieldRequests": {
+			"driver/firstName": [
+				"PUT driver/firstName",
+				"GET quote"
+			],
+			"driver/lastName": [
+				"PUT driver/lastName",
+				"GET quote"
+			],
+			"driver/address/zipCode": [
+				"PUT driver/address/zipCode",
+				"GET quote"
+			],
+			"driver/address/city": [
+				"PUT driver/address/city",
+				"GET quote"
+			],
+			"driver/address/street": [
+				"PUT driver/address/street",
+				"GET quote"
+			],
+			"driver/birthDate": {
+				"puts": 1,
+				"requests": [
+					"PUT driver/birthDate",
+					"GET quote"
+				]
+			},
+			"driver/gender:change": [
+				"PUT driver/gender",
+				"GET quote"
+			],
+			"driver/gender:reclick": []
+		}
+	}
+}

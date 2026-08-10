@@ -1,0 +1,58 @@
+// G-E5 — the coverage description popover.
+//
+// ⚠️ REWRITTEN, NOT PORTED. `less/config.less:22-42` styled the `angular-tooltips` DOM directly:
+// three custom elements, `tooltip > tip > tip-arrow`, none of which exists any more. C-8 replaced
+// that library with a CDK Overlay (`shared/html-popover/`), so there is no element left for those
+// selectors to reach and porting them would have produced a stylesheet that compiled, shipped, and
+// styled nothing.
+//
+// What IS carried is the appearance the rules described, plus the one line worth keeping from
+// `less/common/common.less:134-136` — `.common-tooltip`'s `min-width: 340px`, which was applied
+// through `tooltip-class="common-tooltip"` on the coverage row.
+//
+// The class arrives via `panelClass: 'html-popover'` on the overlay config, and the CDK puts it on
+// the overlay pane — so this rule cannot live in a component stylesheet: the pane is attached to
+// the CDK's own overlay container at the end of `<body>`, outside every component's view.
+
+.html-popover {
+	position: relative;
+	min-width: 340px;
+	// Room for the arrow, which is drawn outside the panel's left edge.
+	margin-left: 19px;
+	padding: 15px;
+	border: 1px solid var(--mat-sys-primary);
+	border-radius: 4px;
+	background-color: @color-white;
+	color: @color-text;
+	text-align: left;
+}
+
+// A readable line length, and the one rule here that has to name the CDK's own class.
+//
+// `FlexibleConnectedPositionStrategy` puts `max-width: 100%` on `.cdk-overlay-pane` so the panel
+// can never overflow the space it measured. That is a single class, so a plain `.html-popover`
+// cap ties on specificity and loses on order — a declaration that silently computes to something
+// else. Matching the CDK's specificity is the framework's own mechanism for overriding it
+// (`css.md`: work with the framework); `!important` would be fighting it. Without a cap the
+// descriptions render as one line across whatever width the viewport happens to offer, which at a
+// wide screen is well past the ~90 characters that stays readable (`responsive.md`).
+.cdk-overlay-pane.html-popover {
+	max-width: 480px;
+}
+
+// `tip-arrow` was an element; here the same 19×19 `imgs/arrow-tooltip.svg` is a pseudo-element,
+// which is what it always was in spirit — decoration with no content and no accessibility meaning.
+// The panel is anchored to the right edge of the coverage row and vertically centred on it
+// (`html-popover.ts`), so the arrow points back left at its origin.
+.html-popover::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: -19px;
+	width: 19px;
+	height: 19px;
+	transform: translateY(-50%);
+	background-image: url('imgs/arrow-tooltip.svg');
+	background-repeat: no-repeat;
+	background-position: right center;
+}

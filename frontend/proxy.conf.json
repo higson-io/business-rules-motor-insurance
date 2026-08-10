@@ -1,0 +1,18 @@
+{
+	"/driver": {
+		"target": "http://localhost:48080",
+		"secure": false
+	},
+	"/vehicle": {
+		"target": "http://localhost:48080",
+		"secure": false
+	},
+	"/dictionaries": {
+		"target": "http://localhost:48080",
+		"secure": false
+	},
+	"/quote": {
+		"target": "http://localhost:48080",
+		"secure": false
+	}
+}

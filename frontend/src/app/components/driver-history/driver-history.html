@@ -1,0 +1,52 @@
+<!--
+	The `data-testid` hooks are the ones the goldens were captured against (spec.md §8.3) and
+	`<mat-label>` gives each control the accessible name the AngularJS sibling-`div` labels never
+	provided.
+
+	⛔ DR-03 — each field commits on `(blur)`, never on `(input)`. Today `ng-change` fires per
+	keystroke with no debounce, so typing `12` is two PUTs and two full Higson evaluations.
+
+	The value comes off the input element itself rather than through a form control: `valueAsNumber`
+	is `NaN` for an empty or unparseable field, which is precisely the case DR-02 must not send.
+	`min` stays on the element so the browser keeps its native spinner behaviour, but the guard in
+	the component is what actually enforces it — there is no `<form>` and no validation display
+	anywhere on this screen (ND-4).
+-->
+<mat-form-field class="driver-history__field">
+	<mat-label>Number of accidents in the last 5 years</mat-label>
+	<input
+		#accidentsInput
+		matInput
+		type="number"
+		min="0"
+		data-testid="driver-accidents"
+		[value]="accidents() ?? ''"
+		(blur)="commitAccidents(accidentsInput.valueAsNumber)"
+	/>
+</mat-form-field>
+
+<mat-form-field class="driver-history__field">
+	<mat-label>Number of traffic tickets in the last 5 years</mat-label>
+	<input
+		#ticketsInput
+		matInput
+		type="number"
+		min="0"
+		data-testid="driver-tickets"
+		[value]="tickets() ?? ''"
+		(blur)="commitTickets(ticketsInput.valueAsNumber)"
+	/>
+</mat-form-field>
+
+<mat-form-field class="driver-history__field">
+	<mat-label>Driver's age when driver licence was obtained</mat-label>
+	<input
+		#licenceAgeInput
+		matInput
+		type="number"
+		min="16"
+		data-testid="driver-licence-age"
+		[value]="licenceAge() ?? ''"
+		(blur)="commitLicenceAge(licenceAgeInput.valueAsNumber)"
+	/>
+</mat-form-field>

@@ -1,0 +1,58 @@
+// The port of `less/main/main.less` — the menubar, the logo and the scrollbars.
+//
+// ⛔ NOT PORTED — `.spinner` (`main.less:6-12`). Its positioning already lives on the spinner's own
+// `:host` in `app/components/spinner/spinner.less`, where it belongs. Plan step 9.3 lists it for
+// this file as well; a second copy targeting the same element would be dead at best and a silent
+// divergence the day one of the two is edited.
+//
+// ⛔ NOT PORTED — the `outline: none` block (`main.less:34-48`). It stripped the focus ring from
+// `input`, `select`, `li`, `td`, `.btn` and `.uib-datepicker`. Three of those elements no longer
+// exist, and suppressing the focus indicator on the ones that do is precisely what
+// `accessibility.md` forbids: keyboard users lose all trace of where they are. Material draws its
+// own focus indicators, so deleting these rules restores keyboard visibility rather than changing
+// any design decision.
+
+.menubar {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	height: 65px;
+	margin-bottom: 26px;
+	padding-right: 15px;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background-color: @color-white;
+}
+
+// Decorative and named by `aria-label` on the element itself (`app.html`), so the image is a
+// background rather than an `<img>`. The 206×38 box matches the SVG's intrinsic size.
+.logo {
+	display: inline-block;
+	width: 206px;
+	height: 38px;
+	background: url('imgs/logo-insurance-app.svg') no-repeat;
+	background-size: 206px 38px;
+}
+
+// `main.less:13-32`, carried verbatim. WebKit-only and purely cosmetic: every browser that ignores
+// these still gets a working scrollbar.
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 10px;
+	background-color: rgba(236, 236, 236, 1);
+}
+
+::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: rgba(181, 181, 181, 1);
+	cursor: pointer;
+	outline: none;
+}
