@@ -61,6 +61,18 @@
 	padding: 0 15px;
 }
 
+// ⚠️ The "Address" divider is the one that is NOT a sibling of the widgets — ND-3 records that it
+// is emitted from inside the driver component, so it sits within `.sidebar-container__widget` and
+// inherits that element's 15px gutter before applying its own. Doubled, it started 15px further in
+// than every field beside it and ran 14px past the panel's right edge.
+//
+// The gutter belongs to whichever element establishes it; here that is the widget, so the nested
+// divider contributes none of its own.
+.sidebar-container__widget .sidebar-container__divider {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .sidebar-container__divider__icon {
 	display: flex;
 	width: 100%;

@@ -1,0 +1,57 @@
+def /ROOT
+  quote Quote                                        @desc quote (with all available options)
+
+def Address table ADDRESS                        @desc Address data
+  city string column CITY                            @desc city name
+  country string column COUNTRY                      @desc country name
+  flatNo string column FALT_NO                       @desc flat number
+  street string column STREET                        @desc street name
+  streetNo string column STREET_NUMBER               @desc street number
+  zipCode string column ZIP_CODE                     @desc postal code  (zip code)
+
+def Coverage table COVERAGE                      @desc Risk Coverage
+  code string column code                            @desc Unique code for this coverage
+  description string                                 @desc description
+  limit1 number                                      @desc Limit 1, meaning depends on coverage
+  limit2 number                                      @desc Limit 2 (optional), meaning depends on coverage
+  name string                                        @desc name of risk coverage
+  position integer                                   @desc position number
+  premium number column premium                      @desc calculated premium
+
+def Discount table DISCOUNT                      @desc Available discount
+  code string column code                            @desc discount's code
+  name string                                        @desc dicount's name
+  position integer                                   @desc position number
+  value number column value                          @desc discounts' value
+
+def Driver table DRIVER                          @desc Driver - personal and licence-related data
+  address Address                                    @desc client's main address
+  age integer column age                             @desc client's age
+  birthDate date column BIRTH_DATE                   @desc client's birth day
+  firstname string column FIRST_NAME                 @desc first name
+  gender string column gender                        @desc gender - M (male) or F (female)
+  lastname string column LAST_NAME                   @desc last name
+  licenceObtainedAtAge integer column LICENCE_AGE    @desc age when driver licence was obtained
+  numberOfAccidents integer column ACCIDENTS_COUNT   @desc number of accidents in the last 5 years
+  numberOfTickets integer column TICKETS_COUNT       @desc number of traffic tickets in the last 5 years
+
+def Option table OPTION                          @desc Rating Option (variation)
+  code string column code                            @desc Option unique code
+  coverages Coverage*                                @desc All coverages selected for this option
+  discounts Discount*                                @desc Available discounts
+  order integer                                      @desc order number
+
+def Quote table QUOTE                            @desc Insurance Policy / Proposal
+  driver Driver                                      @desc insured driver
+  options Option*                                    @desc rating variations
+  planCode string column PLAN_CODE                   @desc code of rating plan for this policy
+  vehicle Vehicle                                    @desc insured vehicle
+
+def Vehicle table VEHICLE                        @desc Vehicle data
+  make string                                        @desc Manufacturer of the vehicle
+  makeId integer                                     @desc Manufacturer ID
+  model string                                       @desc Vehicle model
+  modelId integer column MODEL_ID                    @desc Vehicle model ID
+  primaryUse string                                  @desc Primary use of vehicle [commute (to work or school), pleasure, business]
+  productionYear integer                             @desc Vehicle production year (in form YYYY)
+  typeId integer column TYPE_ID                      @desc Vehicle type ID

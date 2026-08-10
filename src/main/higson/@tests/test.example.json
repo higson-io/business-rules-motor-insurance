@@ -1,0 +1,22 @@
+{
+  "name" : "test.example",
+  "testElements" : [ {
+    "id" : "parameter@demo.motor.coverage.veh.premium",
+    "expectedValue" : "200",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "COMMA",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "coverage.code",
+    "type" : "string",
+    "value" : "COLL"
+  }, {
+    "code" : "option.code",
+    "type" : "string",
+    "value" : "BRONZE"
+  } ]
+}

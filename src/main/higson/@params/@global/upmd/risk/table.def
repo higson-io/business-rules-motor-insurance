@@ -1,0 +1,29 @@
+code = "upmd.risk.table"
+description = ""
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Description"
+
+[[inputLevel]]
+code = "numberOfTickets"
+label = "numberOfTickets"
+type = "integer"
+matcher = "between/ie"
+reverseMatcher = false
+property = "quote.driver.numberOfTickets"
+source = "quote.driver.numberOfTickets"
+union = false
+
+[[outputLevel]]
+code = "value"
+label = "value"
+type = "number"
+external = false
+array = false

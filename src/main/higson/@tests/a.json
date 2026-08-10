@@ -1,0 +1,22 @@
+{
+  "name" : "a",
+  "testElements" : [ {
+    "id" : "parameter@demo.motor.coverage.bi.tariff",
+    "expectedValue" : "",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "COMMA",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "quote.driver.gender",
+    "type" : "string",
+    "value" : "F"
+  }, {
+    "code" : "quote.driver.age",
+    "type" : "integer",
+    "value" : "20"
+  } ]
+}

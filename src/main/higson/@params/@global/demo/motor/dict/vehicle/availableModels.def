@@ -1,0 +1,77 @@
+code = "demo.motor.dict.vehicle.availableModels"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = "model asc"
+masterName = "demo.motor.dict.vehicle.data"
+slave = true
+label = "<no label>"
+
+[[inputLevel]]
+code = "type_id"
+label = "type identifier"
+type = "integer"
+reverseMatcher = false
+property = "quote.vehicle.typeId"
+source = "quote.vehicle.typeId"
+union = false
+
+[[outputLevel]]
+code = "model"
+label = "model name"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "model_id"
+label = "model identifier"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "seats"
+label = "number of seats"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "doors"
+label = "number of doors"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capacity"
+label = "engine capacity (cm3)"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "power"
+label = "engine power (HP)"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "body_type"
+label = "body type code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "model_label"
+label = "model label"
+type = "string"
+external = false
+array = false

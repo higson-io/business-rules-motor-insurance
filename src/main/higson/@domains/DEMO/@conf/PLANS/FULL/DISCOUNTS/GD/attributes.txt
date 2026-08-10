@@ -1,0 +1,17 @@
+[[attr]]
+attributeCode = "available"
+attributeName = "is discount available"
+refType = "PARAMETER"
+refName = "demo.motor.discount.goodriver [available]"
+
+[[attr]]
+attributeCode = "position"
+attributeName = "discount position"
+refType = "LITERAL"
+refName = "2"
+
+[[attr]]
+attributeCode = "value"
+attributeName = "discount amount"
+refType = "PARAMETER"
+refName = "demo.motor.discount.goodriver [amountValue]"

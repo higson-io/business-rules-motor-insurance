@@ -1,0 +1,28 @@
+code = "pl.decerto.demo.telco.extra.channel.details"
+description = ""
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "channelCode"
+label = "channel code"
+type = "string"
+reverseMatcher = false
+property = "extraChannel.code"
+source = "extraChannel.code"
+union = false
+
+[[outputLevel]]
+code = "details"
+label = "additional details"
+type = "string"
+external = false
+array = false

@@ -1,0 +1,36 @@
+code = "pl.decerto.demo.telco.package.invoice.prices"
+description = ""
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "InvoiceEntryNumber"
+label = "ordinal number on invoice"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "invoice.entryNumber"
+source = "invoice.entryNumber"
+union = false
+
+[[outputLevel]]
+code = "OverallPrice"
+label = "monthly price"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "OverallPriceAfterDiscounts"
+label = "monthly price after discount"
+type = "number"
+external = false
+array = false

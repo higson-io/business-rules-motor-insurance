@@ -1,0 +1,6 @@
+#matrix for parameter dictionary.product.details
+PRODUCT_CODE;TYPE;DESCRIPTION
+ACCOUNT;DEPOSIT_PRODUCT;Bank account
+CARD;CREDIT_PRODUCT;Credit card
+DEPOSIT;DEPOSIT_PRODUCT;Deposit in the bank
+PLUMBER_ASSISTANCE;ASSISTANCE_PRODUCT;Plumbing assistance services

@@ -11,10 +11,11 @@
 // Dropped outright, because every rule that referenced them is deleted rather than ported:
 //   @color-border      only the `.common-input-*` controls that `mat-form-field` replaces (C-9)
 //   @color-gray        only `.common-input-default__label`, replaced by `<mat-label>`
-//   @color-gray-light  only `.common-btn-group .active` and `.coverage__divider` (DR-25)
 //   @color-gray-dark   folded into @color-text, which held the identical #333
 //   @color-blue        never referenced by anything, in nine years
 //   @color-background  never referenced by anything, in nine years
+//
+// @color-gray-light was dropped with them and has since been restored — see below.
 
 // The hairline that separates the white panels from each other. Material's `--mat-sys-outline`
 // family is derived from the primary hue and comes out visibly violet; this border is neutral
@@ -27,3 +28,13 @@
 
 // Body copy. `--mat-sys-on-surface` is likewise hue-tinted; this is neutral near-black.
 @color-text: #333;
+
+// The selected fill of the gender toggle, carried from `less/variables.less`.
+//
+// This variable was dropped as dead when the styles were ported, on the reasoning that its only two
+// consumers — `.common-btn-group .active` and `.coverage__divider` — were both gone. The second is
+// gone for good (DR-25). The first was not: `mat-button-toggle` took over the job, and it defaults
+// to a tinted primary container that renders lavender beside three white fields. The original
+// neutral grey does the same work without introducing a fourth colour, so the variable is back with
+// its consumer in `_forms.less` rather than the value being inlined there.
+@color-gray-light: #f2f2f2;

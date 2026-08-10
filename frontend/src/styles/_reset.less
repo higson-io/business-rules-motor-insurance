@@ -1,0 +1,17 @@
+// Border-box sizing.
+//
+// ⚠️ This is a genuine bug fix, not a preference. The ported sidebar rules combine `width: 100%`
+// with horizontal padding — `.sidebar-container__divider` is `width: 100%; padding: 0 15px` — and
+// under the default `content-box` those add up: a divider inside a 354px column measured 384px and
+// overflowed its own card by 30px, which is what made every section heading sit wider than the
+// panel containing it.
+//
+// The AngularJS build never showed this because Bootstrap 3 shipped exactly this reset; dropping
+// Bootstrap (C-9) dropped the reset with it, and the ported rules were written against its
+// presence. Restoring it is the smallest correct fix — the alternative is rewriting every ported
+// width/padding pair to subtract its own gutter.
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}

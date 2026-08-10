@@ -1,0 +1,29 @@
+code = "pl.decerto.demo.telco.serviceAndChannel.discount.channelsForDiscount"
+description = "Parametr przechowuje dane wykorzystywane potem przez aliasy do kalkulacji ceny za usługę : PHONE, uwzględniając zniżkę za wybranie danego kanału z pakietu : EXTRA_CHANNELS oraz usługi PHONE"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+masterName = "pl.decerto.demo.telco.discountForChannelAndPhone"
+slave = true
+label = "<no label>"
+
+[[inputLevel]]
+code = "packageCode"
+label = "package code"
+type = "string"
+reverseMatcher = false
+property = "package.code"
+source = "package.code"
+union = false
+
+[[outputLevel]]
+code = "extraChannel"
+label = "chosen additional channels"
+type = "string"
+external = false
+array = false

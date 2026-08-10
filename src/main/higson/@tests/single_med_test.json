@@ -1,0 +1,26 @@
+{
+  "name" : "single_med_test",
+  "testElements" : [ {
+    "id" : "parameter@demo.motor.coverage.med.premium",
+    "expectedValue" : "70",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "COMMA",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "coverage.code",
+    "type" : "string",
+    "value" : "MED"
+  }, {
+    "code" : "quote.driver.gender",
+    "type" : "string",
+    "value" : "M"
+  }, {
+    "code" : "coverage.limit1",
+    "type" : "number",
+    "value" : "5000"
+  } ]
+}

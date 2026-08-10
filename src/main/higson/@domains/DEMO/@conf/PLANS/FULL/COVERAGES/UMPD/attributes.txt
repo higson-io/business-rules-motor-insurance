@@ -1,0 +1,41 @@
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Whether this coverage is available for current option"
+attributeDescription = ""
+refType = "PARAMETER"
+refName = "demo.motor.coverage.availability"
+
+[[attr]]
+attributeCode = "LIMIT_1"
+attributeName = "Limit 1 for this coverage"
+attributeDescription = ""
+refType = "PARAMETER"
+refName = "demo.motor.coverage.limits [limit1]"
+
+[[attr]]
+attributeCode = "LIMIT_2"
+attributeName = "Limit 2 for this coverage (optional)"
+attributeDescription = ""
+refType = "PARAMETER"
+refName = "demo.motor.coverage.limits [limit2]"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Position on the screen or printout "
+attributeDescription = ""
+refType = "PARAMETER"
+refName = "demo.motor.coverage.position"
+
+[[attr]]
+attributeCode = "PREMIUM"
+attributeName = "Base premium for this coverage"
+attributeDescription = ""
+refType = "FLOW"
+refName = "demo.motor.plan.full.calculate.premium [premium]"
+
+[[attr]]
+attributeCode = "RISK_ASSESSMENT"
+attributeName = "Risk assessment"
+attributeDescription = ""
+refType = "PARAMETER"
+refName = "upmd.risk.table"

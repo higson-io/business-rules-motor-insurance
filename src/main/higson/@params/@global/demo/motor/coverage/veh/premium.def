@@ -1,0 +1,35 @@
+code = "demo.motor.coverage.veh.premium"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "cover"
+label = "coverage code"
+type = "string"
+reverseMatcher = false
+property = "coverage.code"
+source = "coverage.code"
+union = false
+
+[[inputLevel]]
+code = "option"
+label = "option code"
+type = "string"
+reverseMatcher = false
+property = "option.code"
+source = "option.code"
+union = false
+
+[[outputLevel]]
+code = "premium"
+label = "premium"
+type = "number"
+external = false
+array = false

@@ -1,0 +1,33 @@
+code = "dictionary.product.details"
+description = "Details of products"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "<no label>"
+
+[[outputLevel]]
+code = "PRODUCT_CODE"
+label = "Code of product"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "TYPE"
+label = "Type of product"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "DESCRIPTION"
+label = "Description of product"
+type = "string"
+external = false
+array = false

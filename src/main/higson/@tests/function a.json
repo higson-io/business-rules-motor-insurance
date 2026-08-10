@@ -1,0 +1,19 @@
+{
+  "name" : "function a",
+  "testElements" : [ {
+    "id" : "function@a",
+    "expectedValue" : "",
+    "functionArguments" : [ {
+      "argumentName" : "a",
+      "functionName" : "a",
+      "type" : "java.lang.Integer",
+      "value" : "2"
+    } ]
+  } ],
+  "columnDelimiter" : "COMMA",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ ]
+}

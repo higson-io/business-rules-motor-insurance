@@ -1,0 +1,14 @@
+/*
+#Full code: demo.motor.plan.full.calculate.premium
+
+# DO NOT REMOVE, MOVE OR MODIFY THIS COMMENT
+# unless you know what you're doing. Incorrect content will cause error during import.
+# IMPORTANT: these escape sequences MUST be used inside this comment: '/' -> '\/', '\' -> '\\'
+
+arguments = []
+categories = []
+logLevel = "INFO"
+description = ""
+*/
+
+{"arguments":[],"variables":[{"name":"premium","type":"number","value":null,"returned":true},{"name":"limit1","type":"number","value":null,"returned":false},{"name":"factor","type":"number","value":null,"returned":false}],"nodes":[{"id":"97d291f0-c89b-46d2-abe2-7b2bf4a579d7","actions":[{"type":"FUNCTION","value":"util.ctx.get","outputVariable":"limit1","arguments":[{"value":"coverage.limit1","source":"LITERAL","name":"path"}],"label":"Get limit"}],"links":[],"defaultNextNode":"1f6cb440-d055-4c46-b681-6a235815bffc","position":{"x":-232.99999330132857,"y":36.99998103737707}},{"id":"06e787c2-7f1c-47e3-8647-6100625c62fc","actions":[{"type":"DECISION_TABLE","value":"demo.motor.plan.full.tariff","outputVariable":"factor","arguments":[],"label":"Read tariff factor"}],"links":[],"defaultNextNode":"97d291f0-c89b-46d2-abe2-7b2bf4a579d7","position":{"x":-543.0000256520564,"y":36.999981513537435}},{"id":"1f6cb440-d055-4c46-b681-6a235815bffc","actions":[{"type":"FUNCTION","value":"util.multiply","outputVariable":"premium","arguments":[{"value":"factor","source":"VARIABLE","name":"arg1"},{"value":"limit1","source":"VARIABLE","name":"arg2"}],"label":"Calculate premium"}],"links":[],"defaultNextNode":"11fd4af9-f6e3-4622-85f4-3c9191dda987","position":{"x":84.00001174093836,"y":36.99998103722059}},{"id":"11fd4af9-f6e3-4622-85f4-3c9191dda987","actions":[],"links":[{"conditionString":"premium == 0","condition":[],"target":"8c188a36-f5c1-4339-a65c-ff47ab627373","label":"premium == 0"}],"defaultNextNode":"a7476b5e-5755-4cfa-8493-3173d9435075","position":{"x":529.0000046536015,"y":17.000009887842367}},{"id":"8c188a36-f5c1-4339-a65c-ff47ab627373","actions":[{"type":"FUNCTION","value":"util.echo","outputVariable":"premium","arguments":[{"value":"10","source":"LITERAL","name":"text"}],"label":"Set min premium as 10$"}],"links":[],"defaultNextNode":"a7476b5e-5755-4cfa-8493-3173d9435075","position":{"x":823.9999566683075,"y":-103.00000750830665}},{"id":"a7476b5e-5755-4cfa-8493-3173d9435075","actions":[{"type":"FUNCTION","value":"util.round","outputVariable":"premium","arguments":[{"value":"premium","source":"VARIABLE","name":"arg1"},{"value":"2","source":"LITERAL","name":"arg2"}],"label":"Round premium"}],"links":[],"defaultNextNode":null,"position":{"x":1236.0000206654456,"y":37.00001702070227}}],"startNodeId":"06e787c2-7f1c-47e3-8647-6100625c62fc","version":"V1"}

@@ -1,0 +1,80 @@
+// Form-control appearance.
+//
+// Every `mat-form-field` on this screen uses `appearance="outline"`, set in the templates. The
+// default `fill` appearance paints `--mat-sys-surface-container-highest` (#e8e0eb, lavender-grey),
+// rounds only its top two corners and draws a bottom underline. `outline` gives a white field with
+// all four corners rounded and a 1px border on every side — which is both what was asked for and
+// what `less/common/common.less`'s `.common-input-default__input` drew before the migration:
+// 56px tall, 8px radius, a 1px rgba(0,0,0,.38) border and a floating label notched into the top
+// edge.
+//
+// The rules below are the parts `outline` does not give for free.
+
+// The fields stack, so each must fill its column. Material's host is `inline-flex` by default,
+// which leaves them sized to their content.
+.mat-mdc-form-field {
+	display: block;
+	width: 100%;
+}
+
+// White, not the theme's surface tone. `outline` leaves the container transparent, so this shows
+// the panel behind it; naming it explicitly keeps the field white even if the panel ever is not.
+//
+// ⚠️ The `.mdc-text-field--outlined` qualifier is load-bearing, not decoration. Material keeps a
+// `4px 4px 0 0` radius on the wrapper — a leftover of the `fill` appearance, harmless while the
+// wrapper is transparent — and it beats an unqualified selector. Filling that wrapper white makes
+// it visible: the white block's square bottom corners spill out from under the outline's rounded
+// ones. Matching the specificity lets the fill follow the border it sits inside.
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+	background-color: @color-white;
+	border-radius: var(--mat-sys-corner-medium);
+}
+
+// The gender control.
+//
+// ⚠️ `mat-button-toggle` defaults to `flex: 0 1 auto`, so the two buttons sized themselves to their
+// captions — 85px for "Male", 71px for "Female" — and left ~165px of empty bordered track inside a
+// group stretched to the full column width. Equal flex fills it and makes the pair read as one
+// control rather than two stray buttons in a box.
+// ⚠️ Material 3 shapes the toggle group with `--mat-sys-corner-full`, which renders it as a pill —
+// the one control on the screen that would not share the 8px radius every field and card uses.
+// The token is overridden rather than the radius, so the group and its end caps stay in agreement;
+// setting `border-radius` on the group alone leaves the first and last buttons still drawing pill
+// ends underneath it.
+.mat-button-toggle-group {
+	width: 100%;
+	--mat-button-toggle-shape: var(--mat-sys-corner-medium);
+	--mat-button-toggle-legacy-shape: var(--mat-sys-corner-medium);
+	border-radius: var(--mat-sys-corner-medium);
+	overflow: hidden;
+}
+
+.mat-button-toggle {
+	flex: 1 1 0;
+	text-align: center;
+}
+
+// The selected fill. Material's default is a tinted primary container — lavender against three
+// otherwise white controls. `less/common/common.less`'s `.common-btn-group__btn.active` used a
+// neutral `#f2f2f2`, which is both closer to the original and easier to sit beside the white
+// fields. The text stays at the body colour, so selection reads from the fill and the check mark
+// rather than from a colour shift.
+.mat-button-toggle-checked {
+	--mat-button-toggle-selected-state-background-color: @color-gray-light;
+	--mat-button-toggle-selected-state-text-color: inherit;
+}
+
+// Matches the 56px of the text fields, so the vertical rhythm does not break at the one control
+// that is not a `mat-form-field`. Material's own default is 40px.
+.mat-button-toggle .mat-button-toggle-button,
+.mat-button-toggle .mat-button-toggle-label-content {
+	height: 56px;
+	line-height: 56px;
+}
+
+// `mat-form-field` reserves a subscript row under every field for hints and errors, which supplies
+// the 20px gap between the stacked fields. The toggle group has no such row, so without this the
+// "Address" divider below it sat 1px away.
+.driver__gender {
+	margin-bottom: 20px;
+}
