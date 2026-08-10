@@ -1,0 +1,230 @@
+orchestrator:
+  started_phase: analyze-current-state
+  completed_phases:
+    - phase-1
+    - phase-2
+    - phase-3
+  failed_phases: []
+
+  auto_fix_attempts:
+    phase-1: 0
+    phase-2: 0
+    phase-3: 0
+    phase-4: 0
+    phase-5: 0
+    phase-6: 0
+    phase-7: 0
+    phase-8: 0
+
+  options:
+    docs_enabled: false
+
+  created: 2026-08-06T00:00:00Z
+  updated: 2026-08-06T00:00:00Z
+  task_path: .maister/tasks/migrations/2026-08-06-angularjs-to-angular
+
+  task_ids:
+    phase-1: "1"
+    phase-2: "2"
+    phase-3: "3"
+    phase-4: "4"
+    phase-5: "5"
+    phase-6: "6"
+    phase-7: "7"
+    phase-8: "8"
+
+task:
+  title: "Migracja frontendu AngularJS 1.8.3 -> najnowszy Angular (parytet 1:1)"
+  description: >
+    Przepisanie frontendu z AngularJS 1.8.3 na najnowszego Angulara, z zachowaniem
+    ukladu repozytorium (frontend i backend w jednym repo) oraz pakowania do WAR przez
+    Maven. Pierwszy krok: zachowanie obecnej funkcjonalnosci 1 do 1 (parytet funkcjonalny,
+    zero nowych funkcji). Zakres obejmuje zastapienie pipeline'u npm+Gulp przez Angular CLI
+    z zachowaniem hooka Maven prepare-package oraz reimplementacje komponentow UI opartych
+    na angular-ui-bootstrap / angular-tooltips / angular-spinner / Bootstrap 3.
+  status: in_progress
+  tags: [frontend, angular, migration, war, maven]
+  priority: high
+
+project_context:
+  index_path: .maister/docs/INDEX.md
+  project_doc_paths:
+    - .maister/docs/project/tech-stack.md
+    - .maister/docs/project/architecture.md
+
+migration_context:
+  migration_type: code
+  current_system:
+    description: "AngularJS 1.8.3 SPA pod src/main/webapp/, budowana przez npm + Gulp 4.0.2, pakowana do motor-insurance.war"
+    technologies:
+      - AngularJS 1.8.3
+      - Gulp 4.0.2
+      - Bootstrap 3
+      - angular-ui-bootstrap
+      - angular-tooltips
+      - angular-spinner
+      - LESS
+      - Maven WAR (exec-maven-plugin, prepare-package)
+  target_system:
+    description: "Angular 22 (latest stable) standalone components + signals, Angular CLI (esbuild application builder), workspace in frontend/, Angular Material for datepicker/tooltip/spinner, LESS retained, output wired into the WAR via maven-war-plugin webResources"
+    technologies:
+      - Angular 22.1.0
+      - TypeScript 6.0.x
+      - Angular CLI / @angular/build (esbuild)
+      - Angular Material
+      - Angular CDK
+      - LESS
+      - Bootstrap 3 CSS (grid + alert, retention TBD - OD-C)
+      - Node.js >= 22.22.3 (currently 23.6.1 - BLOCKER)
+      - Maven WAR (exec-maven-plugin prepare-package + maven-war-plugin webResources)
+  migration_strategy:
+    approach: "big-bang"
+    detail: >
+      Big-bang cutover on a branch, gated by golden captures recorded against the current
+      build FIRST. Dual-run rejected: the AngularJS build is a git artefact, so replaying
+      the captured flows against the pre-migration commit's WAR gives the same value for free.
+      ngUpgrade ruled out in Phase 1; that decision stands.
+    phases:
+      - "G0  Toolchain and test deps (P-1/P-2/P-4) - S, 5 tests, no deps"
+      - "G1  MockMvc contract goldens (P-3a) - L, 8 tests, deps G0"
+      - "G2  Playwright goldens + tag (P-3b, HARD GATE) - L, 6 tests, deps G0"
+      - "G3  Scaffold and packaging - M, 7 tests, deps G1+G2"
+      - "G4  Store, interceptors, services - M, 6 tests, deps G3"
+      - "G5  Presentational + variants + popover - M, 4 tests, deps G4"
+      - "G6  Vehicle cascade + driver-history - L, 6 tests, deps G4"
+      - "G7  Driver + datepicker (last by design) - L, 6 tests, deps G5+G6"
+      - "G8  Shell, sidebar, spinner - M, 4 tests, deps G7"
+      - "G9  Styles, theme, assets - M, 3 tests, deps G8"
+      - "G10 Backend C-6 / DR-14 + golden flip - S, 3 tests, deps G8"
+      - "G11 Parity verification (replay, verdict only) - M, deps G9+G10"
+      - "G12 CUTOVER - deletion - S, 7 tests, deps G11"
+      - "G13 Docs and standards - S, deps G11"
+    parallelisable: "[G1,G2] [G5,G6] [G9,G10] [G12,G13]"
+  risk_level: medium-high
+  gaps_identified: 65
+  defect_register_entries: 27
+  recorded_non_deviations: 8
+  empirical_corrections_to_phase_1:
+    - "HttpClient does NOT JSON-quote string bodies (@angular/common 22.1.0 fesm2022/_module-chunk.mjs:541-543) - string bodies pass through verbatim; only Content-Type changes to text/plain. Phase 1's top risk was wrong. Inverted danger: an implementer adding JSON.stringify WOULD corrupt values."
+    - "OD-B RESOLVED: default container context path is /demo (Tomcat log + GET / -> 404, GET /demo/ -> 200); @PropertySource resolves per key, not per file. BUT the container currently running on this machine has SERVER_SERVLET_CONTEXT_PATH=/app. Phase 1's proposed 'ng build --base-href=/demo/' would have 404'd every asset there. Resolution: ship NO <base> element at all - context-path-agnostic, matches today's behaviour, keeps the relative-URL rule."
+    - "dateOfBirth is an ISO-8601 string ('1986-08-06T00:00:00.000+00:00'), NOT epoch millis - Spring Boot disables WRITE_DATES_AS_TIMESTAMPS. New risk: offset follows server TZ while MatDatepicker parses browser-local, so goldens are TZ-sensitive - pin TZ=UTC for capture and replay."
+    - "A failed GET quote returns 404, not 400, and the body has no 'message' key - today's red error banner renders EMPTY."
+    - "The backend DOES already sort coverages and discounts by position - so the orderBy no-op fix must introduce NO client-side sort."
+  target_toolchain_verified:
+    angular: "22.1.0 (CLI 22.1.3, Material 22.1.1)"
+    typescript: "~6.0.3 - peer range is >=6.0 <6.1; typescript@latest is 7.0.2 and BREAKS the build"
+    less: "optional peer NOT bundled by @angular/build (it ships sass) - must be added explicitly"
+    maven_war_plugin: "do NOT pin - Spring Boot manages it at 3.4.0 and its pluginManagement already carries an <archive> block that an explicit version would clobber"
+  breaking_changes: []
+  rollback_plan_created: true
+  dual_run_configured: false
+  spec_decisions:
+    - "C-9 OVERRIDES the target-state plan's OD-C/OD-D recommendations (which said keep Bootstrap 3 and use Material for only 4 controls). Implementers must not follow target-state-plan.md section 6 on styling."
+    - "Angular Material theming API is Sass-only - mat.theme() has no LESS equivalent. Resolution: ONE deliberate src/theme.scss seeding the #4C4CDE / 8px tokens, everything else LESS, theme listed first in angular.json so LESS wins the cascade. Recorded as a scoped exception to css.md."
+    - "PUT driver/birthDate MUST be passed a Date object, NEVER a string. DriverApi.java:34-37 is @RequestBody Date; an ISO string takes HttpClient's string branch -> unquoted body + text/plain -> Jackson cannot bind Date -> HTTP 415. This rule pulls OPPOSITE to the never-JSON.stringify-a-string rule for adjacent endpoints."
+    - "CDK Layout (BreakpointObserver) NOT introduced despite C-9 naming it - no component reacts to viewport changes. Grid is CSS Grid preserving Bootstrap's 992px collapse point (minimal-implementation.md)."
+    - "Playwright lives in e2e/ at repo root, not frontend/ - the same specs must run against both frontends and the harness must exist before frontend/ does. CAVEAT: capturing goldens requires adding data-testid attributes to the AngularJS templates first, so 'against an untouched build' is really 'against a build touched only by additive test hooks'."
+    - "toHaveScreenshot() explicitly banned from every spec - screenshots are documentation, not a gate."
+
+  phase_summaries:
+    current_state_analysis: >
+      SPA is small and unusually uniform (920 lines JS+HTML, 13 JS files, 11 templates,
+      8 element directives, 4 $http factories, 1 non-routed screen). Directive shape maps
+      1:1 onto standalone Angular components. Risk is concentrated in 4 AngularJS-locked
+      libraries with no successors, two silent-breakage traps (base href vs /demo context
+      path; HttpClient JSON-quoting the 6 raw-string PUT bodies), ~19 latent defects, zero
+      test/CI safety net, and a Node 23.6.1 toolchain blocker. Complexity moderate, risk
+      medium-high. Artefacts: analysis/current-state-analysis.md, analysis/clarifications.md.
+    gap_analysis: >
+      65 gaps across scaffolding/build, HTTP layer, components, state, styling, third-party UI,
+      test infrastructure and docs. 27-entry defect register (19 behavioural + 8 structural) plus
+      8 explicitly recorded NON-deviations so nobody "fixes" the vehicle emit asymmetry or the
+      "Documents" label. Strategy: big-bang on a branch behind a golden-capture gate. Five Phase 1
+      facts corrected empirically against a running build. Two rulings still needed: OD-E (Node
+      toolchain, hard blocker) and OD-G (new - DR-14 needs a ~5-line backend @RestControllerAdvice
+      change, which is outside the stated frontend-only scope). Artefact: analysis/target-state-plan.md.
+    specification: >
+      spec.md (13 sections) + rollback-plan.md (7 sections). Parity is stated imperatively as
+      functional/contractual only - "a visual difference is never, on its own, a finding". Defect
+      register carries all 27 entries with checkable acceptance criteria, plus 8 non-deviations
+      restated as ND-1..ND-8 with their own checks. DR-13/ND-1 (vehicle emit asymmetry) flagged in
+      three places as the change an idiomatic reactive rewrite makes BY ACCIDENT - losing it is a
+      failed migration. Three new findings neither analysis phase caught: Material theming is
+      Sass-only, PUT driver/birthDate needs a Date object not a string (else HTTP 415), and C-9
+      silently invalidated the target-state plan's styling recommendations.
+    implementation_planning: >
+      14 task groups, 142 steps, ~62 tests, effort 2xS/5xM/7xL. Four planner decisions recorded as
+      deliberate deviations: (1) three rollback points split for test granularity, with an n:1 mapping
+      table so none is lost; (2) MIGRATION_STAGE=pre|post env var sequences DR-14 deliberately - a
+      15-row expected-delta table where only DR-affected assertions branch, so spec files stay
+      byte-identical between capture and replay; the Java-side flip is a method replacement in one
+      commit rather than an env branch; (3) Angular Material installed in G3 not G8 (deferring would
+      block every component from G5 onward); (4) ND-1/DR-13 guarded FOUR ways - a quote-store unit
+      test, a vehicle unit test, two NO-BRANCH E2E rows whose assertions must be byte-identical pre
+      and post, and three code comments at the non-recalculating handlers. G11 checks those two rows
+      first. Two watch items: DR-02's pre-row records a live HTTP 500 as golden (capture run will log
+      errors), and DR-10's raw values make quote-panel.spec.ts the spec most sensitive to the Higson
+      snapshot returning different numbers between capture and replay.
+    gap_analysis: null
+    specification: null
+    implementation: null
+
+external_research:
+  performed: false
+  category: null
+  breaking_changes: []
+  migration_guide_url: null
+
+task_context:
+  clarifications_resolved: true
+  decisions:
+    C-1_ui_library: "Angular Material (MatDatepicker, MatTooltip, MatProgressSpinner) - accepted visual change"
+    C-2_workspace_layout: "frontend/ sibling directory at repo root"
+    C-3_defects: "Fix all ~19 latent defects during migration; mandatory enumerated defect register"
+    C-4_parity_evidence: "MockMvc API contract tests + Playwright E2E golden before/after + screenshot comparison"
+    C-5_node_toolchain: >
+      OD-E resolved: bump Node locally only. NO .nvmrc, NO frontend-maven-plugin. exec-maven-plugin
+      stays as-is and keeps depending on whatever npm is on PATH. Accepted consequence: the next
+      person (or a future CI) hits the same opaque prepare-package failure. Not a Docker-image
+      concern - the image never builds the frontend, it only COPYs target/motor-insurance.war.
+      P-1 RESOLVED 2026-08-06: `brew install node@22` -> Node 22.23.2 + npm 10.9.8 at
+      /opt/homebrew/opt/node@22/bin. Satisfies ^22.22.3. It is KEG-ONLY and the user declined
+      any ~/.zshrc modification, so it is NOT on the default PATH - the machine's default `node`
+      is still 23.6.1. EVERY npm/ng/mvn invocation must therefore be prefixed with:
+        export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+      Maven's exec-maven-plugin resolves npm from the PATH present when Maven launches, so a bare
+      `mvn package` in a fresh shell WILL still fail opaquely. Nothing is committed to fix this
+      (C-5); document it in Readme.md as part of G13.
+    C-6_backend_in_scope: >
+      OD-G resolved: DR-14 accepted - GlobalExceptionHandler moves @ControllerAdvice ->
+      @RestControllerAdvice (~5 lines of Java). This is a deliberate, enumerated register entry.
+      Consequence: the golden contract for a failed GET quote moves from 404-with-empty-body to
+      400-with-message, so the MockMvc contract tests must encode the NEW behaviour deliberately.
+      Scope is therefore frontend + this one backend file.
+    C-7_DR06_error_handling: >
+      Accepted narrowly: the 14 currently-silent mutation calls surface failures through the
+      SAME red banner that already exists for the quote error. No new UI elements, no per-field
+      messages, no retry, no value rollback.
+  open_decisions:
+    - "OD-A: coverage.description is HTML but MatTooltip is text-only - needs CdkOverlay popover or plain-text degradation"
+    - "OD-B: RESOLVED in Phase 2 - ship no <base> element at all; context-path-agnostic"
+    - "OD-E: RESOLVED by C-5 - bump Node locally only; still ACTIONABLE, machine is on 23.6.1"
+    - "OD-G: RESOLVED by C-6 - backend GlobalExceptionHandler fix is in scope"
+    - "OD-C: keep Bootstrap 3 CSS for grid + alert alongside Material, or re-implement grid"
+    - "OD-D: Angular Material theming vs existing LESS design tokens (#4C4CDE, 8px radius, notched-outline inputs)"
+    - "OD-E: BLOCKER - Node 23.6.1 rejected by Angular 22 (^22.22.3 || ^24.15.0 || >=26.0.0); needs .nvmrc + toolchain baseline or frontend-maven-plugin"
+    - "OD-F: Font Awesome 4 + 90 vendored Open Sans files + Manrope CDN vs Material icon font"
+  parity_definition: >
+    Functional parity of user-visible capability and of the backend contract - NOT bug-for-bug
+    and NOT pixel-for-pixel. Sanctioned deviations: the 4 Material-replaced controls (C-1) and
+    the enumerated defect register (C-3). Anything else is a regression.
+
+verification_context:
+  last_status: null
+  issues_found: []
+  fixes_applied: []
+  decisions_made: []
+  reverify_count: 0
+
+options:
+  docs_enabled: false
