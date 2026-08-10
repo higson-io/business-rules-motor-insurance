@@ -4,7 +4,31 @@ orchestrator:
     - phase-1
     - phase-2
     - phase-3
+    - phase-4
+    - phase-5
   failed_phases: []
+
+  execution_result:
+    task_groups_completed: "14 of 14 (G0-G13)"
+    steps_completed: "114 of 114 checkboxes"
+    parity_verdict: "PASS - 206 leaf keys compared, 35 substantive deltas, every one traceable to a DR-nn row or C-9, zero regressions"
+    dr13_nd1: "The four NO-BRANCH rows are byte-identical pre and post. Checked first, extracted explicitly rather than inferred from absence of diff."
+    tests: "27 Angular / 14 files; 11 Java (8 contract + 3 snapshot); 6 Playwright flows + 2 style checks"
+    commits:
+      - "d09c201 - golden capture, tagged pre-angular-migration (the replay anchor)"
+      - "78f478f - Angular 22 rewrite + the single backend fix"
+      - "55274ae - cutover, 102 AngularJS files deleted"
+      - "13f0f6f - standards and project docs"
+    strongest_evidence: >
+      After deleting the AngularJS frontend, the goldens were re-captured against a WAR built from
+      the deleted tree and `diff -r` came back IDENTICAL. Nothing observable depended on the removed
+      files.
+    open_items:
+      - "Bundle budget: 680.86 kB raw / 143.68 kB transfer against a 500 kB warning threshold. ~95% is Material + CDK + datepicker. angular.json deliberately untouched so the signal is not erased. Accept, or raise maximumWarning with an argument."
+      - "AC-S1 vs Angular best practice: the MCP best-practices say not to set OnPush explicitly on v22+, while AC-S1 requires it. Project rule followed. Suggested restatement: 'no component opts out of OnPush'."
+      - "Node is not enforced by the build (C-5). Node 22.23.2 is keg-only at /opt/homebrew/opt/node@22/bin and must be prepended to PATH manually; a wrong version fails opaquely inside prepare-package."
+      - "src/main/higson/ remains untracked by design. A fresh clone needs `mvn higson-cli:pull` before the E2E goldens can be reproduced."
+      - "No CI exists. The three test suites are new with this migration and nothing gates a merge."
 
   auto_fix_attempts:
     phase-1: 0
