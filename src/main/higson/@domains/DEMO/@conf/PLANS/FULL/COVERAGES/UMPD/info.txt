@@ -1,2 +1,0 @@
-name = "Uninsured Motorist Property Damage"
-tags = []

@@ -11,3 +11,7 @@ frontend/dist/
 frontend/.angular/
 *.iml
 higson-cli*.log
+
+# The Higson rules snapshot. Studio is the system of record, never git
+# (standards/higson/snapshot.md). A fresh clone populates it with `mvn higson-cli:pull`.
+src/main/higson/

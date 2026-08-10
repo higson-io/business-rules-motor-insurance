@@ -1,5 +1,0 @@
-#matrix for parameter dictionary.productType.description
-PRODUCT_TYPE;DESCRIPTION
-ASSISTANCE_PRODUCT;Product which gives access to assistance services
-CREDIT_PRODUCT;Product where clients borrow money from the bank
-DEPOSIT_PRODUCT;Product where clients deposit their money in the bank

@@ -1,5 +1,0 @@
-#matrix for parameter pl.decerto.demo.telco.discountForChannelAndPhone
-packageCode;isServiceSelected;serviceCode;extraChannel;discount
-*;false;PHONE;*;0
-COMFORT;true;PHONE;MEZZO;50
-COMFORT_WITH_HBO;true;PHONE;MEZZO;50

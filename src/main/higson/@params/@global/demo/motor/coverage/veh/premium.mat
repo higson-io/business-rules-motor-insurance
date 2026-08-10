@@ -1,9 +1,0 @@
-#matrix for parameter demo.motor.coverage.veh.premium
-cover;option;premium
-COLL;BRONZE;200
-COLL;GOLD;$f demo.motor.coverage.vehicle.calculatePremium (2.5)
-COLL;SILVER;$f demo.motor.coverage.vehicle.calculatePremium (1.8)
-COMP;*;$f demo.motor.coverage.vehicle.calculatePremium (0.65)
-ERS;BRONZE;15,2
-ERS;GOLD;17,8
-ERS;SILVER;16,5
