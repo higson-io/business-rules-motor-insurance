@@ -1,7 +1,10 @@
-// A custom element is inline by default, which would collapse the stacked fields onto one line.
-// Everything else about this panel's appearance belongs to the global LESS (G9).
+// ⚠️ `display: contents` rather than `block`. This component emits TWO groups — personal details
+// and the address — because ND-3 records that the "Address" divider belongs inside it rather than in
+// the panel that owns every other heading. `contents` removes the host from the box tree so both
+// sections land as direct children of the input band's grid, which is what lets ND-3 stand without
+// the address ending up stacked inside the personal group.
 :host {
-	display: block;
+	display: contents;
 }
 
 .driver__field {

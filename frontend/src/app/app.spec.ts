@@ -30,7 +30,7 @@ describe('App shell', () => {
 		openMoto();
 		const startup = settleShell(httpTesting);
 
-		expect(elements('app-sidebar').length, 'the shell composes exactly one sidebar').toBe(1);
+		expect(elements('app-inputs').length, 'the shell composes exactly one sidebar').toBe(1);
 		expect(elements('app-variants').length, 'the shell composes exactly one variants panel').toBe(
 			1,
 		);

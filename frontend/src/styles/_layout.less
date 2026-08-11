@@ -1,39 +1,14 @@
-// The Bootstrap 3 grid of `main.html:1-22`, rewritten as CSS Grid (C-9, plan step 9.4).
+// The page frame.
 //
-//   .container  → .app-shell           `config.less:16-20`'s 1440px cap, plus the 15px gutter
-//   .main       → .app-shell           `main/main.less:1-3`'s `padding-top: 3rem`, folded in —
-//                                       there is no longer a separate element to carry it
-//   .row        → .app-shell__layout   the grid itself
-//   .col-md-3   → .app-shell__sidebar
-//   .col-md-9   → .app-shell__content
+//   .container  → .app-shell   `config.less:16-20`'s 1440px cap, plus the 15px gutter
+//   .main       → .app-shell   `main/main.less:1-3`'s `padding-top`, folded in — there is no
+//                               longer a separate element to carry it
 //
-// ⛔ `@angular/cdk/layout`'s `BreakpointObserver` is deliberately NOT introduced. It is a
-// TypeScript API for components that must REACT to a viewport change; nothing here does — the
-// layout is two columns or one, and a media query already says so. Adding an observer to restate
-// a media query in TypeScript would be a speculative abstraction (`minimal-implementation.md`).
-
+// ⛔ The 25/75 grid that used to live here moved into the motor demo (`moto.less`), where it
+// belongs: it positions that demo's two panels, not the page. A demo with one panel — the life
+// placeholder — should not have to opt out of a split it never asked for.
 .app-shell {
 	max-width: 1440px;
 	margin: 0 auto;
-	padding: 3rem 15px 0;
-}
-
-// Mobile-first (`responsive.md`): one column is the base case, and the second column is added at
-// the breakpoint rather than removed below it.
-.app-shell__layout {
-	display: grid;
-	grid-template-columns: 1fr;
-	column-gap: 26px;
-	row-gap: 26px;
-}
-
-// ⚠️ 992px is Bootstrap 3's own `md` breakpoint, kept to the pixel. The collapse point is a
-// behaviour users and screenshots both notice; moving it would be a redesign smuggled in under a
-// rewrite. `minmax(0, …fr)` rather than a literal `25% 75%` because percentages plus a column gap
-// overflow the track, and `minmax(0, …)` also lets the long dictionary labels inside the sidebar
-// shrink instead of forcing the grid wider.
-@media (min-width: 992px) {
-	.app-shell__layout {
-		grid-template-columns: minmax(0, 25fr) minmax(0, 75fr);
-	}
+	padding: 1.75rem 15px 3rem;
 }

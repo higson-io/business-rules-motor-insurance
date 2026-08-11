@@ -1,17 +1,21 @@
 <!--
-	Moved verbatim from `app.html` when the landing screen was added — same class names, same
-	structure, so G9's CSS Grid port (`_layout.less`, `sidebar.less`) lands on the same elements and
-	the 992px collapse point is unchanged.
+	Inputs on the left, the comparison beside them.
+
+	⛔ The input panel no longer scrolls inside itself. `less/sidebar/sidebar.less:23-26`'s
+	`height: 83vh; overflow: auto` put a scrollable region inside the page's own scroll, so the
+	reader could never see the whole input state and a touch device stopped scrolling the page
+	whenever a finger landed on the form. The panel is simply as tall as its fields now, and the
+	fields were compacted enough (`_forms.less`) that it is no longer a problem worth solving.
 
 	⛔ Pure layout. No handlers, no bindings. `main.js:21-23`'s recalculate relay was deleted rather
 	than ported; `QuoteStore` replaced the whole bus.
 -->
-<div class="app-shell__layout">
-	<aside class="app-shell__sidebar">
-		<app-sidebar />
+<div class="moto">
+	<aside class="moto__inputs">
+		<app-inputs />
 	</aside>
 
-	<div class="app-shell__content">
+	<div class="moto__results">
 		<app-variants />
 	</div>
 </div>

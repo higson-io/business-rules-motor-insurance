@@ -66,7 +66,7 @@ test('a failed mutation and a failed quote surface as recorded', async ({ page }
 	});
 
 	await test.step('a failed GET quote (DR-07, DR-14)', async () => {
-		const cardsBefore = await page.getByTestId(TESTID.variantCard).count();
+		const cardsBefore = await page.getByTestId(TESTID.variantColumn).count();
 		expect(cardsBefore, 'the quote is still rendered before the failure is provoked').toBe(3);
 
 		log.reset();
@@ -83,7 +83,7 @@ test('a failed mutation and a failed quote surface as recorded', async ({ page }
 		).toBe(1);
 
 		const quoteResponses = log.allResponses().filter((r) => r.path === 'quote');
-		const cardsAfter = await page.getByTestId(TESTID.variantCard).count();
+		const cardsAfter = await page.getByTestId(TESTID.variantColumn).count();
 		const bannerText = (await banner.innerText()).trim();
 		observed['failedQuote'] = {
 			responses: quoteResponses,

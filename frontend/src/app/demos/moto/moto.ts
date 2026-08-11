@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { Sidebar } from '../../components/sidebar/sidebar';
+import { Inputs } from '../../components/inputs/inputs';
 import { Variants } from '../../components/variants/variants';
 
 /**
@@ -13,8 +13,9 @@ import { Variants } from '../../components/variants/variants';
  */
 @Component({
 	selector: 'app-moto',
-	imports: [Sidebar, Variants],
+	imports: [Inputs, Variants],
 	templateUrl: './moto.html',
+	styleUrl: './moto.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Moto {}

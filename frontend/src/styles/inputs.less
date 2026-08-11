@@ -1,0 +1,96 @@
+// The input band.
+//
+// ⛔ Replaced `less/sidebar/sidebar.less`'s vertical panel. Two things were wrong with it: twelve
+// fields lived inside an 83vh scroller nested in the page's own scroll, so the whole input state was
+// never visible at once; and it took a quarter of the width from the comparison table, which needs
+// all of it to stand three tiers side by side.
+//
+// ⛔ DR-16 — `transition: 0.5s` and `opacity: 1` are not carried. They were the residue of a
+// sidebar-collapse feature whose JavaScript (`sidebar.js:21-27`) was never ported: nothing ever
+// changed the properties they animated.
+
+.inputs {
+	padding: 20px 18px 18px;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-paper;
+	box-shadow: @shadow-panel;
+}
+
+.inputs__header {
+	margin-bottom: 20px;
+}
+
+.inputs__title {
+	margin: 0 0 2px;
+	font-size: 1.25rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	color: @color-text;
+}
+
+.inputs__subtitle {
+	margin: 0;
+	font-size: 0.875rem;
+	color: @color-text-muted;
+}
+
+// A single column of groups. The panel sits beside the comparison table, so its width is set by the
+// layout and the fields simply stack.
+.inputs__grid {
+	display: block;
+}
+
+// Separates one group from the next. The heading above carries the label; this is the air that makes
+// the four read as four rather than as twelve fields with captions.
+.inputs__group + .inputs__group,
+app-driver + .inputs__group {
+	margin-top: 22px;
+}
+
+.inputs__group__heading {
+	display: flex;
+	align-items: center;
+	margin: 0 0 12px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+// The four section icons.
+//
+// ⚠️ SCOPED TO `i`, where the original left them as bare class selectors. That was a latent bug:
+// `driver.html` put `address` on the divider DIV as well as on the icon inside it, so `.address`'s
+// `width: 24px` won the cascade over the divider's `width: 100%` and squashed the whole Address
+// heading to a 24-pixel box. The companion rule meant to handle it, `less/sidebar/sidebar.less:45-47`,
+// was written `&address` instead of `&.address` and compiled to a selector that has never matched an
+// element.
+.inputs__group__heading i {
+	display: inline-block;
+	margin-right: 8px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	// The headings are small caps now, so the icons come down to match rather than towering over
+	// them at their original 20–24px.
+	width: 16px;
+	height: 16px;
+	opacity: 0.75;
+}
+
+i.person {
+	background-image: url('imgs/person.svg');
+}
+
+i.address {
+	background-image: url('imgs/address.svg');
+}
+
+i.vehicle {
+	background-image: url('imgs/vehicle.svg');
+}
+
+i.documents {
+	background-image: url('imgs/doc.svg');
+}

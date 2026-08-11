@@ -16,10 +16,10 @@ import { Vehicle } from '../vehicle/vehicle';
  * behaviour.
  */
 @Component({
-	selector: 'app-sidebar',
+	selector: 'app-inputs',
 	imports: [Driver, Vehicle, DriverHistory],
-	templateUrl: './sidebar.html',
-	styleUrl: './sidebar.less',
+	templateUrl: './inputs.html',
+	styleUrl: './inputs.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Sidebar {}
+export class Inputs {}

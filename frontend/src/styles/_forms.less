@@ -78,3 +78,18 @@
 .driver__gender {
 	margin-bottom: 20px;
 }
+
+// ⛔ Material reserves a subscript row under every field for hints and error text. This screen shows
+// neither — ND-4 records that it carries no validation display at all, exactly as the AngularJS
+// build did not — so twelve fields were each paying about 20px for a row that can never contain
+// anything. Removed, the form loses roughly 240px of nothing, which is what let the panel stop
+// scrolling inside itself.
+//
+// ⚠️ If a field ever does need to show an error, this rule is what has to go first.
+.mat-mdc-form-field-subscript-wrapper {
+	display: none;
+}
+
+.mat-mdc-form-field {
+	margin-bottom: 14px;
+}

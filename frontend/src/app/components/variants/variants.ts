@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { DecimalPipe } from '@angular/common';
 import { MatCard } from '@angular/material/card';
 
+import { HtmlPopover } from '../../shared/html-popover/html-popover';
 import { QuoteStore } from '../../core/quote-store';
 import { bodyMessageOf } from '../../core/http-error-message';
+import { buildQuoteMatrix } from './quote-matrix';
 import { Coverage } from './coverage/coverage';
-import { Discount } from './discount/discount';
 
 /**
  * Shown when a request fails without telling us why. Today's failing `GET quote` answers 404 with a
@@ -16,10 +17,16 @@ import { Discount } from './discount/discount';
  */
 const GENERIC_QUOTE_ERROR = 'The quote could not be calculated.';
 
-/** The three variant cards, and the only error branch in the application (`variants.js:35-38`). */
+/**
+ * The tier comparison matrix, and the only error branch in the application (`variants.js:35-38`).
+ *
+ * ⛔ Replaced three parallel per-tier lists. Those could show what a tier contained but never what
+ * it lacked, and comparing one coverage across tiers meant matching names by eye between columns —
+ * the one question the screen exists to answer.
+ */
 @Component({
 	selector: 'app-variants',
-	imports: [DecimalPipe, MatCard, Coverage, Discount],
+	imports: [DecimalPipe, MatCard, Coverage, HtmlPopover],
 	templateUrl: './variants.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,21 +60,19 @@ export class Variants {
 	 * return a fourth option or return them in another order — and the rules are exactly the thing
 	 * this application exists to let people change.
 	 */
-	/** The richest tier's coverage count — the denominator the gauge is read against. */
-	readonly maxCoverages = computed(() =>
-		Math.max(0, ...this.options().map((option) => option.coverages.length)),
-	);
+	/** The quote pivoted into rows and columns. See `quote-matrix.ts` for why. */
+	readonly matrix = computed(() => buildQuoteMatrix(this.options()));
 
-	readonly coverBreadth = computed(() => {
-		const counts = this.options().map((option) => option.coverages.length);
-		const richest = Math.max(0, ...counts);
-		if (richest === 0) {
-			return new Map<string, number>();
-		}
-		return new Map(
-			this.options().map((option) => [option.code, option.coverages.length / richest]),
-		);
-	});
+	/**
+	 * ⚠️ Derived from the response, never from the column's position. The obvious shortcut is
+	 * `nth-child(1|2|3)` in CSS with the widths written by hand, which is a lie the moment the rules
+	 * return a fourth option or return them in another order — and the rules are exactly the thing
+	 * this application exists to let people change.
+	 */
+	breadthOf(coverageCount: number): number {
+		const richest = this.matrix().maxCoverages;
+		return richest === 0 ? 0 : coverageCount / richest;
+	}
 
 	/**
 	 * One banner, two sources (C-7: the DR-06 fix adds no new UI surface, no per-field messages, no

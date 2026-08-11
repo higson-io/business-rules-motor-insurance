@@ -76,7 +76,7 @@ test('CHECK 1 — no font or image request fails during a full flow', async ({ p
 	// what it paints. The logo and the four sidebar icons come with the first render; the popover
 	// arrow is fetched only when a popover opens, so hovering a coverage row is load-bearing here.
 	await test.step('exercise the deferred url() references', async () => {
-		await page.getByTestId(TESTID.coverageRow).first().hover();
+		await page.getByTestId(TESTID.coverageHeader).first().hover();
 		await expect(
 			page.getByTestId('html-popover-panel'),
 			'the popover must open, otherwise its arrow image is never requested'
@@ -103,7 +103,7 @@ test('CHECK 2 — DR-15: a variant card is not clickable and carries no hover af
 	page
 }) => {
 	await openApp(page);
-	const card = page.getByTestId(TESTID.variantCard).first();
+	const card = page.getByTestId(TESTID.variantColumn).first();
 
 	// ⚠️ `auto` AND `default` both satisfy this, and the G9 acceptance criterion's literal wording
 	// ("the computed cursor is `default`") does not. `cursor` is not an inherited-and-resolved

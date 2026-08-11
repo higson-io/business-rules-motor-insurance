@@ -4,7 +4,11 @@ import { TestBed } from '@angular/core/testing';
 import { Coverage } from './coverage';
 
 /**
- * G5 test 1 — DR-10 / DR-11.
+ * DR-10 / DR-11, and the composition bar.
+ *
+ * ⛔ The name, code and description assertions moved to `variants.spec.ts` with the elements
+ * themselves: in the comparison matrix those are properties of the ROW, identical down it, and only
+ * the limits and the premium vary per tier.
  *
  * DR-11 is a NO BRANCH row: `| number: 2` on the AngularJS side already renders en-US despite the
  * page being served with `lang="pl"`, so `100000` must stay `100,000.00` and must never become
@@ -22,9 +26,6 @@ describe('Coverage', () => {
 		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
 		const fixture = TestBed.createComponent(Coverage);
-		fixture.componentRef.setInput('code', 'BI');
-		fixture.componentRef.setInput('name', 'Bodily Injury Liability');
-		fixture.componentRef.setInput('description', null);
 		fixture.componentRef.setInput('limitLeft', inputs.limitLeft);
 		fixture.componentRef.setInput('limitRight', inputs.limitRight);
 		fixture.componentRef.setInput('premium', inputs.premium);
@@ -51,11 +52,6 @@ describe('Coverage', () => {
 			textOf(bothLimits, 'coverage-premium'),
 			'DR-10: a whole-number premium is padded to two decimals',
 		).toBe('100.00');
-		expect(
-			textOf(bothLimits, 'coverage-header'),
-			'the header keeps the `name (code)` shape the goldens recorded',
-		).toBe('Bodily Injury Liability (BI)');
-
 		for (const symbol of ['$', 'zł', 'PLN', '€']) {
 			expect(
 				bothLimits.textContent ?? '',
@@ -93,7 +89,7 @@ describe('Coverage', () => {
 		expect(
 			host.querySelector('.coverage__composition')?.getAttribute('aria-label'),
 			'the share is named for assistive technology instead of being drawn as text',
-		).toBe('25% of the pre-discount premium');
+		).toBe('25% of the tier premium');
 	});
 
 	it('draws an empty bar rather than dividing by zero', () => {

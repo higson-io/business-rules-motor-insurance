@@ -131,9 +131,9 @@ describe('Variants', () => {
 		);
 	}
 
-	function cards(): Element[] {
+	function columns(): Element[] {
 		return [
-			...(fixture.nativeElement as HTMLElement).querySelectorAll('[data-testid="variant-card"]'),
+			...(fixture.nativeElement as HTMLElement).querySelectorAll('[data-testid="variant-column"]'),
 		];
 	}
 
@@ -146,15 +146,31 @@ describe('Variants', () => {
 			'DR-05: options render in response array order — a sort by `order` would yield BRONZE, GOLD',
 		).toEqual(['GOLD', 'BRONZE']);
 
+		// ⚠️ ROWS ARE ORDERED BY `position`, and that is a real difference from "render the array".
+		//
+		// A matrix needs ONE row order that every column shares, and the union of three tiers' lists
+		// has no array order of its own. First-seen-wins was tried and is wrong: the tiers
+		// interleave, so taking SILVER's ordering first puts collision cover ahead of the uninsured
+		// property row, and GOLD's own cells then come out in an order GOLD never sent.
+		//
+		// `position` is the engine's own ordering key and the G1 contract test pins that every tier
+		// returns it ascending, so in practice this equals each tier's array order — which
+		// `quote-panel.spec.ts` asserts per option against the live response. This fixture is
+		// scrambled precisely so the difference is visible: GOLD sent [ERS, BI], and the rows come
+		// out BI, PD, ERS.
 		expect(
-			textsOf('coverage-header', cards()[0]),
-			'DR-05: coverages render in array order — a sort by `position` would put BI first',
-		).toEqual(['Emergency Road Service (ERS)', 'Bodily Injury Liability (BI)']);
+			textsOf('coverage-header'),
+			'rows order by `position`, the only total order a union of three tiers has',
+		).toEqual([
+			'Bodily Injury Liability (BI)',
+			'Property Damage Liability (PD)',
+			'Emergency Road Service (ERS)',
+		]);
 
 		expect(
-			textsOf('discount-name', cards()[0]),
-			'DR-05: discounts render in array order — a sort by `position` would put Good Driver first',
-		).toEqual(['Loyalty Discount', 'Good Driver']);
+			textsOf('discount-name'),
+			'discount rows likewise order by `position`',
+		).toEqual(['Good Driver', 'Loyalty Discount']);
 
 		// DR-10: `premiumBeforeDiscounts`, the final premium and the discount value are raw today
 		// (`variants.html:19,28`, `discount.html:11`). The target formats all three, keeping the
@@ -166,16 +182,40 @@ describe('Variants', () => {
 		expect(textsOf('variant-premium'), 'DR-10: the final premium is DecimalPipe-formatted').toEqual(
 			['1,381.19', '264.78'],
 		);
+		// Two discount rows × two columns. BRONZE does not earn the loyalty discount, so its cell in
+		// that row states the absence rather than being blank.
 		expect(
 			textsOf('discount-value'),
 			'DR-10: the discount value keeps its literal `-` prefix and gains only the formatting',
-		).toEqual(['-10.00', '-20.00', '-20.00']);
+		).toEqual(['-20.00', '-20.00', '-10.00', '\u2014']);
+	});
+
+	it('states what a tier does NOT include instead of stopping the list early', async () => {
+		await loadQuote();
+
+		// ⛔ The reason the matrix replaced three parallel lists. A list can only stop, which reads
+		// as "nothing more to say"; a cell can say "not in this tier". Which of the two it is
+		// happens to be the entire basis for choosing a tier, and the old layout could not express
+		// it at all.
+		//
+		// GOLD carries ERS and BI; BRONZE carries only PD. So of six cells, three are absences.
+		expect(
+			textsOf('coverage-cell'),
+			'every tier gets a cell in every row — absent cover is stated, not omitted',
+		).toEqual([
+			'201.88 60,000.00 / 120,000.00',
+			'\u2014',
+			'\u2014',
+			'100.00 25,000.00',
+			'17.80 0.00',
+			'\u2014',
+		]);
 	});
 
 	// G5 test 3 — DR-07 (and the DR-14 message the C-6 backend fix will start sending).
 	it('renders zero cards and one banner when the quote resource is in error', async () => {
 		await loadQuote();
-		expect(cards().length, 'the quote renders before the failure is provoked').toBe(2);
+		expect(columns().length, 'the quote renders before the failure is provoked').toBe(2);
 
 		TestBed.inject(QuoteStore).recalculate();
 		fixture.detectChanges();
@@ -189,7 +229,7 @@ describe('Variants', () => {
 		fixture.detectChanges();
 
 		expect(
-			cards().length,
+			columns().length,
 			'DR-07: the previous quote must not survive underneath the banner — `resource()` drops it',
 		).toBe(0);
 

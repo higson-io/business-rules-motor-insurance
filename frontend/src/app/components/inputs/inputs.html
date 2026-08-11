@@ -1,0 +1,46 @@
+<!--
+	The input band: every field visible at once, in four labelled groups.
+
+	⛔ Replaced a vertical panel that scrolled inside itself. Twelve fields in an 83vh scroller meant
+	the reader could never see the whole input state, and on a screen whose point is "change
+	something and watch the price move" that is the wrong thing to hide.
+
+	⚠️ `<app-driver>` supplies TWO groups — personal details and the address — because ND-3 records
+	that the "Address" divider is emitted from inside that component rather than from here. The host
+	is `display: contents` so both of its sections land as siblings in this grid; moving the divider
+	instead would be the deviation ND-3 exists to prevent.
+
+	The `<i>` icons stay purely decorative background-image carriers and are hidden from assistive
+	technology, because the heading beside each one already says what the section is.
+-->
+<div class="inputs">
+	<div class="inputs__header">
+		<h1 class="inputs__title">Get a Quote</h1>
+		<p class="inputs__subtitle">Change anything below — the rules reprice as you go.</p>
+	</div>
+
+	<div class="inputs__grid">
+		<app-driver />
+
+		<section class="inputs__group">
+			<h2 class="inputs__group__heading">
+				<i class="vehicle" aria-hidden="true"></i>
+				Vehicle
+			</h2>
+			<app-vehicle />
+		</section>
+
+		<!--
+			⛔ ND-2 — the label is literally "Documents" while the section below it holds CLAIM
+			HISTORY: accidents, traffic tickets and the age the licence was obtained. The copy is
+			wrong and it stays wrong: rewording it is a product decision, not a design one.
+		-->
+		<section class="inputs__group">
+			<h2 class="inputs__group__heading">
+				<i class="documents" aria-hidden="true"></i>
+				Documents
+			</h2>
+			<app-driver-history />
+		</section>
+	</div>
+</div>

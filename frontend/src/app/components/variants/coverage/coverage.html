@@ -1,34 +1,23 @@
-<div class="coverage" data-testid="coverage-row" [appHtmlPopover]="description()">
-	<div class="coverage__header" data-testid="coverage-header">{{ name() }} ({{ code() }})</div>
-	<div class="coverage__content">
-		<div class="coverage__text" data-testid="coverage-limit">
-			{{ limitLeft() | number: '1.2-2' }}
-			@if (limitRight(); as right) {
-				<span>/ {{ right | number: '1.2-2' }}</span>
-			}
-		</div>
-		<div class="coverage__sum" data-testid="coverage-premium">
-			{{ premium() | number: '1.2-2' }}
-		</div>
-	</div>
+<span class="coverage__sum" data-testid="coverage-premium">{{ premium() | number: '1.2-2' }}</span>
 
-	<!--
-		The composition bar: this coverage's share of the pre-discount premium.
+<span class="coverage__text" data-testid="coverage-limit">
+	{{ limitLeft() | number: '1.2-2' }}
+	@if (limitRight(); as right) {
+		<span>/ {{ right | number: '1.2-2' }}</span>
+	}
+</span>
 
-		⚠️ It renders NO TEXT, deliberately. The behaviour goldens compare rendered text, so a
-		decorative element that carries none leaves them byte-identical — the design change is
-		provably not a behaviour change. The share is exposed to assistive technology through
-		`aria-label` instead, which `innerText` does not see either.
+<!--
+	The composition bar: this coverage's share of its tier's pre-discount premium.
 
-		The bar is the only interpretation on this screen. Everything else states a number the rules
-		engine returned; this says how the numbers relate to each other, which is what makes the
-		list worth reading rather than merely correct.
-	-->
-	<div
-		class="coverage__composition"
-		role="img"
-		[attr.aria-label]="(share() * 100 | number: '1.0-0') + '% of the pre-discount premium'"
-	>
-		<div class="coverage__composition__fill" [style.width.%]="share() * 100"></div>
-	</div>
-</div>
+	⚠️ It renders NO TEXT, deliberately, so it contributes nothing to the rendered-text comparisons
+	the E2E goldens make. The share is exposed to assistive technology through `aria-label`, which
+	`innerText` does not see either.
+-->
+<span
+	class="coverage__composition"
+	role="img"
+	[attr.aria-label]="(share() * 100 | number: '1.0-0') + '% of the tier premium'"
+>
+	<span class="coverage__composition__fill" [style.width.%]="share() * 100"></span>
+</span>

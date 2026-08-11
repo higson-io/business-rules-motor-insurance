@@ -48,12 +48,13 @@ export const TESTID = {
 	model: 'vehicle-model',
 
 	errorBanner: 'quote-error-banner',
-	variantCard: 'variant-card',
+	variantColumn: 'variant-column',
 	variantCode: 'variant-code',
 	variantPremiumBeforeDiscounts: 'variant-premium-before-discounts',
 	variantPremium: 'variant-premium',
 
 	coverageRow: 'coverage-row',
+	coverageCell: 'coverage-cell',
 	coverageHeader: 'coverage-header',
 	coverageLimit: 'coverage-limit',
 	coveragePremium: 'coverage-premium',
@@ -94,7 +95,7 @@ export async function openApp(page: Page): Promise<RequestLog> {
 	await page.getByTestId(TESTID.demoTileMoto).click();
 
 	await expect(
-		page.getByTestId(TESTID.variantCard).first(),
+		page.getByTestId(TESTID.variantColumn).first(),
 		'the quote panel must render before any flow starts'
 	).toBeVisible();
 	await settle(page);
@@ -195,4 +196,57 @@ export function defaultDateOfBirth(): string {
 	const month = String(now.getUTCMonth() + 1).padStart(2, '0');
 	const day = String(now.getUTCDate()).padStart(2, '0');
 	return `${year}-${month}-${day}`;
+}
+
+/**
+ * Reads the comparison matrix into a plain object.
+ *
+ * ⛔ Replaced per-card scoping. The screen is a table now: a coverage is a ROW and a tier is a
+ * COLUMN, so "this option's coverages" is a column read, which Playwright expresses badly one
+ * locator at a time. One DOM pass returns the whole grid and the assertions become ordinary array
+ * comparisons.
+ *
+ * An absent cell — a coverage a tier does not include — comes back as `null` rather than as an empty
+ * string, because the distinction is the reason the matrix exists.
+ */
+export async function readMatrix(page: Page): Promise<{
+	tiers: string[];
+	rows: { label: string; cells: ({ premium: string; limit: string } | null)[] }[];
+	discounts: { label: string; values: (string | null)[] }[];
+	beforeDiscounts: string[];
+	finals: string[];
+}> {
+	return page.evaluate(() => {
+		const clean = (el: Element | null | undefined) =>
+			(el?.textContent ?? '').replace(/\s+/g, ' ').trim();
+		const pick = (root: ParentNode, id: string) =>
+			Array.from(root.querySelectorAll(`[data-testid="${id}"]`));
+		const ABSENT = '—';
+
+		return {
+			tiers: pick(document, 'variant-column').map((el) => clean(el.querySelector('[data-testid="variant-code"]'))),
+			rows: pick(document, 'coverage-row').map((row) => ({
+				label: clean(row.querySelector('[data-testid="coverage-header"]')),
+				cells: pick(row, 'coverage-cell').map((cell) => {
+					const premium = cell.querySelector('[data-testid="coverage-premium"]');
+					if (!premium) {
+						return null;
+					}
+					return {
+						premium: clean(premium),
+						limit: clean(cell.querySelector('[data-testid="coverage-limit"]')),
+					};
+				}),
+			})),
+			discounts: pick(document, 'discount-row').map((row) => ({
+				label: clean(row.querySelector('[data-testid="discount-name"]')),
+				values: pick(row, 'discount-value').map((cell) => {
+					const text = clean(cell);
+					return text === ABSENT ? null : text;
+				}),
+			})),
+			beforeDiscounts: pick(document, 'variant-premium-before-discounts').map(clean),
+			finals: pick(document, 'variant-premium').map(clean),
+		};
+	});
 }

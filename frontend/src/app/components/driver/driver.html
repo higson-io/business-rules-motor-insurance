@@ -8,6 +8,12 @@
 	error display and no zip-code mask, because it carries none today. Adding any of it is a new
 	feature, not a migration.
 -->
+<section class="inputs__group">
+	<h2 class="inputs__group__heading">
+		<i class="person" aria-hidden="true"></i>
+		Personal information
+	</h2>
+
 <mat-form-field appearance="outline" class="driver__field">
 	<mat-label>First name</mat-label>
 	<input
@@ -85,12 +91,13 @@
 	component (`driver.html:55-60`) rather than from the sidebar that owns every other divider. It
 	is odd structure with zero user impact; moving it risks layout drift for no gain.
 -->
-<div class="sidebar-container__divider address">
-	<div class="sidebar-container__divider__icon">
-		<i class="address"></i>
-		<div class="sidebar-container__divider__text">Address</div>
-	</div>
-</div>
+</section>
+
+<section class="inputs__group">
+	<h2 class="inputs__group__heading">
+		<i class="address" aria-hidden="true"></i>
+		Address
+	</h2>
 
 <mat-form-field appearance="outline" class="driver__field">
 	<mat-label>Zip code</mat-label>
@@ -127,3 +134,4 @@
 		(blur)="commitStreet(streetInput.value)"
 	/>
 </mat-form-field>
+</section>

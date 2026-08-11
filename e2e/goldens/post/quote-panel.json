@@ -168,10 +168,16 @@
 				}
 			]
 		},
-		"renderedVariantCards": [
-			"BRONZE\nBodily Injury Liability (BI)\n30,000.00 / 50,000.00\n129.78\nProperty Damage Liability (PD)\n25,000.00\n100.00\nMedical Payments (MED)\n2,000.00\n55.00\nPrice before discounts\n284.78\nGood Driver\t-20.00\nFINAL PRICE\n264.78",
-			"SILVER\nBodily Injury Liability (BI)\n50,000.00 / 100,000.00\n180.25\nProperty Damage Liability (PD)\n40,000.00\n100.00\nPersonal Injury Protection (PIP)\n5,000.00\n95.00\nUninsured Motorist Bodily Injury (UMBI)\n50,000.00 / 100,000.00\n55.11\nCollision (COLL)\n1,000.00\n263.66\nPrice before discounts\n694.02\nGood Driver\t-20.00\nFINAL PRICE\n674.02",
-			"GOLD\nBodily Injury Liability (BI)\n60,000.00 / 120,000.00\n201.88\nProperty Damage Liability (PD)\n60,000.00\n100.00\nPersonal Injury Protection (PIP)\n10,000.00\n200.00\nUninsured Motorist Bodily Injury (UMBI)\n100,000.00 / 200,000.00\n110.11\nUninsured Motorist Property Damage (UMPD)\n100,000.00\n310.00\nComprehensive (COMP)\n1,500.00\n95.21\nCollision (COLL)\n3,000.00\n366.19\nEmergency Road Service (ERS)\n0.00\n17.80\nPrice before discounts\n1,401.19\nGood Driver\t-20.00\nFINAL PRICE\n1,381.19"
+		"renderedMatrixRows": [
+			"Bodily Injury Liability (BI)\t\n129.78\n30,000.00 / 50,000.00\n\t\n180.25\n50,000.00 / 100,000.00\n\t\n201.88\n60,000.00 / 120,000.00",
+			"Property Damage Liability (PD)\t\n100.00\n25,000.00\n\t\n100.00\n40,000.00\n\t\n100.00\n60,000.00",
+			"Medical Payments (MED)\t\n55.00\n2,000.00\n\t—\t—",
+			"Personal Injury Protection (PIP)\t—\t\n95.00\n5,000.00\n\t\n200.00\n10,000.00",
+			"Uninsured Motorist Bodily Injury (UMBI)\t—\t\n55.11\n50,000.00 / 100,000.00\n\t\n110.11\n100,000.00 / 200,000.00",
+			"Uninsured Motorist Property Damage (UMPD)\t—\t—\t\n310.00\n100,000.00",
+			"Comprehensive (COMP)\t—\t—\t\n95.21\n1,500.00",
+			"Collision (COLL)\t—\t\n263.66\n1,000.00\n\t\n366.19\n3,000.00",
+			"Emergency Road Service (ERS)\t—\t—\t\n17.80\n0.00"
 		]
 	}
 }

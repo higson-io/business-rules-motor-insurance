@@ -1,0 +1,26 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// Mobile-first: one column is the base case and the second is ADDED at the breakpoint.
+.moto {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 26px;
+	align-items: start;
+}
+
+// ⚠️ A fixed 340px rather than the old `25fr`. A form column has a comfortable width that does not
+// depend on the window: at 1920 a quarter is 460px, which stretches a single text field well past
+// the point where it helps anyone. The comparison table takes whatever is left, and it is the thing
+// that genuinely benefits from more room.
+//
+// 992px is Bootstrap 3's own `md` breakpoint, kept to the pixel — the collapse point is a behaviour
+// users notice, and moving it would be a redesign smuggled in under a layout change.
+@media (min-width: 992px) {
+	.moto {
+		grid-template-columns: 340px minmax(0, 1fr);
+	}
+}

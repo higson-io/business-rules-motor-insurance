@@ -1,159 +1,223 @@
-// The port of `less/variants/variants.less`.
+// The comparison matrix.
 //
-// ⛔ DR-15 — `cursor: pointer` (`:9`) and the `:hover` block (`:21-24`) are DELETED. The variant
-// column has never had a click handler: `variants.html` binds nothing to it, and neither did the
-// AngularJS template. The pointer cursor and the lift-on-hover promised an action that does not
-// exist, and on a page whose whole job is choosing between three options that is a genuinely
-// misleading affordance rather than a cosmetic one. `transition: 0.5s` (`:16`) goes with them —
-// it existed only to animate that hover.
+// ⛔ Replaced `less/variants/variants.less`'s three floating cards. Those could say what a tier
+// contained but never what it lacked, and reading one coverage across three tiers meant matching
+// names by eye between columns — the one comparison the screen exists to support.
 //
-// The negative `margin-left: -15px` (`:3`) is also gone: it cancelled the padding Bootstrap's
-// `.col-md-9` added, and there is no such padding in the CSS Grid layout to cancel.
+// ⛔ DR-15 — no `cursor: pointer` and no `:hover` lift survive from the original. The tiers have
+// never been selectable: nothing binds a click, and promising an action that does not exist is a
+// misleading affordance rather than a cosmetic one.
 
-.variants {
-	position: relative;
-	display: flex;
-	// Mobile-first (`responsive.md`): the three cards sit side by side when there is room and wrap
-	// onto their own rows when there is not, instead of being crushed to an unreadable width. The
-	// original fixed `width: 329px` could do neither.
-	flex-wrap: wrap;
-	// Each card ends where its content ends, rather than every card being stretched to the tallest.
-	//
-	// ⚠️ The trade this makes: the three final prices no longer sit on one line, so comparing them
-	// costs an eye movement instead of none. Bought in exchange for the dead space that alignment
-	// forced into the leaner tiers — BRONZE carries three coverages against GOLD's eight, and
-	// stretching it to match left roughly a third of the card empty. The tier gauge under each name
-	// already says which tier is broader, so the height no longer has to.
-	align-items: flex-start;
-	gap: 26px;
+.quote {
+	display: block;
 }
 
-.variants__column {
-	display: flex;
-	flex: 1 1 280px;
-	flex-direction: column;
-	padding: 20px 0;
+.quote__table {
+	width: 100%;
+	// The figures line up on their own once the cells share a width, so no border-collapse tricks
+	// and no vertical rules are needed to guide the eye down a column.
+	border-collapse: collapse;
+	background: @color-paper;
 	border: 1px solid @color-border-block;
 	border-radius: var(--mat-sys-corner-medium);
-	background: @color-paper;
 	box-shadow: @shadow-panel;
+	// `border-radius` has no effect on a table's own corners once cells paint over them.
+	overflow: hidden;
 }
 
-// The tier name. 26px at the 16px root, and the one place on the card where Manrope is pushed to
-// its heaviest weight with the tracking pulled in — the family carries 200–800, so the display
-// voice comes from the range that is already downloaded rather than from a second typeface.
+// The table needs an accessible name; sighted readers get it from the page around it.
+.quote__caption {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+// The corner cell names the row axis. It was going to be hidden — a table this small "obviously"
+// has coverages down the side — but the columns are named and the rows were not, and an axis label
+// costs one word.
+.quote__corner {
+	width: 34%;
+	padding: 22px 18px 16px;
+	border-bottom: 1px solid @color-border-block;
+	text-align: left;
+	vertical-align: bottom;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+// ── Column headings ───────────────────────────────────────────────────────────────────────────
+
+.quote__tier {
+	padding: 22px 18px 16px;
+	border-bottom: 1px solid @color-border-block;
+	text-align: right;
+	vertical-align: bottom;
+}
+
+// The one place Manrope is pushed to its heaviest weight with the tracking pulled in — the family
+// carries 200–800, so the display voice comes from the range already downloaded rather than from a
+// second typeface.
 //
-// ⛔ NOT numbered 01 / 02 / 03. The tiers are a ladder, but they already have names that say where
-// on it they sit; a number beside "GOLD" would restate what the word carries and claim a sequence
-// the user does not step through.
-//
-// The rule underneath is a tier gauge, so the three cards read as a progression at a glance before
-// a single figure has been compared.
-.variants__column__header {
-	width: 100%;
-	padding-bottom: 34px;
-	font-size: 1.625rem;
+// ⛔ NOT numbered 01 / 02 / 03. The tiers are a ladder, but their names already say where on it they
+// sit; a number beside "GOLD" would restate what the word carries.
+.quote__tier__name {
+	display: block;
+	font-size: 1.375rem;
 	font-weight: 800;
 	letter-spacing: -0.02em;
-	text-align: center;
 	color: @color-text;
 }
 
-// The gauge track. Width is set from the data in the template, never from `nth-child`: the rules
-// decide how many options come back and in what order, and a hand-written width per position would
-// be wrong the first time someone changes them.
-.variants__column__gauge {
+// The gauge track. Width comes from the data in the template, never from `nth-child`.
+.quote__tier__gauge {
 	display: block;
-	width: 56%;
+	width: 100%;
 	height: 3px;
-	margin: 14px auto 0;
+	margin-top: 10px;
 	border-radius: 2px;
 	background: fade(@color-text-muted, 16%);
 	overflow: hidden;
 }
 
-// ⛔ Neutral, and not a second colour. Cyan here was half of what made the card incoherent — it sat
-// opposite the pink on the wheel, at similar strength, on the same 300px of paper.
-//
-// Neutral is also the more honest encoding: the gauge measures breadth of cover and the bars below
-// measure money. Two different quantities should not share a colour, and giving the gauge the
-// accent would have said they do.
-.variants__column__gauge__fill {
+// Neutral, and not a second colour: the gauge measures breadth of cover while the cell bars measure
+// money, and two different quantities should not share one.
+.quote__tier__gauge__fill {
 	display: block;
 	height: 100%;
-	border-radius: 2px;
 	background: @color-text-muted;
 	transition: width 0.35s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.variants__column__gauge__fill {
+	.quote__tier__gauge__fill {
 		transition: none;
 	}
 }
 
-// ⛔ Was `margin-top: auto`, which pushed the footer to the bottom of a stretched card. With cards
-// at their natural height there is no gap left to absorb, and the auto margin would collapse to
-// nothing anyway — the fixed margin keeps the divider off the last coverage row.
-.variants__column__footer {
-	margin-top: 6px;
+// ── Rows and cells ────────────────────────────────────────────────────────────────────────────
+
+.quote__row__label {
+	padding: 14px 18px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-align: left;
+	color: @color-text;
 }
 
-.variants__column__border {
-	margin: 0 15px;
-	border-top: 1px solid @color-border-block;
+// The row label carries the description popover, and C-8 made it keyboard-reachable where
+// `angular-tooltips` was hover-only — so it is a tab stop and must show where the focus is
+// (`accessibility.md`). The directive only puts a row in the tab order when it has something to
+// show, so this never marks an inert element.
+.quote__row__label:focus-visible {
+	outline: 2px solid @color-accent;
+	outline-offset: -2px;
 }
 
-.variants__column__price-before-discount {
-	padding: 15px 15px 0;
+.quote__cell {
+	padding: 14px 18px;
+	text-align: right;
+	vertical-align: top;
 }
 
-.variants__column__price-before-discounts__label {
-	display: inline-block;
+// Zebra striping rather than horizontal rules: nine coverage rows across four columns need the eye
+// guided along a row, and a tint does that without adding nine more lines to a page that is already
+// a grid.
+.quote__row:nth-child(odd) {
+	background: fade(@color-text-muted, 4%);
+}
+
+// An absent coverage. Muted and centred on the column's figures, so a gap in a tier reads as a
+// deliberate statement rather than as missing data.
+.quote__cell__absent {
+	color: fade(@color-text-muted, 55%);
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────────────────────
+
+.quote__row--subtotal .quote__row__label,
+.quote__row--subtotal .quote__cell,
+.quote__row--discount .quote__row__label,
+.quote__row--discount .quote__cell {
+	padding-top: 10px;
+	padding-bottom: 10px;
 	font-size: 0.875rem;
 	font-weight: 600;
 	color: @color-text-muted;
 }
 
-.variants__column__price-before-discounts__value {
-	font-size: 1rem;
-	font-weight: 600;
-	color: @color-text-muted;
-	float: right;
+.quote__row--subtotal .quote__row__label,
+.quote__row--subtotal .quote__cell {
+	border-top: 1px solid @color-border-block;
+	padding-top: 16px;
 }
 
-.variants__column__final-price {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	padding: 4px 15px 0;
+.quote__row--discount .quote__row__label {
+	font-weight: 400;
 }
 
-.variants__column__final-price__label {
-	display: inline-block;
+.quote__row--total .quote__row__label {
+	padding-top: 14px;
+	padding-bottom: 22px;
 	font-size: 0.75rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	color: @color-text-muted;
 }
 
-// The payload of the whole screen. The accent is spent here, on the composition bars, and on
-// interaction states — nowhere else on paper. The pre-discount figure above it steps back to muted
-// so the eye lands on the number that matters rather than choosing between two.
-.variants__column__final-price__value {
-	font-size: 1.75rem;
+// The payload of the whole screen. The accent is spent here, on the cell bars, and on interaction
+// states — nowhere else on paper.
+.quote__cell--total {
+	padding-top: 14px;
+	padding-bottom: 22px;
+	font-size: 1.625rem;
 	font-weight: 800;
 	letter-spacing: -0.02em;
 	color: @color-accent;
 }
 
-// `less/variants/variants.less:79-84`'s `.variants__error_text`, renamed to the class the Angular
-// template actually emits. G5 replaced the Bootstrap `.alert-danger` div with a `<mat-card>`, so
-// the surface, elevation and radius come from Material; only the placement is set here. It takes a
-// full row of the flex container so the cards below it keep their own line.
-.variants__error {
-	flex: 1 1 100%;
+// The footer rows carry their own emphasis, so the striping stops at the body.
+.quote__row--subtotal,
+.quote__row--discount,
+.quote__row--total {
+	background: none;
+}
+
+// ── Error ─────────────────────────────────────────────────────────────────────────────────────
+// G5 replaced the Bootstrap `.alert-danger` div with a `<mat-card>`, so surface, elevation and
+// radius come from Material; only placement is set here.
+.quote__error {
+	margin-bottom: 26px;
 	padding: 15px;
 	font-size: 1rem;
 	text-align: center;
+}
+
+// ── Narrow screens ────────────────────────────────────────────────────────────────────────────
+// A four-column table cannot shrink indefinitely. Below the layout's own breakpoint the padding
+// tightens and the tier names step down rather than the columns being crushed to an unreadable
+// width (`responsive.md`).
+@media (max-width: 991px) {
+	.quote__row__label,
+	.quote__cell,
+	.quote__tier {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.quote__tier__name {
+		font-size: 1.125rem;
+	}
+
+	.quote__cell--total {
+		font-size: 1.25rem;
+	}
 }

@@ -66,7 +66,7 @@ test('startup renders the seeded quote and issues the expected requests', async 
 		golden.record('vehicle', vehicle);
 	});
 
-	await test.step('three variant cards render in backend order', async () => {
+	await test.step('three tier columns render in backend order', async () => {
 		const codes = await textsOf(page, TESTID.variantCode);
 		expect(codes, 'the three rating options render in backend `order`, BRONZE/SILVER/GOLD').toEqual(
 			['BRONZE', 'SILVER', 'GOLD']

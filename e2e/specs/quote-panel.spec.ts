@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openApp, renderedText, TESTID, textsOf } from '../support/app';
+import { openApp, readMatrix, renderedText, TESTID, textsOf } from '../support/app';
 import { Golden } from '../support/golden';
 import { byStage } from '../support/stage';
 
@@ -48,35 +48,52 @@ test('the quote panel renders in backend order with the recorded formatting', as
 	await openApp(page);
 	const quote = (await (await quoteResponse).json()) as { options: OptionDto[] };
 
-	const cards = page.getByTestId(TESTID.variantCard);
+	const matrix = await readMatrix(page);
 
 	await test.step('options, coverages and discounts render in array order (DR-05)', async () => {
 		// ⛔ NO BRANCH. The backend already sorts - options by `order`, coverages and discounts
 		// by `position` - so DR-05 removes the dead `| orderBy: position` and introduces NO
 		// client-side sort. Rendering must therefore follow the response array on both frontends.
 		expect(
-			await textsOf(page, TESTID.variantCode),
+			matrix.tiers,
 			'DR-05: options render in response array order, with no client-side sort'
 		).toEqual(quote.options.map((o) => o.code));
 
 		for (const [index, option] of quote.options.entries()) {
-			const card = cards.nth(index);
-
 			const positions = option.coverages.map((c) => c.position);
 			expect(
 				positions,
 				`${option.code}: the backend already returns coverage positions ascending - the DR-05 evidence`
 			).toEqual([...positions].sort((a, b) => a - b));
 
+			// A column read: the rows this tier actually carries, in the order the matrix lists
+			// them. The merge preserves each option's own ordering, so this is that option's array.
 			expect(
-				await textsOf(card, TESTID.coverageHeader),
-				`${option.code}: coverages render in response array order`
+				matrix.rows.filter((r) => r.cells[index] !== null).map((r) => r.label),
+				`${option.code}: its coverages appear in response array order`
 			).toEqual(option.coverages.map((c) => `${c.name} (${c.code})`));
 
 			expect(
-				await textsOf(card, TESTID.discountName),
-				`${option.code}: discounts render in response array order`
+				matrix.discounts.filter((d) => d.values[index] !== null).map((d) => d.label),
+				`${option.code}: its discounts appear in response array order`
 			).toEqual(option.discounts.map((d) => d.name));
+		}
+	});
+
+	await test.step('a tier states the cover it does NOT include', async () => {
+		// ⛔ The reason the matrix replaced three parallel lists: a list can only stop, which reads
+		// as "nothing more to say"; a cell can say "not in this tier". Which of the two it is
+		// happens to be the whole basis for choosing a tier.
+		const union = new Set(quote.options.flatMap((o) => o.coverages.map((c) => c.code)));
+		expect(matrix.rows.length, 'every coverage any tier carries gets exactly one row').toBe(
+			union.size
+		);
+
+		for (const [index, option] of quote.options.entries()) {
+			expect(
+				matrix.rows.filter((r) => r.cells[index] === null).length,
+				`${option.code}: every coverage it lacks is stated as an absence, not omitted`
+			).toBe(union.size - option.coverages.length);
 		}
 	});
 
@@ -85,19 +102,19 @@ test('the quote panel renders in backend order with the recorded formatting', as
 		// leaves `LOCALE_ID` at Angular's default `en-US` and does NOT register `pl`, so
 		// `100000` must stay `100,000.00` and never become `100 000,00`.
 		for (const [index, option] of quote.options.entries()) {
-			const card = cards.nth(index);
+			const cells = matrix.rows.map((r) => r.cells[index]).filter((c) => c !== null);
 
-			const limits = (await textsOf(card, TESTID.coverageLimit)).map((t) =>
-				t.replace(/\s+/g, ' ').trim()
-			);
-			expect(limits, `${option.code}: DR-11 coverage limits render as en-US decimals`).toEqual(
+			expect(
+				cells.map((c) => c.limit),
+				`${option.code}: DR-11 coverage limits render as en-US decimals`
+			).toEqual(
 				option.coverages.map((c) =>
 					c.limitRight ? `${money(c.limitLeft)} / ${money(c.limitRight)}` : money(c.limitLeft)
 				)
 			);
 
 			expect(
-				await textsOf(card, TESTID.coveragePremium),
+				cells.map((c) => c.premium),
 				`${option.code}: DR-11 coverage premiums render as en-US decimals`
 			).toEqual(option.coverages.map((c) => money(c.premium)));
 		}
@@ -146,10 +163,10 @@ test('the quote panel renders in backend order with the recorded formatting', as
 			'the description is hidden until the coverage row is hovered'
 		).not.toContain(description);
 
-		const row = cards.first().getByTestId(TESTID.coverageRow).nth(
+		const row = page.getByTestId(TESTID.coverageRow).nth(
 			quote.options[0].coverages.indexOf(described!)
 		);
-		await row.hover();
+		await row.getByTestId(TESTID.coverageHeader).hover();
 		await expect
 			.poll(
 				async () => (await renderedText(page)).includes(description),
@@ -186,7 +203,7 @@ test('the quote panel renders in backend order with the recorded formatting', as
 			discounts: o.discounts.map((d) => ({ position: d.position, code: d.code, value: d.value }))
 		}))
 	});
-	golden.record('renderedVariantCards', await textsOf(page, TESTID.variantCard));
+	golden.record('renderedMatrixRows', await textsOf(page, TESTID.coverageRow));
 
 	await golden.screenshot(page, 'quote-panel');
 });

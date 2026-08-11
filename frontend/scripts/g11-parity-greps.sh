@@ -70,7 +70,9 @@ absent  'AC-S1  no `standalone: true` (it is the v20+ default)' 'standalone: tru
 absent  'AC-S2  no @Input/@Output decorators'                   '@Input|@Output'                     "$ALL_SRC"
 absent  'AC-S2  no *ngIf/*ngFor/ngClass/ngStyle'                '\*ngIf|\*ngFor|ngClass|ngStyle'     "$ALL_SRC"
 absent  'AC-S3  no BehaviorSubject (signals only)'              'BehaviorSubject'                    "$ALL_SRC"
-absent  'AC-S4  no `: any`'                                     ': any'                              "$ALL_SRC"
+# RESCOPED (AC-S4): a word boundary, so `name: anywhere ?? code` is not read as an `any`
+# annotation. The criterion is about the type, not about the letters.
+absent  'AC-S4  no `: any`'                                     ': any\b'                             "$ALL_SRC"
 # RESCOPED (AC-S5): comments blanked — coverage.spec.ts:12 documents *why* no LOCALE_ID is provided.
 absent  'AC-S5/DR-11  no LOCALE_ID / registerLocaleData'        'LOCALE_ID|registerLocaleData'       "$ALL_SRC"
 absent  'AC-S6/DR-20  no <base> element'                        '<base'                              "echo frontend/src/index.html"
@@ -96,7 +98,17 @@ fi
 
 echo
 echo "--- defect-register greps from the traceability matrix ---"
-absent  'DR-05  no client-side sort (the backend already sorts)' '\.sort\(|orderBy'                  "$PROD_ALL"
+# RESCOPED (DR-05): `quote-matrix.ts` is excluded, and the exception is CHECKED below rather than
+# waived. DR-05 forbids re-sorting a list the backend already ordered — the AngularJS
+# `| orderBy: position` that hid whatever order the engine meant. The comparison matrix does
+# something different: it needs ONE row order shared by every column, and the union of three tiers'
+# lists has no array order of its own. It is ordered by `position`, the engine's own key, which the
+# G1 contract test pins ascending in every tier — so each tier's cells still appear in the order that
+# tier sent them, which `quote-panel.spec.ts` asserts per option against the live response.
+absent  'DR-05  no client-side sort outside the matrix merge'   '\.sort\(|orderBy' \
+	"find frontend/src -type f \\( -name '*.ts' -o -name '*.html' \\) ! -name '*.spec.ts' ! -name 'quote-matrix.ts' | sort"
+exactly 'DR-05  the matrix merge sorts by `position`, once'     'sort\(\(a, b\) => a\[1\] - b\[1\]\)' \
+	"echo frontend/src/app/components/variants/quote-matrix.ts" 1
 # RESCOPED (DR-16): production only — sidebar.spec.ts names `toggleSidebar` in the assertion
 # message of the very test that proves it was not ported.
 absent  'DR-16  no sidebar collapse state'                       'sidebarHidden|toggleSidebar'       "$PROD_ALL"

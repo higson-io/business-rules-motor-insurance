@@ -1,74 +1,126 @@
-<div class="variants">
+<div class="quote">
 	@if (errorMessage(); as message) {
-		<mat-card role="alert" data-testid="quote-error-banner" class="variants__error">
+		<mat-card role="alert" data-testid="quote-error-banner" class="quote__error">
 			{{ message }}
 		</mat-card>
 	}
 
-	<!-- ⛔ DR-05 — NO CLIENT-SIDE SORT, on any of the three loops.
-	     The backend already returns options by ascending `order` and coverages and discounts by
-	     ascending `position` (pinned by the G1 contract test). The AngularJS ordering filter at
-	     `variants.html:8,21` took an UNQUOTED predicate, so it resolved to `undefined` on the scope
-	     and sorted nothing — a no-op that only looked like a sort. Adding a real one "to be safe"
-	     would be an unsanctioned deviation. -->
-	@for (variant of options(); track variant.code) {
-		<div class="variants__column" data-testid="variant-card">
-			<div class="variants__column__header" data-testid="variant-code">
-				{{ variant.code }}
-				<!--
-					The tier gauge: how much of the richest tier's cover this one includes. Renders no
-					text, so the behaviour goldens stay byte-identical; the figure it draws is named
-					for assistive technology instead.
-				-->
-				<span
-					class="variants__column__gauge"
-					role="img"
-					[attr.aria-label]="
-						variant.coverages.length + ' of ' + maxCoverages() + ' coverages'
-					"
-				>
-					<span
-						class="variants__column__gauge__fill"
-						[style.width.%]="(coverBreadth().get(variant.code) ?? 0) * 100"
-					></span>
-				</span>
-			</div>
+	@if (matrix(); as m) {
+		@if (m.options.length) {
+			<!--
+				A real <table>. The data is genuinely tabular — coverages against tiers — so the
+				element that says so gives screen readers row and column context for free, and gives
+				sighted readers a header row that stays meaningful as the rules add tiers.
 
-			@for (coverage of variant.coverages; track coverage.code) {
-				<app-coverage
-					[code]="coverage.code"
-					[name]="coverage.name"
-					[description]="coverage.description"
-					[limitLeft]="coverage.limitLeft"
-					[limitRight]="coverage.limitRight"
-					[premium]="coverage.premium"
-					[total]="variant.premiumBeforeDiscounts"
-				/>
-			}
+				⛔ DR-05 — NO CLIENT-SIDE SORT anywhere. The backend returns coverages and discounts
+				by ascending `position` and the G1 contract test pins it. `quote-matrix.ts` merges
+				the per-tier lists without reordering them; the merge adds completeness, not
+				sequence.
+			-->
+			<table class="quote__table">
+				<caption class="quote__caption">
+					Cover and premium by tier
+				</caption>
 
-			<div class="variants__column__footer">
-				<div class="variants__column__border"></div>
-				<div class="variants__column__price-before-discount">
-					<div class="variants__column__price-before-discounts__label">Price before discounts</div>
-					<div
-						class="variants__column__price-before-discounts__value"
-						data-testid="variant-premium-before-discounts"
-					>
-						{{ variant.premiumBeforeDiscounts | number: '1.2-2' }}
-					</div>
-				</div>
+				<thead>
+					<tr>
+						<th scope="col" class="quote__corner">Coverage</th>
 
-				@for (discount of variant.discounts; track discount.code) {
-					<app-discount [name]="discount.name" [value]="discount.value" />
-				}
+						@for (option of m.options; track option.code) {
+							<th scope="col" class="quote__tier" data-testid="variant-column">
+								<span class="quote__tier__name" data-testid="variant-code">{{ option.code }}</span>
 
-				<div class="variants__column__final-price">
-					<div class="variants__column__final-price__label">FINAL PRICE</div>
-					<div class="variants__column__final-price__value" data-testid="variant-premium">
-						{{ variant.premium | number: '1.2-2' }}
-					</div>
-				</div>
-			</div>
-		</div>
+								<!--
+									The tier gauge: how much of the richest tier's cover this one
+									includes. Renders no text; the figure is named for assistive
+									technology instead.
+								-->
+								<span
+									class="quote__tier__gauge"
+									role="img"
+									[attr.aria-label]="
+										option.coverages.length + ' of ' + m.maxCoverages + ' coverages'
+									"
+								>
+									<span
+										class="quote__tier__gauge__fill"
+										[style.width.%]="breadthOf(option.coverages.length) * 100"
+									></span>
+								</span>
+							</th>
+						}
+					</tr>
+				</thead>
+
+				<tbody>
+					@for (row of m.coverageRows; track row.code) {
+						<tr class="quote__row" data-testid="coverage-row">
+							<th scope="row" class="quote__row__label" [appHtmlPopover]="row.description">
+								<span data-testid="coverage-header">{{ row.name }} ({{ row.code }})</span>
+							</th>
+
+							@for (cell of row.cells; track $index) {
+								<td class="quote__cell" data-testid="coverage-cell">
+									@if (cell.coverage; as coverage) {
+										<app-coverage
+											[limitLeft]="coverage.limitLeft"
+											[limitRight]="coverage.limitRight"
+											[premium]="coverage.premium"
+											[total]="cell.total"
+										/>
+									} @else {
+										<!--
+											⛔ An explicit absence, not an empty cell. Three parallel
+											lists could only stop early, which reads as "nothing more
+											to say" rather than "this tier does not include it" —
+											and which of the two it is happens to be the whole basis
+											for choosing a tier.
+										-->
+										<span class="quote__cell__absent" aria-label="not included">—</span>
+									}
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+
+				<tfoot>
+					<tr class="quote__row quote__row--subtotal">
+						<th scope="row" class="quote__row__label">Price before discounts</th>
+						@for (option of m.options; track option.code) {
+							<td class="quote__cell" data-testid="variant-premium-before-discounts">
+								{{ option.premiumBeforeDiscounts | number: '1.2-2' }}
+							</td>
+						}
+					</tr>
+
+					@for (discount of m.discountRows; track discount.code) {
+						<tr class="quote__row quote__row--discount" data-testid="discount-row">
+							<th scope="row" class="quote__row__label" data-testid="discount-name">
+								{{ discount.name }}
+							</th>
+							@for (value of discount.values; track $index) {
+								<td class="quote__cell" data-testid="discount-value">
+									@if (value !== null) {
+										-{{ value | number: '1.2-2' }}
+									} @else {
+										<span class="quote__cell__absent" aria-label="not included">—</span>
+									}
+								</td>
+							}
+						</tr>
+					}
+
+					<tr class="quote__row quote__row--total">
+						<th scope="row" class="quote__row__label">Final price</th>
+						@for (option of m.options; track option.code) {
+							<td class="quote__cell quote__cell--total" data-testid="variant-premium">
+								{{ option.premium | number: '1.2-2' }}
+							</td>
+						}
+					</tr>
+				</tfoot>
+			</table>
+		}
 	}
 </div>

@@ -51,8 +51,8 @@ test('the numeric claim-history fields commit, guard and recalculate as recorded
 	});
 
 	await test.step('the quote survives the edit', async () => {
-		const cards = await page.getByTestId(TESTID.variantCard).count();
-		expect(cards, 'three variant cards still render after a successful edit').toBe(3);
+		const tiers = await page.getByTestId(TESTID.variantColumn).count();
+		expect(tiers, 'three tier columns still render after a successful edit').toBe(3);
 	});
 
 	await test.step('clearing a numeric field (DR-02)', async () => {
