@@ -16,13 +16,14 @@
 html {
 	@include mat.theme(
 		(
-			// Material generates a full tonal palette from a hue. `$violet-palette` is the stock
-			// palette closest to the brand's #4C4CDE, which the override below then pins exactly;
-			// the palette supplies the surrounding tones (containers, hovers, focus rings) that a
-			// single hex cannot.
+			// Material generates a full tonal palette from a hue. `$magenta-palette` is the stock
+			// palette nearest Higson's `--deep-pink` #ff0e6f, which the override below pins; the
+			// palette supplies the surrounding tones (containers, hovers, focus rings) that a
+			// single hex cannot. `$cyan-palette` carries Decerto's `--decerto-cyan-200` into the
+			// tertiary role, so the two brands each have a seat rather than one being interpreted.
 			color: (
-					primary: mat.$violet-palette,
-					tertiary: mat.$violet-palette,
+					primary: mat.$magenta-palette,
+					tertiary: mat.$cyan-palette,
 				),
 			// Manrope, self-hosted in `styles/_typography.less`. Material's typography tokens are
 			// independent of the `body` font rule, so without this every control on the screen —
@@ -40,9 +41,12 @@ html {
 	// Everything downstream references these tokens rather than re-declaring the values —
 	// `var(--mat-sys-primary)` and `var(--mat-sys-corner-medium)` appear throughout the LESS.
 	//
-	// #4C4CDE measures ~6.2:1 against white, past the 4.5:1 WCAG AA floor for body text at any
-	// size (`accessibility.md`), so it is safe as a text colour and not only as a fill.
-	--mat-sys-primary: #4c4cde;
+	// ⚠️ NOT Higson's #ff0e6f. That measures ~3.9:1 on paper — fine for large text and for UI
+	// component boundaries, below the 4.5:1 floor for the small copy Material puts in field labels
+	// (`accessibility.md`). `--mat-sys-primary` drives labels, so it takes the deepened variant
+	// #a80949, which is the same hue past 7:1. The bright accent is spent where it is legible and
+	// where it counts: the final price, and the composition bars on the dark ground.
+	--mat-sys-primary: #a80949;
 	--mat-sys-corner-extra-small: 8px;
 	--mat-sys-corner-small: 8px;
 	--mat-sys-corner-medium: 8px;

@@ -11,4 +11,24 @@
 			{{ premium() | number: '1.2-2' }}
 		</div>
 	</div>
+
+	<!--
+		The composition bar: this coverage's share of the pre-discount premium.
+
+		⚠️ It renders NO TEXT, deliberately. The behaviour goldens compare rendered text, so a
+		decorative element that carries none leaves them byte-identical — the design change is
+		provably not a behaviour change. The share is exposed to assistive technology through
+		`aria-label` instead, which `innerText` does not see either.
+
+		The bar is the only interpretation on this screen. Everything else states a number the rules
+		engine returned; this says how the numbers relate to each other, which is what makes the
+		list worth reading rather than merely correct.
+	-->
+	<div
+		class="coverage__composition"
+		role="img"
+		[attr.aria-label]="(share() * 100 | number: '1.0-0') + '% of the pre-discount premium'"
+	>
+		<div class="coverage__composition__fill" [style.width.%]="share() * 100"></div>
+	</div>
 </div>

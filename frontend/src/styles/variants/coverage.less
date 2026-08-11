@@ -3,14 +3,18 @@
 // ⛔ DR-25 — `.coverage__divider` (`:11-16`) is DELETED, not ported. No template has ever emitted
 // the class: it is absent from the AngularJS `coverage.html` and from the Angular one.
 
+// 30px between rows became 22px: the composition bar now separates them, so the gap no longer has
+// to do that job on its own, and eight of these stacked in the GOLD card were pushing the price
+// off the fold.
 .coverage {
-	margin-bottom: 30px;
+	margin-bottom: 22px;
 	padding: 0 15px;
 }
 
 .coverage__header {
 	font-size: 0.875rem;
 	font-weight: 600;
+	color: @color-text;
 }
 
 .coverage__content {
@@ -19,15 +23,56 @@
 	justify-content: space-between;
 }
 
+// The limits. Cyan and small: they qualify the coverage rather than price it, and until now they
+// competed with the premium beside them at nearly equal weight.
+//
+// ⚠️ `@color-support` on paper is ~2.1:1 — nowhere near a text contrast floor. `#2c6d78` is the
+// same hue darkened to ~5.4:1, which is what a small figure needs (`accessibility.md`). The bright
+// cyan stays for the tier gauge and the bars, where the 3:1 non-text floor applies.
 .coverage__text {
 	display: inline-block;
 	font-size: 0.75rem;
+	color: #2c6d78;
 }
 
 .coverage__sum {
 	font-size: 1rem;
-	font-weight: bold;
+	font-weight: 700;
+	color: @color-text;
 	float: right;
+}
+
+// ── The signature ─────────────────────────────────────────────────────────────────────────────
+// Each row's share of the pre-discount premium, drawn as a hairline.
+//
+// This is the one interpretive mark on the screen. Every other element states a figure the rules
+// engine returned; this states how the figures relate — and because the engine recomputes on every
+// edit, the bars redistribute as the user types. That is the product's entire claim, shown rather
+// than asserted, and it costs one element and no request.
+//
+// Deliberately 3px and low-contrast: it is a texture you read down a column, not a chart. The whole
+// point is that eight of them stack into a picture of the price without any one of them shouting.
+.coverage__composition {
+	height: 3px;
+	margin-top: 8px;
+	border-radius: 2px;
+	background: fade(@color-slate, 16%);
+	overflow: hidden;
+}
+
+.coverage__composition__fill {
+	height: 100%;
+	border-radius: 2px;
+	background: @color-accent;
+	// The redistribution is the thing worth seeing, so it is the one animation on the screen. Short
+	// enough to read as a consequence of the edit rather than as an effect.
+	transition: width 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.coverage__composition__fill {
+		transition: none;
+	}
 }
 
 // The row carries the description popover, and C-8 made it reachable from the keyboard where

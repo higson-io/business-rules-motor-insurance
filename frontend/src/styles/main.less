@@ -12,20 +12,20 @@
 // own focus indicators, so deleting these rules restores keyboard visibility rather than changing
 // any design decision.
 
+// ⛔ Was a 65px white slab with a border and a radius — a panel in its own right, competing with
+// the panels that actually hold content, and holding one wordmark. On midnight blue it becomes what
+// a masthead should be: part of the ground, separated by a hairline rather than by a box.
 .menubar {
 	display: flex;
 	align-items: center;
-	// `space-between` rather than `end`: the back control sits at the left, the logo stays at the
-	// right where it has always been. With no back control the logo is the only child, and a lone
-	// flex item under `space-between` still lands at the end — so the landing screen's bar is
-	// pixel-for-pixel what `justify-content: end` produced.
+	// `space-between` rather than `end`: the back control sits at the left, the wordmark stays at
+	// the right where it has always been. With no back control the wordmark is the only child, and
+	// a lone flex item under `space-between` still lands at the end.
 	justify-content: space-between;
-	height: 65px;
+	height: 56px;
 	margin-bottom: 26px;
-	padding: 0 15px;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
-	background-color: @color-white;
+	padding: 0 2px;
+	border-bottom: 1px solid fade(@color-mist, 18%);
 }
 
 // The way out of a demo. New with the landing screen and unavoidable: without a router there is no
@@ -37,17 +37,20 @@
 	border-radius: var(--mat-sys-corner-medium);
 	background: none;
 	font: inherit;
-	font-weight: 500;
-	color: var(--mat-sys-primary);
+	font-weight: 600;
+	// On the dark ground the palette inverts: mist reads as the quiet state, white as the active
+	// one. `@color-slate` would sink into midnight blue.
+	color: @color-mist;
 	cursor: pointer;
+	transition: color 0.15s ease;
 }
 
 .menubar__back:hover {
-	background: @color-gray-light;
+	color: @color-white;
 }
 
 .menubar__back:focus-visible {
-	outline: 2px solid var(--mat-sys-primary);
+	outline: 2px solid @color-support;
 	outline-offset: 2px;
 }
 
@@ -59,11 +62,14 @@
 // no asset, is neutral by construction, scales, and is selectable and searchable. The SVG is
 // deleted rather than left unreferenced (`minimal-implementation.md`); it is one `git checkout` out
 // of history if a demo ever wants its own mark.
+// White on midnight blue, not the accent: the masthead is the quietest thing on the page, and the
+// accent has one job further down. Manrope at 800 with the tracking pulled in is the display voice
+// used throughout — the same treatment as the tier names, so the page has one voice, not two.
 .wordmark {
 	font-size: 1.125rem;
-	font-weight: 700;
-	color: var(--mat-sys-primary);
-	letter-spacing: 0.01em;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	color: @color-white;
 	white-space: nowrap;
 }
 

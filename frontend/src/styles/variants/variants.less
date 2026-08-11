@@ -28,19 +28,55 @@
 	padding: 20px 0;
 	border: 1px solid @color-border-block;
 	border-radius: var(--mat-sys-corner-medium);
-	background: @color-white;
+	background: @color-paper;
 }
 
-// 26px at the 16px root. The colour is the brand primary, ~6.2:1 against the white card —
-// comfortably past the 4.5:1 WCAG AA floor for body text, and this is display size
-// (`accessibility.md`).
+// The tier name. 26px at the 16px root, and the one place on the card where Manrope is pushed to
+// its heaviest weight with the tracking pulled in — the family carries 200–800, so the display
+// voice comes from the range that is already downloaded rather than from a second typeface.
+//
+// ⛔ NOT numbered 01 / 02 / 03. The tiers are a ladder, but they already have names that say where
+// on it they sit; a number beside "GOLD" would restate what the word carries and claim a sequence
+// the user does not step through.
+//
+// The rule underneath is a tier gauge: it fills a third, two thirds, then fully, so the three cards
+// read as a progression at a glance before a single figure has been compared. Cyan rather than the
+// accent — this is supporting structure, and the accent is spent on the price.
 .variants__column__header {
 	width: 100%;
-	padding-bottom: 50px;
+	padding-bottom: 34px;
 	font-size: 1.625rem;
-	font-weight: bold;
+	font-weight: 800;
+	letter-spacing: -0.02em;
 	text-align: center;
-	color: var(--mat-sys-primary);
+	color: @color-text;
+}
+
+// The gauge track. Width is set from the data in the template, never from `nth-child`: the rules
+// decide how many options come back and in what order, and a hand-written width per position would
+// be wrong the first time someone changes them.
+.variants__column__gauge {
+	display: block;
+	width: 56%;
+	height: 3px;
+	margin: 14px auto 0;
+	border-radius: 2px;
+	background: fade(@color-slate, 16%);
+	overflow: hidden;
+}
+
+.variants__column__gauge__fill {
+	display: block;
+	height: 100%;
+	border-radius: 2px;
+	background: @color-support;
+	transition: width 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.variants__column__gauge__fill {
+		transition: none;
+	}
 }
 
 .variants__column__footer {
@@ -60,11 +96,13 @@
 	display: inline-block;
 	font-size: 0.875rem;
 	font-weight: 600;
+	color: @color-slate;
 }
 
 .variants__column__price-before-discounts__value {
 	font-size: 1rem;
-	font-weight: bold;
+	font-weight: 600;
+	color: @color-slate;
 	float: right;
 }
 
@@ -72,18 +110,26 @@
 	display: flex;
 	align-items: baseline;
 	justify-content: space-between;
-	padding: 0 15px;
+	padding: 4px 15px 0;
 }
 
 .variants__column__final-price__label {
 	display: inline-block;
-	font-size: 1.125rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	color: @color-slate;
 }
 
+// The payload of the whole screen, and the only place Higson's bright pink appears on paper.
+// 1.75rem bold is large text, where the 3:1 contrast floor applies rather than 4.5:1
+// (`accessibility.md`) — which is exactly why the accent is spendable here and nowhere smaller.
+// The pre-discount figure above it steps back to slate so the eye lands on the number that matters.
 .variants__column__final-price__value {
-	font-size: 1.5rem;
-	font-weight: bold;
-	color: var(--mat-sys-primary);
+	font-size: 1.75rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	color: @color-accent;
 }
 
 // `less/variants/variants.less:79-84`'s `.variants__error_text`, renamed to the class the Angular

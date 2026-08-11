@@ -1,40 +1,64 @@
-// The trimmed survivors of `less/variables.less` (14 declarations → 3).
+// The brand palette, taken from the two sites this product actually belongs to.
 //
-// The rule applied here is the one from plan step 9.3: where Angular Material already publishes a
-// system token, reference the token instead of re-declaring the hex, so the brand seed in
-// `theme.scss` stays the single place a brand colour is defined.
+// Both were read from their own published CSS custom properties rather than eyedropped, and both
+// turn out to share a core — `#001f33` midnight blue and `#667d8d` slate grey appear, under those
+// names, in each. Decerto sets its body face to Manrope, which this application already self-hosts.
+// Both round to 8px. So the two brands are one system with two accents, and the palette below is
+// that system rather than an interpretation of it.
 //
-//   @color-primary        → var(--mat-sys-primary)          (#4C4CDE, set in theme.scss)
-//   @color-tooltip-border → var(--mat-sys-primary)          it WAS rgba(76,76,222,1) — the same colour
-//   @border-radius        → var(--mat-sys-corner-medium)    (8px, set in theme.scss)
+//   higson.io    --midnight-blue #001f33   --midnight-blue-2 #051c2b   --deep-pink #ff0e6f
+//                --slate-grey    #667d8d   --alice-blue      #e1e9ef   --white-smoke #f9f9fb
+//   decerto.com  --midnight-blue #112639   --decerto-cyan-200 #5dc7d5  --mid-gray  #667d8d
+//                --text          #333      --futuristic-green #89fcc5
 //
-// Dropped outright, because every rule that referenced them is deleted rather than ported:
-//   @color-border      only the `.common-input-*` controls that `mat-form-field` replaces (C-9)
-//   @color-gray        only `.common-input-default__label`, replaced by `<mat-label>`
-//   @color-gray-dark   folded into @color-text, which held the identical #333
-//   @color-blue        never referenced by anything, in nine years
-//   @color-background  never referenced by anything, in nine years
-//
-// @color-gray-light was dropped with them and has since been restored — see below.
+// What this replaces: `#4C4CDE` on a violet gradient. That was Angular Material's default violet
+// with the hue nudged — it matched neither brand, and it is the single thing that made the screen
+// read as a framework demo rather than as this product.
 
-// The hairline that separates the white panels from each other. Material's `--mat-sys-outline`
-// family is derived from the primary hue and comes out visibly violet; this border is neutral
-// grey by design, so it stays a literal.
-@color-border-block: #ECECEC;
+// ── Ground ────────────────────────────────────────────────────────────────────────────────────
+// The page. Both brands ground on midnight blue; Higson's is the darker of the two and is what a
+// product surface sits on, so it is the one used here.
+@color-ink: #001f33;
+@color-ink-deep: #051c2b;
 
-// The panels are deliberately PURE white against the blue gradient. Material's `--mat-sys-surface`
-// is hue-tinted in M3 and would tint them towards the background they are supposed to sit on top of.
+// ── Accents ───────────────────────────────────────────────────────────────────────────────────
+// Higson's signature. ⚠️ Measures ~3.9:1 on white — below the 4.5:1 floor for body text, above the
+// 3:1 floor for large text and for UI component boundaries (`accessibility.md`). So it is allowed
+// on the large numerals and on the dark ground, and NOWHERE on small copy. `@color-accent-ink`
+// below is the variant for anything that has to carry text weight on paper.
+@color-accent: #ff0e6f;
+@color-accent-ink: #a80949;
+
+// Decerto's cyan, for supporting data — limits, meta, the quieter half of a pair. Kept away from
+// anything that competes with the accent.
+@color-support: #5dc7d5;
+
+// ── Neutrals ──────────────────────────────────────────────────────────────────────────────────
+// Shared by both brands under the same name, which is why secondary copy uses it rather than a
+// grey mixed for the occasion.
+@color-slate: #667d8d;
+
+// Higson's `--alice-blue`: hairlines and dividers on the dark ground.
+@color-mist: #e1e9ef;
+
+// Higson's `--white-smoke`. The panels are NOT pure white: against midnight blue, white glares,
+// and both brands use this softer surface for exactly that reason.
+@color-paper: #f9f9fb;
 @color-white: #fff;
 
-// Body copy. `--mat-sys-on-surface` is likewise hue-tinted; this is neutral near-black.
-@color-text: #333;
+// The hairline between panels. Higson publishes `--border: #00000026`; on paper that resolves to
+// about this, and a literal keeps it out of the alpha-compositing question.
+@color-border-block: #e6e9ee;
+
+// Decerto's `--midnight-blue` doubles as body copy: near-black with the same blue cast as the
+// ground, so text and background belong to one family rather than two.
+@color-text: #112639;
 
 // The selected fill of the gender toggle, carried from `less/variables.less`.
 //
 // This variable was dropped as dead when the styles were ported, on the reasoning that its only two
 // consumers — `.common-btn-group .active` and `.coverage__divider` — were both gone. The second is
 // gone for good (DR-25). The first was not: `mat-button-toggle` took over the job, and it defaults
-// to a tinted primary container that renders lavender beside three white fields. The original
-// neutral grey does the same work without introducing a fourth colour, so the variable is back with
-// its consumer in `_forms.less` rather than the value being inlined there.
+// to a tinted primary container. The original neutral grey does the same work without introducing a
+// fourth colour, so the variable is back with its consumer in `_forms.less`.
 @color-gray-light: #f2f2f2;

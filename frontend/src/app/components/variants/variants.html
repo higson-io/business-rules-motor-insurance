@@ -13,7 +13,26 @@
 	     would be an unsanctioned deviation. -->
 	@for (variant of options(); track variant.code) {
 		<div class="variants__column" data-testid="variant-card">
-			<div class="variants__column__header" data-testid="variant-code">{{ variant.code }}</div>
+			<div class="variants__column__header" data-testid="variant-code">
+				{{ variant.code }}
+				<!--
+					The tier gauge: how much of the richest tier's cover this one includes. Renders no
+					text, so the behaviour goldens stay byte-identical; the figure it draws is named
+					for assistive technology instead.
+				-->
+				<span
+					class="variants__column__gauge"
+					role="img"
+					[attr.aria-label]="
+						variant.coverages.length + ' of ' + maxCoverages() + ' coverages'
+					"
+				>
+					<span
+						class="variants__column__gauge__fill"
+						[style.width.%]="(coverBreadth().get(variant.code) ?? 0) * 100"
+					></span>
+				</span>
+			</div>
 
 			@for (coverage of variant.coverages; track coverage.code) {
 				<app-coverage
@@ -23,6 +42,7 @@
 					[limitLeft]="coverage.limitLeft"
 					[limitRight]="coverage.limitRight"
 					[premium]="coverage.premium"
+					[total]="variant.premiumBeforeDiscounts"
 				/>
 			}
 

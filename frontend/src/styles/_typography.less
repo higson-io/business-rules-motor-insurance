@@ -55,6 +55,20 @@ body {
 	font-family: 'Manrope', sans-serif;
 	color: @color-text;
 	font-size: 0.8125rem;
-	background: linear-gradient(to bottom right, rgba(76, 76, 222, 1), rgba(41, 41, 120, 1));
+	// ⛔ Was a violet gradient, `rgba(76,76,222)` → `rgba(41,41,120)`. Flat midnight blue replaces
+	// it because that is the ground both brands actually stand on, and because a gradient behind a
+	// screen whose subject is a column of numbers competes with the numbers. Flat also lets the one
+	// accent land: on a gradient, pink reads differently at the top of the page than at the bottom.
+	background: @color-ink;
 	min-height: 100vh;
+}
+
+// Every figure on this screen sits in a column that is meant to be compared with the column beside
+// it — three premiums, three pre-discount totals, a stack of coverage sums. Proportional digits
+// make those columns ragged. This is the one typographic decision on the page that is functional
+// before it is aesthetic.
+.variants,
+.coverage,
+.discounts {
+	font-variant-numeric: tabular-nums;
 }

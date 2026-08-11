@@ -16,6 +16,8 @@ describe('Coverage', () => {
 		limitLeft: number;
 		limitRight: number | null;
 		premium: number;
+		/** Only the composition-bar tests care; everything else takes a plausible default. */
+		total?: number;
 	}): HTMLElement {
 		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
@@ -26,6 +28,9 @@ describe('Coverage', () => {
 		fixture.componentRef.setInput('limitLeft', inputs.limitLeft);
 		fixture.componentRef.setInput('limitRight', inputs.limitRight);
 		fixture.componentRef.setInput('premium', inputs.premium);
+		// The denominator of the composition bar. Most of this suite is about number formatting, so
+		// a plausible total is enough; the bar's own arithmetic is covered by the last two cases.
+		fixture.componentRef.setInput('total', inputs.total ?? 1000);
 		fixture.detectChanges();
 		return fixture.nativeElement as HTMLElement;
 	}
@@ -70,5 +75,35 @@ describe('Coverage', () => {
 			textOf(leftOnly, 'coverage-premium'),
 			'DR-10: a fractional premium keeps exactly two decimals',
 		).toBe('129.78');
+	});
+
+	it('sizes the composition bar to the share of the total and adds no text', () => {
+		const host = render({ limitLeft: 25000, limitRight: null, premium: 250, total: 1000 });
+		const bar = host.querySelector<HTMLElement>('.coverage__composition__fill');
+
+		expect(bar?.style.width, 'a quarter of the premium fills a quarter of the bar').toBe('25%');
+
+		// ⛔ The bar must contribute NOTHING to `innerText`. The Playwright goldens compare rendered
+		// text, so this is what makes the design change provably not a behaviour change — and it is
+		// the assertion that fails first if someone later "helpfully" prints the percentage.
+		expect(
+			bar?.textContent ?? '',
+			'the bar renders no text, so the behaviour goldens stay byte-identical',
+		).toBe('');
+		expect(
+			host.querySelector('.coverage__composition')?.getAttribute('aria-label'),
+			'the share is named for assistive technology instead of being drawn as text',
+		).toBe('25% of the pre-discount premium');
+	});
+
+	it('draws an empty bar rather than dividing by zero', () => {
+		// A zero-premium quote is a legitimate rules outcome, not an error state — the engine is
+		// free to price everything at nothing — so the bar has to survive it.
+		const host = render({ limitLeft: 0, limitRight: null, premium: 0, total: 0 });
+
+		expect(
+			host.querySelector<HTMLElement>('.coverage__composition__fill')?.style.width,
+			'a zero total yields an empty bar, never NaN',
+		).toBe('0%');
 	});
 });
