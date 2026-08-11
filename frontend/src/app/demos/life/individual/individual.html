@@ -1,0 +1,224 @@
+<!--
+	Risk questions on the left, the policy you are assembling on the right — the same two-column
+	frame as the motor demo, filled with a different interaction. There you compare three finished
+	tiers; here you build one contract and the premium accumulates.
+-->
+<div class="life">
+	<aside class="life__risk">
+		<div class="inputs">
+			<div class="inputs__header">
+				<h1 class="inputs__title">Ubezpieczenie na życie</h1>
+				<p class="inputs__subtitle">Odpowiedz na kilka pytań — składka przelicza się na bieżąco.</p>
+			</div>
+
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Ubezpieczony</h2>
+
+				<!--
+					⛔ No question about sex. Test-Achats has barred EU insurers from pricing on it
+					since December 2012, so the field would either change nothing or demonstrate
+					something unlawful. Age, tobacco, build and occupation are the lawful factors and
+					they are the ones asked for here.
+				-->
+				<mat-form-field appearance="outline">
+					<mat-label>Wiek</mat-label>
+					<input
+						#ageInput
+						matInput
+						type="number"
+						data-testid="life-age"
+						[min]="ageRange.min"
+						[max]="ageRange.max"
+						[value]="age()"
+						(blur)="setAge(ageInput.valueAsNumber)"
+					/>
+					<span matSuffix class="life__suffix">lat</span>
+				</mat-form-field>
+
+				<div class="life__pair">
+					<mat-form-field appearance="outline">
+						<mat-label>Wzrost</mat-label>
+						<input
+							#heightInput
+							matInput
+							type="number"
+							data-testid="life-height"
+							[value]="heightCm()"
+							(blur)="heightCm.set(heightInput.valueAsNumber || heightCm())"
+						/>
+						<span matSuffix class="life__suffix">cm</span>
+					</mat-form-field>
+
+					<mat-form-field appearance="outline">
+						<mat-label>Waga</mat-label>
+						<input
+							#weightInput
+							matInput
+							type="number"
+							data-testid="life-weight"
+							[value]="weightKg()"
+							(blur)="weightKg.set(weightInput.valueAsNumber || weightKg())"
+						/>
+						<span matSuffix class="life__suffix">kg</span>
+					</mat-form-field>
+				</div>
+
+				<!-- BMI is not asked for, it is shown: the two fields above already answer it. -->
+				<p class="life__bmi" data-testid="life-bmi">
+					BMI <strong>{{ bmiText() }}</strong>
+					<span class="life__bmi__band">{{ bmiLabel() }}</span>
+				</p>
+			</section>
+
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Ocena ryzyka</h2>
+
+				<p class="life__question">Czy palisz tytoń?</p>
+				<mat-button-toggle-group
+					class="life__toggle"
+					aria-label="Palenie tytoniu"
+					[value]="smoker()"
+					(change)="smoker.set($event.value)"
+				>
+					<mat-button-toggle [value]="false" data-testid="life-smoker-no">Nie</mat-button-toggle>
+					<mat-button-toggle [value]="true" data-testid="life-smoker-yes">Tak</mat-button-toggle>
+				</mat-button-toggle-group>
+
+				<mat-form-field appearance="outline">
+					<mat-label>Klasa ryzyka zawodowego</mat-label>
+					<mat-select
+						data-testid="life-occupation"
+						[value]="occupationClass()"
+						(selectionChange)="occupationClass.set($event.value)"
+					>
+						@for (occupation of occupations; track occupation.value) {
+							<mat-option [value]="occupation.value">{{ occupation.label }}</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+			</section>
+		</div>
+	</aside>
+
+	<div class="life__policy">
+		<div class="policy">
+			<!-- The main contract: the one cover that is not optional. -->
+			<section class="policy__main">
+				<div class="policy__main__text">
+					<h2 class="policy__main__title">Umowa główna — na życie</h2>
+					<p class="policy__main__note">
+						Świadczenie wypłacane uposażonym w razie śmierci ubezpieczonego, niezależnie od
+						przyczyny.
+					</p>
+				</div>
+
+				<mat-form-field appearance="outline" class="policy__sum">
+					<mat-label>Suma ubezpieczenia</mat-label>
+					<mat-select
+						data-testid="life-main-sum"
+						[value]="mainSum()"
+						(selectionChange)="mainSum.set($event.value)"
+					>
+						@for (value of mainSums; track value) {
+							<mat-option [value]="value">{{ sum(value) }} zł</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+			</section>
+
+			<h2 class="policy__heading">Umowy dodatkowe</h2>
+
+			<ul class="policy__riders">
+				@for (rider of riders; track rider.code) {
+					<li
+						class="policy__rider"
+						[class.policy__rider--on]="isSelected(rider.code)"
+						[attr.data-testid]="'life-rider-' + rider.code"
+					>
+						<mat-checkbox
+							class="policy__rider__toggle"
+							[checked]="isSelected(rider.code)"
+							(change)="toggle(rider, $event.checked)"
+						>
+							<span class="policy__rider__name">{{ rider.name }}</span>
+						</mat-checkbox>
+
+						<p class="policy__rider__description">{{ rider.description }}</p>
+
+						@if (rider.karencja; as karencja) {
+							<p class="policy__rider__karencja">Karencja: {{ karencja }}</p>
+						}
+
+						<div class="policy__rider__cover">
+							@if (rider.amounts.length) {
+								<mat-form-field appearance="outline" class="policy__rider__amount">
+									<mat-label>
+										{{ rider.kind === 'dzienne' ? 'Świadczenie dzienne' : 'Suma ubezpieczenia' }}
+									</mat-label>
+									<mat-select
+										[attr.data-testid]="'life-amount-' + rider.code"
+										[disabled]="!isSelected(rider.code)"
+										[value]="amountOf(rider)"
+										(selectionChange)="setAmount(rider, $event.value)"
+									>
+										@for (amount of rider.amounts; track amount) {
+											<mat-option [value]="amount">{{ sum(amount) }} zł</mat-option>
+										}
+									</mat-select>
+								</mat-form-field>
+							} @else {
+								<p class="policy__rider__flat">Pakiet usług — bez sumy ubezpieczenia</p>
+							}
+						</div>
+					</li>
+				}
+			</ul>
+
+			<!--
+				The running total. The stacked bar is the same idea as the motor demo's composition
+				bars in a different form: there you compare three prices, here you assemble one, so
+				the parts belong in a single bar. It renders no text — the figures are in the list
+				above it.
+			-->
+			<div class="policy__summary" data-testid="life-summary">
+				<div class="policy__stack" role="img" aria-label="Udział poszczególnych umów w składce">
+					@for (part of shares(); track part.code) {
+						<span
+							class="policy__stack__part"
+							[class.policy__stack__part--main]="part.code === 'MAIN'"
+							[style.width.%]="part.share * 100"
+						></span>
+					}
+				</div>
+
+				<ul class="policy__lines">
+					@for (line of quote().lines; track line.code) {
+						<li class="policy__line">
+							<span class="policy__line__name">{{ line.name }}</span>
+							<span class="policy__line__amount">
+								@if (line.kind === 'ryczalt') {
+									—
+								} @else {
+									{{ sum(line.amount) }} zł{{ line.kind === 'dzienne' ? '/dzień' : '' }}
+								}
+							</span>
+							<span class="policy__line__premium">{{ money(line.premium) }} zł</span>
+						</li>
+					}
+				</ul>
+
+				<div class="policy__total">
+					<span class="policy__total__label">Składka miesięczna</span>
+					<span class="policy__total__value" data-testid="life-total">
+						{{ money(quote().total) }} zł
+					</span>
+				</div>
+
+				<p class="policy__disclaimer">
+					Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
+					Kodeksu cywilnego.
+				</p>
+			</div>
+		</div>
+	</div>
+</div>

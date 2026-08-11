@@ -5,9 +5,14 @@
 }
 
 // Mobile-first: one column is the base case and the second is ADDED at the breakpoint.
+// ⚠️ `minmax(0, 1fr)`, not `1fr`. A grid track's implicit minimum is `auto`, which means it cannot
+// shrink below its content's min-content width — and Material renders a select's value with
+// `white-space: nowrap`, so one long option label sets a floor that pushes the track past the
+// viewport and scrolls the whole page sideways. This is the single-column case, where it is easy to
+// assume nothing can overflow because there is nothing beside it.
 .moto {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	gap: 26px;
 	align-items: start;
 }

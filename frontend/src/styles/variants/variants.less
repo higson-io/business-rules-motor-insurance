@@ -12,6 +12,25 @@
 	display: block;
 }
 
+// ⚠️ The table scrolls, not the page.
+//
+// A comparison of three tiers across four columns has an honest minimum width, and on a phone that
+// minimum is wider than the screen. The choice is to crush the columns until the figures are
+// unreadable, to stack the tiers and lose the comparison that is the entire point, or to let the
+// table move under the reader's finger while the page stays put. The third is the only one that
+// keeps the screen doing its job.
+//
+// This is also what a fourth tier will need on a laptop; the container is here now so that day is a
+// non-event.
+.quote__scroll {
+	overflow-x: auto;
+	// A table given a scroll container will otherwise shrink to fit it, which is the crushing this
+	// exists to avoid.
+	> .quote__table {
+		min-width: 560px;
+	}
+}
+
 .quote__table {
 	width: 100%;
 	// The figures line up on their own once the cells share a width, so no border-collapse tricks

@@ -93,3 +93,16 @@
 .mat-mdc-form-field {
 	margin-bottom: 14px;
 }
+
+// ⚠️ Material gives a select's value `white-space: nowrap`, which makes its min-content width the
+// full length of the longest label it has ever shown. Inside a grid track that is enough to stop the
+// track shrinking and to scroll the page sideways on a phone. Allowing the value to shrink — it
+// already ellipsizes — keeps the floor where the layout expects it.
+.mat-mdc-select-value {
+	min-width: 0;
+}
+
+// Same reason, one level up: a form field must be able to be narrower than its widest content.
+.mat-mdc-form-field-infix {
+	min-width: 0;
+}

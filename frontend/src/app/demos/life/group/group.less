@@ -1,0 +1,64 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// The same two-column frame as the other two demos: a fixed form column beside the results.
+// ⚠️ `minmax(0, 1fr)`, not `1fr`. A grid track's implicit minimum is `auto`, which means it cannot
+// shrink below its content's min-content width — and Material renders a select's value with
+// `white-space: nowrap`, so one long option label sets a floor that pushes the track past the
+// viewport and scrolls the whole page sideways. This is the single-column case, where it is easy to
+// assume nothing can overflow because there is nothing beside it.
+.group {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 26px;
+	align-items: start;
+}
+
+@media (min-width: 992px) {
+	.group {
+		grid-template-columns: 340px minmax(0, 1fr);
+	}
+}
+
+.group__suffix {
+	padding-left: 6px;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+// ⚠️ The participation note earns its space. Every other figure on this screen is a number the
+// reader can act on; this one explains WHY the number moves, and it is the mechanism that makes
+// group cover cheap. Without it the factor looks arbitrary.
+.group__note {
+	margin: -4px 0 14px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	color: @color-text-muted;
+}
+
+.group__insured {
+	margin: 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+.group__extension {
+	display: block;
+	margin-bottom: 4px;
+}
+
+// The assistance row carries no sum — it is a service package, so a złoty figure would be a lie.
+.group__included {
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+.group__disclaimer {
+	margin: 14px 2px 0;
+	font-size: 0.6875rem;
+	line-height: 1.5;
+	color: @color-text-muted;
+}

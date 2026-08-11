@@ -1,0 +1,306 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// The same two-column frame as the motor demo — a fixed form column beside the thing being built.
+// Mobile-first: one column is the base case, the second is added at Bootstrap's own 992px point.
+// ⚠️ `minmax(0, 1fr)`, not `1fr`. A grid track's implicit minimum is `auto`, which means it cannot
+// shrink below its content's min-content width — and Material renders a select's value with
+// `white-space: nowrap`, so one long option label sets a floor that pushes the track past the
+// viewport and scrolls the whole page sideways. This is the single-column case, where it is easy to
+// assume nothing can overflow because there is nothing beside it.
+.life {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 26px;
+	align-items: start;
+}
+
+@media (min-width: 992px) {
+	.life {
+		grid-template-columns: 340px minmax(0, 1fr);
+	}
+}
+
+// Height and weight answer one question between them, so they share a line.
+.life__pair {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	column-gap: 12px;
+}
+
+.life__suffix {
+	padding-left: 6px;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+// BMI is derived, not asked — stated quietly under the two fields that produce it.
+.life__bmi {
+	margin: -4px 0 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+.life__bmi__band {
+	margin-left: 8px;
+	padding: 1px 8px;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-gray-light;
+	font-size: 0.75rem;
+}
+
+.life__question {
+	margin: 0 0 8px;
+	font-size: 0.8125rem;
+	color: @color-text;
+}
+
+.life__toggle {
+	margin-bottom: 18px;
+}
+
+// ── The policy being assembled ────────────────────────────────────────────────────────────────
+
+.policy {
+	padding: 22px;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-paper;
+	box-shadow: @shadow-panel;
+}
+
+// The main contract sits apart from the riders: it is the only cover that is not a choice, and the
+// list below reads as additions to it.
+// ⚠️ Wraps. The title and a fixed 220px select cannot share a line on a phone, and without this the
+// select simply hangs off the side of the panel.
+.policy__main {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 22px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid @color-border-block;
+}
+
+.policy__main__title {
+	margin: 0 0 4px;
+	font-size: 1.125rem;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	color: @color-text;
+}
+
+.policy__main__note {
+	margin: 0;
+	max-width: 46ch;
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	color: @color-text-muted;
+}
+
+.policy__sum {
+	flex: 0 0 220px;
+}
+
+.policy__heading {
+	margin: 22px 0 12px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.policy__riders {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 10px;
+}
+
+// A rider is a card that is on or off. The border carries the state rather than a badge: same
+// information, less furniture, and it reads at a glance down a list of seven.
+.policy__rider {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 220px;
+	grid-template-areas:
+		'toggle cover'
+		'description cover'
+		'karencja cover';
+	align-items: start;
+	column-gap: 22px;
+	padding: 14px 16px;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-white;
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.policy__rider--on {
+	border-color: fade(@color-accent, 45%);
+	background: fade(@color-accent, 3%);
+}
+
+.policy__rider__toggle {
+	grid-area: toggle;
+}
+
+.policy__rider__name {
+	font-size: 0.9375rem;
+	font-weight: 700;
+	color: @color-text;
+}
+
+.policy__rider__description {
+	grid-area: description;
+	margin: 4px 0 0 32px;
+	max-width: 62ch;
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	color: @color-text-muted;
+}
+
+// The waiting period is the single most misunderstood term on a Polish life policy, so it is stated
+// on the rider rather than buried in a document nobody opens.
+.policy__rider__karencja {
+	grid-area: karencja;
+	margin: 6px 0 0 32px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: @color-text-muted;
+}
+
+.policy__rider__cover {
+	grid-area: cover;
+}
+
+.policy__rider__amount {
+	width: 100%;
+}
+
+.policy__rider__flat {
+	margin: 8px 0 0;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}
+
+@media (max-width: 767px) {
+	.policy__rider {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			'toggle'
+			'description'
+			'karencja'
+			'cover';
+	}
+}
+
+// ── The running total ─────────────────────────────────────────────────────────────────────────
+
+.policy__summary {
+	margin-top: 22px;
+	padding-top: 18px;
+	border-top: 1px solid @color-border-block;
+}
+
+// The composition of the premium, as one bar. The motor demo puts a bar on every row because it is
+// comparing three prices; here there is one price with parts, so the parts share a bar.
+.policy__stack {
+	display: flex;
+	height: 6px;
+	margin-bottom: 16px;
+	border-radius: 3px;
+	background: fade(@color-text-muted, 12%);
+	overflow: hidden;
+}
+
+.policy__stack__part {
+	height: 100%;
+	background: @color-accent-soft;
+	// A hairline between the parts, so adjacent riders of similar size stay countable.
+	box-shadow: inset -1px 0 0 @color-paper;
+	transition: width 0.35s ease;
+}
+
+// The main contract is the floor the rest sits on, so it reads at full strength.
+.policy__stack__part--main {
+	background: @color-accent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.policy__stack__part {
+		transition: none;
+	}
+}
+
+.policy__lines {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-variant-numeric: tabular-nums;
+}
+
+.policy__line {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto auto;
+	column-gap: 18px;
+	padding: 5px 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+.policy__line__name {
+	color: @color-text;
+}
+
+.policy__line__amount {
+	min-width: 120px;
+	text-align: right;
+}
+
+.policy__line__premium {
+	min-width: 84px;
+	text-align: right;
+	font-weight: 600;
+	color: @color-text;
+}
+
+.policy__total {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	margin-top: 14px;
+	padding-top: 14px;
+	border-top: 1px solid @color-border-block;
+	font-variant-numeric: tabular-nums;
+}
+
+.policy__total__label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+// The payload. The accent is spent here and on the stacked bar, nowhere else on this screen.
+.policy__total__value {
+	font-size: 1.75rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	color: @color-accent;
+}
+
+// Required in substance if not in law: a Polish quotation screen that does not say this is asking to
+// be mistaken for an offer.
+.policy__disclaimer {
+	margin: 14px 0 0;
+	font-size: 0.6875rem;
+	line-height: 1.5;
+	color: @color-text-muted;
+}

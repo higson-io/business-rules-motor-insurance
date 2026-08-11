@@ -94,3 +94,17 @@ i.vehicle {
 i.documents {
 	background-image: url('imgs/doc.svg');
 }
+
+// ⚠️ `clip`, and deliberately not `hidden`.
+//
+// Material gives every icon button a 48px touch target, absolutely positioned and centred on a
+// smaller icon — so the datepicker toggle's target extends about 4px past the edge of its field.
+// It changes no layout, but it does enlarge the page's scrollable area, and on a 390px screen that
+// was enough to make the whole page scroll sideways by nine pixels. The target itself must stay:
+// 44px is an accessibility floor, not a style choice.
+//
+// `clip` cuts the overflow without creating a scroll container, which `hidden` would — and a nested
+// scroller inside the page's own scroll is the exact wart this panel was rebuilt to remove.
+.inputs {
+	overflow-x: clip;
+}

@@ -1,0 +1,203 @@
+<!--
+	Questions about the GROUP on the left, the three variants beside them.
+
+	⛔ Nothing here asks about a person's health. A group scheme carries no individual underwriting —
+	that is the product, not a shortcut for the demo.
+-->
+<div class="group">
+	<aside class="group__risk">
+		<div class="inputs">
+			<div class="inputs__header">
+				<h1 class="inputs__title">Ubezpieczenie grupowe</h1>
+				<p class="inputs__subtitle">Program pracowniczy — składka zależy od grupy, nie od osoby.</p>
+			</div>
+
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Grupa</h2>
+
+				<mat-form-field appearance="outline">
+					<mat-label>Liczba pracowników</mat-label>
+					<input
+						#headcountInput
+						matInput
+						type="number"
+						data-testid="group-headcount"
+						[min]="headcountRange.min"
+						[max]="headcountRange.max"
+						[value]="headcount()"
+						(blur)="setHeadcount(headcountInput.valueAsNumber)"
+					/>
+					<span matSuffix class="group__suffix">osób</span>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline">
+					<mat-label>Średni wiek</mat-label>
+					<input
+						#ageInput
+						matInput
+						type="number"
+						data-testid="group-average-age"
+						[value]="averageAge()"
+						(blur)="setAverageAge(ageInput.valueAsNumber)"
+					/>
+					<span matSuffix class="group__suffix">lat</span>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline">
+					<mat-label>Branża pracodawcy</mat-label>
+					<mat-select
+						data-testid="group-industry"
+						[value]="industryClass()"
+						(selectionChange)="industryClass.set($event.value)"
+					>
+						@for (industry of industries; track industry.value) {
+							<mat-option [value]="industry.value">{{ industry.label }}</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+			</section>
+
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Przystąpienie</h2>
+
+				<mat-form-field appearance="outline">
+					<mat-label>Partycypacja</mat-label>
+					<input
+						#participationInput
+						matInput
+						type="number"
+						data-testid="group-participation"
+						[min]="participationRange.min"
+						[max]="participationRange.max"
+						[value]="participation()"
+						(blur)="setParticipation(participationInput.valueAsNumber)"
+					/>
+					<span matSuffix class="group__suffix">%</span>
+				</mat-form-field>
+
+				<!--
+					The factor that actually distinguishes group business: when half the staff join,
+					it is the half that expects to claim. Saying so on the screen is the difference
+					between a number and an explanation.
+				-->
+				<p class="group__note">
+					Im więcej osób przystąpi, tym niższa składka — wysoka partycypacja ogranicza
+					antyselekcję. Przy udziale poniżej 50% stawka rośnie.
+				</p>
+
+				<p class="group__insured" data-testid="group-insured">
+					Ubezpieczonych: <strong>{{ sum(quote().insuredCount) }}</strong>
+				</p>
+			</section>
+
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Rozszerzenia</h2>
+
+				<mat-checkbox
+					class="group__extension"
+					data-testid="group-spouse"
+					[checked]="includeSpouse()"
+					(change)="includeSpouse.set($event.checked)"
+				>
+					Współmałżonek lub partner
+				</mat-checkbox>
+
+				<mat-checkbox
+					class="group__extension"
+					data-testid="group-child"
+					[checked]="includeAdultChild()"
+					(change)="includeAdultChild.set($event.checked)"
+				>
+					Pełnoletnie dziecko
+				</mat-checkbox>
+			</section>
+		</div>
+	</aside>
+
+	<div class="group__variants">
+		<div class="quote__scroll">
+		<table class="quote__table">
+			<caption class="quote__caption">
+				Zakres świadczeń i składka w wariantach
+			</caption>
+
+			<thead>
+				<tr>
+					<th scope="col" class="quote__corner">Świadczenie</th>
+
+					@for (variant of variants; track variant.code) {
+						<th scope="col" class="quote__tier" data-testid="group-variant">
+							<span class="quote__tier__name">{{ variant.code }}</span>
+
+							<span
+								class="quote__tier__gauge"
+								role="img"
+								[attr.aria-label]="
+									benefitCount(variant.code) + ' z ' + benefits.length + ' świadczeń'
+								"
+							>
+								<span
+									class="quote__tier__gauge__fill"
+									[style.width.%]="breadthOf(variant.code) * 100"
+								></span>
+							</span>
+						</th>
+					}
+				</tr>
+			</thead>
+
+			<tbody>
+				@for (benefit of benefits; track benefit.code) {
+					<tr class="quote__row" data-testid="group-benefit-row">
+						<th scope="row" class="quote__row__label">{{ benefit.name }}</th>
+
+						@for (variant of variants; track variant.code) {
+							<td class="quote__cell" data-testid="group-benefit-cell">
+								@if (sumFor(benefit, variant.code); as amount) {
+									@if (benefit.code === 'AM') {
+										<span class="group__included">w pakiecie</span>
+									} @else {
+										{{ sum(amount) }} zł
+									}
+								} @else {
+									<!--
+										An explicit absence, as in the motor demo: a variant that stops
+										early reads as "nothing more to say" rather than "not covered",
+										and which of the two it is decides which variant an employer buys.
+									-->
+									<span class="quote__cell__absent" aria-label="brak">—</span>
+								}
+							</td>
+						}
+					</tr>
+				}
+			</tbody>
+
+			<tfoot>
+				<tr class="quote__row quote__row--subtotal">
+					<th scope="row" class="quote__row__label">Składka miesięczna za pracownika</th>
+					@for (variant of quote().variants; track variant.code) {
+						<td class="quote__cell" data-testid="group-per-employee">
+							{{ money(variant.perEmployee) }} zł
+						</td>
+					}
+				</tr>
+
+				<tr class="quote__row quote__row--total">
+					<th scope="row" class="quote__row__label">Koszt programu miesięcznie</th>
+					@for (variant of quote().variants; track variant.code) {
+						<td class="quote__cell quote__cell--total" data-testid="group-monthly-total">
+							{{ money(variant.monthlyTotal) }} zł
+						</td>
+					}
+				</tr>
+			</tfoot>
+		</table>
+		</div>
+
+		<p class="group__disclaimer">
+			Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
+			Kodeksu cywilnego.
+		</p>
+	</div>
+</div>
