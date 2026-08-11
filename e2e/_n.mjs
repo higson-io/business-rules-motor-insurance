@@ -1,0 +1,13 @@
+import { chromium } from '@playwright/test';
+const out = process.argv[2];
+const b = await chromium.launch();
+const p = await b.newPage({ viewport:{width:1500,height:980}, timeZoneId:'UTC' });
+await p.goto('http://localhost:48080/demo/',{waitUntil:'networkidle'});
+await p.getByTestId('demo-tile-moto').click();
+await p.waitForSelector('[data-testid="variant-card"]');
+await p.waitForLoadState('networkidle');
+await p.waitForTimeout(1200);
+await p.screenshot({ path: out+'/natural-moto.png', fullPage:true });
+const h = await p.$$eval('[data-testid="variant-card"]', es=>es.map(e=>Math.round(e.getBoundingClientRect().height)));
+console.log('wysokosci kart:', JSON.stringify(h));
+await b.close();

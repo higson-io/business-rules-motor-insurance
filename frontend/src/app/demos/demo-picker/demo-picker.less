@@ -75,11 +75,13 @@
 	opacity: 0.55;
 }
 
+// One accent per surface, spent on whatever that surface is for. On the quote screen that is the
+// price; here there is no price and the tiles themselves are the payload, so the icons carry it.
 .demo-picker__icon {
 	display: block;
 	width: 56px;
 	height: 56px;
-	color: var(--mat-sys-primary);
+	color: @color-accent;
 
 	svg {
 		width: 100%;
@@ -92,7 +94,7 @@
 .demo-picker__name {
 	font-size: 1.25rem;
 	font-weight: 700;
-	color: var(--mat-sys-primary);
+	color: @color-text;
 }
 
 .demo-picker__summary {

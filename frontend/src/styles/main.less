@@ -25,7 +25,7 @@
 	height: 56px;
 	margin-bottom: 26px;
 	padding: 0 2px;
-	border-bottom: 1px solid fade(@color-mist, 18%);
+	border-bottom: 1px solid @color-ground-line;
 }
 
 // The way out of a demo. New with the landing screen and unavoidable: without a router there is no
@@ -40,7 +40,7 @@
 	font-weight: 600;
 	// On the dark ground the palette inverts: mist reads as the quiet state, white as the active
 	// one. `@color-slate` would sink into midnight blue.
-	color: @color-mist;
+	color: @color-on-ground;
 	cursor: pointer;
 	transition: color 0.15s ease;
 }

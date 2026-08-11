@@ -17,7 +17,14 @@
 	// onto their own rows when there is not, instead of being crushed to an unreadable width. The
 	// original fixed `width: 329px` could do neither.
 	flex-wrap: wrap;
-	align-items: stretch;
+	// Each card ends where its content ends, rather than every card being stretched to the tallest.
+	//
+	// ⚠️ The trade this makes: the three final prices no longer sit on one line, so comparing them
+	// costs an eye movement instead of none. Bought in exchange for the dead space that alignment
+	// forced into the leaner tiers — BRONZE carries three coverages against GOLD's eight, and
+	// stretching it to match left roughly a third of the card empty. The tier gauge under each name
+	// already says which tier is broader, so the height no longer has to.
+	align-items: flex-start;
 	gap: 26px;
 }
 
@@ -39,9 +46,8 @@
 // on it they sit; a number beside "GOLD" would restate what the word carries and claim a sequence
 // the user does not step through.
 //
-// The rule underneath is a tier gauge: it fills a third, two thirds, then fully, so the three cards
-// read as a progression at a glance before a single figure has been compared. Cyan rather than the
-// accent — this is supporting structure, and the accent is spent on the price.
+// The rule underneath is a tier gauge, so the three cards read as a progression at a glance before
+// a single figure has been compared.
 .variants__column__header {
 	width: 100%;
 	padding-bottom: 34px;
@@ -61,15 +67,22 @@
 	height: 3px;
 	margin: 14px auto 0;
 	border-radius: 2px;
-	background: fade(@color-slate, 16%);
+	background: fade(@color-text-muted, 16%);
 	overflow: hidden;
 }
 
+// ⛔ Neutral, NOT cyan. Cyan on this surface was half of what made the card incoherent — it sat
+// opposite the pink on the wheel, at similar strength, on the same 300px of paper. It has a home on
+// the dark ground instead.
+//
+// Neutral is also the more honest encoding: the gauge measures breadth of cover and the bars below
+// measure money. Two different quantities should not share a colour, and giving the gauge the
+// accent would have said they do.
 .variants__column__gauge__fill {
 	display: block;
 	height: 100%;
 	border-radius: 2px;
-	background: @color-support;
+	background: @color-text-muted;
 	transition: width 0.35s ease;
 }
 
@@ -79,8 +92,11 @@
 	}
 }
 
+// ⛔ Was `margin-top: auto`, which pushed the footer to the bottom of a stretched card. With cards
+// at their natural height there is no gap left to absorb, and the auto margin would collapse to
+// nothing anyway — the fixed margin keeps the divider off the last coverage row.
 .variants__column__footer {
-	margin-top: auto;
+	margin-top: 6px;
 }
 
 .variants__column__border {
@@ -96,13 +112,13 @@
 	display: inline-block;
 	font-size: 0.875rem;
 	font-weight: 600;
-	color: @color-slate;
+	color: @color-text-muted;
 }
 
 .variants__column__price-before-discounts__value {
 	font-size: 1rem;
 	font-weight: 600;
-	color: @color-slate;
+	color: @color-text-muted;
 	float: right;
 }
 
@@ -118,13 +134,12 @@
 	font-size: 0.75rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
-	color: @color-slate;
+	color: @color-text-muted;
 }
 
-// The payload of the whole screen, and the only place Higson's bright pink appears on paper.
-// 1.75rem bold is large text, where the 3:1 contrast floor applies rather than 4.5:1
-// (`accessibility.md`) — which is exactly why the accent is spendable here and nowhere smaller.
-// The pre-discount figure above it steps back to slate so the eye lands on the number that matters.
+// The payload of the whole screen. The accent is spent here, on the composition bars, and on
+// interaction states — nowhere else on paper. The pre-discount figure above it steps back to muted
+// so the eye lands on the number that matters rather than choosing between two.
 .variants__column__final-price__value {
 	font-size: 1.75rem;
 	font-weight: 800;
