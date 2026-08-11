@@ -19,14 +19,15 @@
 .demo-picker__title {
 	margin: 0 0 0.5rem;
 	font-size: 2rem;
-	font-weight: 700;
-	color: #fff;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	color: @color-text;
 }
 
 .demo-picker__subtitle {
 	margin: 0 0 2.5rem;
 	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.85);
+	color: @color-text-muted;
 }
 
 // `auto-fit` with a floor rather than a fixed column count: the row simply grows as industries are
@@ -51,6 +52,7 @@
 	border: 1px solid @color-border-block;
 	border-radius: var(--mat-sys-corner-medium);
 	background: @color-paper;
+	box-shadow: @shadow-panel;
 	font: inherit;
 	color: @color-text;
 	text-align: center;
@@ -66,7 +68,7 @@
 }
 
 .demo-picker__tile:focus-visible {
-	outline: 2px solid @color-white;
+	outline: 2px solid @color-accent;
 	outline-offset: 3px;
 }
 

@@ -38,19 +38,19 @@
 	background: none;
 	font: inherit;
 	font-weight: 600;
-	// On the dark ground the palette inverts: mist reads as the quiet state, white as the active
-	// one. `@color-slate` would sink into midnight blue.
-	color: @color-on-ground;
+	// Muted at rest, full text weight on hover — the same two-step every quiet control on the page
+	// uses, now that the ground is light and there is no inverted scale to think about.
+	color: @color-text-muted;
 	cursor: pointer;
 	transition: color 0.15s ease;
 }
 
 .menubar__back:hover {
-	color: @color-white;
+	color: @color-text;
 }
 
 .menubar__back:focus-visible {
-	outline: 2px solid @color-support;
+	outline: 2px solid @color-accent;
 	outline-offset: 2px;
 }
 
@@ -62,14 +62,14 @@
 // no asset, is neutral by construction, scales, and is selectable and searchable. The SVG is
 // deleted rather than left unreferenced (`minimal-implementation.md`); it is one `git checkout` out
 // of history if a demo ever wants its own mark.
-// White on midnight blue, not the accent: the masthead is the quietest thing on the page, and the
-// accent has one job further down. Manrope at 800 with the tracking pulled in is the display voice
-// used throughout — the same treatment as the tier names, so the page has one voice, not two.
+// Ink, not the accent: the masthead is the quietest thing on the page and the accent has one job
+// further down. Manrope at 800 with the tracking pulled in is the display voice used throughout —
+// the same treatment as the tier names, so the page has one voice rather than two.
 .wordmark {
 	font-size: 1.125rem;
 	font-weight: 800;
 	letter-spacing: -0.01em;
-	color: @color-white;
+	color: @color-text;
 	white-space: nowrap;
 }
 

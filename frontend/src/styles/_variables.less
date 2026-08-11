@@ -1,76 +1,67 @@
-// The palette, rebuilt as a system rather than as a set of borrowed brand colours.
+// The palette: a light system, built as a ramp rather than as a set of borrowed brand colours.
 //
-// The first attempt took the hex values straight off higson.io and decerto.com and used them at the
-// intensity a marketing page uses them. That failed for three reasons, and the fixes below are each
-// aimed at one of them:
+// Two things were wrong with the first attempt and both are fixed here rather than tuned:
 //
-//   1. GROUND TOO HARD. `#001f33` is the surface Higson puts TEXT on. Here it only frames bright
-//      panels, so the page jumped from L*≈11 to L*≈98 with nothing between and read as holes cut in
-//      black. The ground is lifted and desaturated, and the panels come down to meet it: the step is
-//      still clear, it is no longer a cliff.
+//   1. IT WAS DARK. The brand navy is the surface Higson puts TEXT on; here it only framed bright
+//      panels, so the page read as holes cut in black and no amount of lifting the ground changed
+//      what it fundamentally was. Inverted, the panels are the lightest thing and the ground is a
+//      tint of the same hue — the relationship a document has with the desk it lies on.
 //   2. TWO ACCENTS FIGHTING. Hot pink and cyan sit near-opposite on the wheel and were both at full
-//      chroma on the same card. Now they never share a surface — see the rule below.
-//   3. TWO PINKS DOING ONE JOB. A magenta heading beside a hot-pink price reads as inconsistency,
-//      not hierarchy. Static headings are neutral now; the accent is spent once, on the payload.
+//      chroma on the same card. There is one chromatic accent now, and it is spent once per surface.
 //
-// ⛔ THE RULE THAT KEEPS IT COHERENT: **cyan lives on the dark ground, pink lives on the light
-// panels.** Neither ever appears on the other's surface. Each brand keeps a seat, and nothing has
-// to be balanced against a colour it clashes with, because they are never seen together.
+// ⛔ ON DECERTO'S CYAN. It is deliberately NOT in the interface. In a light single-accent system it
+// could only be a second accent, which is precisely the clash that was just removed. The parent
+// brand is present in the things that actually carry a house style — Manrope, which is Decerto's own
+// body face, and the blue hue family every neutral below is mixed from. A colour sprinkled somewhere
+// it has no job is not brand presence, it is noise.
 
 // ── The neutral ramp ──────────────────────────────────────────────────────────────────────────
-// One hue family (blue ~205°) at falling saturation, so ground, panel, border and text are visibly
-// relatives. Saturation is the thing that was wrong: the brand navy is S100, which is right for a
-// hero band and far too loud under a screen of figures. These sit at S30–45.
+// One hue family (blue ~207°) at falling saturation and rising lightness. Ground, panel, border and
+// text are visibly relatives instead of four separate decisions.
 
-// The page. Higson's midnight blue lifted from L*11 to L*19 and pulled from S100 down to S~42 — the
-// same colour family, at a weight a working screen can carry for an hour. The saturation is the
-// bigger half of the fix: full chroma is right for a hero band and exhausting under a page of
-// figures, whatever its lightness.
-@color-ground: #1b3144;
+// The page: the brand navy as a tint. Cool enough to read as blue rather than as grey, light enough
+// that white panels lift off it without a shadow.
+@color-ground: #e7edf3;
 
-// Hairlines and dividers ON the ground.
-@color-ground-line: #2f4a61;
+// Hairlines drawn ON the ground — the masthead rule.
+@color-ground-line: #cdd8e3;
 
-// The panels. Softened from #f9f9fb: against a dark ground a near-white glares, and every figure on
-// this screen sits on this surface.
-@color-paper: #f4f6f8;
+// The panels. Now the LIGHTEST surface, which is what makes them read as raised: on the dark ground
+// the cards were bright objects in a void, here they are paper on a desk.
+@color-paper: #fff;
 @color-white: #fff;
 
 // The hairline between elements on paper.
-@color-border-block: #dde4ea;
+@color-border-block: #dfe6ed;
 
-// Body copy — the ground colour at text weight, so type and page belong to one family.
+// White on a light ground separates by only ~1.2:1, so the hairline alone was carrying the edge of
+// every panel. A shadow this soft adds no visible grey — it just gives the paper somewhere to sit.
+// The vocabulary is already on the page: the sidebar header has carried one since the AngularJS
+// build.
+@shadow-panel: 0 1px 2px rgba(23, 41, 58, 0.04), 0 4px 12px rgba(23, 41, 58, 0.05);
+
+// Body copy — the ground's hue at text weight, so type and page belong to one family. ~13:1.
 @color-text: #17293a;
 
 // Secondary copy: labels, limits, the pre-discount figure. Part of the ramp rather than a grey mixed
-// for the occasion. ~5.3:1 on paper, so it is legal for small text (`accessibility.md`).
+// for the occasion. ~5.1:1 on paper, legal for small text (`accessibility.md`).
 @color-text-muted: #55697c;
 
-// Type on the dark ground, where the ramp inverts.
-@color-on-ground: #e8eef3;
-@color-on-ground-muted: #93a8b9;
-
-// ── The accents ───────────────────────────────────────────────────────────────────────────────
-// Higson's `--deep-pink` #ff0e6f, deepened. At full chroma it vibrated against both the near-black
-// ground and the white panel; this holds the hue and buys contrast (~4.9:1 on paper, legal for body
-// text and not only for display).
+// ── The accent ────────────────────────────────────────────────────────────────────────────────
+// Higson's `--deep-pink` #ff0e6f, deepened. At full chroma it vibrated against every surface it
+// touched; this holds the hue and reaches ~4.9:1 on white, legal for body text and not only for
+// display.
 //
-// ⚠️ PAPER ONLY. It appears on the final price, on the composition bars, and on interaction states.
-// Nowhere on the dark ground.
+// Spent ONCE PER SURFACE, on whatever that surface is for: the final price on the quote screen, the
+// tile icons on the picker, and interaction states everywhere. A screen that tints every heading has
+// no way left to say "this one".
 @color-accent: #e00a5f;
 
 // The same accent at texture weight, for the composition bars. Eight of them stacked at full
-// strength turned the card pink; this reads as a measure rather than as decoration.
+// strength turned the richest card into a pink object and pulled the eye off the price.
 @color-accent-soft: fade(#e00a5f, 42%);
 
-// Decerto's `--decerto-cyan-200` #5dc7d5.
-//
-// ⚠️ DARK GROUND ONLY — the masthead, focus rings on the ground, and the demo tiles' iconography.
-// On paper it competed with the accent; against navy it is simply the legible cool note, and it is
-// the one place the parent brand shows.
-@color-support: #5dc7d5;
-
 // The selected fill of the gender toggle, carried from `less/variables.less`. Neutral by design: the
-// toggle marks a choice, and a coloured fill there would be a third accent on a surface that is
-// allowed one.
-@color-gray-light: #eceff2;
+// toggle marks a choice, and a coloured fill there would be a second accent on a surface allowed
+// exactly one.
+@color-gray-light: #eef1f5;

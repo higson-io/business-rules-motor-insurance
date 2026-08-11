@@ -55,10 +55,11 @@ body {
 	font-family: 'Manrope', sans-serif;
 	color: @color-text;
 	font-size: 0.8125rem;
-	// ⛔ Was a violet gradient, `rgba(76,76,222)` → `rgba(41,41,120)`. Flat midnight blue replaces
-	// it because that is the ground both brands actually stand on, and because a gradient behind a
-	// screen whose subject is a column of numbers competes with the numbers. Flat also lets the one
-	// accent land: on a gradient, pink reads differently at the top of the page than at the bottom.
+	// ⛔ Was a violet gradient, `rgba(76,76,222)` → `rgba(41,41,120)`, and then briefly the brand's
+	// midnight blue. Flat and light replaces both: a gradient behind a screen whose subject is a
+	// column of numbers competes with the numbers, and dark made the panels read as holes cut in
+	// it rather than as paper on a desk. Flat also lets the one accent land — on a gradient, the
+	// same pink reads differently at the top of the page than at the bottom.
 	background: @color-ground;
 	min-height: 100vh;
 }
