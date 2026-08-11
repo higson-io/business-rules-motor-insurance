@@ -33,7 +33,8 @@ export const DEMOS: readonly Demo[] = [
 	{
 		code: 'life',
 		name: 'Life insurance',
-		summary: 'Not built yet — the screen exists so the shape of adding an industry is visible.',
+		summary:
+			'Assemble an individual protection policy the way the Polish market sells one: a main contract plus riders, priced as you go.',
 		available: true,
 	},
 ];
