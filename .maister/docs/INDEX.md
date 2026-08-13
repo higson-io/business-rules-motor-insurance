@@ -30,6 +30,53 @@ Technology choices with rationale for the **Business Rules for Motor Insurance**
 System architecture of the single-module Spring Boot WAR application. Covers: the layered MVC monolith with the **Adapter pattern** as the rules-engine boundary (API → Converter → Service → Domain → Adapter → Context → Higson Engine → JDBC), and the core principle that all pricing logic lives in Higson rules rather than Java; per-layer package breakdown under `pl.decerto.higson.demo.motor` (REST controllers `QuoteApi`/`DriverApi`/`VehicleApi`/`DictionaryApi`/`ProfilersApi`, DTOs, hand-written converters, `@SessionScope QuoteService` holding the `Quote` aggregate between requests, the domain model, `*Adapter` classes as the only code aware of Higson context paths, `MotorContext`, the `Motor` calculation orchestrator, and `GlobalExceptionHandler` — now `@RestControllerAdvice` returning `ErrorDto`, with the history of why); the **Angular 22 SPA inventory** — standalone components, the four HTTP services, the two HTTP interceptors, and the **`QuoteStore` signal store** that replaced the `$emit`/`$broadcast` event bus, including the `RELOADS_QUOTE` table that encodes the vehicle-cascade reload asymmetry; the end-to-end recalculation data flow with its two deliberate exceptions (blur-commit, model-only reload); external integrations; the deliberate absence of an application-owned DB schema and migrations, with the warning that snapshot-based versioning is aspirational because the snapshot is never committed; configuration layering; and deployment (WAR artifact with the frontend build wired in, `all_in_one` profile, Docker image, compose topology, limited observability, no CI).
 **Read before** adding endpoints, changing the domain model, touching adapters or context paths, altering how the application talks to the rules engine, or changing how the SPA triggers recalculation.
 
+### Profil LIFE — projekt konfiguracji (`project/higson-life-profile.md`)
+> Wersja z 2026-08-13: wszystkie kwestie otwarte rozstrzygnięte jako **D-1…D-7**; zostało sześć
+> punktów **W-1…W-6** do zweryfikowania przed implementacją. Po przeglądzie pod kątem polskiego
+> rynku i demonstrowalności: kody są **pełnymi angielskimi nazwami** (`CRITICAL_ILLNESS`,
+> `HOSPITAL_STAY`, warianty `BASIC`/`EXTENDED`/`COMPLETE`) zamiast skrótów, `MAIN_COVER` stoi obok
+> `RIDERS` zamiast w nich, karencja ma poziom `cause` odwzorowujący zapis OWU „nie obowiązuje przy
+> nieszczęśliwym wypadku", a `PER_PERCENT` odróżnia świadczenie za 1% uszczerbku od sumy. §11 wprowadza
+> **budżet złożoności** (funkcja ≤80 linii, tabela ≤30 wierszy, flow ≤15 nodów) — wszystko mieści się
+> z zapasem, dwa artefakty są blisko sufitu i mają opisaną drogę wyjścia.
+⚠️ **Propozycja, nie stan faktyczny — w Higsonie nic z tego jeszcze nie istnieje.** Projekt
+konfiguracji nowego profilu `LIFE` pokrywającego obie ścieżki demo życiowego. Zawiera: drzewo domeny
+dzielące się na pierwszym poziomie na `INDIVIDUAL` (ochronne — `MAIN_COVER` plus siedem umów
+dodatkowych w `RIDERS`) i `GROUP` (pracownicze — trzy warianty i trzynaście świadczeń), wraz z
+uzasadnieniem, dlaczego świadczenia wiszą pod gałęzią, a nie pod wariantami; typy domenowe
+`PRODUCT_LINE`/`RIDER`/`VARIANT`/`BENEFIT` z atrybutami i źródłami; rozdzielone konteksty
+wejściowe, w których gałąź grupowa **nie ma dostępu** do danych osobowych, bo polisa grupowa nie
+prowadzi indywidualnej oceny ryzyka; 29 tabel decyzyjnych pod prefiksem `demo.life.individual.*` / `demo.life.group.*` / `demo.life.underwriting.*` (taryfa,
+czynniki ryzyka, dostępność, sumy, underwriting, antyselekcja) z pełnymi matrycami; sześć flow
+modelujące algorytmy wyceny i underwritingu; osiem funkcji Groovy, każda z uzasadnieniem, dlaczego
+tabela nie wystarcza; oraz **wersjonowanie datą przez Region `LIFE` z dwoma timeline'ami**
+(`2026-01-01` i `2026-07-01`) obejmujące sześć tabel i jeden element domeny, ze scenariuszami demonstracyjnymi —
+w tym takim, który pokazuje, że wersjonowanie jest selektywne. Osobno: zestaw testów regułowych,
+siedem zapisanych decyzji i **zero otwartych kwestii produktowych**. **D-1** — `REFER` zwraca składkę
+oznaczoną `binding = false`, `DECLINE` nie zwraca ceny, a uzasadnienie rozdziela się na
+`reasonInternal` dla underwritera i `underwriting.customerMessage` dla klienta. **D-2** — wariant grupowy
+wybiera pracownik, a `variant.code` pozostaje **iteracją w obu fazach**: rozkład wyborów
+(`quote.group.enrolment`) wchodzi dopiero przy agregacji, faza programu nie ma własnej taryfy, wybór per
+pracownik otwiera drugą oś antyselekcji wycenianą przez `group.factor.variantMix`, a `monthlyTotal`
+zmienia nazwę na `monthlyTotalIfAll`, bo rzeczywisty koszt niesie nowe `programCost`.
+**D-3** — suma umowy dodatkowej ma pułap względem głównej, ale **trójrodzajowy** (`RATIO` /
+`ABSOLUTE` / `NONE`) sterowany tym samym `benefitKind`, który wybiera wzór na składkę; katalog sum
+zostaje nietknięty, a naruszenie pułapu jest **błędem, nie cichym przycięciem**. **D-4** — region
+`LIFE` obejmuje **oba** wymiary, ale rozłącznie: parametry odpowiadają na „ile wynosi", a
+`@conf/.../@regions/` na „co istnieje", więc wersja 2 dokłada świadczenie `MENTAL_HEALTH_SUPPORT` jako **element
+domeny**, zostawiając jego wiersze w tabelach wartości globalnymi i bezczynnymi w wersji 1 —
+wzorzec wzięty z działającego MOTO (`DISCOUNTS/@regions/MOTOR/1/DE`). **D-5** — poprzednia ochrona
+**skraca** karencję (nie znosi), pod trzema warunkami naraz: przerwa ≤ 30 dni, długość ≥ 1/6 miesięcy
+i rodzaj umowy, przy czym PZ i NDP zawsze zatrzymują połowę. **D-6** — waluta nie jest wymiarem
+(jedna, PLN), taryfa zostaje miesięczna, a **składka roczna jest wielokrotnością zaokrąglonej raty**,
+nie liczbą liczoną osobno — konstrukcja usuwa całą klasę rozjazdów zamiast ją obsługiwać. **D-7** —
+dochód wchodzi jako **drugi** pułap dla SZP i NDP, obowiązujący łącznie z produktowym przez `min`.
+Z D-3/D-4/D-5/D-7 wyłania się nazwany wzorzec **„reguła bazowa × reguła modyfikująca"**: nowy wymiar
+dokłada się drugą tabelą i złożeniem we flow, zamiast rozsadzać macierz bazową o kolejny poziom.
+⚠️ D-2 unieważnia etykietę „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA (W-4).
+**Read before** touching anything related to the LIFE demo's rules, or before assuming any of this
+exists in Studio — the frontend LIFE demo currently runs on TypeScript mocks, not on Higson.
+
 ### Vision (`project/vision.md`)
 *Not created.* Add it to capture project mission, goals, target users, and long-term direction.
 
