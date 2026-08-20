@@ -11,6 +11,7 @@ import { mutationErrorInterceptor } from '../core/mutation-error.interceptor';
 import { pendingRequestsInterceptor } from '../core/pending-requests.interceptor';
 import { DictionaryEntryDto } from '../models/dictionary-entry';
 import { DriverDto } from '../models/driver';
+import { LifeQuoteDto } from '../models/life';
 import { QuoteDto } from '../models/quote';
 import { VehicleDto } from '../models/vehicle';
 
@@ -103,6 +104,66 @@ export function openMoto(): void {
  *
  * @returns the URL of every request answered, in the order they were answered.
  */
+/**
+ * The life demo's opening quote, as `LifeApi` builds it from the seeded insured. Trimmed to one
+ * rider and one variant: these specs assert the shell's wiring, not the tariff, and a full
+ * thirteen-benefit catalogue here would only obscure that.
+ */
+export const LIFE_QUOTE: LifeQuoteDto = {
+	lineCode: 'INDIVIDUAL',
+	startDate: '2026-08-20',
+	mainSum: 300000,
+	paymentFrequency: 'MONTHLY',
+	birthDate: null,
+	entryAge: 35,
+	smoker: false,
+	heightCm: 178,
+	weightKg: 78,
+	bmi: 24.6,
+	occupationClass: 1,
+	monthlyIncome: 8000,
+	priorCoverFrom: null,
+	priorCoverTo: null,
+	decision: 'ACCEPT',
+	binding: true,
+	message: null,
+	medicalRequired: false,
+	premiumMonthly: 57,
+	instalment: 57,
+	installments: null,
+	premiumAnnual: 684,
+	riders: [
+		{
+			code: 'CRITICAL_ILLNESS',
+			name: 'Powazne zachorowanie',
+			description: null,
+			position: 1,
+			benefitKind: 'SUM_ASSURED',
+			sums: [20000, 50000],
+			defaultSum: 50000,
+			maxSum: 300000,
+			waitingPeriodDays: 90,
+			selected: false,
+			sum: 50000,
+			premium: null,
+		},
+	],
+	headcount: 100,
+	averageAge: 35,
+	industryClass: 1,
+	participation: 60,
+	includeSpouse: false,
+	includeAdultChild: false,
+	insuredCount: null,
+	programCost: null,
+	variants: [
+		{ code: 'BASIC', name: 'Wariant podstawowy', position: 1, available: false, perEmployee: null, monthlyTotalIfAll: null },
+	],
+	benefits: [
+		{ code: 'DEATH', name: 'Smierc ubezpieczonego', position: 1, benefitKind: 'SUM_ASSURED', sumByVariant: null },
+	],
+};
+
 export function settleShell(httpTesting: HttpTestingController): string[] {
 	const answered: string[] = [];
 
@@ -122,6 +183,9 @@ export function settleShell(httpTesting: HttpTestingController): string[] {
 }
 
 function bodyFor(url: string): object {
+	if (url === 'life') {
+		return LIFE_QUOTE;
+	}
 	if (url === 'quote') {
 		return QUOTE;
 	}

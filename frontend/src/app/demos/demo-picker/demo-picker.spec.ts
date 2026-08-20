@@ -87,8 +87,12 @@ describe('Demo picker', () => {
 		expect(el('app-life'), 'the life tile mounts its own screen, not the motor one').not.toBeNull();
 		expect(el('app-moto'), 'the two demos are never mounted together').toBeNull();
 
-		// The life screen is a placeholder and fetches nothing; nothing is left open from the motor
-		// demo either, which is what makes leaving and re-entering safe.
+		// The life screen loads its own quote and nothing else. In particular it must not re-issue
+		// the motor demo's requests: the two stores are separate, and leaving a demo has to leave
+		// its traffic behind it.
+		expect(settleShell(httpTesting), 'the life screen fetches its quote, and only that').toEqual([
+			'life',
+		]);
 		httpTesting.verify();
 	});
 });
