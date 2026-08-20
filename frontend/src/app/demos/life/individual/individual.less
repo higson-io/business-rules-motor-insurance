@@ -18,9 +18,31 @@
 	align-items: start;
 }
 
+// One column: no "beside" to put the total in, so it goes FIRST instead — above the form it
+// annotates, rather than at the end of a page the reader would have to scroll to reach.
+.life__summary {
+	order: -1;
+}
+
+// Three columns as soon as there is room for them. The riders are the long thing on this screen, so
+// the total sits beside them rather than above them — that is what keeps the page from growing
+// downwards as covers are added. The tracks are tight at 992 and roomier past 1280; both leave the
+// policy column wider than either side.
 @media (min-width: 992px) {
 	.life {
-		grid-template-columns: 340px minmax(0, 1fr);
+		grid-template-columns: 280px minmax(0, 1fr) 260px;
+	}
+
+	.life__summary {
+		position: sticky;
+		top: 0;
+		order: 0;
+	}
+}
+
+@media (min-width: 1280px) {
+	.life {
+		grid-template-columns: 320px minmax(0, 1fr) 300px;
 	}
 }
 
@@ -202,10 +224,14 @@
 
 // ── The running total ─────────────────────────────────────────────────────────────────────────
 
+// Its own card, beside the policy rather than inside it. The stickiness lives on the column
+// (`.life__summary`); this is just the panel.
 .policy__summary {
-	margin-top: 22px;
-	padding-top: 18px;
-	border-top: 1px solid @color-border-block;
+	padding: 20px;
+	border: 1px solid @color-border-block;
+	border-radius: var(--mat-sys-corner-medium);
+	background: @color-paper;
+	box-shadow: @shadow-panel;
 }
 
 // The composition of the premium, as one bar. The motor demo puts a bar on every row because it is

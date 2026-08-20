@@ -62,3 +62,56 @@
 	line-height: 1.5;
 	color: @color-text-muted;
 }
+
+// ── The pinned comparison header ──────────────────────────────────────────────────────────────
+//
+// The two premium rows moved out of `tfoot` and into `thead`, next to the variant names: the price
+// is what the controls on the left are being moved for, so it has to stay on screen while thirteen
+// benefit rows scroll past.
+//
+// ⚠️ Three things have to be true at once for `position: sticky` to do anything here, and the
+// shared table styles break two of them:
+//   1. the sticky element needs an ancestor that actually scrolls — hence the bounded height, so
+//      the matrix scrolls inside its own box rather than with the page;
+//   2. no ancestor between the two may clip, and `.quote__table` sets `overflow: hidden` for its
+//      rounded corners, which silently turns sticky off;
+//   3. the pinned cells need their own opaque background, or the rows travel visibly underneath.
+// Scoped to this screen so the motor demo's copy of the table keeps its own behaviour.
+.group__variants {
+	// On the two-column layout the panel itself is pinned as well, so the prices survive scrolling
+	// the FORM, not just scrolling the matrix. Single-column (phone) keeps normal flow: there the
+	// form is above the table, and pinning would cover it.
+	@media (min-width: 992px) {
+		position: sticky;
+		top: 0;
+	}
+
+	.quote__scroll {
+		max-height: calc(100vh - 150px);
+		overflow: auto;
+	}
+
+	.quote__table {
+		overflow: visible;
+	}
+
+	thead {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+
+		th,
+		td {
+			background: @color-paper;
+		}
+
+		// `border-collapse: collapse` drops the borders of a sticky row while it is pinned, so the
+		// separating line is painted inside the cell instead.
+		.quote__row--total {
+			th,
+			td {
+				box-shadow: inset 0 -1px 0 @color-border-block;
+			}
+		}
+	}
+}

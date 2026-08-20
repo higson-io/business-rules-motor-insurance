@@ -1,10 +1,21 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 
+import { LifeStore } from '../../core/life-store';
+import { LifeLineCode } from '../../models/life';
+import { LifeService } from '../../services/life-service';
+import { EffectiveDate } from './effective-date/effective-date';
 import { Group } from './group/group';
 import { Individual } from './individual/individual';
 
 /** The two ways life cover is bought in Poland, and they are genuinely different products. */
 export type LifePath = 'individual' | 'group';
+
+/** The screen's word for a path, and the rules engine's word for the same thing. */
+const LINE_CODES: Record<LifePath, LifeLineCode> = {
+	individual: 'INDIVIDUAL',
+	group: 'GROUP',
+};
 
 /**
  * The life demo: two paths, sharing nothing but a heading.
@@ -21,15 +32,27 @@ export type LifePath = 'individual' | 'group';
  */
 @Component({
 	selector: 'app-life',
-	imports: [Group, Individual],
+	imports: [EffectiveDate, Group, Individual],
 	templateUrl: './life.html',
 	styleUrl: './life.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Life {
+	private readonly store = inject(LifeStore);
+	private readonly lifeService = inject(LifeService);
+
 	readonly path = signal<LifePath>('individual');
 
+	/**
+	 * ⛔ The switch is not local state. The backend holds the aggregate and decides which flow prices
+	 * it, so the path has to reach `PUT life/line` — otherwise the group screen renders against an
+	 * individually-priced quote, which has no available variants and shows an empty comparison.
+	 */
 	open(path: LifePath): void {
+		if (this.path() === path) {
+			return;
+		}
 		this.path.set(path);
+		void this.store.commit(firstValueFrom(this.lifeService.updateLine(LINE_CODES[path])));
 	}
 }

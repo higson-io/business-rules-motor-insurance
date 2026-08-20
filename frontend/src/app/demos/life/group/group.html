@@ -48,7 +48,7 @@
 					<mat-select
 						data-testid="group-industry"
 						[value]="industryClass()"
-						(selectionChange)="industryClass.set($event.value)"
+						(selectionChange)="setIndustryClass($event.value)"
 					>
 						@for (industry of industries; track industry.value) {
 							<mat-option [value]="industry.value">{{ industry.label }}</mat-option>
@@ -86,7 +86,7 @@
 				</p>
 
 				<p class="group__insured" data-testid="group-insured">
-					Ubezpieczonych: <strong>{{ sum(quote().insuredCount) }}</strong>
+					Ubezpieczonych: <strong>{{ sum(insuredCount()) }}</strong>
 				</p>
 			</section>
 
@@ -97,7 +97,7 @@
 					class="group__extension"
 					data-testid="group-spouse"
 					[checked]="includeSpouse()"
-					(change)="includeSpouse.set($event.checked)"
+					(change)="setIncludeSpouse($event.checked)"
 				>
 					Współmałżonek lub partner
 				</mat-checkbox>
@@ -106,7 +106,7 @@
 					class="group__extension"
 					data-testid="group-child"
 					[checked]="includeAdultChild()"
-					(change)="includeAdultChild.set($event.checked)"
+					(change)="setIncludeAdultChild($event.checked)"
 				>
 					Pełnoletnie dziecko
 				</mat-checkbox>
@@ -125,7 +125,7 @@
 				<tr>
 					<th scope="col" class="quote__corner">Świadczenie</th>
 
-					@for (variant of variants; track variant.code) {
+					@for (variant of variants(); track variant.code) {
 						<th scope="col" class="quote__tier" data-testid="group-variant">
 							<span class="quote__tier__name">{{ variant.code }}</span>
 
@@ -133,7 +133,7 @@
 								class="quote__tier__gauge"
 								role="img"
 								[attr.aria-label]="
-									benefitCount(variant.code) + ' z ' + benefits.length + ' świadczeń'
+									benefitCount(variant.code) + ' z ' + benefits().length + ' świadczeń'
 								"
 							>
 								<span
@@ -144,17 +144,45 @@
 						</th>
 					}
 				</tr>
+				<tr class="quote__row quote__row--subtotal">
+					<th scope="row" class="quote__row__label">Składka miesięczna za pracownika</th>
+					@for (variant of variants(); track variant.code) {
+						<td class="quote__cell" data-testid="group-per-employee">
+							{{ money(variant.perEmployee) }} zł
+						</td>
+					}
+				</tr>
+
+				<tr class="quote__row quote__row--total">
+					<!--
+						⛔ NIE "Koszt programu". Przy wyborze wariantu przez pracownika ta liczba
+						odpowiada na pytanie "ile, gdyby WSZYSCY wybrali ten wariant" — jest hipotezą,
+						nie kosztem. Rzeczywisty koszt wymaga rozkładu przystąpień (D-2).
+					-->
+					<th scope="row" class="quote__row__label">Gdyby wszyscy wybrali ten wariant</th>
+					@for (variant of variants(); track variant.code) {
+						<td class="quote__cell quote__cell--total" data-testid="group-monthly-total">
+							{{ money(variant.monthlyTotalIfAll) }} zł
+						</td>
+					}
+				</tr>
 			</thead>
 
 			<tbody>
-				@for (benefit of benefits; track benefit.code) {
+				@for (benefit of benefits(); track benefit.code) {
 					<tr class="quote__row" data-testid="group-benefit-row">
 						<th scope="row" class="quote__row__label">{{ benefit.name }}</th>
 
-						@for (variant of variants; track variant.code) {
+						@for (variant of variants(); track variant.code) {
 							<td class="quote__cell" data-testid="group-benefit-cell">
-								@if (sumFor(benefit, variant.code); as amount) {
-									@if (benefit.code === 'AM') {
+								<!--
+									⛔ Explicit null check, never truthiness: a service package carries
+									a sum of ZERO, and `@if (amount)` would drop assistance and
+									mental-health support out of the variant that does include them.
+								-->
+								@let amount = sumFor(benefit, variant.code);
+								@if (amount !== null) {
+									@if (isServicePackage(benefit)) {
 										<span class="group__included">w pakiecie</span>
 									} @else {
 										{{ sum(amount) }} zł
@@ -173,25 +201,6 @@
 				}
 			</tbody>
 
-			<tfoot>
-				<tr class="quote__row quote__row--subtotal">
-					<th scope="row" class="quote__row__label">Składka miesięczna za pracownika</th>
-					@for (variant of quote().variants; track variant.code) {
-						<td class="quote__cell" data-testid="group-per-employee">
-							{{ money(variant.perEmployee) }} zł
-						</td>
-					}
-				</tr>
-
-				<tr class="quote__row quote__row--total">
-					<th scope="row" class="quote__row__label">Koszt programu miesięcznie</th>
-					@for (variant of quote().variants; track variant.code) {
-						<td class="quote__cell quote__cell--total" data-testid="group-monthly-total">
-							{{ money(variant.monthlyTotal) }} zł
-						</td>
-					}
-				</tr>
-			</tfoot>
 		</table>
 		</div>
 

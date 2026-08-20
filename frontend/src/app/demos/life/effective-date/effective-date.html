@@ -1,0 +1,26 @@
+<!--
+	Data początku ochrony. Steruje wersją taryfy przez engine.setEffectiveDate, więc jest
+	kontrolką demonstracyjną, a nie zwykłym polem formularza — stąd osobna ramka i podpis
+	mówiący wprost, która wersja obowiązuje.
+-->
+<div class="effective-date">
+	<mat-form-field appearance="outline" class="effective-date__field">
+		<mat-label>Data początku ochrony</mat-label>
+		<input
+			matInput
+			data-testid="life-start-date"
+			[matDatepicker]="picker"
+			[value]="startDate()"
+			(dateChange)="pick($event.value)"
+		/>
+		<mat-datepicker-toggle matIconSuffix [for]="picker" />
+		<mat-datepicker #picker />
+		<mat-hint>Wersja taryfy wybiera się tą datą, nie zegarem serwera</mat-hint>
+	</mat-form-field>
+
+	@if (tariffVersion(); as version) {
+		<p class="effective-date__version" data-testid="life-tariff-version">
+			Obowiązuje: <strong>{{ version }}</strong>
+		</p>
+	}
+</div>

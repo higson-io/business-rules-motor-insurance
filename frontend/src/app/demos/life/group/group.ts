@@ -1,41 +1,37 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { firstValueFrom } from 'rxjs';
 
-import {
-	BENEFITS,
-	Benefit,
-	GroupDetails,
-	HEADCOUNT_RANGE,
-	IndustryClass,
-	PARTICIPATION_RANGE,
-	VARIANTS,
-	VariantCode,
-	priceGroup,
-} from '../pricing/group-tariff';
+import { LifeStore } from '../../../core/life-store';
+import { LifeBenefitDto, LifeVariantDto } from '../../../models/life';
+import { LifeService } from '../../../services/life-service';
 
 /** Industry risk classes, in the wording a group underwriter classifies an employer by. */
-const INDUSTRIES: readonly { readonly value: IndustryClass; readonly label: string }[] = [
+const INDUSTRIES: readonly { readonly value: number; readonly label: string }[] = [
 	{ value: 1, label: 'I — biura, IT, finanse, administracja' },
 	{ value: 2, label: 'II — handel, edukacja, ochrona zdrowia' },
 	{ value: 3, label: 'III — produkcja, logistyka, transport' },
 	{ value: 4, label: 'IV — budownictwo, górnictwo, energetyka' },
 ];
 
+const HEADCOUNT_RANGE = { min: 3, max: 5000 } as const;
+const PARTICIPATION_RANGE = { min: 10, max: 100 } as const;
+
 /**
- * The group path: an employer-sponsored scheme, compared across three ready-made variants.
+ * The group path: an employer-sponsored scheme, compared across ready-made variants.
  *
- * ⛔ Deliberately the OPPOSITE interaction to the individual path beside it. There you assemble a
- * contract and the premium accumulates; group cover is not assembled — the insurer offers fixed
- * variants and the employer picks one, so the question is what each variant contains and the answer
- * is a comparison. Benefits are rows and variants are columns, the same shape the motor demo uses
- * for the same reason.
+ * ⛔ Deliberately the OPPOSITE interaction to the individual path. There you assemble a contract and
+ * the premium accumulates; group cover is not assembled — the insurer offers fixed variants and the
+ * employer picks one, so the question is what each variant contains and the answer is a comparison.
  *
  * ⛔ AND NO INDIVIDUAL UNDERWRITING. No age of the person, no BMI, no tobacco — a group policy rates
- * the GROUP. That is not a simplification for the demo: it is the product. See `group-tariff.ts` for
- * why participation is the factor that matters most.
+ * the GROUP. That is not a simplification for the demo: it is the product, and the backend enforces
+ * it by giving this branch no access to `quote.insured.*` at all.
+ *
+ * ⛔ NO LOCAL PRICING. Every figure comes from `demo.life.group.calculateQuote` through `LifeStore`.
  */
 @Component({
 	selector: 'app-life-group',
@@ -45,92 +41,127 @@ const INDUSTRIES: readonly { readonly value: IndustryClass; readonly label: stri
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Group {
+	private readonly store = inject(LifeStore);
+	private readonly lifeService = inject(LifeService);
+
 	readonly headcountRange = HEADCOUNT_RANGE;
 	readonly participationRange = PARTICIPATION_RANGE;
 	readonly industries = INDUSTRIES;
-	readonly benefits = BENEFITS;
-	readonly variants = VARIANTS;
 
-	readonly headcount = signal(120);
-	readonly averageAge = signal(38);
-	readonly industryClass = signal<IndustryClass>(1);
-	readonly participation = signal(80);
-	readonly includeSpouse = signal(false);
-	readonly includeAdultChild = signal(false);
+	/** ⚠️ `hasValue()` before `value()` — a failed resource throws from `value()` in Angular 22. */
+	private readonly loaded = computed(() =>
+		this.store.quote.hasValue() ? this.store.quote.value() : null,
+	);
 
-	private readonly details = computed<GroupDetails>(() => ({
-		headcount: this.headcount(),
-		averageAge: this.averageAge(),
-		industryClass: this.industryClass(),
-		participation: this.participation(),
-		includeSpouse: this.includeSpouse(),
-		includeAdultChild: this.includeAdultChild(),
-	}));
+	readonly headcount = computed(() => this.loaded()?.headcount ?? HEADCOUNT_RANGE.min);
+	readonly averageAge = computed(() => this.loaded()?.averageAge ?? 35);
+	readonly industryClass = computed(() => this.loaded()?.industryClass ?? 1);
+	readonly participation = computed(() => this.loaded()?.participation ?? 0);
+	readonly includeSpouse = computed(() => this.loaded()?.includeSpouse ?? false);
+	readonly includeAdultChild = computed(() => this.loaded()?.includeAdultChild ?? false);
 
-	readonly quote = computed(() => priceGroup(this.details()));
+	readonly benefits = computed<readonly LifeBenefitDto[]>(() => this.loaded()?.benefits ?? []);
+
+	/** Only variants the rules made available for this headcount reach the comparison. */
+	readonly variants = computed<readonly LifeVariantDto[]>(() =>
+		(this.loaded()?.variants ?? []).filter((variant) => variant.available),
+	);
+
+	readonly insuredCount = computed(() => this.loaded()?.insuredCount ?? null);
+	readonly eligible = computed(() => this.loaded()?.decision !== 'DECLINE');
 
 	/**
 	 * How many benefits a variant carries, against the richest — the gauge under each column
-	 * heading, so the ladder reads before any figure is compared. Derived from the benefit table
-	 * rather than written per column, for the same reason the motor demo derives its own.
+	 * heading, so the ladder reads before any figure is compared.
 	 */
-	breadthOf(code: VariantCode): number {
-		const counts = this.variants.map((v) => this.benefitCount(v.code));
+	breadthOf(code: string): number {
+		const counts = this.variants().map((variant) => this.benefitCount(variant.code));
 		const richest = Math.max(0, ...counts);
 		return richest === 0 ? 0 : this.benefitCount(code) / richest;
 	}
 
-	benefitCount(code: VariantCode): number {
-		return this.benefits.filter((benefit) => benefit.sums[code] !== null).length;
+	benefitCount(code: string): number {
+		return this.benefits().filter((benefit) => this.sumFor(benefit, code) !== null).length;
 	}
 
-	sumFor(benefit: Benefit, code: VariantCode): number | null {
-		return benefit.sums[code];
+	/**
+	 * A benefit's amount in a variant, or null when the variant does not carry it.
+	 *
+	 * ⚠️ Zero means "carried, but as a service package" — assistance and mental-health support have
+	 * no sum. Treating 0 as absent would drop two rows from the richest variant.
+	 */
+	sumFor(benefit: LifeBenefitDto, code: string): number | null {
+		const sum = benefit.sumByVariant?.[code];
+		if (sum === undefined) {
+			return null;
+		}
+		return sum;
+	}
+
+	isServicePackage(benefit: LifeBenefitDto): boolean {
+		return benefit.benefitKind === 'SERVICE_PACKAGE';
 	}
 
 	// ── Bounded inputs ────────────────────────────────────────────────────────────────────────
-	// Both are typed by hand and both have ranges the product is written for, so they clamp rather
-	// than letting a slip produce a quotation for four employees aged two hundred.
+	// Both ranges are the ones the product is written for, so they clamp rather than letting a slip
+	// produce a quotation for four employees aged two hundred.
 
 	setHeadcount(value: number): void {
 		if (!Number.isFinite(value)) {
 			return;
 		}
-		this.headcount.set(
-			Math.min(HEADCOUNT_RANGE.max, Math.max(HEADCOUNT_RANGE.min, Math.round(value))),
+		const clamped = Math.min(
+			HEADCOUNT_RANGE.max,
+			Math.max(HEADCOUNT_RANGE.min, Math.round(value)),
 		);
+		void this.store.commit(firstValueFrom(this.lifeService.updateHeadcount(clamped)));
 	}
 
 	setParticipation(value: number): void {
 		if (!Number.isFinite(value)) {
 			return;
 		}
-		this.participation.set(
-			Math.min(PARTICIPATION_RANGE.max, Math.max(PARTICIPATION_RANGE.min, Math.round(value))),
+		const clamped = Math.min(
+			PARTICIPATION_RANGE.max,
+			Math.max(PARTICIPATION_RANGE.min, Math.round(value)),
 		);
+		void this.store.commit(firstValueFrom(this.lifeService.updateParticipation(clamped)));
 	}
 
 	setAverageAge(value: number): void {
 		if (!Number.isFinite(value)) {
 			return;
 		}
-		this.averageAge.set(Math.min(67, Math.max(18, Math.round(value))));
+		const clamped = Math.min(67, Math.max(18, Math.round(value)));
+		void this.store.commit(firstValueFrom(this.lifeService.updateAverageAge(clamped)));
+	}
+
+	setIndustryClass(value: number): void {
+		void this.store.commit(firstValueFrom(this.lifeService.updateIndustryClass(value)));
+	}
+
+	setIncludeSpouse(value: boolean): void {
+		void this.store.commit(firstValueFrom(this.lifeService.updateIncludeSpouse(value)));
+	}
+
+	setIncludeAdultChild(value: boolean): void {
+		void this.store.commit(firstValueFrom(this.lifeService.updateIncludeAdultChild(value)));
 	}
 
 	// ── Polish number formatting ──────────────────────────────────────────────────────────────
-	// Through `Intl` rather than a registered locale, for the reason recorded in the individual
-	// path: the application stays on en-US because the motor goldens pin that formatting.
+	// Through `Intl` rather than a registered locale: the application stays on en-US because the
+	// motor goldens pin that formatting.
 	private readonly plnFormat = new Intl.NumberFormat('pl-PL', {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	});
 	private readonly wholeFormat = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
 
-	money(value: number): string {
-		return this.plnFormat.format(value);
+	money(value: number | null): string {
+		return this.plnFormat.format(value ?? 0);
 	}
 
-	sum(value: number): string {
-		return this.wholeFormat.format(value);
+	sum(value: number | null): string {
+		return this.wholeFormat.format(value ?? 0);
 	}
 }

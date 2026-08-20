@@ -44,7 +44,7 @@
 							type="number"
 							data-testid="life-height"
 							[value]="heightCm()"
-							(blur)="heightCm.set(heightInput.valueAsNumber || heightCm())"
+							(blur)="setHeight(heightInput.valueAsNumber)"
 						/>
 						<span matSuffix class="life__suffix">cm</span>
 					</mat-form-field>
@@ -57,7 +57,7 @@
 							type="number"
 							data-testid="life-weight"
 							[value]="weightKg()"
-							(blur)="weightKg.set(weightInput.valueAsNumber || weightKg())"
+							(blur)="setWeight(weightInput.valueAsNumber)"
 						/>
 						<span matSuffix class="life__suffix">kg</span>
 					</mat-form-field>
@@ -78,7 +78,7 @@
 					class="life__toggle"
 					aria-label="Palenie tytoniu"
 					[value]="smoker()"
-					(change)="smoker.set($event.value)"
+					(change)="setSmoker($event.value)"
 				>
 					<mat-button-toggle [value]="false" data-testid="life-smoker-no">Nie</mat-button-toggle>
 					<mat-button-toggle [value]="true" data-testid="life-smoker-yes">Tak</mat-button-toggle>
@@ -89,7 +89,7 @@
 					<mat-select
 						data-testid="life-occupation"
 						[value]="occupationClass()"
-						(selectionChange)="occupationClass.set($event.value)"
+						(selectionChange)="setOccupationClass($event.value)"
 					>
 						@for (occupation of occupations; track occupation.value) {
 							<mat-option [value]="occupation.value">{{ occupation.label }}</mat-option>
@@ -117,9 +117,9 @@
 					<mat-select
 						data-testid="life-main-sum"
 						[value]="mainSum()"
-						(selectionChange)="mainSum.set($event.value)"
+						(selectionChange)="setMainSum($event.value)"
 					>
-						@for (value of mainSums; track value) {
+						@for (value of mainSums(); track value) {
 							<mat-option [value]="value">{{ sum(value) }} zł</mat-option>
 						}
 					</mat-select>
@@ -129,15 +129,15 @@
 			<h2 class="policy__heading">Umowy dodatkowe</h2>
 
 			<ul class="policy__riders">
-				@for (rider of riders; track rider.code) {
+				@for (rider of riders(); track rider.code) {
 					<li
 						class="policy__rider"
-						[class.policy__rider--on]="isSelected(rider.code)"
+						[class.policy__rider--on]="rider.selected"
 						[attr.data-testid]="'life-rider-' + rider.code"
 					>
 						<mat-checkbox
 							class="policy__rider__toggle"
-							[checked]="isSelected(rider.code)"
+							[checked]="rider.selected"
 							(change)="toggle(rider, $event.checked)"
 						>
 							<span class="policy__rider__name">{{ rider.name }}</span>
@@ -145,23 +145,23 @@
 
 						<p class="policy__rider__description">{{ rider.description }}</p>
 
-						@if (rider.karencja; as karencja) {
-							<p class="policy__rider__karencja">Karencja: {{ karencja }}</p>
+						@if (rider.waitingPeriodDays; as days) {
+							<p class="policy__rider__karencja">Karencja: {{ days }} dni</p>
 						}
 
 						<div class="policy__rider__cover">
-							@if (rider.amounts.length) {
+							@if (rider.sums?.length) {
 								<mat-form-field appearance="outline" class="policy__rider__amount">
 									<mat-label>
-										{{ rider.kind === 'dzienne' ? 'Świadczenie dzienne' : 'Suma ubezpieczenia' }}
+										{{ rider.benefitKind === 'DAILY_AMOUNT' ? 'Świadczenie dzienne' : 'Suma ubezpieczenia' }}
 									</mat-label>
 									<mat-select
 										[attr.data-testid]="'life-amount-' + rider.code"
-										[disabled]="!isSelected(rider.code)"
+										[disabled]="!rider.selected"
 										[value]="amountOf(rider)"
 										(selectionChange)="setAmount(rider, $event.value)"
 									>
-										@for (amount of rider.amounts; track amount) {
+										@for (amount of rider.sums ?? []; track amount) {
 											<mat-option [value]="amount">{{ sum(amount) }} zł</mat-option>
 										}
 									</mat-select>
@@ -174,51 +174,81 @@
 				}
 			</ul>
 
-			<!--
-				The running total. The stacked bar is the same idea as the motor demo's composition
-				bars in a different form: there you compare three prices, here you assemble one, so
-				the parts belong in a single bar. It renders no text — the figures are in the list
-				above it.
-			-->
-			<div class="policy__summary" data-testid="life-summary">
-				<div class="policy__stack" role="img" aria-label="Udział poszczególnych umów w składce">
-					@for (part of shares(); track part.code) {
-						<span
-							class="policy__stack__part"
-							[class.policy__stack__part--main]="part.code === 'MAIN'"
-							[style.width.%]="part.share * 100"
-						></span>
-					}
-				</div>
-
-				<ul class="policy__lines">
-					@for (line of quote().lines; track line.code) {
-						<li class="policy__line">
-							<span class="policy__line__name">{{ line.name }}</span>
-							<span class="policy__line__amount">
-								@if (line.kind === 'ryczalt') {
-									—
-								} @else {
-									{{ sum(line.amount) }} zł{{ line.kind === 'dzienne' ? '/dzień' : '' }}
-								}
-							</span>
-							<span class="policy__line__premium">{{ money(line.premium) }} zł</span>
-						</li>
-					}
-				</ul>
-
-				<div class="policy__total">
-					<span class="policy__total__label">Składka miesięczna</span>
-					<span class="policy__total__value" data-testid="life-total">
-						{{ money(quote().total) }} zł
-					</span>
-				</div>
-
-				<p class="policy__disclaimer">
-					Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
-					Kodeksu cywilnego.
-				</p>
-			</div>
+			<p class="policy__disclaimer">
+				Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
+				Kodeksu cywilnego.
+			</p>
 		</div>
 	</div>
+
+	<aside class="life__summary">
+		<!--
+			The running total, first on the screen and sticky, because it is the answer to every
+			control below it — scrolling through the riders must not scroll the price away.
+
+			The stacked bar is the same idea as the motor demo's composition bars in a different
+			form: there you compare three prices, here you assemble one, so the parts belong in a
+			single bar. It renders no text — the figures are in the list beneath it.
+		-->
+		<div class="policy__summary" data-testid="life-summary">
+			<div class="policy__stack" role="img" aria-label="Udział poszczególnych umów w składce">
+				@for (part of shares(); track part.code) {
+					<span
+						class="policy__stack__part"
+						[class.policy__stack__part--main]="part.code === 'MAIN'"
+						[style.width.%]="part.share * 100"
+					></span>
+				}
+			</div>
+
+			<ul class="policy__lines">
+				@for (rider of riders(); track rider.code) {
+					@if (rider.selected) {
+						<li class="policy__line">
+							<span class="policy__line__name">{{ rider.name }}</span>
+							<span class="policy__line__amount">
+								@if (rider.benefitKind === 'SERVICE_PACKAGE') {
+									—
+								} @else {
+									{{ sum(rider.sum) }} zł{{ rider.benefitKind === 'DAILY_AMOUNT' ? '/dzień' : '' }}
+								}
+							</span>
+							<span class="policy__line__premium">{{ money(rider.premium) }} zł</span>
+						</li>
+					}
+				}
+			</ul>
+
+			<div class="policy__total">
+				<span class="policy__total__label">Składka miesięczna</span>
+				<span class="policy__total__value" data-testid="life-total">
+					{{ money(premiumMonthly()) }} zł
+				</span>
+			</div>
+
+			<!--
+				⛔ binding, nie obecność składki. REFER wraca z pełną ceną i mimo to nie jest
+				wiążący — bez tego rozróżnienia ekran pokazałby cenę wstępną jak ofertę (D-1).
+			-->
+			@if (message(); as text) {
+				<p class="policy__notice" data-testid="life-decision-message">{{ text }}</p>
+			}
+
+			@if (medicalRequired()) {
+				<p class="policy__notice" data-testid="life-medical">
+					Wymagane badania lekarskie przed zawarciem umowy.
+				</p>
+			}
+
+			@if (instalment(); as amount) {
+				<p class="policy__instalment" data-testid="life-instalment">
+					Rata: <strong>{{ money(amount) }} zł</strong>
+					@if (premiumAnnual(); as annual) {
+						· rocznie {{ money(annual) }} zł
+					}
+				</p>
+			}
+
+		</div>
+	</aside>
 </div>
