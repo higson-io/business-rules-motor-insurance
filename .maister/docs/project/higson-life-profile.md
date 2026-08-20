@@ -225,9 +225,9 @@ OUT  available boolean
 ```
 ```
 line;available
-*;no
-INDIVIDUAL;yes
-GROUP;yes
+*;false
+INDIVIDUAL;true
+GROUP;true
 ```
 
 ### 4.2 Indywidualne — taryfa
@@ -241,15 +241,15 @@ OUT  rate      number
 ```
 age;rate
 * - *;3.10
-18-29;0.09
-30-34;0.13
-35-39;0.19
-40-44;0.29
-45-49;0.46
-50-54;0.75
-55-59;1.22
-60-64;1.95
-65-70;3.10
+18 - 29;0.09
+30 - 34;0.13
+35 - 39;0.19
+40 - 44;0.29
+45 - 49;0.46
+50 - 54;0.75
+55 - 59;1.22
+60 - 64;1.95
+65 - 70;3.10
 ```
 
 #### `demo.life.individual.rider.rate` ⭐ **wersjonowana**
@@ -261,14 +261,14 @@ OUT  ageRated  boolean
 ```
 ```
 rider;rate;ageRated
-*;0;no
-CRITICAL_ILLNESS;0.36;yes
-ACCIDENTAL_DEATH;0.035;no
-PERMANENT_IMPAIRMENT;0.075;no
-HOSPITAL_STAY;0.115;yes
-SURGERY;0.14;yes
-DISABILITY;0.21;yes
-MEDICAL_ASSISTANCE;9.00;no
+*;0;false
+CRITICAL_ILLNESS;0.36;true
+ACCIDENTAL_DEATH;0.035;false
+PERMANENT_IMPAIRMENT;0.075;false
+HOSPITAL_STAY;0.115;true
+SURGERY;0.14;true
+DISABILITY;0.21;true
+MEDICAL_ASSISTANCE;9.00;false
 ```
 
 > `MEDICAL_ASSISTANCE` ma `rate` w złotych, nie za 1 000 zł — bo jego `COVER_KIND` to `SERVICE_PACKAGE`. Rodzaj pokrycia
@@ -325,15 +325,15 @@ OUT  available boolean
 ```
 ```
 rider;age;available
-*;* - *;no
-MAIN_COVER;18-70;yes
-CRITICAL_ILLNESS;18-60;yes
-ACCIDENTAL_DEATH;18-70;yes
-PERMANENT_IMPAIRMENT;18-65;yes
-HOSPITAL_STAY;18-65;yes
-SURGERY;18-65;yes
-DISABILITY;18-55;yes
-MEDICAL_ASSISTANCE;18-70;yes
+*;* - *;false
+MAIN_COVER;18 - 70;true
+CRITICAL_ILLNESS;18 - 60;true
+ACCIDENTAL_DEATH;18 - 70;true
+PERMANENT_IMPAIRMENT;18 - 65;true
+HOSPITAL_STAY;18 - 65;true
+SURGERY;18 - 65;true
+DISABILITY;18 - 55;true
+MEDICAL_ASSISTANCE;18 - 70;true
 ```
 
 #### `demo.life.individual.rider.sumsOffered`
@@ -463,12 +463,12 @@ OUT  creditRatio  number
 ```
 rider;priorMonths;gapDays;creditRatio
 *;* - *;* - *;0.00
-CRITICAL_ILLNESS;6 - *;0-30;0.50
-HOSPITAL_STAY;1-5;0-30;0.50
-HOSPITAL_STAY;6 - *;0-30;1.00
-SURGERY;1-5;0-30;0.50
-SURGERY;6 - *;0-30;1.00
-DISABILITY;6 - *;0-30;0.50
+CRITICAL_ILLNESS;6 - *;0 - 30;0.50
+HOSPITAL_STAY;1 - 5;0 - 30;0.50
+HOSPITAL_STAY;6 - *;0 - 30;1.00
+SURGERY;1 - 5;0 - 30;0.50
+SURGERY;6 - *;0 - 30;1.00
+DISABILITY;6 - *;0 - 30;0.50
 ```
 
 > **Przerwa dłuższa niż 30 dni nie zalicza się w ogóle** — wpada w wiersz domyślny. Przerwa jest
@@ -521,10 +521,10 @@ OUT  maxNoExam  number
 ```
 age;maxNoExam
 * - *;100000
-18-35;600000
-36-45;400000
-46-55;250000
-56-70;100000
+18 - 35;600000
+36 - 45;400000
+46 - 55;250000
+56 - 70;100000
 ```
 
 #### `demo.life.underwriting.rules` — tabela **wielowierszowa**
@@ -544,9 +544,9 @@ age;bmi;smoker;occupation;decision;severity;reasonInternal
 * - *;* - *;*;*;ACCEPT;0;
 * - *;40 - *;*;*;DECLINE;2;BMI powyżej 40
 * - *;* - 16;*;*;DECLINE;2;BMI poniżej 16
-61-70;32 - *;yes;*;DECLINE;2;Wiek, BMI i palenie łącznie
+61 - 70;32 - *;true;*;DECLINE;2;Wiek, BMI i palenie łącznie
 * - *;32 - 40;*;*;REFER;1;Podwyższone BMI
-56-70;* - *;yes;*;REFER;1;Wiek i palenie
+56 - 70;* - *;true;*;REFER;1;Wiek i palenie
 * - *;* - *;*;4;REFER;1;IV klasa ryzyka zawodowego
 ```
 
@@ -577,10 +577,10 @@ OUT  binding   boolean
 ```
 ```
 decision;message;binding
-*;Skontaktuj się z doradcą, żeby dokończyć wniosek.;no
-ACCEPT;;yes
-REFER;Składka wstępna. Warunki ostateczne ustalimy po ocenie medycznej.;no
-DECLINE;Tego wniosku nie możemy obsłużyć online — skontaktuj się z doradcą.;no
+*;Skontaktuj się z doradcą, żeby dokończyć wniosek.;false
+ACCEPT;;true
+REFER;Składka wstępna. Warunki ostateczne ustalimy po ocenie medycznej.;false
+DECLINE;Tego wniosku nie możemy obsłużyć online — skontaktuj się z doradcą.;false
 ```
 
 #### `demo.life.underwriting.sumLimit`
@@ -608,33 +608,33 @@ OUT  available boolean
 ```
 ```
 benefit;variant;available
-*;*;no
-DEATH;BASIC;yes
-DEATH;EXTENDED;yes
-DEATH;COMPLETE;yes
-ACCIDENTAL_DEATH;BASIC;yes
-ACCIDENTAL_DEATH;EXTENDED;yes
-ACCIDENTAL_DEATH;COMPLETE;yes
-IMPAIRMENT_PER_PERCENT;BASIC;yes
-IMPAIRMENT_PER_PERCENT;EXTENDED;yes
-IMPAIRMENT_PER_PERCENT;COMPLETE;yes
-SPOUSE_DEATH;BASIC;yes
-SPOUSE_DEATH;EXTENDED;yes
-SPOUSE_DEATH;COMPLETE;yes
-PARENT_DEATH;EXTENDED;yes
-PARENT_DEATH;COMPLETE;yes
-CHILD_BIRTH;EXTENDED;yes
-CHILD_BIRTH;COMPLETE;yes
-CHILD_ORPHANING;EXTENDED;yes
-CHILD_ORPHANING;COMPLETE;yes
-CRITICAL_ILLNESS;EXTENDED;yes
-CRITICAL_ILLNESS;COMPLETE;yes
-HOSPITAL_STAY;EXTENDED;yes
-HOSPITAL_STAY;COMPLETE;yes
-SURGERY;COMPLETE;yes
-DISABILITY;COMPLETE;yes
-MEDICAL_ASSISTANCE;COMPLETE;yes
-MENTAL_HEALTH_SUPPORT;COMPLETE;yes
+*;*;false
+DEATH;BASIC;true
+DEATH;EXTENDED;true
+DEATH;COMPLETE;true
+ACCIDENTAL_DEATH;BASIC;true
+ACCIDENTAL_DEATH;EXTENDED;true
+ACCIDENTAL_DEATH;COMPLETE;true
+IMPAIRMENT_PER_PERCENT;BASIC;true
+IMPAIRMENT_PER_PERCENT;EXTENDED;true
+IMPAIRMENT_PER_PERCENT;COMPLETE;true
+SPOUSE_DEATH;BASIC;true
+SPOUSE_DEATH;EXTENDED;true
+SPOUSE_DEATH;COMPLETE;true
+PARENT_DEATH;EXTENDED;true
+PARENT_DEATH;COMPLETE;true
+CHILD_BIRTH;EXTENDED;true
+CHILD_BIRTH;COMPLETE;true
+CHILD_ORPHANING;EXTENDED;true
+CHILD_ORPHANING;COMPLETE;true
+CRITICAL_ILLNESS;EXTENDED;true
+CRITICAL_ILLNESS;COMPLETE;true
+HOSPITAL_STAY;EXTENDED;true
+HOSPITAL_STAY;COMPLETE;true
+SURGERY;COMPLETE;true
+DISABILITY;COMPLETE;true
+MEDICAL_ASSISTANCE;COMPLETE;true
+MENTAL_HEALTH_SUPPORT;COMPLETE;true
 ```
 
 > Wiersz `MENTAL_HEALTH_SUPPORT` jest **globalny, a mimo to nieosiągalny przed `2026-07-01`** — element domeny
@@ -778,10 +778,10 @@ OUT  factor    number
 ```
 spouse;child;factor
 *;*;1.00
-no;no;1.00
-yes;no;1.35
-no;yes;1.12
-yes;yes;1.51
+no;false;1.00
+yes;false;1.35
+no;true;1.12
+yes;true;1.51
 ```
 
 ### 4.7 Grupowe — reguły dostępności programu
@@ -795,10 +795,10 @@ OUT  reason        string
 ```
 ```
 headcount;participation;eligible;reason
-* - *;* - *;no;Poza zakresem oferty
-3-9;50-100;yes;
-3-9;10-49;no;Grupa poniżej 10 osób wymaga partycypacji min. 50%
-10-5000;10-100;yes;
+* - *;* - *;false;Poza zakresem oferty
+3 - 9;50 - 100;true;
+3 - 9;10 - 49;false;Grupa poniżej 10 osób wymaga partycypacji min. 50%
+10 - 5000;10 - 100;true;
 ```
 
 > Tutaj kolumna nazywa się `reason`, a nie `reasonInternal` — i to jest zamierzona asymetria wobec
@@ -814,10 +814,10 @@ OUT  available boolean
 ```
 ```
 variant;headcount;available
-*;* - *;no
-BASIC;3-5000;yes
-EXTENDED;3-5000;yes
-COMPLETE;20-5000;yes
+*;* - *;false
+BASIC;3 - 5000;true
+EXTENDED;3 - 5000;true
+COMPLETE;20 - 5000;true
 ```
 
 ---
@@ -849,6 +849,13 @@ flowchart TD
 `mainPremium`, `ridersPremium`, `premiumMonthly` *(returned)*, `installment` *(returned)*,
 `installments` *(returned)*, `premiumAnnual` *(returned)*, `breakdown` *(returned)*,
 `binding` *(returned)*, `message` *(returned)*, `medicalRequired` *(returned)*.
+
+> 🔧 **Zmiana wymuszona przez API (W-10).** Odczyt `underwriting.customerMessage` **nie odbywa się
+> we flow**, tylko wewnątrz funkcji `underwriting.resolveDecision`. Powód: w Higsonie istnieje
+> wyłącznie `util.ctx.get` — **nie ma `ctx.set`**, więc flow nie potrafi wstawić wyliczonej decyzji
+> do kontekstu, a tabela kluczowana decyzją musi ją skądś wziąć. Funkcja podaje ją przez
+> `higson.createContext`, tak samo jak `ageRatingFactor` czyta stawkę dla wieku odniesienia.
+> Treść nadal siedzi w tabeli, więc D-1 obowiązuje w całości — zmienia się wyłącznie miejsce odczytu.
 
 > ⚠️ **`premiumAnnual` jest wyliczane z zaokrąglonej raty, nie liczone niezależnie** — decyzja
 > **D-6** (§10). Gdyby powstawało własnym torem, `12 × rata` i „składka roczna" potrafiłyby się
@@ -1306,15 +1313,15 @@ się to, jakie świadczenia istnieją — a to inny wymiar.
 ```
 age;rate
 * - *;3.35
-18-29;0.09
-30-34;0.13
-35-39;0.19
-40-44;0.29
-45-49;0.50   ← było 0.46
-50-54;0.81   ← było 0.75
-55-59;1.32   ← było 1.22
-60-64;2.11   ← było 1.95
-65-70;3.35   ← było 3.10
+18 - 29;0.09
+30 - 34;0.13
+35 - 39;0.19
+40 - 44;0.29
+45 - 49;0.50   ← było 0.46
+50 - 54;0.81   ← było 0.75
+55 - 59;1.32   ← było 1.22
+60 - 64;2.11   ← było 1.95
+65 - 70;3.35   ← było 3.10
 ```
 
 **Zmiana 2 — obniżenie progu badań lekarskich**
@@ -1323,10 +1330,10 @@ age;rate
 ```
 age;maxNoExam
 * - *;80000
-18-35;500000   ← było 600000
-36-45;300000   ← było 400000
-46-55;200000   ← było 250000
-56-70;80000    ← było 100000
+18 - 35;500000   ← było 600000
+36 - 45;300000   ← było 400000
+46 - 55;200000   ← było 250000
+56 - 70;80000    ← było 100000
 ```
 
 **Zmiana 3 — ostrzejsza kontrola antyselekcji w grupówce, na obu osiach**
