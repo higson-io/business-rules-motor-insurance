@@ -77,11 +77,6 @@ export class Questionnaire {
 		})).filter((section) => section.questions.length > 0);
 	});
 
-	/** How many questions the rules currently show — the number the demo is about. */
-	readonly visibleCount = computed(
-		() => (this.loaded()?.questions ?? []).filter((question) => question.visible).length,
-	);
-
 	label(question: PropertyQuestionDto, option: string): string {
 		const index = question.options.indexOf(option);
 		return index >= 0 && index < question.optionLabels.length

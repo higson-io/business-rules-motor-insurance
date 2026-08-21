@@ -50,6 +50,8 @@ public class LifeQuoteDto {
 	private Integer insuredCount;
 	private BigDecimal programCost;
 
+	private LifeTariffVersionDto tariffVersion;
+
 	private List<LifeVariantDto> variants;
 	private List<LifeBenefitDto> benefits;
 
@@ -115,6 +117,8 @@ public class LifeQuoteDto {
 	public void setInsuredCount(Integer insuredCount) { this.insuredCount = insuredCount; }
 	public BigDecimal getProgramCost() { return programCost; }
 	public void setProgramCost(BigDecimal programCost) { this.programCost = programCost; }
+	public LifeTariffVersionDto getTariffVersion() { return tariffVersion; }
+	public void setTariffVersion(LifeTariffVersionDto tariffVersion) { this.tariffVersion = tariffVersion; }
 	public List<LifeVariantDto> getVariants() { return variants; }
 	public void setVariants(List<LifeVariantDto> variants) { this.variants = variants; }
 	public List<LifeBenefitDto> getBenefits() { return benefits; }

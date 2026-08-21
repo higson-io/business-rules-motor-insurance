@@ -62,13 +62,20 @@ describe('Demo picker', () => {
 			'every catalogue entry gets a tile, in catalogue order',
 		).toEqual(DEMOS.map((demo) => `demo-tile-${demo.code}`));
 
-		// An unavailable demo is shown but not selectable — the catalogue doubles as the roadmap.
-		for (const demo of DEMOS) {
-			expect(
-				(el(`[data-testid="demo-tile-${demo.code}"]`) as HTMLButtonElement).disabled,
-				`the ${demo.code} tile is selectable exactly when the catalogue says it is available`,
-			).toBe(!demo.available);
-		}
+		// ⛔ The order is the argument, not a detail. Each demo hands the rules engine something
+		// bigger than the last, so a catalogue reshuffle turns a build-up into three unrelated
+		// screens — which still works and stops meaning anything.
+		expect(
+			elements('.demo-picker__step').map((e) => e.textContent?.trim()),
+			'the tiles carry their position in the story',
+		).toEqual(['01', '02', '03']);
+
+		// Every tile carries a glyph. A missing `@switch` case renders an empty hole, and the
+		// landing screen is the first thing an audience sees.
+		expect(
+			elements('.demo-picker__icon svg').length,
+			'every demo has an icon; a missing case reads as an unfinished product',
+		).toBe(DEMOS.length);
 	});
 
 	it('opens the chosen demo and comes back to the picker', () => {

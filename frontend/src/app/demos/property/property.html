@@ -1,7 +1,15 @@
 <!--
-	Układ: data ochrony nad wszystkim, bo przełącza reżim; ankieta i rekomendacja w kolumnie
-	roboczej; podsumowanie przyklejone po prawej, tak jak w demo LIFE.
+	Układ: tytuł, potem data ochrony nad wszystkim, bo przełącza reżim; ankieta i rekomendacja w
+	kolumnie roboczej; podsumowanie przyklejone po prawej, tak jak w demo LIFE.
 -->
+<header class="property__head">
+	<h1 class="property__title">Ubezpieczenie domu i mieszkania</h1>
+	<p class="property__lead">
+		Analiza potrzeb klienta jest konfiguracją w Higsonie, nie formularzem w kodzie. Java nie zna
+		ani jednego pytania i ani jednego progu.
+	</p>
+</header>
+
 <app-property-effective-date />
 
 <div class="property">
@@ -13,26 +21,28 @@
 
 	@if (ready()) {
 		<aside class="property__summary" data-testid="property-summary">
-			<h3 class="property__summary-title">Podsumowanie</h3>
+			<h2 class="property__summary-title">Podsumowanie</h2>
+
+			<!--
+				Suma murów wybita, bo to ona jest liczona przez reguły z odpowiedzi klienta, a nie
+				wpisywana. Reszta to jej rozbicie i wejścia, które ją wyznaczyły — dlatego niżej i
+				drobniej. Wiek budynku i strefa kradzieżowa wypadły stąd: obie są odpowiedziami z
+				ankiety, widocznymi kilkanaście centymetrów obok, a tutaj tylko rozcieńczały liczbę,
+				po którą się w tę szpaltę patrzy.
+			-->
+			<p class="property__headline-label">Suma ubezpieczenia murów</p>
+			<p class="property__headline" data-testid="property-sum-building">{{ sumBuilding() }} zł</p>
+			<p class="property__headline-note">policzona z metrażu i standardu, nie wpisana</p>
 
 			<dl class="property__rows">
-				<dt>Suma murów</dt>
-				<dd data-testid="property-sum-building">{{ sumBuilding() }} zł</dd>
-
-				<dt>Suma elementów stałych</dt>
+				<dt>Elementy stałe</dt>
 				<dd>{{ sumFixtures() }} zł</dd>
 
-				<dt>Suma ruchomości</dt>
+				<dt>Ruchomości</dt>
 				<dd>{{ sumContents() }} zł</dd>
-
-				<dt>Wiek budynku</dt>
-				<dd>{{ buildingAge() }} lat</dd>
 
 				<dt>Strefa powodziowa</dt>
 				<dd data-testid="property-flood-zone">{{ floodZone() }}</dd>
-
-				<dt>Strefa kradzieżowa</dt>
-				<dd>{{ theftZone() }}</dd>
 			</dl>
 
 			@if (chosen(); as variant) {

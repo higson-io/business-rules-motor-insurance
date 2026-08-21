@@ -8,40 +8,43 @@
  *
  * To add one: append an entry here, add the component, and extend the switch in `app.html`. The
  * `code` is the discriminator in all three places.
+ *
+ * ⛔ THE ORDER IS THE ARGUMENT, not alphabetical and not chronological. Each step hands the rules
+ * engine something bigger: first the price, then which version of the tariff, then what the seller
+ * is allowed to ask the client at all. Shuffling these turns a build-up into three unrelated
+ * screens — the demo would still work and would stop meaning anything.
  */
 export type DemoCode = 'moto' | 'life' | 'property';
 
 export interface Demo {
 	readonly code: DemoCode;
+	/** Position in the story. Shown on the tile, because the sequence is the point. */
+	readonly step: string;
 	readonly name: string;
-	/** One line, shown under the name on the tile. */
+	/** One line, shown under the name on the tile. Written to be read in sequence. */
 	readonly summary: string;
-	/**
-	 * `false` renders the tile greyed out and unselectable. A demo appears here as soon as someone
-	 * intends to build it, so the landing screen shows the roadmap rather than hiding it.
-	 */
-	readonly available: boolean;
 }
 
 export const DEMOS: readonly Demo[] = [
 	{
 		code: 'moto',
-		name: 'Motor insurance',
-		summary: 'Rate a car policy across three cover levels, with limits and discounts priced by rules.',
-		available: true,
-	},
-	{
-		code: 'property',
-		name: 'Property insurance',
+		step: '01',
+		name: 'Ubezpieczenie komunikacyjne',
 		summary:
-			'Quote a home or flat through a needs analysis that lives in the rules — move the policy date and the questionnaire itself changes.',
-		available: true,
+			'Cena i zakres każdego wariantu pochodzą z tabel decyzyjnych, nie z kodu. Zmień cokolwiek po lewej — przelicza się na bieżąco.',
 	},
 	{
 		code: 'life',
-		name: 'Life insurance',
+		step: '02',
+		name: 'Ubezpieczenie na życie',
 		summary:
-			'Assemble an individual protection policy the way the Polish market sells one: a main contract plus riders, priced as you go.',
-		available: true,
+			'Ten sam silnik sprzedaje zupełnie inny produkt — a data polisy wybiera wersję taryfy i to, które świadczenia w ogóle istnieją.',
+	},
+	{
+		code: 'property',
+		step: '03',
+		name: 'Ubezpieczenie majątkowe',
+		summary:
+			'Data polisy zmienia nie cenę, tylko to, o co wolno zapytać klienta. Analiza potrzeb jest konfiguracją, nie formularzem.',
 	},
 ];

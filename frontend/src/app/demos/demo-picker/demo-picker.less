@@ -10,7 +10,7 @@
 }
 
 .demo-picker {
-	max-width: 900px;
+	max-width: 1000px;
 	margin: 0 auto;
 	padding: 2rem 0 3rem;
 	text-align: center;
@@ -25,8 +25,10 @@
 }
 
 .demo-picker__subtitle {
-	margin: 0 0 2.5rem;
+	max-width: 60ch;
+	margin: 0 auto 2.5rem;
 	font-size: 1rem;
+	line-height: 1.5;
 	color: @color-text-muted;
 }
 
@@ -61,8 +63,9 @@
 }
 
 // ⚠️ Unlike the variant cards — which look clickable and are not (DR-15) — these genuinely are, so
-// the hover affordance is correct here rather than a false promise.
-.demo-picker__tile:hover:not(:disabled) {
+// the hover affordance is correct here rather than a false promise. No `:disabled` variant: every
+// demo in the catalogue is built, so the greyed-out state could never render.
+.demo-picker__tile:hover {
 	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.25);
 	transform: translateY(-2px);
 }
@@ -70,11 +73,6 @@
 .demo-picker__tile:focus-visible {
 	outline: 2px solid @color-accent;
 	outline-offset: 3px;
-}
-
-.demo-picker__tile:disabled {
-	cursor: not-allowed;
-	opacity: 0.55;
 }
 
 // One accent per surface, spent on whatever that surface is for. On the quote screen that is the
@@ -104,11 +102,11 @@
 	line-height: 1.4;
 }
 
-.demo-picker__badge {
-	padding: 0.15rem 0.6rem;
-	border-radius: var(--mat-sys-corner-medium);
-	background: @color-gray-light;
-	font-size: 0.75rem;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
+// Position in the story. Large and muted: it has to be legible from the back of a room without
+// competing with the name it precedes.
+.demo-picker__step {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	color: @color-text-muted;
 }

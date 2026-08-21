@@ -20,3 +20,7 @@ src/main/higson/
 # i screenshoty weryfikacyjne. Powstają w katalogu roboczym przy każdym uruchomieniu i nie są
 # dowodem: dowodem jest złoty plik w e2e/ (standards/testing/test-writing.md).
 .playwright-mcp/
+
+# Zrzuty robocze robione przy przeglądzie UX. Ta sama zasada co wyżej: dowodem jest złoty plik,
+# nie obrazek. Wzorzec, bo nazwy nadaje ten, kto akurat patrzy na ekran.
+*-now.png

@@ -23,6 +23,7 @@ import pl.decerto.higson.demo.life.domain.Benefit;
 import pl.decerto.higson.demo.life.domain.Insured;
 import pl.decerto.higson.demo.life.domain.LifeQuote;
 import pl.decerto.higson.demo.life.domain.Rider;
+import pl.decerto.higson.demo.life.domain.TariffVersion;
 import pl.decerto.higson.demo.life.domain.Variant;
 
 /**
@@ -46,6 +47,7 @@ public class Life {
 	private static final String FUNCTION_MAX_SUM = "demo.life.individual.maxSumAssured";
 	private static final String FUNCTION_WAITING_PERIOD = "demo.life.individual.effectiveWaitingPeriod";
 
+	private static final String PARAM_TARIFF_VERSION = "demo.life.tariff.version";
 	private static final String PARAM_RIDER_SUMS = "demo.life.individual.rider.sumsOffered";
 	private static final String PARAM_BENEFIT_AVAILABILITY = "demo.life.group.benefit.availability";
 	private static final String PARAM_BENEFIT_SUM = "demo.life.group.benefit.sumAssured";
@@ -191,6 +193,9 @@ public class Life {
 			.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		engine.setEffectiveDate(effective);
 		try {
+			// Po setEffectiveDate, nigdy przed: to region rozstrzyga, która wersja odpowiada.
+			loadTariffVersion(quote);
+
 			if (LifeQuote.LINE_GROUP.equals(quote.getLineCode())) {
 				calculateGroup(quote);
 			} else {
@@ -201,6 +206,20 @@ public class Life {
 			// na kolejną wycenę w tym samym wątku.
 			engine.clearEffectiveDate();
 		}
+	}
+
+	/**
+	 * Nazwa obowiązującej wersji taryfy. Jedyny powód, dla którego ta tabela istnieje: bez niej
+	 * ekran musiałby znać datę progu, żeby napisać, co obowiązuje — a to postawiłoby drugą kopię
+	 * reguły w przeglądarce.
+	 */
+	private void loadTariffVersion(LifeQuote quote) {
+		ParamValue value = engine.get(PARAM_TARIFF_VERSION, new LifeContext(quote));
+		TariffVersion version = new TariffVersion();
+		version.setCode(value.getString("code"));
+		version.setName(value.getString("name"));
+		version.setValidFrom(value.getString("validFrom"));
+		quote.setTariffVersion(version);
 	}
 
 	private void calculateIndividual(LifeQuote quote) {

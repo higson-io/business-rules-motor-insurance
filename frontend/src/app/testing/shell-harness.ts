@@ -112,6 +112,7 @@ export function openMoto(): void {
 export const LIFE_QUOTE: LifeQuoteDto = {
 	lineCode: 'INDIVIDUAL',
 	startDate: '2026-08-20',
+	tariffVersion: { code: 'V2', name: 'Taryfa 2026 H2', validFrom: '1 lipca 2026' },
 	mainSum: 300000,
 	paymentFrequency: 'MONTHLY',
 	birthDate: null,

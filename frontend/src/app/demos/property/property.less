@@ -4,6 +4,23 @@
 	display: block;
 }
 
+.property__head {
+	margin: 0 0 16px;
+}
+
+.property__title {
+	margin: 0;
+	font-size: 1.5rem;
+	line-height: 1.2;
+}
+
+.property__lead {
+	margin: 4px 0 0;
+	max-width: 68ch;
+	font-size: 0.875rem;
+	color: @color-text-muted;
+}
+
 // Mobile-first: jedna kolumna, podsumowanie NAD pracą, bo nie ma obok czego go postawić.
 .property {
 	display: grid;
@@ -51,6 +68,30 @@
 .property__summary-title {
 	margin: 0 0 12px;
 	font-size: 1rem;
+}
+
+// Liczba, po którą się w tę szpaltę patrzy. Wcześniej stała jako jeden z sześciu wierszy listy
+// definicyjnej i ważyła tyle samo co strefa kradzieżowa.
+.property__headline-label {
+	margin: 0;
+	font-size: 0.6875rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.property__headline {
+	margin: 2px 0 0;
+	font-size: 1.5rem;
+	font-weight: 600;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+}
+
+.property__headline-note {
+	margin: 2px 0 12px;
+	font-size: 0.75rem;
+	color: @color-text-muted;
 }
 
 .property__rows {

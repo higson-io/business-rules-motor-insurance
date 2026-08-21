@@ -53,10 +53,24 @@ export interface LifeBenefitDto {
 	readonly sumByVariant: Readonly<Record<string, number>> | null;
 }
 
+/**
+ * Obowiązująca wersja taryfy, podana przez `demo.life.tariff.version`.
+ *
+ * ⛔ Nie licz jej z `startDate`. Data progu jest osią czasu regionu w Higsonie; kopia w TypeScripcie
+ * byłaby drugą definicją tej samej reguły i to ona zdezaktualizowałaby się pierwsza.
+ */
+export interface LifeTariffVersionDto {
+	readonly code: string;
+	readonly name: string;
+	/** Data początku obowiązywania, gotowa do wyświetlenia. Też z reguł. */
+	readonly validFrom: string;
+}
+
 export interface LifeQuoteDto {
 	readonly lineCode: LifeLineCode;
 
 	readonly startDate: string;
+	readonly tariffVersion: LifeTariffVersionDto;
 	readonly mainSum: number;
 	readonly paymentFrequency: PaymentFrequency;
 

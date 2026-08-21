@@ -1,7 +1,6 @@
 <!--
 	The tiles are <button>s, not clickable <div>s: they do something rather than go somewhere, and a
 	button is keyboard-reachable and announced correctly without any ARIA (`accessibility.md`).
-	`disabled` carries the unavailable state, so it needs no separate aria-disabled either.
 
 	Icons are inline SVG rather than an icon font. Angular Material's icon component needs a
 	ligature font that this application does not ship (C-10 dropped Font Awesome and self-hosts only
@@ -12,9 +11,10 @@
 		The brand is in the menubar, so the heading says what to DO rather than repeating it. It
 		also stays industry-neutral: the tiles name the lines of business, this screen does not.
 	-->
-	<h1 id="demo-picker-title" class="demo-picker__title">Choose a demo</h1>
+	<h1 id="demo-picker-title" class="demo-picker__title">Wybierz demo</h1>
 	<p class="demo-picker__subtitle">
-		Each one is a working application whose decisions are driven by Higson business rules.
+		Każde z nich to działająca aplikacja, w której decyzje podejmują reguły biznesowe Higsona.
+		Kolejność jest celowa — każdy kolejny krok oddaje regułom więcej.
 	</p>
 
 	<ul class="demo-picker__grid">
@@ -24,7 +24,6 @@
 					type="button"
 					class="demo-picker__tile"
 					[attr.data-testid]="'demo-tile-' + demo.code"
-					[disabled]="!demo.available"
 					(click)="open(demo)"
 				>
 					<span class="demo-picker__icon" aria-hidden="true">
@@ -43,15 +42,19 @@
 									<path d="M12 20.5S3.8 15.4 3.8 9.7A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 8.2 2.1c0 5.7-8.2 10.8-8.2 10.8z" />
 								</svg>
 							}
+							@case ('property') {
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+									<path d="M3.5 10.5 12 4l8.5 6.5" />
+									<path d="M5.5 9.7V19a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.7" />
+									<path d="M10 20v-5.5h4V20" />
+								</svg>
+							}
 						}
 					</span>
 
+					<span class="demo-picker__step" aria-hidden="true">{{ demo.step }}</span>
 					<span class="demo-picker__name">{{ demo.name }}</span>
 					<span class="demo-picker__summary">{{ demo.summary }}</span>
-
-					@if (!demo.available) {
-						<span class="demo-picker__badge">Coming soon</span>
-					}
 				</button>
 			</li>
 		}

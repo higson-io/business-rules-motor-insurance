@@ -1,29 +1,58 @@
 <!--
-	Data początku ochrony. Steruje wersją regionu przez engine.setEffectiveDate, więc decyduje
-	nie tylko o cenie, ale i o tym, o co wolno zapytać. Stąd osobna ramka i podpis mówiący wprost,
-	który reżim APK obowiązuje.
--->
-<div class="effective-date">
-	<mat-form-field appearance="outline" class="effective-date__field">
-		<mat-label>Data początku ochrony</mat-label>
-		<input
-			matInput
-			data-testid="property-start-date"
-			[matDatepicker]="picker"
-			[value]="startDate()"
-			(dateChange)="pick($event.value)"
-		/>
-		<mat-datepicker-toggle matIconSuffix [for]="picker" />
-		<mat-datepicker #picker />
-		<mat-hint>Reżim analizy potrzeb wybiera się tą datą, nie zegarem serwera</mat-hint>
-	</mat-form-field>
+	Najważniejszy element na ekranie, i dlatego najgłośniejszy.
 
-	@if (regimeName(); as regime) {
-		<p class="effective-date__regime" data-testid="property-regime">
-			Obowiązuje: <strong>{{ regime }}</strong>
-			@if (legalBasis(); as basis) {
-				<span class="effective-date__basis">{{ basis }}</span>
+	Ta data nie zmienia ceny — zmienia to, o co wolno zapytać klienta. Pasek pokazuje trzy rzeczy
+	obok siebie: co ustawiono, jak nazywa się reżim, który z tego wynika, i ile ten reżim daje
+	pytań. Trzecia część jest odczytem z odpowiedzi serwera, nie wyliczeniem z daty — przesunięcie
+	daty i skok liczby pytań to dwa zdarzenia, które widz ma zobaczyć jako jedno.
+-->
+<div class="date-band">
+	<div class="date-band__control">
+		<mat-form-field appearance="outline" class="date-band__field">
+			<mat-label>Data początku ochrony</mat-label>
+			<input
+				matInput
+				data-testid="property-start-date"
+				[matDatepicker]="picker"
+				[value]="startDate()"
+				(dateChange)="pick($event.value)"
+			/>
+			<mat-datepicker-toggle matIconSuffix [for]="picker" />
+			<mat-datepicker #picker />
+		</mat-form-field>
+	</div>
+
+	@if (now(); as reading) {
+		<div class="date-band__regime">
+			<p class="date-band__caption">Reżim analizy potrzeb</p>
+			<p class="date-band__name" data-testid="property-regime">{{ reading.regime }}</p>
+			@if (reading.legalBasis; as basis) {
+				<p class="date-band__basis">{{ basis }}</p>
 			}
-		</p>
+		</div>
+
+		<div class="date-band__reading" data-testid="property-reading">
+			<div class="date-band__figure">
+				<span class="date-band__number">{{ reading.questions }}</span>
+				<span class="date-band__unit">pytań w ankiecie</span>
+				@if (before(); as was) {
+					<span class="date-band__was">było {{ was.questions }}</span>
+				}
+			</div>
+			<div class="date-band__figure">
+				<span class="date-band__number">{{ reading.sections }}</span>
+				<span class="date-band__unit">sekcje</span>
+				@if (before(); as was) {
+					<span class="date-band__was">było {{ was.sections }}</span>
+				}
+			</div>
+			<div class="date-band__figure">
+				<span class="date-band__number">{{ reading.justified ? 'tak' : 'nie' }}</span>
+				<span class="date-band__unit">pisemne uzasadnienie</span>
+				@if (before(); as was) {
+					<span class="date-band__was">było {{ was.justified ? 'tak' : 'nie' }}</span>
+				}
+			</div>
+		</div>
 	}
 </div>

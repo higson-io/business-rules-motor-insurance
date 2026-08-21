@@ -126,12 +126,16 @@
 	background: none;
 	font-size: 0.6875rem;
 	color: @color-text-muted;
-	text-decoration: underline;
 	cursor: pointer;
 }
 
-.apk__refuse:hover {
+// ⚠️ Bez podkreślenia w stanie spoczynku. Przy szesnastu pytaniach szesnaście podkreślonych
+// linków czyta się jak szesnaście rzeczy do zrobienia — a to jest wyjście awaryjne, nie krok.
+// Podkreślenie wraca na hover i na focus, więc nadal wygląda na klikalne wtedy, gdy o nie pytasz.
+.apk__refuse:hover,
+.apk__refuse:focus-visible {
 	color: @color-text;
+	text-decoration: underline;
 }
 
 .apk__refusal {
@@ -141,11 +145,4 @@
 	background: @color-gray-light;
 	font-size: 0.75rem;
 	line-height: 1.35;
-}
-
-.apk__count {
-	margin: 0;
-	font-size: 0.75rem;
-	color: @color-text-muted;
-	text-align: right;
 }

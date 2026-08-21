@@ -47,6 +47,16 @@ public class LifeQuote {
 	private BigDecimal programCost;
 	private Integer insuredCount;
 
+	private TariffVersion tariffVersion = new TariffVersion();
+
+	public TariffVersion getTariffVersion() {
+		return tariffVersion;
+	}
+
+	public void setTariffVersion(TariffVersion tariffVersion) {
+		this.tariffVersion = tariffVersion;
+	}
+
 	public List<Rider> getSelectedRiders() {
 		List<Rider> selected = new ArrayList<>();
 		for (Rider rider : riders) {

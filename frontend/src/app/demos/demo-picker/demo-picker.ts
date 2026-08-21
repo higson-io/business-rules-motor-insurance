@@ -21,9 +21,6 @@ export class DemoPicker {
 	readonly demos = DEMOS;
 
 	open(demo: Demo): void {
-		if (!demo.available) {
-			return;
-		}
 		this.selection.open(demo.code);
 	}
 }

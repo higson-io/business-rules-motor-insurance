@@ -34,8 +34,6 @@ export class Property {
 	readonly sumFixtures = computed(() => this.loaded()?.sumFixtures ?? null);
 	readonly sumContents = computed(() => this.loaded()?.sumContents ?? null);
 	readonly floodZone = computed(() => this.loaded()?.floodZone ?? null);
-	readonly theftZone = computed(() => this.loaded()?.theftZone ?? null);
-	readonly buildingAge = computed(() => this.loaded()?.buildingAge ?? null);
 
 	readonly chosen = computed(() => {
 		const quote = this.loaded();

@@ -1,26 +1,50 @@
 <!--
-	Data początku ochrony. Steruje wersją taryfy przez engine.setEffectiveDate, więc jest
-	kontrolką demonstracyjną, a nie zwykłym polem formularza — stąd osobna ramka i podpis
-	mówiący wprost, która wersja obowiązuje.
+	Ten sam pasek co w demo majątkowym, ta sama klasa, ten sam plik stylów — bo to ten sam
+	mechanizm. Data trafia do engine.setEffectiveDate i wybiera wersję regionu; różni się tylko to,
+	co ta wersja zmienia. Tu: stawki i katalog świadczeń. Tam: zestaw pytań w ankiecie.
 -->
-<div class="effective-date">
-	<mat-form-field appearance="outline" class="effective-date__field">
-		<mat-label>Data początku ochrony</mat-label>
-		<input
-			matInput
-			data-testid="life-start-date"
-			[matDatepicker]="picker"
-			[value]="startDate()"
-			(dateChange)="pick($event.value)"
-		/>
-		<mat-datepicker-toggle matIconSuffix [for]="picker" />
-		<mat-datepicker #picker />
-		<mat-hint>Wersja taryfy wybiera się tą datą, nie zegarem serwera</mat-hint>
-	</mat-form-field>
+<div class="date-band">
+	<div class="date-band__control">
+		<mat-form-field appearance="outline" class="date-band__field">
+			<mat-label>Data początku ochrony</mat-label>
+			<input
+				matInput
+				data-testid="life-start-date"
+				[matDatepicker]="picker"
+				[value]="startDate()"
+				(dateChange)="pick($event.value)"
+			/>
+			<mat-datepicker-toggle matIconSuffix [for]="picker" />
+			<mat-datepicker #picker />
+		</mat-form-field>
+	</div>
 
-	@if (tariffVersion(); as version) {
-		<p class="effective-date__version" data-testid="life-tariff-version">
-			Obowiązuje: <strong>{{ version }}</strong>
-		</p>
+	@if (now(); as reading) {
+		<div class="date-band__regime">
+			<p class="date-band__caption">Wersja taryfy</p>
+			<p class="date-band__name" data-testid="life-tariff-version">{{ reading.version }}</p>
+			<p class="date-band__basis">obowiązuje od {{ reading.validFrom }}</p>
+		</div>
+
+		<div class="date-band__reading" data-testid="life-reading">
+			<div class="date-band__figure">
+				<span class="date-band__number">{{ reading.catalogue }}</span>
+				<span class="date-band__unit">{{ reading.catalogueUnit }}</span>
+				@if (before(); as was) {
+					<span class="date-band__was">było {{ was.catalogue }}</span>
+				}
+			</div>
+			@if (reading.price !== null) {
+				<div class="date-band__figure">
+					<span class="date-band__number">{{ reading.price }}</span>
+					<span class="date-band__unit">{{ reading.priceUnit }}</span>
+					@if (before(); as was) {
+						@if (was.price !== null) {
+							<span class="date-band__was">było {{ was.price }}</span>
+						}
+					}
+				</div>
+			}
+		</div>
 	}
 </div>

@@ -120,9 +120,6 @@ describe('Questionnaire', () => {
 			element.querySelector('[data-question="WALL_MATERIAL"]'),
 			'a hidden question must not reach the DOM — a hidden-but-present control still gets tabbed into',
 		).toBeNull();
-		expect(element.querySelector('[data-testid="property-question-count"]')?.textContent).toContain(
-			'1',
-		);
 	});
 
 	it('renders a section only when it has a visible question', async () => {
