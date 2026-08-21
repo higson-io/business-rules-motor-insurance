@@ -79,15 +79,31 @@
 	margin-bottom: 20px;
 }
 
-// ⛔ Material reserves a subscript row under every field for hints and error text. This screen shows
-// neither — ND-4 records that it carries no validation display at all, exactly as the AngularJS
-// build did not — so twelve fields were each paying about 20px for a row that can never contain
-// anything. Removed, the form loses roughly 240px of nothing, which is what let the panel stop
-// scrolling inside itself.
+// ⛔ Material reserves a subscript row under every field for hints and error text. The motor screen
+// shows neither — ND-4 records that it carries no validation display at all, exactly as the
+// AngularJS build did not — so twelve fields were each paying about 20px for a row that can never
+// contain anything. Collapsed, the form loses roughly 240px of nothing, which is what let the panel
+// stop scrolling inside itself.
 //
-// ⚠️ If a field ever does need to show an error, this rule is what has to go first.
+// ⛔ COLLAPSED WHEN EMPTY, NOT ALWAYS. The blanket `display: none` this replaces was hiding every
+// `mat-hint` in the application — two existed, one under each demo's policy-date control, and
+// neither had ever appeared on screen. A rule that silently deletes content is worse than the
+// 20px it saves, and it fails in the direction that is hardest to notice: nothing looks broken.
+//
+// The discriminator has to be `mat-hint` itself, not the wrapper. Material renders
+// `.mat-mdc-form-field-hint-wrapper` either way — a field without a hint gets one containing only
+// `.mat-mdc-form-field-hint-spacer` — so keying on the wrapper would collapse nothing at all.
+//
+// ⚠️ Written as hide-then-reveal on purpose. A browser without `:has()` drops the second rule and
+// lands on today's behaviour (hint hidden, layout intact); the inverse spelling would drop the
+// hiding instead and give every motor field its 20px back. Measured: a hinted field goes 56 → 76px,
+// a plain one stays at 56px.
 .mat-mdc-form-field-subscript-wrapper {
 	display: none;
+}
+
+.mat-mdc-form-field-subscript-wrapper:has(mat-hint, mat-error) {
+	display: block;
 }
 
 .mat-mdc-form-field {

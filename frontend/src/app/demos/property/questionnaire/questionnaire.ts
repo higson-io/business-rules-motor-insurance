@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
+import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
@@ -46,9 +46,7 @@ interface Section {
 		MatButtonToggleGroup,
 		MatCheckbox,
 		MatFormField,
-		MatHint,
 		MatInput,
-		MatLabel,
 		MatOption,
 		MatSelect,
 	],

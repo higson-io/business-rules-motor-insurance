@@ -129,6 +129,8 @@ i **nie zna żadnego pytania**.
 | **P-4** *(zamknięte)* | Uzasadnienie podawało kody pokryć zamiast nazw | Myliłem się, twierdząc, że funkcja Groovy nie widzi nazw z drzewa. `RhinoDomain`/`RhinoDomainElement` dają pełną nawigację: `getSafe(kolekcja, kod)`, `name()`, `hasAttr()`, `getAttrString()` bez kontekstu. `apk.justify` tłumaczy kody na nazwy **w regule**, nie w Javie — bo tekst dla klienta należy do reguł w całości, razem z nazwami, które w nim padają. Opisane w §13.6 dokumentu |
 | **Układ ekranu** | Sekcje wychodziły poza ekran, demo mało ergonomiczne | Trzy przyczyny, wszystkie usunięte: **(1)** ankieta była jedną kolumną 520 px w panelu szerokim na 1100 px — jest siatką `auto-fill`, więc 16 pytań mieści się w czterech kartach zamiast w metrze przewijania; **(2)** ⛔ **teksty pomocy z Higsona w ogóle się nie renderowały** — `mat-hint` jest jednowierszowy i przy dłuższym zdaniu znika, więc zniknął dowód, że treść pochodzi z reguł; **(3)** długie pytania były ucinane wielokropkiem w `mat-label`, która się nie zawija. Treść pytania i pomoc idą teraz w zwykłe akapity nad i pod kontrolką — identycznie dla wyboru, liczby i tak/nie |
 
+| **`mat-hint` globalnie** | Zgłosiłeś, że hinty mają działać | `_forms.less` gasił `mat-mdc-form-field-subscript-wrapper` **bezwarunkowo**, więc **żaden hint w całej aplikacji nigdy się nie pokazał** — były dwa, po jednym pod datą polisy w LIFE i w PROPERTY. Reguła zwija teraz wiersz tylko wtedy, gdy nie ma w nim czego pokazać: `:has(mat-hint, mat-error)`. Dyskryminatorem musi być sam `mat-hint`, bo `hint-wrapper` Material renderuje zawsze — pole bez hinta dostaje wrapper z samym `hint-spacer` |
+
 ⚠️ **(2) i (3) to nie były usterki kosmetyczne.** Treść pytania i tekst pomocy przychodzą z Higsona
 i mogą mieć dowolną długość. Wsadzenie ich w komponenty Material, które zakładają krótką etykietę,
 sprawiało, że **konfiguracja nie docierała na ekran** — a to jest dokładnie ta rzecz, którą to demo
@@ -136,6 +138,18 @@ ma pokazywać.
 
 Sprawdzone przy 1440, 1024 i 390 px: strona **nie przewija się w poziomie** na żadnej z tych
 szerokości, a szeroka macierz porównawcza przewija się we własnym kontenerze (`responsive.md`).
+
+**Poprawka `mat-hint` zmierzona na wszystkich trzech demach**, bo dotyka globalnego arkusza:
+
+| Demo | Pola | Pokazany wiersz podpisu | Efekt |
+|---|---|---|---|
+| MOTO | 13 | **0** | bez zmian — oszczędność ~240 px z ND-4 nienaruszona, panel nadal nie przewija się wewnątrz |
+| LIFE | 12 | **1** | hint pod datą polisy **pojawił się pierwszy raz** |
+| PROPERTY | 7 | **1** | jw. |
+
+Pole z hintem rośnie 56 → 76 px, pole bez hinta zostaje na 56 px. Reguła jest napisana jako
+„ukryj, potem odsłoń" celowo: przeglądarka bez `:has()` gubi drugą regułę i ląduje na dzisiejszym
+zachowaniu, a nie na rozjechanym MOTO.
 
 ---
 
