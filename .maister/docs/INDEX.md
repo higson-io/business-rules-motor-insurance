@@ -5,7 +5,7 @@
 ## Quick Reference
 
 ### Project Documentation
-Project-level documentation. Available: **tech-stack**, **architecture** (both in Polish). Not created: vision, roadmap.
+Project-level documentation. Available: **tech-stack**, **architecture** (both in Polish), plus two profile design documents — **higson-life-profile** and **higson-property-profile**. Not created: vision, roadmap.
 
 ### Technical Standards
 Coding standards, conventions, and best practices organized by domain. Six categories: **global** (9 files), **higson** (3 files), **backend** (6 files), **frontend** (8 files), **testing** (2 files), **deployment** (2 files).
@@ -76,6 +76,27 @@ dokłada się drugą tabelą i złożeniem we flow, zamiast rozsadzać macierz b
 ⚠️ D-2 unieważnia etykietę „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA (W-4).
 **Read before** touching anything related to the LIFE demo's rules, or before assuming any of this
 exists in Studio — the frontend LIFE demo currently runs on TypeScript mocks, not on Higson.
+
+### Profil PROPERTY — projekt konfiguracji (`project/higson-property-profile.md`)
+> ⚙️ **Zbudowane i działające** w profilu `PROPERTY` (2026-08-21), zweryfikowane przeglądarką.
+Trzecie demo aplikacji: **ubezpieczenie domu i mieszkania (detal)**, w którym osią nie jest taryfa,
+tylko **analiza potrzeb klienta (APK) jako konfiguracja wersjonowana datą polisy**. Zawiera: drzewo
+domeny `/PRODUCTS[HOME]/{COVERS,VARIANTS,QUESTIONS}`, gdzie **katalog 18 pytań APK to elementy
+domeny**, a nie formularz; 32 tabele decyzyjne pod prefiksem `demo.property.*` (widoczność pytania,
+mapowanie odpowiedzi na potrzeby, konfrontacja wyłączeń z sytuacją klienta, wyliczenie sumy
+ubezpieczenia, taryfa, strefy, limity); 18 funkcji Groovy i dwa flow; oraz **region `PROPERTY`
+z dwoma wersjami — `2026-01-01` i `2027-07-01`**, czyli terminem dostosowania z §2 uchwały KNF
+nr 190/2026. Przesunięcie daty polisy przez ten próg zmienia **zestaw pytań** (9 → 16 widocznych),
+**reżim APK** i **treść rekomendacji** — bez wdrożenia. Osiem decyzji **D-1…D-8**: granica
+mury/elementy stałe jako **trzy niezależne parametry** (a nie jedna decyzja), suma liczona
+z metrażu i stawki zł/m², strefa powodziowa jako **przełącznik dostępności** obok strefy
+kradzieżowej jako czynnika, pytanie jako element domeny, wersjonowanie obejmujące **oba** wymiary
+naraz, odmowa odpowiedzi jako trzeci stan, przekroczony budżet z **nazwaną luką**, franszyza
+w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie.
+⚠️ Wszystkie stawki są **demonstracyjne** (W-2); jedyne liczby przepisane z OWU to limity z PZU §46.
+**Read before** touching the property demo's rules, the APK question catalogue, or anything that
+depends on the region version — a question added without `CONTEXT_PATH` and `VALUE_TYPE` will not
+reach the engine.
 
 ### Vision (`project/vision.md`)
 *Not created.* Add it to capture project mission, goals, target users, and long-term direction.
