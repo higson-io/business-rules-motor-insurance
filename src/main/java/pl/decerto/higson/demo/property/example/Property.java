@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +51,7 @@ public class Property {
 
 	private static final String PARAM_REGIME = "demo.property.apk.regime";
 	private static final String PARAM_DEFAULT_ANSWER = "demo.property.apk.question.defaultAnswer";
+	private static final String PARAM_COVER_AVAILABILITY = "demo.property.cover.availability";
 
 	private static final String FUNCTION_BUILDING_AGE = "demo.property.util.buildingAge";
 	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
@@ -238,6 +238,8 @@ public class Property {
 			variant.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
 			variant.setLiabilitySum(definition.getAttrDecimal("LIABILITY_SUM", ctx));
 
+			applyCovers(quote, variant);
+
 			Map<String, Object> result = engine.flow(FLOW_QUOTE, ctx).getResult();
 			boolean available = "YES".equals(asString(result.get("available")));
 			variant.setAvailable(available);
@@ -258,6 +260,26 @@ public class Property {
 	}
 
 	/**
+	 * Zakres wariantu czytany WPROST z tabeli dostępności, para (pokrycie, wariant).
+	 *
+	 * ⚠️ Nie da się go wyprowadzić z listy braków zwróconej przez apk.scoreVariants — tamta jest
+	 * liczona względem POTRZEB klienta, więc pokrycie, którego klient nie potrzebuje, nie trafia
+	 * ani do pokrytych, ani do brakujących. Macierz porównawcza zbudowana na tamtej liście
+	 * pokazywałaby ptaszki wszędzie tam, gdzie klient o nic nie prosił.
+	 */
+	private void applyCovers(PropertyQuote quote, Variant variant) {
+		variant.getCovers().clear();
+		for (Cover cover : quote.getCovers()) {
+			PropertyContext cellCtx = new PropertyContext(quote)
+				.withCover(cover.getCode())
+				.withVariant(variant.getCode());
+			if (Boolean.TRUE.equals(engine.get(PARAM_COVER_AVAILABILITY, cellCtx).getBoolean("available"))) {
+				variant.getCovers().add(cover.getCode());
+			}
+		}
+	}
+
+	/**
 	 * Analiza potrzeb. Ten sam flow obsługuje obie wersje regionu — różnicę robią przełączniki
 	 * z apk.regime, a nie drugi algorytm.
 	 */
@@ -268,7 +290,6 @@ public class Property {
 
 		quote.setNeeds(parseNeeds(asString(result.get("needs"))));
 		quote.setWarnings(parseWarnings(asString(result.get("warnings"))));
-		applyVariantCoverage(quote, asString(result.get("scores")));
 		quote.setRecommendation(parseRecommendation(asString(result.get("recommendation")),
 			asString(result.get("justification"))));
 
@@ -325,30 +346,6 @@ public class Property {
 		return warnings;
 	}
 
-	/** "KOD|pokryte|wszystkie|brakujące" — materiał na jawne wskazanie różnic (rek. 9.3). */
-	private void applyVariantCoverage(PropertyQuote quote, String raw) {
-		if (raw == null || raw.isEmpty()) {
-			return;
-		}
-		Map<String, String[]> byCode = new LinkedHashMap<>();
-		for (String entry : raw.split(";")) {
-			String[] parts = entry.split("\\|", -1);
-			if (parts.length >= 4) {
-				byCode.put(parts[0], parts);
-			}
-		}
-		for (Variant variant : quote.getVariants()) {
-			String[] parts = byCode.get(variant.getCode());
-			if (parts == null) {
-				continue;
-			}
-			variant.getCovers().clear();
-			for (Cover cover : quote.getCovers()) {
-				variant.getCovers().add(cover.getCode());
-			}
-			variant.getCovers().removeAll(split(parts[3]));
-		}
-	}
 
 	private Recommendation parseRecommendation(String raw, String justification) {
 		Recommendation recommendation = new Recommendation();

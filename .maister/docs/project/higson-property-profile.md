@@ -1,6 +1,7 @@
 # Profil PROPERTY — projekt konfiguracji Higson
 
-**Status:** propozycja do pracy. **W Higsonie nic jeszcze nie utworzono.**
+**Status:** ⚙️ **zbudowane i działające** w profilu `PROPERTY` (2026-08-21). Odstępstwa wymuszone
+przez API i przez pierwsze uruchomienie — §13.
 **Data:** 2026-08-20
 **Zakres:** ubezpieczenie domu i mieszkania (detal) — drzewo domeny, kontekst, tabele decyzyjne,
 flow, funkcje Groovy, wersjonowanie datą **oraz analiza potrzeb klienta (APK) jako konfiguracja**.
@@ -37,9 +38,10 @@ czego nie ma ani MOTO, ani LIFE.
 
 ```mermaid
 graph TD
-    P["PROPERTY — dom i mieszkanie"] --> C["COVERS<br/><i>przedmioty i ryzyka</i>"]
-    P --> V["VARIANTS<br/><i>pakiety</i>"]
-    P --> Q["QUESTIONS<br/><i>katalog pytań APK</i>"]
+    P["PRODUCTS"] --> H["HOME — dom i mieszkanie"]
+    H --> C["COVERS<br/><i>przedmioty i ryzyka</i>"]
+    H --> V["VARIANTS<br/><i>pakiety</i>"]
+    H --> Q["QUESTIONS<br/><i>katalog pytań APK</i>"]
 
     C --> C1["BUILDING — mury i konstrukcja"]
     C --> C2["FIXTURES — elementy stałe"]
@@ -75,7 +77,9 @@ odwzorować rozróżnienie, którego oferta i tak nie robi.
 ### 2.1 Typy domenowe i atrybuty
 
 Ścieżki tak, jak konsumuje je `domain.get()`:
-`domain.get('PROPERTY', '/COVERS[BUILDING]')`, `domain.get('PROPERTY', '/QUESTIONS[AREA]')`.
+`domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('COVERS')`,
+`domain.get('PROPERTY', '/PRODUCTS[HOME]/QUESTIONS[AREA]')`. Węzeł `PRODUCTS[HOME]` istnieje,
+bo silnik adresuje kolekcję przez element nadrzędny — §13.
 
 #### `COVER` — przedmiot lub ryzyko
 
@@ -1125,7 +1129,7 @@ def variant = ctx.getString('variant.code')
 def risk = ctx.getDecimal('quote.risk.factor')
 def total = 0
 def lines = []
-for (cover in domain.get('PROPERTY', '/COVERS').getChildren()) {
+for (cover in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('COVERS')) {
     def code = cover.getCode()
     def cellCtx = higson.createContext('cover.code', code, 'variant.code', variant)
     if (!higson.getBoolean('demo.property.cover.availability', cellCtx)) {
@@ -1208,7 +1212,7 @@ for (n in needs.split(';')) {
     }
 }
 def out = []
-for (variant in domain.get('PROPERTY', '/VARIANTS').getChildren()) {
+for (variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')) {
     def code = variant.getCode()
     def covered = 0
     def missing = []
@@ -1667,9 +1671,9 @@ przewinięta.
 
 | Artefakt | Limit | Maksimum w projekcie | Zapas |
 |---|---|---|---|
-| Funkcja Groovy | 80 linii | **29** — `tariff.variantPremium` | 64% |
-| Tabela decyzyjna | 30 wierszy | **22** — `cover.availability` | 27% |
-| Flow | 15 nodów | **13** — `apk.recommend` | 13% |
+| Funkcja Groovy | 80 linii | **62** — `apk.justify` | 23% |
+| Tabela decyzyjna | 30 wierszy | **19** — `apk.question.position` | 37% |
+| Flow | 15 nodów | **9** — `apk.recommend` | 40% |
 | Poziomy wejściowe tabeli | 4 | **3** — `sum.ratePerSqm`, `apk.question.visibility` | 25% |
 
 **Jedyne miejsce bez realnego zapasu i droga wyjścia.**
@@ -1706,3 +1710,103 @@ jako D-1…D-8. Zostaje siedem rzeczy innego rodzaju.
 | **W-5** | Czy `type.paramValue()` przyjmie **cztery** wartości (`sum.suggest`). W LIFE zweryfikowano trzy | §6.3 |
 | **W-6** | Bufor **115%** za akceptację sugerowanej sumy (Generali §27 ust. 3) — realny mechanizm rynkowy, świadomie pominięty, bo wymaga trzeciej sumy obok wyliczonej i wybranej | D-2 |
 | **W-7** | **Rekomendacja 7.2** — próg 30% oczekiwanych odszkodowań do składek jako wskaźnik wartości produktu. Brief wymienia go jako opcjonalny; **poza zakresem**, bo wymaga danych portfelowych, których demo nie ma i nie umie udawać | poza zakresem |
+
+---
+
+## 13. Odstępstwa wymuszone przez wykonanie
+
+Profil został zbudowany i uruchomiony **2026-08-21**. Poniżej wszystko, co różni się od §1–§12,
+razem z powodem. Żadnej z tych rzeczy nie dało się przewidzieć z dokumentacji — każda wyszła przy
+pierwszym wywołaniu.
+
+### 13.1 Struktura
+
+| Co | Jak jest | Dlaczego |
+|---|---|---|
+| Kolekcje pod korzeniem | `/PRODUCTS[HOME]/{COVERS,VARIANTS,QUESTIONS}` zamiast `/{COVERS,VARIANTS,QUESTIONS}` | Silnik adresuje kolekcję **przez element nadrzędny** (`domain.get(profil, '/PRODUCTS[HOME]').getAll('COVERS')`). Kolekcja wisząca wprost pod `ROOT` nie ma po czym być nawigowana. Ten sam kształt co `PRODUCT_LINES` w LIFE i `PLANS` w MOTO |
+| `apk.regime`, `fixtures.model` | **jedna** kolumna wejściowa (`quote.property.kind`) z jedynym wierszem `*` | §4.2 zapowiadał tabelę bez kolumn wejściowych. Zostawiona jedna, dopasowywana zawsze — koszt jednej kolumny za brak ryzyka, że silnik odrzuci parametr bez poziomów. Semantyka bez zmian: tabela odpowiada na „jaki reżim obowiązuje", a odpowiedź wybiera wersja regionu |
+| `cover.availability` | **13 wierszy**, nie 22 | Wiersz `*;*;false` pokrywa wszystkie kombinacje niedostępne, więc jawnie wypisane są tylko dostępne. Ta sama macierz, o 9 wierszy mniej do przeczytania |
+
+### 13.2 Dwa nowe atrybuty pytania — i dlaczego oba są potrzebne
+
+`QUESTION` ma **13 atrybutów**, nie 11. Doszły dwa i każdy usuwa inną klasę błędów.
+
+**`CONTEXT_PATH`** — ścieżka kontekstu, pod którą trafia odpowiedź.
+
+To jest atrybut, dzięki któremu **Java nie zna ani jednego kodu pytania**. `PropertyContext` zbiera
+odpowiedzi po ścieżce, którą podało Higson, a nie po polach modelu. Bez niego adapter musiałby
+wyliczyć pola jeden po drugim i dołożenie pytania w Studio wymagałoby wdrożenia — czyli dokładnie
+tego, czemu to demo przeczy. Pytanie wielokrotnego wyboru (`CIRCUMSTANCES`) ma tę ścieżkę **pustą**:
+jego wartości nie trafiają do kontekstu w ogóle, tylko iterują się po jednej przez `answer.value`.
+
+**`VALUE_TYPE`** — czym jest wpisana wartość: `STRING`, `INTEGER`, `DECIMAL`, `BOOLEAN`, `DATE`.
+
+⚠️ **Silnik nie konwertuje typów przy dopasowaniu poziomu wejściowego.** `BigDecimal` podany pod
+poziom `integer` kończy się `conversion not supported for: class java.math.BigDecimal` — i to jest
+**dobry** przypadek, bo widać. Gorszy jest ten, w którym typ się formalnie zgadza, ale nie ten:
+tabela cicho spada na wiersz domyślny i wycena wychodzi z liczbą, której nikt nie policzył.
+
+`KIND` mówi, **jak narysować kontrolkę**, `VALUE_TYPE` — **czym jest wartość**. Zlanie ich w jedno
+wyglądałoby oszczędniej i nie dałoby się utrzymać: `COVER_PERIOD` jest `CHOICE` do narysowania
+i `INTEGER` do dopasowania, a `BUDGET` jest `MONEY` do narysowania i `DECIMAL` do dopasowania.
+
+### 13.3 Trzecia tabela APK: `demo.property.apk.question.defaultAnswer`
+
+Odpowiedzi, którymi demo wypełnia ankietę na starcie — po jednej na pytanie.
+
+Są w Higsonie z tego samego powodu, co wszystko inne: gdyby siedziały w Javie, orkiestrator
+musiałby znać kody pytań i nowe pytanie startowałoby puste albo wymagałoby wdrożenia. MOTO i LIFE
+seedują wniosek w Javie, bo ich pola są w Javie; tutaj pól nie ma.
+
+### 13.4 Funkcje: **18**, nie 8
+
+Ta sama przyczyna, co przy LIFE (22 zamiast 8): brak `EXPRESSION` we flow przenosi arytmetykę do
+Groovy'ego, a rozgałęzienie po skalarze wymaga cienkich nakładek zwracających jedną wartość.
+
+| Grupa | Funkcje |
+|---|---|
+| Wyliczenia | `util.buildingAge`, `zone.resolve`, `sum.suggest`, `risk.factor`, `limit.effective` |
+| Nakładki na tabele wielokolumnowe | `variant.isAvailable`, `variant.unavailableReason`, `apk.requiresExclusionCheck`, `apk.requiresJustification` |
+| Taryfa | `tariff.coverPremiums`, `tariff.sumPremiums`, `tariff.annualPremium`, `tariff.instalment` |
+| APK | `apk.deriveNeeds`, `apk.checkExclusions`, `apk.scoreVariants`, `apk.pickVariant`, `apk.justify` |
+
+Cztery nakładki zwracają **`'YES'` / `'NO'`, nie `boolean`**. Warunek we flow porównuje wtedy
+napisy i nie zależy od tego, jak silnik rzutuje typ zmiennej — a to jest różnica między gałęzią,
+która działa, a gałęzią, która milczy.
+
+### 13.5 API, które trzeba było poznać empirycznie
+
+| # | Ustalenie | Skutek, gdy się o nim nie wie |
+|---|---|---|
+| **A** | `type.paramValue()` ma API `.withCodes(…).withTypes(…).addValues(…).create()` | Zapis `.value(k, v).build()` z §6 dokumentu nie istnieje |
+| **B** | Funkcja wołana z flow **musi mieć `ctx` jako pierwszy argument** | `Invalid argument data type passed on position 0 … Expected: BigDecimal` |
+| **C** | Atrybut `LITERAL` o pustej wartości **nie powstaje**; `getAttrString` rzuca wtedy NPE głęboko w silniku, bez nazwy atrybutu | Pytanie bez `CONTEXT_PATH` (wielokrotny wybór) wywraca całą wycenę |
+| **D** | Java iteruje kolekcję przez `getChildren(kolekcja)`, Groovy przez `getAll(kolekcja)` | Nie kompiluje się albo nie znajduje metody |
+| **E** | Zakresu wariantu **nie da się** wyprowadzić z listy braków z `apk.scoreVariants` | Tamta lista jest liczona względem potrzeb klienta, więc pokrycie, o które klient nie prosił, nie trafia ani do pokrytych, ani do brakujących — macierz porównawcza pokazywała ptaszki wszędzie. Zakres czyta się wprost z `cover.availability`, para po parze |
+
+### 13.6 Poprawka w regule, którą znalazło uruchomienie
+
+`apk.pickVariant` zwraca **szósty człon**: kod wariantu najlepiej dopasowanego do potrzeb. Bez
+niego `apk.justify` wstawiał w komunikat o przekroczonym budżecie cenę wariantu **proponowanego**
+i wychodziło zdanie „wariant najpełniej odpowiadający potrzebom kosztuje 545 zł, czyli powyżej
+Twojego budżetu 900 zł". Zdanie zbudowane z dwóch prawdziwych liczb, które razem kłamią.
+
+### 13.7 Co zweryfikowano uruchomieniem
+
+Ta sama sesja, zmieniana wyłącznie datą polisy:
+
+| Sprawdzenie | `2026-08-21` (wersja 1) | `2027-08-01` (wersja 2) |
+|---|---|---|
+| Pytania widoczne | **9** | **16** |
+| Sekcje ankiety | SUBJECT, SITUATION | + NEEDS, EXCLUSIONS |
+| Podpis reżimu | „APK — minimum ustawowe · art. 8 ustawy o dystrybucji ubezpieczeń" | „APK wg Rekomendacji KNF · uchwała nr 190/2026" |
+| Przełączniki reżimu | 0 z 4 | **4 z 4** |
+| Suma murów (60 m², obszar `00`) | **474 000 zł** | **528 000 zł** |
+| Potrzeby wyprowadzone z odpowiedzi | 1 | **4** |
+| Uzasadnienie propozycji | **brak** | **6 zdań** |
+| `VACANCY = tak` | pytania nie ma, więc i ostrzeżenia nie ma | **czerwone ostrzeżenie + sposób naprawy** |
+| Kod pocztowy `57-xxx`, dom | wariant pełny **niedostępny z podanym powodem** | jw. |
+| Obszar `50` (niewersjonowany wiersz) | 474 000 zł | **474 000 zł — bez zmian** |
+
+Ostatni wiersz jest tu z tego samego powodu, co w §7.4: wersjonowanie ma być widocznie
+**selektywne**, a nie globalnym przełącznikiem.

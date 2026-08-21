@@ -159,6 +159,7 @@ Komplet z `2026-08-13-higson-life-implementation/implementation-plan.md` §9 i �
 | **W-27** | Katalog czytany raz przy tworzeniu sesji **nie widzi wersji regionu** | ⛔ **Najważniejsza pułapka tego demo.** `loadQuestions` musi siedzieć w ścieżce wyceny, po `setEffectiveDate`, a nie w `@PostConstruct` |
 | **W-28** | Profilu nie da się utworzyć przez MCP; zapis nie waliduje profilu, odczyt waliduje | §2 |
 | **W-29** | `update_context_type(root: true)` nie ustawi **pierwszego** korzenia — typy kontekstu nowego profilu buduje się `import_context`, nie wywołaniami | §2a |
+| **W-30…W-34** | Importer XLSX, prawa plików, wersje regionu, cache Studia, kasowanie przypięć przez import domeny | §8 |
 
 ### Konwencje macierzy, ustalone empirycznie przy LIFE
 
@@ -525,13 +526,56 @@ spójnym.
 |---|---|
 | G0 Profil | ✅ |
 | G1 Konteksty | ✅ — 14 typów, `get_context_type_paths` → 38 ścieżek |
-| G2 Tabele | ⬜ |
-| G3 Funkcje | ⬜ |
-| G4 Flow | ⬜ |
-| G5 Typy domenowe | ⬜ |
-| G6 Drzewo | ⬜ |
-| G7 Publikacja #1 | ⬜ |
-| G8 Region | ⬜ |
-| G9 Backend | ⬜ |
-| G10 Front | ⬜ |
-| G11 Weryfikacja | ⬜ |
+| G2 Tabele | ✅ — **32**, wszystkie z macierzami, wszystkie w profilu `PROPERTY` |
+| G3 Funkcje | ✅ — **18**, nie 8 (ta sama przyczyna co w LIFE) |
+| G4 Flow | ✅ — 2: `calculateQuote` (8 nodów), `apk.recommend` (9 nodów) |
+| G5 Typy domenowe | ✅ — 4 (`PRODUCT`, `COVER`, `VARIANT`, `QUESTION`) |
+| G6 Drzewo | ✅ — 29 elementów, w tym 18 pytań |
+| G7 Publikacja #1 | ✅ |
+| G8 Region | ✅ — 2 wersje, 3 tabele, 7 pytań wyłącznie w wersji 2 |
+| G9 Backend | ✅ — `pl.decerto.higson.demo.property`, 24 pliki |
+| G10 Front | ✅ — 5 komponentów, store, serwis, model, 2 pliki testów |
+| G11 Weryfikacja | ✅ — przeglądarką i obiema suitami; wynik w §11 |
+
+---
+
+## 8. Pułapki znalezione w tej pracy (W-28…W-34)
+
+W-28 i W-29 są opisane w §2 i §2a. Reszta wyszła przy budowaniu i uruchamianiu.
+
+| # | Pułapka | Skutek, gdy się o niej nie wie |
+|---|---|---|
+| **W-28** | Profilu nie da się utworzyć przez MCP; **zapis nie waliduje profilu, odczyt waliduje** | `create_context_type` mówi `SUCCESS` i tworzy typ, a każdy odczyt odpowiada „Profile not found" |
+| **W-29** | `update_context_type(root: true)` nie ustawi **pierwszego** korzenia | `get_context_type_paths` zwraca pustą listę, choć wszystkie typy istnieją — i żadna tabela nie zbinduje poziomu wejściowego. Ratunek: `import_context` z `def /ROOT` |
+| **W-30** | ⛔ **Importer XLSX nie przyjmuje plików z openpyxl** — „Could not parse XLSX file", bez wskazania miejsca | 31 tabel trzeba wygenerować, **kopiując części statyczne z pliku wyeksportowanego przez Higsona** i podmieniając wyłącznie dwa arkusze. Round-trip przez openpyxl (load → save) też nie przechodzi, więc to nie jest kwestia treści |
+| **W-31** | Plik wgrany przez `docker cp` dziedziczy prawa z hosta; przy `640` proces Studio (użytkownik `higson`) go **nie odczyta** | `import_domain_definition` zwraca `INTERNAL_ERROR` z samą ścieżką w komunikacie. Po `docker cp` zawsze `chmod 644` |
+| **W-32** | ⛔ **`attach_to_region` wypełnia WYŁĄCZNIE wersję 1**, niezależnie od tego, która jest aktywna; edycja macierzy trafia w wersję **systemowo aktywną** | Przy timeline w przyszłości (`2027-07-01`) aktywna jest wersja 1, więc treść wersji 2 nie ma jak powstać. Rozwiązanie: **tymczasowo przesunąć `VALIDFROM` wersji 2 w przeszłość, zrestartować Studio, wypełnić wersję 2, przywrócić datę i zrestartować** |
+| **W-33** | Studio **cache'uje aktywną wersję regionu** — zmiana timeline'u w bazie nie działa bez restartu kontenera | `list_regions` pokazuje `timelines[].active` już zmienione, a `versions[].systemActive` jeszcze nie. Edycja idzie do starej wersji i wygląda na poprawną |
+| **W-34** | ⛔ **`import_domain_configuration` KASUJE przypięcie elementów do regionu** | Siedem pytań wersji 2 wróciło do puli globalnej i wersja 1 zaczęła je pokazywać. Po **każdym** imporcie konfiguracji domeny trzeba `attach_to_region` powtórzyć — i sprawdzić SQL-em, a nie statusem importu |
+
+### Zapytania weryfikujące
+
+```sql
+-- tabele: ile wierszy w której wersji regionu (tylko opublikowane, nieusunięte)
+select p.name, p.regionversion_id, count(e.id)
+from parameter p left join parameterentry e on e.parameter_id = p.id
+where p.name like 'demo.property.%' and p.archive = 0 and p.head = 1
+group by 1, 2 order by 1, 2;
+
+-- elementy domeny przypięte do wersji regionu
+select CODE, REGIONVERSION_ID from DOMAINELEMENT
+where PROFILE_CODE = 'PROPERTY' and ARCHIVE = 0 and HEAD = 1 and REGIONVERSION_ID is not null;
+```
+
+⚠️ `get_decision_table_matrix` **scala wersje** i pokazuje working copy — do weryfikacji wersji
+nadaje się wyłącznie SQL (W-26 z LIFE, potwierdzone tutaj drugi raz).
+
+---
+
+## 9. Czego nie zrobiono
+
+| Co | Dlaczego |
+|---|---|
+| **Testy regułowe w `@tests`** (G8 planu LIFE) | Ta grupa została pominięta świadomie: weryfikacja poszła przez uruchomienie aplikacji i przeglądarkę, bo to ona sprawdza tezę demo. Testy regułowe zostają jako dług — tak samo jak w LIFE |
+| **Pytanie `RENOVATED` w scenariuszu demonstracyjnym** | Widoczne dopiero przy budynku starszym niż 50 lat; domyślny rok budowy to 2005, więc na starcie jest ukryte. To jest poprawne zachowanie reguły, nie brak |
+| **Franszyza jako kontrolka na ekranie** | Endpoint `PUT property/policy/deductible` istnieje i działa, ekranu dla niego nie ma. Druga rola franszyzy (warunek dostępności powodzi w strefie `Z2`) jest więc widoczna tylko przez API |
