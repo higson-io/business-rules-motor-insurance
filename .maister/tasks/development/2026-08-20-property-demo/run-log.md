@@ -174,3 +174,94 @@ standardem `higson/snapshot.md`.
 
 Pliki tymczasowe (generatory XLSX, pobrane OWU, kopie eksportów) siedzą w katalogu scratchpad
 sesji, poza repozytorium. W `src/main` i `frontend/src` nie ma martwego kodu.
+
+---
+
+## 8. Przystosowanie trzech dem do prezentacji (2026-08-21)
+
+Osobna tura, po Twojej uwadze „wykorzystaj wiedzę o APK i dostosuj pozostałe dema do prezentacji".
+Przegląd UX robiły dwa agenty — jeden na MOTO, jeden przekrojowo na LIFE i PROPERTY. Poniżej to,
+co z ich ustaleń weszło, i to, co świadomie odrzuciłem.
+
+### 8.1 Rzeczy, które okazały się nie kosmetyką, tylko nieprawdą na ekranie
+
+Przegląd „układu i designu" wyciągnął pięć miejsc, w których ekran **twierdził coś fałszywego**.
+To one były najdroższe do naprawy i one najbardziej zmieniają demo.
+
+| Co ekran mówił | Co było prawdą | Naprawa |
+|---|---|---|
+| Każda wybrana umowa dodatkowa: `0,00 zł` | Flow zwracał tylko łączną `ridersPremium`, `Life.java` ją logował. Składki per umowa nie liczył nikt | Nowa reguła `demo.life.individual.rider.premium` — jedna formuła, dwóch odbiorców (suma i pozycja) |
+| Pasek udziałów: umowa główna na 100% | `shares()` mapował same umowy dodatkowe, gałąź `part.code === 'MAIN'` była martwa | Umowa główna liczona jako reszta; potwierdzone przez silnik: 57 + 18 + 11,50 przy zwróconych 86,50 |
+| `Ubezpieczonych: 0` | Faza przystąpień nie istnieje w Higsonie — `insuredCount` zawsze `null` | Wiersz znika, gdy reguły nie podały liczby. Zero jest twierdzeniem (**W-7** w dokumencie profilu) |
+| Cena REFER wyglądała jak cena ACCEPT | `binding` było liczone i nigdzie nierenderowane | Adnotacja „cena wstępna" pod składką (D-1 wreszcie widoczne) |
+| Dochód klienta nie występował nigdzie | `maxSum` jechał przez DTO i nikt go nie czytał | „Maksimum tutaj: N zł" pod sumą umowy (D-7 wreszcie widoczne) |
+
+Do tego jedna wada niewidoczna na ekranie: `mutationError` był polem `QuoteStore`, więc
+interceptor wołał `inject(QuoteStore)` przy każdym PUT-cie — także w LIFE i PROPERTY, powołując
+sklep motoryzacyjny i wysyłając jego zapytania. Równocześnie `LifeStore.mutationError`
+i `PropertyStore.mutationError` istniały i nikt do nich nie pisał, więc **nieudany PUT w tych
+dwóch demach ginął bez śladu**. Jedna usługa `MutationErrors` i wspólny baner.
+
+### 8.2 Data polisy jako główny obiekt na ekranie
+
+Oba dema wersjonowane miały małe pole z podpisem, a liczba, która się rusza, siedziała w przypisie
+12 px w prawym dolnym rogu ankiety. Teraz pasek niesie trzy części: co ustawiono → jaki reżim
+z tego wynika → ile tego jest. Trzecia część **czyta odpowiedź serwera, nie datę**, więc
+przesunięcie daty i skok liczby to jedno zdarzenie, nie dwa.
+
+Znacznik „było N" pojawia się per liczba, nie per pasek — bo wersjonowanie jest selektywne
+i przy wieku 35 lat obie wersje taryfy dają tę samą stawkę. Milczenie znacznika przy zmienionej
+nazwie wersji jest informacją: *ta akurat liczba od wersji nie zależy*.
+
+⛔ Przy okazji zniknęło `const VERSION_2_FROM = new Date('2026-07-01')` z komponentu LIFE — druga
+kopia osi czasu regionu, w przeglądarce, w demie o tym, że progi należą do konfiguracji. Nazwę
+wersji podaje teraz `demo.life.tariff.version` (§13.1 dokumentu profilu).
+
+### 8.3 MOTO — cofnięta decyzja, nie brak decyzji
+
+`inputs.less` do dziś zaczyna się od wyjaśnienia, że „input band" zastąpił pasek boczny, bo tamten
+zabierał ćwiartkę szerokości tabeli. A `moto.less` przypinał kolumnę do 340 px i `.inputs__grid`
+miał `display: block` — panel wrócił do postaci paska, komentarz został. Dwanaście pól w słupku to
+~1400 px, więc tabela kończyła się w jednej trzeciej strony.
+
+Dwie równe kolumny **od 1280 px**, nie od 992: przy 992 połówka ma ~480 px, formularz nie zmieści
+dwóch pól obok siebie, a tabela zejdzie poniżej swojego minimum 560 px. Zmierzone na 1440:
+formularz 756 px zamiast ~1400, obie kolumny kończą się w promieniu 250 px od siebie.
+
+Tooltip ochron miał **jedną** pozycję (`end/center`) zaczepioną o etykietę wiersza, przy
+`min-width: 340px` — czyli kładł się na składkach BRONZE i SILVER zawsze, na każdym wierszu, przy
+każdej szerokości okna. Lista pozycji w `withPositions()` JEST listą wariantów awaryjnych, a miała
+jeden wpis. Teraz otwiera się pod etykietą (zmierzone: zero nachodzeń na komórki cen). Strzałka
+wycięta — była przypięta do `left: -19px`, poprawnego wyłącznie dla pozycji, która przestała być
+domyślna.
+
+### 8.4 Czego świadomie NIE zrobiłem
+
+| Odrzucone | Dlaczego |
+|---|---|
+| Odznaka „polecany wariant" na ekranie motoryzacyjnym | `OptionDto` nie ma flagi rekomendacji, więc odznaka byłaby osądem wymyślonym w TypeScripcie — na ekranie, którego cała teza brzmi, że osądy siedzą w konfiguracji. Zamiast tego różnica względem najtańszego: odejmowanie na zwróconych liczbach, sprawdzalne wzrokiem |
+| Tłumaczenie MOTO na polski | **ND-2** przypina etykietę `Documents` jako świadomą decyzję produktową, a 206 kluczy golden parity powstało na angielskiej kopii. Do tego treść tabeli (`row.name`, `discount.name`, `coverage.description`) przychodzi z Higsona po angielsku — sama rama po polsku czytałaby się gorzej niż uczciwie angielski ekran. To decyzja produktowa, nie designerska |
+| Zbudowanie fazy przystąpień, żeby `programCost` miał co pokazywać | To funkcja, nie przystosowanie do prezentacji. Zamiast tego wycofałem UI i zapisałem brak jako **W-7** |
+| Usunięcie martwych pól `programCost` / `insuredCount` z DTO | Są udokumentowanym kontraktem D-2 czekającym na W-7; skasowanie ich wymagałoby zmiany decyzji w dokumencie profilu, a to Twoja decyzja |
+| Likwidacja zagnieżdżonego scrolla w tabeli grupowej | Przy 13 świadczeniach tabela mieści się w `100vh - 150px`, więc wewnętrzny scroll w praktyce się nie włącza, a przyklejony nagłówek kolumn ma realną wartość |
+
+### 8.5 Weryfikacja
+
+Obie suity zielone (`mvn -o test`; `ng test --watch=false` — 56 testów). Aplikacja zbudowana
+profilem `all_in_one` i sprawdzona w przeglądarce na 1440×900, wszystkie trzy dema:
+
+- **PROPERTY** — data 1.09.2027 przestawia reżim na „APK wg Rekomendacji KNF", pytania 9 → 16,
+  sekcje 2 → 4, uzasadnienie nie → tak (5 zdań), suma murów 474 000 → 528 000 zł. Trzy znaczniki
+  „było". Nagłówki h1 → h2 → h2. Strona nie przewija się w bok.
+- **LIFE** — wersja taryfy czytana z reguły (`Taryfa 2026 H2`, „obowiązuje od 1 lipca 2026"),
+  przy dacie marcowej przechodzi na H1 bez ani jednej daty w kodzie SPA. Umowy dodatkowe po dwie
+  w rzędzie (4 rzędy zamiast 7), pasek udziałów 65,9 / 20,8 / 13,3 sumuje się do 100%, pozycje
+  18,00 i 11,50 zł przy sumie 86,50 zł. Kolumny wariantów grupowych nazwami, nie kodami.
+- **MOTO** — kolumny 689/689 px, formularz 2-up wewnątrz, składki bez zmian (`264.78`, `674.02`,
+  `1,381.19` — goldeny nietknięte), różnice `+409.24 vs BRONZE`, tooltip zero nachodzeń na ceny.
+
+Dwa nowe testy jednostkowe na pasek daty, oba sprawdzone pod mutacją, którą mają łapać: odczyt
+liczony z daty zamiast z odpowiedzi serwera, i znacznik „było" pokazywany zawsze.
+
+Backupy bazy przed publikacją: `/h2-data/pre-life-version.zip`, `/h2-data/pre-rider-premium.zip`.
+Obie sesje robocze zawierały wyłącznie elementy `demo.life.*`. Nic nie wypchnięte.

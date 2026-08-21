@@ -1,7 +1,10 @@
 # Profil LIFE — projekt konfiguracji Higson
 
-**Status:** propozycja do pracy. **W Higsonie nic jeszcze nie utworzono.**
-**Data:** 2026-08-11
+**Status:** projekt **zbudowany**. Profil `LIFE` istnieje w Studio; region `LIFE` ma dwie wersje.
+Nagłówek „w Higsonie nic jeszcze nie utworzono" był prawdą 2026-08-11 i przestał nią być —
+§13 spisuje to, co powstało po tym dokumencie, a **W-7 spisuje to, co nadal nie powstało**
+(faza przystąpień, a z nią cała druga połowa D-2).
+**Data:** 2026-08-11, aktualizowane 2026-08-21
 **Zakres:** drzewo domeny, tabele decyzyjne, flow, funkcje Groovy, wersjonowanie datą.
 
 Dokument opisuje konfigurację dla nowego profilu `LIFE`, pokrywającą obie ścieżki demo:
@@ -1927,6 +1930,56 @@ w istniejącym kodzie.
 | W-1 | Czy Higson przyznaje pierwszeństwo wierszowi bardziej szczegółowemu przy **częściowym** wildcardzie | D-5; jeśli tak, kilka macierzy da się skrócić |
 | W-2 | Czy `demo.life.group.programCost` może przyjąć mapę wycen jako argument, czy musi ją odczytać z kontekstu | §6.7 |
 | W-3 | Wszystkie stawki, czynniki i progi są **wymyślone na potrzeby demo** — żadna nie pochodzi z danych aktuarialnych | całość §4 |
-| W-4 | Etykieta „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA jest nieprawdziwa pod D-2 | `frontend/src/app/demos/life/group/group.html` |
+| W-4 | ~~Etykieta „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA jest nieprawdziwa pod D-2~~ **Zamknięte 2026-08-21** — wiersz nosi teraz etykietę „Gdyby wszyscy wybrali ten wariant", a `programCost` nie jest w ogóle pokazywany, bo nie jest liczony (patrz W-7) | `frontend/src/app/demos/life/group/group.html` |
+| W-7 | **Faza przystąpień nie istnieje w Higsonie.** `demo.life.group.calculateQuote` zwraca wyłącznie `eligible` i `variants`; `demo.life.group.programCost` (§6.7) i `demo.life.util.insuredCount` (§6.4) są zaprojektowane, ale nie zbudowane. `GroupScheme.enrolment` jest zawsze pustą listą, bo żaden endpoint jej nie ustawia. Skutek: pola `programCost` i `insuredCount` jadą przez DTO jako `null`, a ekran ich nie pokazuje. Dopóki tak jest, **D-2 jest udokumentowaną decyzją, a nie działającym zachowaniem** | `Life.java#calculateGroup`, §6.4, §6.7 |
 | W-5 | Kształt krzywej taryfy: relacja stawki do śmiertelności jest płaska na młodym końcu (18–29 daje ~1.08‰ przy śmiertelności ~1‰) i stroma na starym. Realne taryfy mają **wyższy** narzut przy młodych, bo koszty stałe rozkładają się na małą składkę | §4.2 `individual.tariff.baseRate` |
 | W-6 | Świadomie pominięte, a rozpoznawalne na polskim rynku: **uposażony**, **indeksacja składki i sumy**, **wiek dożycia** (koniec ochrony), **kontynuacja indywidualna po odejściu z pracy**. Żadne nie zmienia struktury — każde to jedna tabela lub atrybut | całość |
+
+---
+
+## 13. Zmiany wprowadzone po tym dokumencie
+
+Sekcja dopisana 2026-08-21. Dokument opisuje projekt konfiguracji; to, co poniżej, powstało
+w Studio później i **istnieje naprawdę**.
+
+### 13.1 `demo.life.tariff.version` — nazwa obowiązującej wersji taryfy
+
+| | |
+|---|---|
+| Kod | `demo.life.tariff.version` |
+| Wejście | `lineCode` ← `quote.lineCode`, wiersz `*` |
+| Wyjście | `code`, `name`, `validFrom` (wszystkie `string`) |
+| Region | `LIFE`, obie wersje |
+| Wersja 1 | `V1` · „Taryfa 2026 H1" · „1 stycznia 2026" |
+| Wersja 2 | `V2` · „Taryfa 2026 H2" · „1 lipca 2026" |
+
+Tabela nie bierze udziału w wycenie. Istnieje po to, żeby **ekran nie musiał znać daty progu**.
+Wcześniej komponent `EffectiveDate` w SPA trzymał `const VERSION_2_FROM = new Date('2026-07-01')`
+i sam rozstrzygał, którą wersję pokazać — czyli druga kopia osi czasu regionu, w przeglądarce,
+w demie, którego tezą jest, że takie progi należą do konfiguracji. Kopia w kodzie zdezaktualizowałaby
+się jako pierwsza i nikt by tam nie zajrzał.
+
+Wzorzec przeniesiony wprost z `demo.property.apk.regime`. `Life.java` czyta ją w `calculate()`
+**po** `setEffectiveDate`, tuż przed rozgałęzieniem na ścieżkę indywidualną i grupową.
+
+### 13.2 `demo.life.individual.rider.premium` — składka jednej umowy dodatkowej
+
+| | |
+|---|---|
+| Kod | `demo.life.individual.rider.premium` |
+| Argumenty | `ctx`, `riskFactor` (`BIG_DECIMAL`) |
+| Czyta | `rider.code`, `rider.sum`, `quote.insured.entryAge` |
+| Zwraca | składkę miesięczną tej umowy, zaokrągloną do grosza; `0` gdy umowa niedostępna |
+
+Wyjęta z pętli w `demo.life.individual.ridersPremium` (§6, funkcja sumująca), która teraz ją woła
+zamiast powtarzać formułę. **Powód nie jest kosmetyczny**: flow zwracał wyłącznie łączną
+`ridersPremium`, więc składki poszczególnych umów nie liczył nikt, a ekran wypisywał każdą wybraną
+umowę za `0,00 zł` i rysował pasek udziałów jako jedną belkę umowy głównej na całej szerokości.
+
+`ridersPremium` wkłada teraz do kontekstu iteracji także `rider.sum` — funkcja jednej linii czyta
+sumę stamtąd, dokładnie tak samo jak czyta ją Java przez `RiderAdapter`.
+
+⚠️ `riskFactor` jest **argumentem, nie odczytem**. Wewnątrz `ridersPremium` kontekst iteracji jest
+budowany przez `higson.createContext` i nie niesie `quote.insured.smoker` ani reszty wejść, których
+`demo.life.individual.riskFactor` potrzebuje — funkcja jednej linii nie miałaby jak go policzyć
+sama. Java liczy go raz na wycenę i podaje przez wariadyczne `engine.call(kod, ctx, riskFactor)`.
