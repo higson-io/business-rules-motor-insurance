@@ -8,7 +8,7 @@
 .property {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	gap: 26px;
+	gap: 20px;
 	align-items: start;
 }
 
@@ -25,9 +25,19 @@
 
 	.property__summary {
 		position: sticky;
-		top: 0;
+		top: 12px;
 		order: 0;
 	}
+}
+
+// Kolumna robocza musi mieć jawne min-width: 0. Bez tego szeroka tabela porównawcza rozpycha
+// ślad kolumny do swojej min-content i overflow-x na jej kontenerze przestaje cokolwiek robić —
+// przewija się cała strona zamiast tabeli.
+.property__work {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 }
 
 .property__summary {

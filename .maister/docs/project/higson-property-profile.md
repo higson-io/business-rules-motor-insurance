@@ -1784,14 +1784,38 @@ która działa, a gałęzią, która milczy.
 | **D** | Java iteruje kolekcję przez `getChildren(kolekcja)`, Groovy przez `getAll(kolekcja)` | Nie kompiluje się albo nie znajduje metody |
 | **E** | Zakresu wariantu **nie da się** wyprowadzić z listy braków z `apk.scoreVariants` | Tamta lista jest liczona względem potrzeb klienta, więc pokrycie, o które klient nie prosił, nie trafia ani do pokrytych, ani do brakujących — macierz porównawcza pokazywała ptaszki wszędzie. Zakres czyta się wprost z `cover.availability`, para po parze |
 
-### 13.6 Poprawka w regule, którą znalazło uruchomienie
+### 13.6 `domain` to pełne API nawigacji, nie tylko `get` + `getAll`
+
+Klasa `io.higson.runtime.rhino.RhinoDomain` i `RhinoDomainElement` dają funkcji Groovy komplet:
+
+| Wywołanie | Co robi |
+|---|---|
+| `domain.get(profil, ścieżka)` | element drzewa; jest też wariant z kontekstem |
+| `element.getAll(kolekcja)` | wszystkie dzieci kolekcji |
+| `element.get(kolekcja, kod)` | konkretne dziecko — **rzuca**, gdy nie istnieje |
+| `element.getSafe(kolekcja, kod)` | to samo, ale zwraca `null` |
+| `element.name()` / `code()` / `getPath()` / `parent()` | tożsamość i nawigacja w górę |
+| `element.hasAttr(kod)` / `isAttrSet(kod)` | czy atrybut istnieje — **bez tego `getAttrString` rzuca NPE na pustym literale** |
+| `element.getAttrString(kod)` | atrybut **bez kontekstu**, gdy nie jest kluczowany |
+
+**Konsekwencja, którą wprowadzono:** `apk.justify` podaje w uzasadnieniu **nazwy** pokryć
+i wariantów, a nie ich kody — „Poza zakresem zostaje: Elementy stałe, Kradzież z włamaniem
+i rabunek" zamiast „FIXTURES, THEFT". Tłumaczenie kodu na nazwę **nie musi być w Javie**: nazwa
+jest w drzewie domeny, a funkcja to drzewo widzi. To jest granica, którą łatwo postawić w złym
+miejscu — tekst dla klienta należy do reguł w całości, razem z nazwami, które w nim padają.
+
+`getSafe` zamiast `get` z rozmysłem: kod, którego nie ma w drzewie, ma zostać sobą, a nie wywalić
+całego uzasadnienia. Uzasadnienie z jednym technicznym kodem jest gorsze od ładnego, ale wciąż
+czytelne; uzasadnienie, które rzuciło wyjątek, nie istnieje.
+
+### 13.7 Poprawka w regule, którą znalazło uruchomienie
 
 `apk.pickVariant` zwraca **szósty człon**: kod wariantu najlepiej dopasowanego do potrzeb. Bez
 niego `apk.justify` wstawiał w komunikat o przekroczonym budżecie cenę wariantu **proponowanego**
 i wychodziło zdanie „wariant najpełniej odpowiadający potrzebom kosztuje 545 zł, czyli powyżej
 Twojego budżetu 900 zł". Zdanie zbudowane z dwóch prawdziwych liczb, które razem kłamią.
 
-### 13.7 Co zweryfikowano uruchomieniem
+### 13.8 Co zweryfikowano uruchomieniem
 
 Ta sama sesja, zmieniana wyłącznie datą polisy:
 

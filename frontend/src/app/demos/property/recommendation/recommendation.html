@@ -2,6 +2,8 @@
 	Trzy bloki, wszystkie z reguł: potrzeby wyprowadzone z odpowiedzi (rek. 8.2.b), ostrzeżenia
 	o wyłączeniach kolidujących z sytuacją klienta (rek. 8.2.c) i pisemne uzasadnienie propozycji
 	(rek. 8.7). W reżimie sprzed 2027 dwa ostatnie są puste — i to jest cała demonstracja.
+
+	Ostrzeżenia stoją NAD propozycją, bo dotyczą decyzji, którą klient ma dopiero podjąć.
 -->
 @if (ready()) {
 	<div class="reco">
@@ -22,35 +24,42 @@
 
 		@if (recommendedName(); as name) {
 			<div class="reco__pick" data-testid="property-recommendation">
-				<h3 class="reco__title">Proponujemy wariant {{ name }}</h3>
-				@if (coverage(); as coverage) {
-					<p class="reco__coverage">Pokrywa {{ coverage }} Twoich potrzeb.</p>
-				}
-				@if (missing().length > 0) {
-					<p class="reco__missing">
-						Poza zakresem zostaje: {{ missing().join(', ') }}.
-					</p>
-				}
-			</div>
-		}
-
-		@if (needs().length > 0) {
-			<ul class="reco__needs" data-testid="property-needs">
-				@for (need of needs(); track need.coverCode) {
-					<li>{{ need.text }}</li>
-				}
-			</ul>
-		}
-
-		<!-- Pusta lista nie renderuje ramki. Brak uzasadnienia jest informacją. -->
-		@if (justification().length > 0) {
-			<div class="reco__justification" data-testid="property-justification">
-				<h4 class="reco__subtitle">Dlaczego ta propozycja</h4>
-				<ol>
-					@for (line of justification(); track line) {
-						<li>{{ line }}</li>
+				<div class="reco__head">
+					<h3 class="reco__title">Proponujemy wariant {{ name }}</h3>
+					@if (coverage(); as coverage) {
+						<span class="reco__coverage">Pokrywa {{ coverage }} Twoich potrzeb</span>
 					}
-				</ol>
+				</div>
+
+				<div class="reco__body">
+					@if (needs().length > 0) {
+						<div class="reco__col">
+							<h4 class="reco__subtitle">Potrzeby wynikające z odpowiedzi</h4>
+							<ul class="reco__needs" data-testid="property-needs">
+								@for (need of needs(); track need.coverCode) {
+									<li>{{ need.text }}</li>
+								}
+							</ul>
+							@if (missing().length > 0) {
+								<p class="reco__missing">
+									Poza zakresem zostaje: {{ missing().join(', ') }}.
+								</p>
+							}
+						</div>
+					}
+
+					<!-- Pusta lista nie renderuje ramki. Brak uzasadnienia jest informacją. -->
+					@if (justification().length > 0) {
+						<div class="reco__col" data-testid="property-justification">
+							<h4 class="reco__subtitle">Dlaczego ta propozycja</h4>
+							<ol class="reco__justification">
+								@for (line of justification(); track line) {
+									<li>{{ line }}</li>
+								}
+							</ol>
+						</div>
+					}
+				</div>
 			</div>
 		}
 	</div>

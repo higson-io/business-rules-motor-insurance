@@ -4,16 +4,18 @@
 	display: block;
 }
 
+// Ostrzeżenia nad propozycją i wizualnie od niej oddzielone — dotyczą decyzji, nie wyniku.
 .reco__warnings {
-	margin-bottom: 18px;
+	margin-bottom: 12px;
 }
 
 .reco__warning {
 	padding: 10px 12px;
-	margin-bottom: 8px;
+	margin-bottom: 6px;
+	border: 1px solid @color-border-block;
 	border-left: 3px solid @color-ground-line;
-	background: @color-gray-light;
-	border-radius: 0 4px 4px 0;
+	background: @color-paper;
+	border-radius: 0 6px 6px 0;
 }
 
 .reco__warning--severe {
@@ -23,6 +25,7 @@
 .reco__warning-text {
 	margin: 0;
 	font-size: 0.875rem;
+	line-height: 1.4;
 }
 
 .reco__warning-remedy {
@@ -32,11 +35,20 @@
 }
 
 .reco__pick {
-	padding: 14px 16px;
+	padding: 16px 18px;
 	background: @color-paper;
 	border: 1px solid @color-border-block;
 	border-radius: 6px;
 	box-shadow: @shadow-panel;
+}
+
+.reco__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 12px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid @color-border-block;
 }
 
 .reco__title {
@@ -44,37 +56,53 @@
 	font-size: 1.0625rem;
 }
 
-.reco__coverage,
-.reco__missing {
-	margin: 6px 0 0;
-	font-size: 0.875rem;
-}
-
-.reco__missing {
+.reco__coverage {
+	font-size: 0.8125rem;
 	color: @color-text-muted;
 }
 
-.reco__needs {
-	margin: 14px 0 0;
-	padding-left: 20px;
-	font-size: 0.875rem;
+// Potrzeby i uzasadnienie stoją obok siebie: jedno jest wejściem analizy, drugie jej wynikiem,
+// a widz ma je porównać, a nie przewijać jedno pod drugim.
+.reco__body {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 6px 28px;
+	margin-top: 12px;
 }
 
-.reco__justification {
-	margin-top: 18px;
-	font-size: 0.875rem;
+@media (min-width: 768px) {
+	.reco__body:has(.reco__col + .reco__col) {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+	}
+}
+
+.reco__col {
+	min-width: 0;
 }
 
 .reco__subtitle {
 	margin: 0 0 6px;
-	font-size: 0.9375rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: @color-text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
 }
 
-.reco__justification ol {
+.reco__needs,
+.reco__justification {
 	margin: 0;
-	padding-left: 20px;
+	padding-left: 18px;
+	font-size: 0.875rem;
+	line-height: 1.45;
 }
 
 .reco__justification li {
-	margin-bottom: 4px;
+	margin-bottom: 5px;
+}
+
+.reco__missing {
+	margin: 8px 0 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
 }

@@ -117,9 +117,25 @@ i **nie zna żadnego pytania**.
 | **P-1** | **Nazwa wersji 1.** Zmieniłem ją z „Wytyczne 2014" na „APK — minimum ustawowe (art. 8 UDU)", bo Wytyczne z 2014 APK nie zawierają. Jeśli w prezentacji ma paść „Wytyczne 2014", to trzeba to powiedzieć inaczej — np. „stan sprzed Rekomendacji" | Zmiana dotyczy tego, co widz przeczyta na ekranie |
 | **P-2** | **Testy regułowe w `@tests`** — nie napisane, tak samo jak przy LIFE. Weryfikacja poszła przez uruchomienie. Czy dopisać? | To jedyna grupa z planu pominięta świadomie |
 | **P-3** | **Franszyza nie ma kontrolki na ekranie.** Endpoint działa, druga rola franszyzy (warunek dostępności powodzi w strefie `Z2`) jest więc widoczna tylko przez API. Dołożyć suwak? | Bez tego decyzja D-8 jest udokumentowana, ale nie pokazana |
-| **P-4** | **Uzasadnienie podaje kody pokryć, nie nazwy** („Poza zakresem zostaje: FIXTURES, THEFT, LIABILITY"). Funkcja Groovy nie widzi nazw elementów domeny. Podmienić w Javie przy składaniu DTO? | Tekst jest user-facing, a kody wyglądają technicznie |
 | **P-5** | **Ubiłem proces Chrome** z 20 sierpnia, żeby odblokować Playwright (Z-8). Jeśli coś w nim było otwarte — przepadło | Nie da się tego cofnąć |
 | **P-6** | **Wiersz `USERREGIONVERSION`** dla `admin` wskazuje wersję 2 regionu `PROPERTY` (został po procedurze z W-32). Nie przeszkadza runtime'owi, ale w UI Studia edycja domyślnie pójdzie do wersji 2 | Usunąć czy zostawić |
+
+---
+
+## 5a. Domknięte po Twoich uwagach
+
+| # | Uwaga | Co zrobiłem |
+|---|---|---|
+| **P-4** *(zamknięte)* | Uzasadnienie podawało kody pokryć zamiast nazw | Myliłem się, twierdząc, że funkcja Groovy nie widzi nazw z drzewa. `RhinoDomain`/`RhinoDomainElement` dają pełną nawigację: `getSafe(kolekcja, kod)`, `name()`, `hasAttr()`, `getAttrString()` bez kontekstu. `apk.justify` tłumaczy kody na nazwy **w regule**, nie w Javie — bo tekst dla klienta należy do reguł w całości, razem z nazwami, które w nim padają. Opisane w §13.6 dokumentu |
+| **Układ ekranu** | Sekcje wychodziły poza ekran, demo mało ergonomiczne | Trzy przyczyny, wszystkie usunięte: **(1)** ankieta była jedną kolumną 520 px w panelu szerokim na 1100 px — jest siatką `auto-fill`, więc 16 pytań mieści się w czterech kartach zamiast w metrze przewijania; **(2)** ⛔ **teksty pomocy z Higsona w ogóle się nie renderowały** — `mat-hint` jest jednowierszowy i przy dłuższym zdaniu znika, więc zniknął dowód, że treść pochodzi z reguł; **(3)** długie pytania były ucinane wielokropkiem w `mat-label`, która się nie zawija. Treść pytania i pomoc idą teraz w zwykłe akapity nad i pod kontrolką — identycznie dla wyboru, liczby i tak/nie |
+
+⚠️ **(2) i (3) to nie były usterki kosmetyczne.** Treść pytania i tekst pomocy przychodzą z Higsona
+i mogą mieć dowolną długość. Wsadzenie ich w komponenty Material, które zakładają krótką etykietę,
+sprawiało, że **konfiguracja nie docierała na ekran** — a to jest dokładnie ta rzecz, którą to demo
+ma pokazywać.
+
+Sprawdzone przy 1440, 1024 i 390 px: strona **nie przewija się w poziomie** na żadnej z tych
+szerokości, a szeroka macierz porównawcza przewija się we własnym kontenerze (`responsive.md`).
 
 ---
 

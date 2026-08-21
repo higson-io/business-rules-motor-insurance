@@ -8,114 +8,124 @@
 	⛔ `track question.code` jest obowiązkowe. Bez stabilnego klucza przesunięcie daty polisy
 	przerysowuje wszystkie kontrolki i gubi focus dokładnie w chwili, w której widz ma patrzeć na
 	to, że ankieta się zmieniła.
+
+	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`, i nie idzie przez `mat-hint`.
+	Etykieta Material nie zawija się — ucina długie zdanie wielokropkiem — a hint jest
+	jednowierszowy i przy dłuższym tekście znika zupełnie. Obie treści pochodzą z Higsona i mogą
+	mieć dowolną długość, więc muszą trafiać w element, który się zawija. To także jedyny sposób,
+	żeby pytanie wyboru, liczbowe i tak/nie wyglądały tak samo.
 -->
 @if (ready()) {
 	<div class="apk">
-		<p class="apk__count" data-testid="property-question-count">
-			Pytań w ankiecie: <strong>{{ visibleCount() }}</strong>
-		</p>
-
 		@for (section of sections(); track section.code) {
 			<section class="apk__section" [attr.data-section]="section.code">
-				<h3 class="apk__section-title">{{ section.title }}</h3>
+				<header class="apk__section-head">
+					<h3 class="apk__section-title">{{ section.title }}</h3>
+					<span class="apk__section-count">{{ section.questions.length }}</span>
+				</header>
 
-				@for (question of section.questions; track question.code) {
-					<div class="apk__question" [attr.data-question]="question.code">
-						@switch (question.kind) {
-							@case ('CHOICE') {
-								<mat-form-field appearance="outline" class="apk__field">
-									<mat-label>{{ question.text }}</mat-label>
-									<mat-select
-										[value]="question.value"
-										(selectionChange)="answer(question, $event.value)"
-									>
-										@for (option of question.options; track option) {
-											<mat-option [value]="option">{{ label(question, option) }}</mat-option>
-										}
-									</mat-select>
-									@if (question.help) {
-										<mat-hint>{{ question.help }}</mat-hint>
-									}
-								</mat-form-field>
-							}
+				<div class="apk__grid">
+					@for (question of section.questions; track question.code) {
+						<div
+							class="apk__question"
+							[class.apk__question--wide]="question.kind === 'MULTI'"
+							[class.apk__question--refused]="question.refused"
+							[attr.data-question]="question.code"
+						>
+							<p class="apk__label" [id]="'q-' + question.code">
+								{{ question.text }}
+								@if (question.required) {
+									<span class="apk__required" aria-hidden="true">*</span>
+								}
+							</p>
 
-							@case ('MULTI') {
-								<fieldset class="apk__multi">
-									<legend class="apk__legend">{{ question.text }}</legend>
-									@for (option of question.options; track option) {
-										<mat-checkbox
-											[checked]="isChecked(question, option)"
-											(change)="toggle(question, option, $event.checked)"
+							@switch (question.kind) {
+								@case ('CHOICE') {
+									<mat-form-field appearance="outline" class="apk__field">
+										<mat-select
+											[value]="question.value"
+											[attr.aria-labelledby]="'q-' + question.code"
+											(selectionChange)="answer(question, $event.value)"
 										>
-											{{ label(question, option) }}
-										</mat-checkbox>
-									}
-									@if (question.help) {
-										<p class="apk__help">{{ question.help }}</p>
-									}
-								</fieldset>
-							}
+											@for (option of question.options; track option) {
+												<mat-option [value]="option">{{ label(question, option) }}</mat-option>
+											}
+										</mat-select>
+									</mat-form-field>
+								}
 
-							@case ('BOOLEAN') {
-								<div class="apk__boolean">
-									<span class="apk__legend">{{ question.text }}</span>
+								@case ('MULTI') {
+									<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
+										@for (option of question.options; track option) {
+											<mat-checkbox
+												[checked]="isChecked(question, option)"
+												(change)="toggle(question, option, $event.checked)"
+											>
+												{{ label(question, option) }}
+											</mat-checkbox>
+										}
+									</div>
+								}
+
+								@case ('BOOLEAN') {
 									<mat-button-toggle-group
+										class="apk__toggle"
 										[value]="question.value"
+										[attr.aria-labelledby]="'q-' + question.code"
 										(change)="answer(question, $event.value)"
 									>
 										<mat-button-toggle value="true">Tak</mat-button-toggle>
 										<mat-button-toggle value="false">Nie</mat-button-toggle>
 									</mat-button-toggle-group>
-									@if (question.help) {
-										<p class="apk__help">{{ question.help }}</p>
-									}
-								</div>
+								}
+
+								@default {
+									<mat-form-field appearance="outline" class="apk__field">
+										<input
+											matInput
+											[type]="question.kind === 'TEXT' ? 'text' : 'number'"
+											[value]="question.value"
+											[attr.aria-labelledby]="'q-' + question.code"
+											(change)="answer(question, $any($event.target).value)"
+										/>
+									</mat-form-field>
+								}
 							}
 
-							@default {
-								<mat-form-field appearance="outline" class="apk__field">
-									<mat-label>{{ question.text }}</mat-label>
-									<input
-										matInput
-										[type]="question.kind === 'TEXT' ? 'text' : 'number'"
-										[value]="question.value"
-										(change)="answer(question, $any($event.target).value)"
-									/>
-									@if (question.help) {
-										<mat-hint>{{ question.help }}</mat-hint>
-									}
-								</mat-form-field>
+							@if (question.help) {
+								<p class="apk__help">{{ question.help }}</p>
 							}
-						}
 
-						<!--
-							Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
-							powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
-						-->
-						@if (question.prefillSource) {
-							<p class="apk__prefill" data-testid="property-prefill">
-								Podpowiedziane na podstawie: {{ question.prefillSource }}
-							</p>
-						}
+							<footer class="apk__foot">
+								<!--
+									Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
+									powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
+								-->
+								@if (question.prefillSource) {
+									<span class="apk__prefill" data-testid="property-prefill">
+										Podpowiedziane: {{ question.prefillSource }}
+									</span>
+								}
 
-						<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
-						<button
-							type="button"
-							class="apk__refuse"
-							[class.apk__refuse--on]="question.refused"
-							(click)="refuse(question)"
-						>
-							{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
-						</button>
+								<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
+								<button type="button" class="apk__refuse" (click)="refuse(question)">
+									{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
+								</button>
+							</footer>
 
-						@if (question.refused && question.refusalMessage) {
-							<p class="apk__refusal" data-testid="property-refusal">
-								{{ question.refusalMessage }}
-							</p>
-						}
-					</div>
-				}
+							@if (question.refused && question.refusalMessage) {
+								<p class="apk__refusal" data-testid="property-refusal">
+									{{ question.refusalMessage }}
+								</p>
+							}
+						</div>
+					}
+				</div>
 			</section>
 		}
+
+		<p class="apk__count" data-testid="property-question-count">
+			Pytań w ankiecie: <strong>{{ visibleCount() }}</strong>
+		</p>
 	</div>
 }
