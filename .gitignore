@@ -15,3 +15,8 @@ higson-cli*.log
 # The Higson rules snapshot. Studio is the system of record, never git
 # (standards/higson/snapshot.md). A fresh clone populates it with `mvn higson-cli:pull`.
 src/main/higson/
+
+# Artefakty przeglądarki sterowanej przez Playwright MCP — zrzuty drzewa dostępności
+# i screenshoty weryfikacyjne. Powstają w katalogu roboczym przy każdym uruchomieniu i nie są
+# dowodem: dowodem jest złoty plik w e2e/ (standards/testing/test-writing.md).
+.playwright-mcp/
