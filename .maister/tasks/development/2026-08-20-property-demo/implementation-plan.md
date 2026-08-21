@@ -49,7 +49,7 @@ MOTO i LIFE, `delete_all_domain_types`, `update_domain_type` z `profileCode: DEM
 | Co | Wynik |
 |---|---|
 | MCP ma narzędzie tworzące profil? | **Nie.** W komplecie 60+ narzędzi nie ma `create_profile` |
-| `higson_create_context_type(profileCode='PROPERTY')` na nieistniejącym profilu | ⛔ **zwraca `{"status":"SUCCESS"}` i nie tworzy niczego.** Fałszywy pozytyw — `higson_search` po nim nadal daje 0 trafień, a `list_context_types` dalej mówi „Profile not found" |
+| `higson_create_context_type(profileCode='PROPERTY')` na nieistniejącym profilu | ⛔ **zwraca `{"status":"SUCCESS"}` i tworzy typ w bazie**, ale **każdy odczyt** (`list_context_types`, `get_domain_definition`) odpowiada „Profile 'PROPERTY' not found". Powstaje wiersz w `SANDBOXTYPESDEFINITION`, nie powstaje wiersz w `DOMAIN_PROFILE` — czyli profil w rozumieniu kontekstu istnieje, a w rozumieniu aplikacji nie |
 | REST `POST /studio/api/profiles` | istnieje (`CreateProfileRequest`), ale wymaga tokenu, którego konfiguracja pluginu nie udostępnia |
 | Studio UI | niedostępne — przeglądarka Playwright zajęta przez inną sesję |
 
@@ -67,10 +67,50 @@ values ('PROPERTY', null, 0, 0, 0, 0, 0, 0);
 
 Potwierdzone `list_profiles` → trzy profile. **Backup bazy zrobiony przed tą operacją.**
 
-> ⚠️ **Fałszywy `SUCCESS` z `create_context_type` jest groźniejszy niż brak narzędzia.** Bez
-> sprawdzenia `list_context_types` po każdym z pięciu typów kontekstu można zbudować cały G1
-> „pomyślnie" i dopiero w G2 zobaczyć, że nie ma do czego wiązać poziomów wejściowych.
+> ⚠️ **Rozjazd między zapisem a odczytem jest groźniejszy niż brak narzędzia.** Zapis nie waliduje
+> profilu, odczyt waliduje. Bez sprawdzenia `list_context_types` po każdym typie można zbudować cały
+> G1 „pomyślnie" i dopiero w G2 zobaczyć, że nie ma do czego wiązać poziomów wejściowych.
 > **Każda grupa kończy się odczytem weryfikującym**, nie odczytem statusu.
+
+---
+
+## 2a. ⚠️ W-29 — `update_context_type(root: true)` nie ustawi pierwszego korzenia
+
+Po utworzeniu wszystkich typów kontekstu w pustym profilu **żaden z nich nie jest korzeniem**, a
+próba naprawy przez API kończy się:
+
+```
+higson_update_context_type(name='ROOT', root=true)
+→ INTERNAL_ERROR: "Collection contains no element matching the predicate."
+```
+
+Wygląda na klasyczne jajko-kura: kod szuka **obecnego** korzenia, żeby go zdegradować, i nie
+znajduje żadnego. Objaw wtórny: `get_context_type_paths` zwraca **pustą listę**, mimo że wszystkie
+typy istnieją i mają atrybuty — czyli **żadna tabela decyzyjna nie mogłaby zbindować poziomu
+wejściowego**, a komunikatu o przyczynie nie ma.
+
+**Rozwiązanie użyte — `higson_import_context`, nie SQL.** Format eksportu (`higson_export_context`)
+oznacza korzeń **ukośnikiem w nazwie**:
+
+```
+@transient
+def /ROOT
+  quote PropertyQuote          @desc Wniosek majatkowy
+```
+
+Import ustawia flagę poprawnie. Wymaga jednak **czystego profilu** — na istniejącym typie mówi
+`Type(ROOT) already exists`. Procedura:
+
+1. `delete_context_type` dla **wszystkich** typów profilu, zaczynając od `ROOT` i typu, który go
+   używa (`PropertyQuote`), potem reszta w dowolnej kolejności
+2. `docker cp` pliku do `/usr/local/tomcat/temp/higson-mcp-workspace/` w kontenerze Studio
+3. `import_context`
+4. **Weryfikacja: `get_context_type_paths` → 38 ścieżek**, nie status importu
+
+> **Wniosek na przyszłość: typy kontekstu w nowym profilu buduje się plikiem, nie wywołaniami.**
+> Jedno wywołanie zamiast czternastu, korzeń wychodzi poprawnie za pierwszym razem, a plik jest
+> przeglądalny przed wysłaniem. Wywołania `create_context_type` mają sens wyłącznie przy dokładaniu
+> pojedynczego typu do profilu, który już ma korzeń.
 
 ---
 
@@ -117,7 +157,8 @@ Komplet z `2026-08-13-higson-life-implementation/implementation-plan.md` §9 i �
 | **W-25** | MCP **nie ma narzędzia przełączającego aktywną wersję regionu** | Wejście do wersji 1: `detach_from_region` → `open_decision_table` + treść v1 → `attach_to_region(versions:["1","2"])` → `open_decision_table` + treść v2 |
 | **W-26** | `get_decision_table_matrix` **scala wersje** | Weryfikacja wersji wyłącznie SQL-em (zapytanie w §8) |
 | **W-27** | Katalog czytany raz przy tworzeniu sesji **nie widzi wersji regionu** | ⛔ **Najważniejsza pułapka tego demo.** `loadQuestions` musi siedzieć w ścieżce wyceny, po `setEffectiveDate`, a nie w `@PostConstruct` |
-| **W-28** | Profilu nie da się utworzyć przez MCP, a `create_context_type` daje fałszywy `SUCCESS` | §2 |
+| **W-28** | Profilu nie da się utworzyć przez MCP; zapis nie waliduje profilu, odczyt waliduje | §2 |
+| **W-29** | `update_context_type(root: true)` nie ustawi **pierwszego** korzenia — typy kontekstu nowego profilu buduje się `import_context`, nie wywołaniami | §2a |
 
 ### Konwencje macierzy, ustalone empirycznie przy LIFE
 
@@ -483,7 +524,7 @@ spójnym.
 | Grupa | Stan |
 |---|---|
 | G0 Profil | ✅ |
-| G1 Konteksty | ⬜ |
+| G1 Konteksty | ✅ — 14 typów, `get_context_type_paths` → 38 ścieżek |
 | G2 Tabele | ⬜ |
 | G3 Funkcje | ⬜ |
 | G4 Flow | ⬜ |
