@@ -111,6 +111,15 @@ export interface LifeQuoteDto {
 	readonly insuredCount: number | null;
 	readonly programCost: number | null;
 
+	/**
+	 * Rozkład wyborów pracowników: kod wariantu → liczba osób.
+	 *
+	 * ⛔ Pusta mapa to FAZA OFERTY, nie „nikt nie wybrał". W fazie oferty partycypacja jest
+	 * deklaracją pracodawcy, a `programCost` nie istnieje; pierwsze przystąpienie przełącza obie
+	 * te rzeczy naraz i robią to reguły (D-2).
+	 */
+	readonly enrolment: Readonly<Record<string, number>>;
+
 	readonly variants: readonly LifeVariantDto[];
 	readonly benefits: readonly LifeBenefitDto[];
 }

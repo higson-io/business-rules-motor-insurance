@@ -157,4 +157,16 @@ public class LifeApi {
 	public void setIncludeAdultChild(@RequestBody boolean includeAdultChild) {
 		quoteService.getQuote().getGroup().setIncludeAdultChild(includeAdultChild);
 	}
+
+	/**
+	 * Ilu pracowników wybrało dany wariant — druga faza demo grupowego (D-2).
+	 *
+	 * Dopóki żadne przystąpienie nie jest zgłoszone, program jest w fazie oferty: partycypacja
+	 * jest deklaracją pracodawcy, a kosztu programu nie ma. Pierwsze zgłoszenie przełącza obie
+	 * te rzeczy naraz — i robią to reguły, nie ten endpoint.
+	 */
+	@PutMapping("/group/enrolment/{variantCode}")
+	public void setEnrolment(@PathVariable String variantCode, @RequestBody int count) {
+		quoteService.getQuote().getGroup().enrol(variantCode, count);
+	}
 }

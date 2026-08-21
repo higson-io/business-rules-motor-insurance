@@ -109,3 +109,64 @@
 	}
 }
 
+// Koszt programu stoi NAD tabelą, nie w niej: nie należy do żadnej kolumny, bo nie należy do
+// żadnego wariantu.
+.group__program {
+	margin-bottom: 14px;
+	padding: 14px 18px;
+	background: @color-paper;
+	border: 1px solid @color-border-block;
+	border-left: 3px solid @color-accent;
+	border-radius: var(--mat-sys-corner-medium);
+}
+
+.group__program__figure {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 10px;
+}
+
+.group__program__label {
+	font-size: 0.6875rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.group__program__value {
+	font-size: 1.5rem;
+	font-weight: 600;
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+}
+
+.group__program__note {
+	margin: 4px 0 0;
+	max-width: 72ch;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}
+
+// Skąd wzięła się liczba ubezpieczonych — widoczne tylko wtedy, gdy odpowiedź się zmieniła.
+.group__insured__note {
+	display: block;
+	font-size: 0.6875rem;
+	color: @color-text-muted;
+}
+
+.group__clear {
+	margin-top: 4px;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 0.6875rem;
+	color: @color-text-muted;
+	cursor: pointer;
+}
+
+.group__clear:hover,
+.group__clear:focus-visible {
+	color: @color-text;
+	text-decoration: underline;
+}

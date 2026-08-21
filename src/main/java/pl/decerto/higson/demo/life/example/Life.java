@@ -305,6 +305,13 @@ public class Life {
 		quote.setDecision(eligible ? "ACCEPT" : "DECLINE");
 		quote.setBinding(eligible);
 
+		// Obie liczby fazy programu (D-2). W fazie oferty programCost wraca jako null — i ma
+		// wracać: bez rozkładu wyborów pracowników rzeczywisty koszt nie istnieje, a zero byłoby
+		// twierdzeniem, że program nic nie kosztuje.
+		BigDecimal insured = asDecimal(result.get("insuredCount"));
+		quote.setInsuredCount(insured == null ? null : insured.intValue());
+		quote.setProgramCost(asDecimal(result.get("programCost")));
+
 		Object variants = result.get("variants");
 		if (variants instanceof ParamValue) {
 			applyVariantPremiums(quote, (ParamValue) variants);

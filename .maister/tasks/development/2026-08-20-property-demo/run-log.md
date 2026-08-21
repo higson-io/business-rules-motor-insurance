@@ -265,3 +265,68 @@ liczony z daty zamiast z odpowiedzi serwera, i znacznik „było" pokazywany zaw
 
 Backupy bazy przed publikacją: `/h2-data/pre-life-version.zip`, `/h2-data/pre-rider-premium.zip`.
 Obie sesje robocze zawierały wyłącznie elementy `demo.life.*`. Nic nie wypchnięte.
+
+---
+
+## 9. Faza przystąpień — domknięcie W-7 (2026-08-21)
+
+Na „napraw, co uważasz za słuszne". Obie decyzje, które zostawiłem Tobie, sprowadzały się do jednej:
+albo faza przystąpień powstaje, albo `programCost` i `insuredCount` są martwym kodem do usunięcia.
+Zbudowałem — jest zaprojektowana w §6.4/§6.6/§6.7 dokumentu profilu, a to ona odróżnia D-2
+udokumentowane od D-2 działającego.
+
+**Okazało się, że brakowało wyłącznie okablowania.** Wszystkie reguły siedziały w Studio od
+13 sierpnia: `enrolmentStats` liczyła statystyki rozkładu, `programCost` ważyła koszt,
+`util.insuredCount` liczyła fazę oferty, a `group.premiums` **już rozdzielał obie fazy u siebie**
+i stosował `factor.variantMix`. Nikt tego nie wołał: flow zwracał tylko `eligible` i `variants`,
+a `enrolment` nie miała jak trafić do modelu, bo nie było endpointu.
+
+Przy okazji wyszło, że `demo.life.group.programCost` **nie dałaby się zawołać** — miała
+`variantPremiums` na pozycji 0 i `ctx` na 1, czego silnik nie przyjmuje. Nikt tego nie zauważył,
+bo nikt nie próbował.
+
+### 9.1 Co zostało dołożone
+
+| Warstwa | Element |
+|---|---|
+| Reguły | `demo.life.group.programCost` przepisana na `(ctx, variants)`; nowa `demo.life.group.insured` (sam rozdział faz, bez własnego wzoru); dwa nody we flow grupowym |
+| Backend | `PUT /life/group/enrolment/{variantCode}` — jedno pole na żądanie, zero usuwa pozycję; `GroupScheme.enrol`; odczyt `insuredCount` i `programCost` z wyniku flow; `LifeQuoteDto.enrolment` |
+| Frontend | Sekcja „Kto co wybrał" w panelu wejść, pasek kosztu programu nad tabelą, adnotacja przy liczbie ubezpieczonych, wyjście „Wróć do fazy oferty" |
+
+### 9.2 Dwie rzeczy złapane przy weryfikacji, obie warte zapisania
+
+**Adnotacja, która kłamała w jednym przypadku.** Napisałem pod kosztem programu, że „nie równa się
+żadnej liczbie z wiersza poniżej". Przy rozkładzie, w którym wszyscy wybrali jeden wariant, równa
+się co do grosza (8 281,70 zł w obu miejscach). Zdanie mówi teraz, **czym ta liczba jest**, a nie
+czym nie jest — dokładnie ten sam rodzaj poprawki, co cała §8.1.
+
+**Równoległe PUT-y gubiły zapisy.** „Wróć do fazy oferty" wysyłało trzy żądania przez `Promise.all`
+i czyściło jeden wariant z trzech. Agregat wyceny jest `@SessionScope` i nie jest bezpieczny
+wątkowo: trzy wątki czytają tę samą `ArrayList`, każdy usuwa swoją pozycję i odkłada wynik, więc
+przeżywa ostatni zapis. **Każda inna mutacja w tym API jest pojedynczym PUT-em i dlatego nigdy na to
+nie trafiła** — to jest pierwsze miejsce w aplikacji, które wysyła serię. Teraz idzie po kolei, a
+test sprawdza, że po pierwszym tick-u leci dokładnie jedno żądanie.
+
+### 9.3 Weryfikacja
+
+100 pracowników, deklarowana partycypacja 60%, wiek 35, branża I:
+
+| Sytuacja | Ubezpieczonych | Koszt programu | Za pracownika |
+|---|---|---|---|
+| Faza oferty | 60 *(z deklaracji)* | — | 40,66 / 61,00 / 91,01 |
+| 70 osób, 30 / 25 / 15 | 70 *(z przystąpień)* | 4 109,95 zł | bez zmian |
+| 70 osób, **wszyscy COMPLETE** | 70 | 8 281,70 zł | 52,86 / 79,30 / **118,31** |
+| 15 osób ze 100 | 15 | 981,37 zł | 47,38 / 71,06 / 106,03 |
+
+Trzeci wiersz jest tym, po co ta faza istnieje: ten sam skład osobowy, ta sama liczba
+ubezpieczonych, **stawka wyżej o 30%** — bo policzyła ją druga oś antyselekcji. To najlepszy moment
+demonstracyjny w całym demie grupowym i do dziś nie dało się go pokazać.
+
+Powrót do fazy oferty sprawdzony w przeglądarce: trzy pola na zero, znika koszt programu, wraca 60
+ubezpieczonych z deklaracji i stawki bazowe. Ścieżka indywidualna nietknięta (57 zł, ACCEPT,
+`Taryfa 2026 H2`).
+
+Obie suity zielone: `mvn -o test`, `ng test --watch=false` — **59 testów** (trzy nowe na granicę
+faz, każdy sprawdzony pod mutacją, którą ma łapać). Backup przed publikacją:
+`/h2-data/pre-enrolment.zip`. Sesja robocza zawierała wyłącznie elementy `demo.life.group.*`.
+Nic nie wypchnięte.

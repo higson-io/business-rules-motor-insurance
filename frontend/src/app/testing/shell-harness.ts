@@ -113,6 +113,8 @@ export const LIFE_QUOTE: LifeQuoteDto = {
 	lineCode: 'INDIVIDUAL',
 	startDate: '2026-08-20',
 	tariffVersion: { code: 'V2', name: 'Taryfa 2026 H2', validFrom: '1 lipca 2026' },
+	// Pusta mapa = faza oferty, i tego dotyczą te testy: powłoka nie zna fazy programu.
+	enrolment: {},
 	mainSum: 300000,
 	paymentFrequency: 'MONTHLY',
 	birthDate: null,

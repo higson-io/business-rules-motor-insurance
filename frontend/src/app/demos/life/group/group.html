@@ -97,7 +97,57 @@
 				@if (insuredCount(); as count) {
 					<p class="group__insured" data-testid="group-insured">
 						Ubezpieczonych: <strong>{{ sum(count) }}</strong>
+						@if (enrolled()) {
+							<span class="group__insured__note">z przystąpień, nie z deklaracji</span>
+						}
 					</p>
+				}
+			</section>
+
+			<!--
+				Faza programu (D-2). Wariant wybiera PRACOWNIK, więc dopóki nie wiadomo, kto co
+				wybrał, „koszt programu" nie istnieje — istnieje tylko hipoteza „gdyby wszyscy".
+
+				⛔ Pierwsza wpisana liczba przełącza fazę, i przełączają ją REGUŁY: partycypacja
+				przestaje być deklaracją pracodawcy i staje się ilorazem policzonym z przystąpień,
+				a `demo.life.group.factor.variantMix` otwiera drugą oś antyselekcji — tę, która
+				mierzy, czy wszyscy rzucili się na najbogatszy wariant. Ten ekran nie wie o żadnej
+				z tych dwóch rzeczy; wysyła liczbę i pokazuje, co wróciło.
+			-->
+			<section class="inputs__group">
+				<h2 class="inputs__group__heading">Kto co wybrał</h2>
+
+				<p class="group__note">
+					Zostaw puste, dopóki program jest ofertą. Pierwsza wpisana liczba przełącza
+					wycenę na rzeczywisty rozkład wyborów — partycypacja liczy się wtedy sama,
+					a nierówny rozkład podnosi stawkę.
+				</p>
+
+				@for (variant of variants(); track variant.code) {
+					<mat-form-field appearance="outline">
+						<mat-label>{{ variant.name }}</mat-label>
+						<input
+							#enrolInput
+							matInput
+							type="number"
+							min="0"
+							[attr.data-testid]="'group-enrolment-' + variant.code"
+							[value]="enrolledIn(variant.code)"
+							(blur)="setEnrolment(variant.code, enrolInput.valueAsNumber)"
+						/>
+						<span matSuffix class="group__suffix">osób</span>
+					</mat-form-field>
+				}
+
+				@if (enrolled()) {
+					<button
+						type="button"
+						class="group__clear"
+						data-testid="group-clear-enrolment"
+						(click)="clearEnrolment()"
+					>
+						Wróć do fazy oferty
+					</button>
 				}
 			</section>
 
@@ -126,6 +176,38 @@
 	</aside>
 
 	<div class="group__variants">
+		<!--
+			⛔ To NIE jest suma wiersza „gdyby wszyscy wybrali ten wariant". Tamta liczba mnoży
+			jeden wariant przez wszystkich; ta waży rzeczywisty rozkład wyborów (D-2). Pokazuje się
+			wyłącznie wtedy, gdy rozkład istnieje — bez niego reguła zwraca `null`, a nie zero.
+		-->
+		<!--
+			⛔ Jawne `!== null`, nie prawdziwościowe `@if (programCost(); as cost)`. Ta sama zasada,
+			którą niżej stosuje komórka świadczenia: zero jest wartością, nie brakiem. Tutaj różnica
+			nie zmienia dziś tego, co widać — koszt nie może wyjść zerowy przy niepustym rozkładzie —
+			ale prawdziwościowy warunek sprawia, że „reguła zwróciła zero" i „reguły nie ma" stają
+			się na ekranie tym samym, a to jest dokładnie rozróżnienie, o które w D-2 chodzi.
+		-->
+		@let cost = programCost();
+		@if (cost !== null) {
+			<div class="group__program" data-testid="group-program">
+				<div class="group__program__figure">
+					<span class="group__program__label">Koszt programu miesięcznie</span>
+					<span class="group__program__value">{{ money(cost) }} zł</span>
+				</div>
+				<!--
+					⚠️ Adnotacja mówi, CZYM ta liczba jest, a nie że różni się od wiersza poniżej.
+					Przy rozkładzie, w którym wszyscy wybrali jeden wariant, koszt programu równa
+					się kolumnie tego wariantu co do grosza — i zdanie „nie równa się żadnej liczbie
+					poniżej" byłoby wtedy po prostu nieprawdziwe.
+				-->
+				<p class="group__program__note">
+					Ważony rzeczywistym rozkładem wyborów pracowników. Wiersz poniżej mnoży jeden
+					wariant przez wszystkich — to hipoteza, nie koszt.
+				</p>
+			</div>
+		}
+
 		<div class="quote__scroll">
 		<table class="quote__table">
 			<caption class="quote__caption">

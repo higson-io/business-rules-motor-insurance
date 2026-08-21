@@ -108,4 +108,15 @@ export class LifeService {
 	updateIncludeAdultChild(includeAdultChild: boolean): Observable<void> {
 		return this.http.put<void>('life/group/includeAdultChild', includeAdultChild);
 	}
+
+	/**
+	 * Ilu pracowników wybrało dany wariant.
+	 *
+	 * ⛔ Zero USUWA pozycję po stronie serwera, a nie zapisuje zera — i to jest jedyny sposób,
+	 * żeby wrócić z fazy programu do fazy oferty. Pusta lista przystąpień jest tym, co te dwie
+	 * fazy odróżnia (D-2).
+	 */
+	updateEnrolment(variantCode: string, count: number): Observable<void> {
+		return this.http.put<void>(`life/group/enrolment/${variantCode}`, count);
+	}
 }

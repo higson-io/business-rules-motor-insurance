@@ -2,8 +2,8 @@
 
 **Status:** projekt **zbudowany**. Profil `LIFE` istnieje w Studio; region `LIFE` ma dwie wersje.
 Nagłówek „w Higsonie nic jeszcze nie utworzono" był prawdą 2026-08-11 i przestał nią być —
-§13 spisuje to, co powstało po tym dokumencie, a **W-7 spisuje to, co nadal nie powstało**
-(faza przystąpień, a z nią cała druga połowa D-2).
+§13 spisuje to, co powstało po tym dokumencie — w tym **fazę przystąpień (§13.3)**, dzięki której
+D-2 przestało być samą decyzją i zaczęło działać.
 **Data:** 2026-08-11, aktualizowane 2026-08-21
 **Zakres:** drzewo domeny, tabele decyzyjne, flow, funkcje Groovy, wersjonowanie datą.
 
@@ -1930,8 +1930,8 @@ w istniejącym kodzie.
 | W-1 | Czy Higson przyznaje pierwszeństwo wierszowi bardziej szczegółowemu przy **częściowym** wildcardzie | D-5; jeśli tak, kilka macierzy da się skrócić |
 | W-2 | Czy `demo.life.group.programCost` może przyjąć mapę wycen jako argument, czy musi ją odczytać z kontekstu | §6.7 |
 | W-3 | Wszystkie stawki, czynniki i progi są **wymyślone na potrzeby demo** — żadna nie pochodzi z danych aktuarialnych | całość §4 |
-| W-4 | ~~Etykieta „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA jest nieprawdziwa pod D-2~~ **Zamknięte 2026-08-21** — wiersz nosi teraz etykietę „Gdyby wszyscy wybrali ten wariant", a `programCost` nie jest w ogóle pokazywany, bo nie jest liczony (patrz W-7) | `frontend/src/app/demos/life/group/group.html` |
-| W-7 | **Faza przystąpień nie istnieje w Higsonie.** `demo.life.group.calculateQuote` zwraca wyłącznie `eligible` i `variants`; `demo.life.group.programCost` (§6.7) i `demo.life.util.insuredCount` (§6.4) są zaprojektowane, ale nie zbudowane. `GroupScheme.enrolment` jest zawsze pustą listą, bo żaden endpoint jej nie ustawia. Skutek: pola `programCost` i `insuredCount` jadą przez DTO jako `null`, a ekran ich nie pokazuje. Dopóki tak jest, **D-2 jest udokumentowaną decyzją, a nie działającym zachowaniem** | `Life.java#calculateGroup`, §6.4, §6.7 |
+| W-4 | ~~Etykieta „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA jest nieprawdziwa pod D-2~~ **Zamknięte 2026-08-21** — wiersz nosi teraz etykietę „Gdyby wszyscy wybrali ten wariant", a `programCost` jest pokazywany osobno i wyłącznie w fazie programu (§13.3) | `frontend/src/app/demos/life/group/group.html` |
+| W-7 | ~~Faza przystąpień nie istnieje w Higsonie~~ **Zamknięte 2026-08-21.** Funkcje istniały od początku (`enrolmentStats`, `programCost`, `util.insuredCount`, a `group.premiums` rozdzielał obie fazy u siebie) — brakowało wyłącznie okablowania: flow ich nie wołał, żaden endpoint nie ustawiał `enrolment`. Szczegóły w §13.3. **D-2 jest teraz działającym zachowaniem** | §13.3 |
 | W-5 | Kształt krzywej taryfy: relacja stawki do śmiertelności jest płaska na młodym końcu (18–29 daje ~1.08‰ przy śmiertelności ~1‰) i stroma na starym. Realne taryfy mają **wyższy** narzut przy młodych, bo koszty stałe rozkładają się na małą składkę | §4.2 `individual.tariff.baseRate` |
 | W-6 | Świadomie pominięte, a rozpoznawalne na polskim rynku: **uposażony**, **indeksacja składki i sumy**, **wiek dożycia** (koniec ochrony), **kontynuacja indywidualna po odejściu z pracy**. Żadne nie zmienia struktury — każde to jedna tabela lub atrybut | całość |
 
@@ -1983,3 +1983,44 @@ sumę stamtąd, dokładnie tak samo jak czyta ją Java przez `RiderAdapter`.
 budowany przez `higson.createContext` i nie niesie `quote.insured.smoker` ani reszty wejść, których
 `demo.life.individual.riskFactor` potrzebuje — funkcja jednej linii nie miałaby jak go policzyć
 sama. Java liczy go raz na wycenę i podaje przez wariadyczne `engine.call(kod, ctx, riskFactor)`.
+
+### 13.3 Faza przystąpień — okablowanie D-2
+
+Zbudowane 2026-08-21. Do tego dnia druga połowa D-2 była projektem: `GroupScheme.enrolment` była
+zawsze pustą listą, więc `programCost` i `insuredCount` szły przez DTO jako `null`, a ekran grupowy
+wypisywał „Ubezpieczonych: 0".
+
+**Czego brakowało: wyłącznie okablowania.** Wszystkie reguły istniały w Studio od 13 sierpnia —
+`demo.life.group.enrolmentStats`, `demo.life.group.programCost`, `demo.life.util.insuredCount`,
+a `demo.life.group.premiums` rozdzielał obie fazy u siebie i stosował `factor.variantMix`. Nikt ich
+nie wołał.
+
+| Element | Zmiana |
+|---|---|
+| `demo.life.group.programCost` | Przepisany na `(ctx, variants)`. ⛔ Poprzednia deklaracja miała `variantPremiums` na pozycji 0 i `ctx` na 1, czego silnik nie przyjmuje („Invalid argument data type passed on position 0") — funkcja **nie dałaby się zawołać**, i nikt tego nie wykrył, bo nikt nie próbował. Bierze teraz wynik `group.premiums` i sam składa z niego mapę cen, więc źródło cen zostaje jedno |
+| `demo.life.group.insured` | **Nowa.** Nie ma własnego wzoru — rozstrzyga wyłącznie, która faza obowiązuje, i deleguje do `enrolmentStats` albo `util.insuredCount` |
+| `demo.life.group.calculateQuote` | Dwa nowe nody: `n5` → `insuredCount`, `n6` → `programCost` (z `variants` jako argumentem). Obie zmienne `returned = true` |
+| `PUT /life/group/enrolment/{variantCode}` | **Nowy endpoint.** Jedno pole na żądanie, jak reszta API. Zero **usuwa** pozycję — to jedyna droga powrotu z fazy programu do fazy oferty |
+| `LifeQuoteDto.enrolment` | `Map<String, Integer>`, kod wariantu → liczba osób. Pusta mapa **to faza oferty**, a nie „nikt nie wybrał" |
+
+**Zmierzone zachowanie** (100 pracowników, deklarowana partycypacja 60%, wiek 35, branża I):
+
+| Sytuacja | Ubezpieczonych | Koszt programu | Składka za pracownika |
+|---|---|---|---|
+| Faza oferty (brak przystąpień) | 60 *(z deklaracji)* | — *(nie istnieje)* | 40,66 / 61,00 / 91,01 |
+| 70 osób, rozkład 30 / 25 / 15 | 70 *(z przystąpień)* | 4 109,95 zł | 40,66 / 61,00 / 91,01 |
+| 70 osób, **wszyscy na COMPLETE** | 70 | 8 281,70 zł | 52,86 / 79,30 / **118,31** |
+| Tylko 15 osób ze 100 | 15 | 981,37 zł | 47,38 / 71,06 / 106,03 |
+
+Trzeci wiersz jest tym, po co ta faza istnieje: **ten sam skład osobowy i ta sama partycypacja, a
+stawka wyżej o 30%** — bo policzył ją `factor.variantMix`, druga oś antyselekcji z D-2. Czwarty
+pokazuje pierwszą oś: słabe przystąpienie podnosi stawkę przez `factor.participation`.
+
+> ⚠️ **Koszt programu bywa równy kolumnie „gdyby wszyscy wybrali ten wariant"** — dokładnie wtedy,
+> gdy wszyscy faktycznie wybrali jeden wariant (wiersz trzeci: 8 281,70 zł w obu miejscach). Adnotacja
+> na ekranie mówi więc, czym ta liczba **jest**, a nie że różni się od tamtej.
+
+> ⛔ **Czyszczenie przystąpień idzie po kolei, nie równolegle.** Agregat wyceny jest `@SessionScope`
+> i nie jest bezpieczny wątkowo: trzy równoległe PUT-y czytają tę samą `ArrayList`, każdy usuwa
+> swoją pozycję i odkłada wynik, więc przeżywa jeden zapis. Zmierzone — z trzech wariantów czyścił
+> się jeden. Każda inna mutacja w tym API jest pojedynczym PUT-em i dlatego nigdy na to nie trafiła.

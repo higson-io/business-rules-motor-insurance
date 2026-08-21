@@ -1,6 +1,7 @@
 package pl.decerto.higson.demo.life.api.dto;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -51,6 +52,12 @@ public class LifeQuoteDto {
 	private BigDecimal programCost;
 
 	private LifeTariffVersionDto tariffVersion;
+
+	/**
+	 * Rozkład wyborów pracowników: kod wariantu → liczba osób. Pusta mapa znaczy faza oferty,
+	 * a nie „nikt nie wybrał" — to rozróżnienie niesie D-2 i front musi je widzieć.
+	 */
+	private Map<String, Integer> enrolment;
 
 	private List<LifeVariantDto> variants;
 	private List<LifeBenefitDto> benefits;
@@ -119,6 +126,8 @@ public class LifeQuoteDto {
 	public void setProgramCost(BigDecimal programCost) { this.programCost = programCost; }
 	public LifeTariffVersionDto getTariffVersion() { return tariffVersion; }
 	public void setTariffVersion(LifeTariffVersionDto tariffVersion) { this.tariffVersion = tariffVersion; }
+	public Map<String, Integer> getEnrolment() { return enrolment; }
+	public void setEnrolment(Map<String, Integer> enrolment) { this.enrolment = enrolment; }
 	public List<LifeVariantDto> getVariants() { return variants; }
 	public void setVariants(List<LifeVariantDto> variants) { this.variants = variants; }
 	public List<LifeBenefitDto> getBenefits() { return benefits; }

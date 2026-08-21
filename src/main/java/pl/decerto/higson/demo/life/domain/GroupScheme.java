@@ -72,6 +72,21 @@ public class GroupScheme {
 		return enrolment;
 	}
 
+	/**
+	 * Ustawia liczność przystąpień do jednego wariantu.
+	 *
+	 * ⛔ Zero USUWA pozycję, a nie zapisuje zera. Pusta lista przystąpień jest tym, co odróżnia
+	 * fazę oferty od fazy programu (D-2): reguły pytają `enrolment.isEmpty()`, więc wariant
+	 * z zerem ludzi zostawiony na liście trzymałby program w fazie programu z liczbą
+	 * ubezpieczonych policzoną z przystąpień, których nikt nie zadeklarował.
+	 */
+	public void enrol(String variantCode, int count) {
+		enrolment.removeIf(entry -> entry.getVariantCode().equals(variantCode));
+		if (count > 0) {
+			enrolment.add(new Enrolment(variantCode, count));
+		}
+	}
+
 	public void setEnrolment(List<Enrolment> enrolment) {
 		this.enrolment = enrolment;
 	}

@@ -1,7 +1,9 @@
 package pl.decerto.higson.demo.life.converter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,7 @@ import pl.decerto.higson.demo.life.api.dto.LifeRiderDto;
 import pl.decerto.higson.demo.life.api.dto.LifeTariffVersionDto;
 import pl.decerto.higson.demo.life.api.dto.LifeVariantDto;
 import pl.decerto.higson.demo.life.domain.Benefit;
+import pl.decerto.higson.demo.life.domain.Enrolment;
 import pl.decerto.higson.demo.life.domain.LifeQuote;
 import pl.decerto.higson.demo.life.domain.Rider;
 import pl.decerto.higson.demo.life.domain.Variant;
@@ -61,11 +64,21 @@ public class LifeQuoteConverter implements Converter<LifeQuote, LifeQuoteDto> {
 		dto.setInsuredCount(quote.getInsuredCount());
 		dto.setProgramCost(quote.getProgramCost());
 		dto.setTariffVersion(convertTariffVersion(quote));
+		dto.setEnrolment(convertEnrolment(quote));
 
 		dto.setVariants(convertVariants(quote.getVariants()));
 		dto.setBenefits(convertBenefits(quote.getBenefits()));
 
 		return dto;
+	}
+
+	/** ⚠️ LinkedHashMap, nie HashMap: kolejność wariantów jest kolejnością z reguł. */
+	private Map<String, Integer> convertEnrolment(LifeQuote quote) {
+		Map<String, Integer> map = new LinkedHashMap<>();
+		for (Enrolment entry : quote.getGroup().getEnrolment()) {
+			map.put(entry.getVariantCode(), entry.getCount());
+		}
+		return map;
 	}
 
 	private LifeTariffVersionDto convertTariffVersion(LifeQuote quote) {

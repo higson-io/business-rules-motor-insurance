@@ -69,6 +69,54 @@ export class Group {
 
 	readonly insuredCount = computed(() => this.loaded()?.insuredCount ?? null);
 
+	/**
+	 * Rozkład wyborów pracowników, i to, czy w ogóle jakiś jest.
+	 *
+	 * ⛔ `enrolled()` czyta rozkład, a NIE liczy fazy z niczego innego. To jedyny przełącznik
+	 * między fazą oferty a fazą programu (D-2), a rozstrzygają go reguły — ten komponent tylko
+	 * pyta serwer, po której stronie właśnie jest.
+	 */
+	private readonly enrolment = computed<Readonly<Record<string, number>>>(
+		() => this.loaded()?.enrolment ?? {},
+	);
+
+	readonly enrolled = computed(() => Object.keys(this.enrolment()).length > 0);
+
+	/** Rzeczywisty koszt programu. `null` w fazie oferty — i tam nie wolno pokazać zera. */
+	readonly programCost = computed(() => this.loaded()?.programCost ?? null);
+
+	enrolledIn(code: string): number {
+		return this.enrolment()[code] ?? 0;
+	}
+
+	setEnrolment(code: string, value: number): void {
+		if (!Number.isFinite(value)) {
+			return;
+		}
+		const clamped = Math.max(0, Math.round(value));
+		void this.store.commit(firstValueFrom(this.lifeService.updateEnrolment(code, clamped)));
+	}
+
+	/**
+	 * Wyjście z fazy programu: wyzerowanie wszystkich przystąpień.
+	 *
+	 * ⛔ PO KOLEI, nie przez `Promise.all`. Agregat wyceny jest `@SessionScope` i nie jest
+	 * bezpieczny wątkowo — trzy równoległe PUT-y czytają tę samą listę, każdy usuwa z niej swoją
+	 * pozycję i odkłada wynik, więc przeżywa tylko ostatni zapis. Zmierzone: z trzech wariantów
+	 * czyścił się jeden. Każda inna mutacja w tej aplikacji jest pojedynczym PUT-em i dlatego
+	 * nigdy na to nie trafiła.
+	 */
+	clearEnrolment(): void {
+		const codes = Object.keys(this.enrolment());
+		void this.store.commit(
+			(async () => {
+				for (const code of codes) {
+					await firstValueFrom(this.lifeService.updateEnrolment(code, 0));
+				}
+			})(),
+		);
+	}
+
 
 	/**
 	 * How many benefits a variant carries, against the richest — the gauge under each column

@@ -39,13 +39,14 @@ System architecture of the single-module Spring Boot WAR application. Covers: th
 > nieszczęśliwym wypadku", a `PER_PERCENT` odróżnia świadczenie za 1% uszczerbku od sumy. §11 wprowadza
 > **budżet złożoności** (funkcja ≤80 linii, tabela ≤30 wierszy, flow ≤15 nodów) — wszystko mieści się
 > z zapasem, dwa artefakty są blisko sufitu i mają opisaną drogę wyjścia.
-⚠️ **Zbudowane, ale nie w całości.** Profil `LIFE` istnieje w Studio wraz z regionem o dwóch
-wersjach; §13 spisuje dwa elementy dołożone po dacie dokumentu (`demo.life.tariff.version` —
+⚙️ **Zbudowane i działające**, łącznie z obiema fazami D-2. Profil `LIFE` istnieje w Studio wraz
+z regionem o dwóch wersjach; §13 spisuje trzy rzeczy dołożone po dacie dokumentu (`demo.life.tariff.version` —
 nazwa obowiązującej wersji taryfy, dzięki której ekran nie zna daty progu; oraz
 `demo.life.individual.rider.premium` — składka JEDNEJ umowy dodatkowej, bez której podsumowanie
-wypisywało każdą wybraną umowę za 0,00 zł). **W-7 spisuje to, czego nie ma:** faza przystąpień,
-a z nią `programCost` i `insuredCount` — więc druga połowa D-2 jest decyzją udokumentowaną,
-nie działającą. Projekt
+wypisywało każdą wybraną umowę za 0,00 zł) oraz **fazę przystąpień (§13.3)** — rozkład wyborów
+pracowników, z którego biorą się `insuredCount` i `programCost`, a przez `factor.variantMix` także
+druga oś antyselekcji: ten sam skład osobowy przy wszystkich na najbogatszym wariancie kosztuje
+o 30% więcej. Projekt
 konfiguracji nowego profilu `LIFE` pokrywającego obie ścieżki demo życiowego. Zawiera: drzewo domeny
 dzielące się na pierwszym poziomie na `INDIVIDUAL` (ochronne — `MAIN_COVER` plus siedem umów
 dodatkowych w `RIDERS`) i `GROUP` (pracownicze — trzy warianty i trzynaście świadczeń), wraz z
@@ -80,9 +81,9 @@ dochód wchodzi jako **drugi** pułap dla SZP i NDP, obowiązujący łącznie z 
 Z D-3/D-4/D-5/D-7 wyłania się nazwany wzorzec **„reguła bazowa × reguła modyfikująca"**: nowy wymiar
 dokłada się drugą tabelą i złożeniem we flow, zamiast rozsadzać macierz bazową o kolejny poziom.
 ⚠️ D-2 unieważnia etykietę „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA (W-4).
-**Read before** touching anything related to the LIFE demo's rules, and read **W-7 and §13** before
-assuming a given piece exists in Studio — the document's design and Studio's contents are close but
-not identical.
+**Read before** touching anything related to the LIFE demo's rules, and read **§13** before assuming
+a given piece exists in Studio — the body of the document is the design, §13 is what was built
+afterwards, and the two are close but not identical.
 
 ### Profil PROPERTY — projekt konfiguracji (`project/higson-property-profile.md`)
 > ⚙️ **Zbudowane i działające** w profilu `PROPERTY` (2026-08-21), zweryfikowane przeglądarką.
