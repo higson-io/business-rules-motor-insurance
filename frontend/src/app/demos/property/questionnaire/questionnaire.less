@@ -1,0 +1,82 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+.apk__count {
+	margin: 0 0 16px;
+	font-size: 0.875rem;
+	color: @color-text-muted;
+}
+
+.apk__section {
+	margin-bottom: 28px;
+}
+
+.apk__section-title {
+	margin: 0 0 12px;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.apk__question {
+	margin-bottom: 18px;
+}
+
+// ⚠️ minmax(0, 1fr) na kolumnie, nie 1fr — Material renderuje wartość selecta z nowrap, więc
+// jedna długa etykieta ustawia podłogę szerokości i przewija całą stronę w bok.
+.apk__field {
+	display: block;
+	width: 100%;
+	max-width: 520px;
+}
+
+.apk__multi,
+.apk__boolean {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.apk__legend {
+	padding: 0;
+	font-size: 0.9375rem;
+	font-weight: 500;
+}
+
+.apk__help {
+	margin: 2px 0 0;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}
+
+.apk__prefill {
+	margin: 2px 0 0;
+	font-size: 0.75rem;
+	font-style: italic;
+	color: @color-text-muted;
+}
+
+.apk__refuse {
+	margin-top: 4px;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.apk__refuse--on {
+	font-weight: 600;
+}
+
+.apk__refusal {
+	margin: 4px 0 0;
+	font-size: 0.8125rem;
+}

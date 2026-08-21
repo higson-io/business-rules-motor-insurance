@@ -1,0 +1,29 @@
+<!--
+	Data początku ochrony. Steruje wersją regionu przez engine.setEffectiveDate, więc decyduje
+	nie tylko o cenie, ale i o tym, o co wolno zapytać. Stąd osobna ramka i podpis mówiący wprost,
+	który reżim APK obowiązuje.
+-->
+<div class="effective-date">
+	<mat-form-field appearance="outline" class="effective-date__field">
+		<mat-label>Data początku ochrony</mat-label>
+		<input
+			matInput
+			data-testid="property-start-date"
+			[matDatepicker]="picker"
+			[value]="startDate()"
+			(dateChange)="pick($event.value)"
+		/>
+		<mat-datepicker-toggle matIconSuffix [for]="picker" />
+		<mat-datepicker #picker />
+		<mat-hint>Reżim analizy potrzeb wybiera się tą datą, nie zegarem serwera</mat-hint>
+	</mat-form-field>
+
+	@if (regimeName(); as regime) {
+		<p class="effective-date__regime" data-testid="property-regime">
+			Obowiązuje: <strong>{{ regime }}</strong>
+			@if (legalBasis(); as basis) {
+				<span class="effective-date__basis">{{ basis }}</span>
+			}
+		</p>
+	}
+</div>

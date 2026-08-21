@@ -11,7 +11,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Import(HigsonIntegrationConfiguration.class)
 // Każde demo ma własny pakiet i musi być tu wymienione — skan nie sięga wyżej niż podane ścieżki,
 // więc dodanie kontrolera bez dopisania pakietu kończy się cichym 404, nie błędem startu.
-@ComponentScan({"pl.decerto.higson.demo.motor", "pl.decerto.higson.demo.life"})
+@ComponentScan({"pl.decerto.higson.demo.motor", "pl.decerto.higson.demo.life",
+	"pl.decerto.higson.demo.property"})
 @EnableAutoConfiguration
 public class ApplicationConfig implements WebMvcConfigurer {
 

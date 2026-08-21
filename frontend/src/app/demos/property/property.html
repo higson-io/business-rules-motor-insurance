@@ -1,0 +1,49 @@
+<!--
+	Układ: data ochrony nad wszystkim, bo przełącza reżim; ankieta i rekomendacja w kolumnie
+	roboczej; podsumowanie przyklejone po prawej, tak jak w demo LIFE.
+-->
+<app-property-effective-date />
+
+<div class="property">
+	<div class="property__work">
+		<app-property-questionnaire />
+		<app-property-recommendation />
+		<app-property-comparison />
+	</div>
+
+	@if (ready()) {
+		<aside class="property__summary" data-testid="property-summary">
+			<h3 class="property__summary-title">Podsumowanie</h3>
+
+			<dl class="property__rows">
+				<dt>Suma murów</dt>
+				<dd data-testid="property-sum-building">{{ sumBuilding() }} zł</dd>
+
+				<dt>Suma elementów stałych</dt>
+				<dd>{{ sumFixtures() }} zł</dd>
+
+				<dt>Suma ruchomości</dt>
+				<dd>{{ sumContents() }} zł</dd>
+
+				<dt>Wiek budynku</dt>
+				<dd>{{ buildingAge() }} lat</dd>
+
+				<dt>Strefa powodziowa</dt>
+				<dd data-testid="property-flood-zone">{{ floodZone() }}</dd>
+
+				<dt>Strefa kradzieżowa</dt>
+				<dd>{{ theftZone() }}</dd>
+			</dl>
+
+			@if (chosen(); as variant) {
+				<div class="property__price">
+					<p class="property__price-variant">{{ variant.name }}</p>
+					<p class="property__price-amount" data-testid="property-premium">
+						{{ variant.annualPremium }} zł
+					</p>
+					<p class="property__price-note">za wybrany okres ochrony</p>
+				</div>
+			}
+		</aside>
+	}
+</div>

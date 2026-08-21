@@ -1,0 +1,77 @@
+<!--
+	Porównanie wariantów. Tabela przewija się we własnym kontenerze, żeby strona nigdy nie
+	przewijała się w bok (`responsive.md`).
+-->
+@if (ready()) {
+	<div class="compare">
+		<h3 class="compare__title">Czym różnią się warianty</h3>
+
+		<div class="compare__scroll">
+			<table class="compare__table" data-testid="property-comparison">
+				<thead>
+					<tr>
+						<th scope="col">Zakres</th>
+						@for (variant of variants(); track variant.code) {
+							<th scope="col" [class.compare__col--picked]="variant.code === selected()">
+								{{ variant.name }}
+								@if (variant.code === recommended()) {
+									<span class="compare__badge">proponowany</span>
+								}
+							</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					@for (cover of covers(); track cover.code) {
+						<tr>
+							<th scope="row">
+								{{ cover.name }}
+								@if (cover.capLabel) {
+									<span class="compare__limit">{{ cover.capLabel }}</span>
+								}
+							</th>
+							@for (variant of variants(); track variant.code) {
+								<td [class.compare__col--picked]="variant.code === selected()">
+									{{ includes(variant.code, cover.code) ? '✓' : '—' }}
+								</td>
+							}
+						</tr>
+					}
+					<tr class="compare__premium">
+						<th scope="row">Składka za okres</th>
+						@for (variant of variants(); track variant.code) {
+							<td [class.compare__col--picked]="variant.code === selected()">
+								@if (variant.available) {
+									{{ variant.annualPremium }} zł
+								} @else {
+									niedostępny
+								}
+							</td>
+						}
+					</tr>
+					<tr>
+						<th scope="row"></th>
+						@for (variant of variants(); track variant.code) {
+							<td>
+								@if (variant.available) {
+									<button type="button" class="compare__pick" (click)="choose(variant.code)">
+										Wybieram
+									</button>
+								}
+							</td>
+						}
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Wariant nie znika po cichu — niesie powód, dla którego nie da się go kupić. -->
+		@for (variant of variants(); track variant.code) {
+			@if (!variant.available && variant.unavailableReason) {
+				<p class="compare__reason" data-testid="property-unavailable">
+					<strong>{{ variant.name }}:</strong> {{ variant.unavailableReason }}
+				</p>
+			}
+		}
+	</div>
+}

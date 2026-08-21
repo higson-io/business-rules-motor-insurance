@@ -1,0 +1,85 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// Mobile-first: jedna kolumna, podsumowanie NAD pracą, bo nie ma obok czego go postawić.
+.property {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 26px;
+	align-items: start;
+}
+
+.property__summary {
+	order: -1;
+}
+
+// Dwie kolumny, gdy jest na nie miejsce. ⚠️ minmax(0, 1fr), nie 1fr — inaczej długa etykieta
+// selecta ustawia podłogę szerokości i przewija stronę w bok.
+@media (min-width: 992px) {
+	.property {
+		grid-template-columns: minmax(0, 1fr) 300px;
+	}
+
+	.property__summary {
+		position: sticky;
+		top: 0;
+		order: 0;
+	}
+}
+
+.property__summary {
+	padding: 16px 18px;
+	background: @color-paper;
+	border: 1px solid @color-border-block;
+	border-radius: 6px;
+	box-shadow: @shadow-panel;
+}
+
+.property__summary-title {
+	margin: 0 0 12px;
+	font-size: 1rem;
+}
+
+.property__rows {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 4px 12px;
+	margin: 0;
+	font-size: 0.8125rem;
+}
+
+.property__rows dt {
+	color: @color-text-muted;
+}
+
+.property__rows dd {
+	margin: 0;
+	text-align: right;
+}
+
+.property__price {
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid @color-border-block;
+}
+
+.property__price-variant {
+	margin: 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+.property__price-amount {
+	margin: 2px 0 0;
+	font-size: 1.5rem;
+	font-weight: 600;
+}
+
+.property__price-note {
+	margin: 2px 0 0;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}

@@ -1,0 +1,57 @@
+<!--
+	Trzy bloki, wszystkie z reguł: potrzeby wyprowadzone z odpowiedzi (rek. 8.2.b), ostrzeżenia
+	o wyłączeniach kolidujących z sytuacją klienta (rek. 8.2.c) i pisemne uzasadnienie propozycji
+	(rek. 8.7). W reżimie sprzed 2027 dwa ostatnie są puste — i to jest cała demonstracja.
+-->
+@if (ready()) {
+	<div class="reco">
+		@if (warnings().length > 0) {
+			<div class="reco__warnings" data-testid="property-warnings">
+				@for (warning of warnings(); track warning.code) {
+					<div
+						class="reco__warning"
+						[class.reco__warning--severe]="warning.severity >= 2"
+						[attr.data-warning]="warning.code"
+					>
+						<p class="reco__warning-text">{{ warning.text }}</p>
+						<p class="reco__warning-remedy">{{ warning.remedy }}</p>
+					</div>
+				}
+			</div>
+		}
+
+		@if (recommendedName(); as name) {
+			<div class="reco__pick" data-testid="property-recommendation">
+				<h3 class="reco__title">Proponujemy wariant {{ name }}</h3>
+				@if (coverage(); as coverage) {
+					<p class="reco__coverage">Pokrywa {{ coverage }} Twoich potrzeb.</p>
+				}
+				@if (missing().length > 0) {
+					<p class="reco__missing">
+						Poza zakresem zostaje: {{ missing().join(', ') }}.
+					</p>
+				}
+			</div>
+		}
+
+		@if (needs().length > 0) {
+			<ul class="reco__needs" data-testid="property-needs">
+				@for (need of needs(); track need.coverCode) {
+					<li>{{ need.text }}</li>
+				}
+			</ul>
+		}
+
+		<!-- Pusta lista nie renderuje ramki. Brak uzasadnienia jest informacją. -->
+		@if (justification().length > 0) {
+			<div class="reco__justification" data-testid="property-justification">
+				<h4 class="reco__subtitle">Dlaczego ta propozycja</h4>
+				<ol>
+					@for (line of justification(); track line) {
+						<li>{{ line }}</li>
+					}
+				</ol>
+			</div>
+		}
+	</div>
+}

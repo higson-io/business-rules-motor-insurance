@@ -4,6 +4,7 @@ import { DemoSelection } from './core/demo-selection';
 import { DemoPicker } from './demos/demo-picker/demo-picker';
 import { Life } from './demos/life/life';
 import { Moto } from './demos/moto/moto';
+import { Property } from './demos/property/property';
 import { PendingRequests } from './core/pending-requests';
 import { Spinner } from './components/spinner/spinner';
 
@@ -25,7 +26,7 @@ import { Spinner } from './components/spinner/spinner';
  */
 @Component({
 	selector: 'app-root',
-	imports: [DemoPicker, Life, Moto, Spinner],
+	imports: [DemoPicker, Life, Moto, Property, Spinner],
 	templateUrl: './app.html',
 	styleUrl: './app.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,

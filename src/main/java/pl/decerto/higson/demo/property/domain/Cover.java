@@ -1,0 +1,80 @@
+package pl.decerto.higson.demo.property.domain;
+
+import java.math.BigDecimal;
+
+/** Pokrycie — przedmiot albo ryzyko. Wszystkie pola pochodzą z domeny i tabel Higsona. */
+public class Cover {
+
+	private String code;
+	private String name;
+	private String description;
+	private int position;
+	private String sumBasis;
+	private String capLabel;
+	private BigDecimal effectiveLimit;
+	private BigDecimal sum;
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public String getSumBasis() {
+		return sumBasis;
+	}
+
+	public void setSumBasis(String sumBasis) {
+		this.sumBasis = sumBasis;
+	}
+
+	public String getCapLabel() {
+		return capLabel;
+	}
+
+	public void setCapLabel(String capLabel) {
+		this.capLabel = capLabel;
+	}
+
+	public BigDecimal getEffectiveLimit() {
+		return effectiveLimit;
+	}
+
+	public void setEffectiveLimit(BigDecimal effectiveLimit) {
+		this.effectiveLimit = effectiveLimit;
+	}
+
+	public BigDecimal getSum() {
+		return sum;
+	}
+
+	public void setSum(BigDecimal sum) {
+		this.sum = sum;
+	}
+}

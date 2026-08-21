@@ -1,0 +1,74 @@
+@import '_variables';
+
+:host {
+	display: block;
+	margin-top: 26px;
+}
+
+.compare__title {
+	margin: 0 0 10px;
+	font-size: 1rem;
+}
+
+// Szeroka tabela przewija się we własnym kontenerze, a nie stroną.
+.compare__scroll {
+	overflow-x: auto;
+}
+
+.compare__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+	background: @color-paper;
+	border: 1px solid @color-border-block;
+	border-radius: 6px;
+}
+
+.compare__table th,
+.compare__table td {
+	padding: 8px 12px;
+	text-align: left;
+	border-bottom: 1px solid @color-border-block;
+}
+
+.compare__table td {
+	text-align: center;
+}
+
+.compare__col--picked {
+	background: @color-gray-light;
+}
+
+.compare__badge {
+	display: block;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	color: @color-accent;
+	text-transform: uppercase;
+}
+
+.compare__limit {
+	display: block;
+	font-size: 0.6875rem;
+	font-weight: 400;
+	color: @color-text-muted;
+}
+
+.compare__premium td {
+	font-weight: 600;
+}
+
+.compare__pick {
+	padding: 4px 10px;
+	border: 1px solid @color-border-block;
+	border-radius: 4px;
+	background: @color-white;
+	font-size: 0.75rem;
+	cursor: pointer;
+}
+
+.compare__reason {
+	margin: 10px 0 0;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}

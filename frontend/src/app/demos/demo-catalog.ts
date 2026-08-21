@@ -9,7 +9,7 @@
  * To add one: append an entry here, add the component, and extend the switch in `app.html`. The
  * `code` is the discriminator in all three places.
  */
-export type DemoCode = 'moto' | 'life';
+export type DemoCode = 'moto' | 'life' | 'property';
 
 export interface Demo {
 	readonly code: DemoCode;
@@ -28,6 +28,13 @@ export const DEMOS: readonly Demo[] = [
 		code: 'moto',
 		name: 'Motor insurance',
 		summary: 'Rate a car policy across three cover levels, with limits and discounts priced by rules.',
+		available: true,
+	},
+	{
+		code: 'property',
+		name: 'Property insurance',
+		summary:
+			'Quote a home or flat through a needs analysis that lives in the rules — move the policy date and the questionnaire itself changes.',
 		available: true,
 	},
 	{
