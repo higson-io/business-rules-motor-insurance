@@ -35,10 +35,23 @@
 	color: @color-text-muted;
 }
 
-// A single column of groups. The panel sits beside the comparison table, so its width is set by the
-// layout and the fields simply stack.
+// Grupy układają się w tyle kolumn, ile zmieści szerokość, którą panel akurat dostał — jedną na
+// wąskim ekranie, dwie od około 560 px w środku. Nic tu nie zna breakpointu strony i to jest cel:
+// `moto.less` zmienia ślad kolumny, a panel sam decyduje, czy stać go na drugą szpaltę.
+//
+// ⚠️ `min(100%, 260px)`, nie samo 260px. Bez tego przy panelu węższym niż 260 px ślad zostaje przy
+// 260 i przewija stronę w bok.
 .inputs__grid {
-	display: block;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+	gap: 22px 20px;
+	align-items: start;
+}
+
+// ⚠️ Konieczne, i z tego samego powodu co minmax(0, 1fr) w moto.less: bez jawnego zera Material
+// ustawia podłogę szerokości grupy na najdłuższą etykietę selecta.
+.inputs__group {
+	min-width: 0;
 }
 
 // Separates one group from the next. The heading above carries the label; this is the air that makes
@@ -46,6 +59,16 @@
 .inputs__group + .inputs__group,
 app-driver + .inputs__group {
 	margin-top: 22px;
+}
+
+// ⛔ Wewnątrz siatki odstęp robi row-gap, nie margines rodzeństwa. Selektor `+` idzie po kolejności
+// w DOM-ie, nie po położeniu: w dwóch kolumnach druga grupa jest sąsiadem pierwszej i dostałaby
+// margines górny, stojąc obok niej — czyli dwie kolumny zaczynałyby się na różnych wysokościach.
+// Reguła z marginesem zostaje, bo ekrany życiowe wstawiają .inputs__group prosto w .inputs, poza
+// tą siatką, i to ona daje im rytm.
+.inputs__grid > .inputs__group,
+.inputs__grid > app-driver > .inputs__group {
+	margin-top: 0;
 }
 
 .inputs__group__heading {

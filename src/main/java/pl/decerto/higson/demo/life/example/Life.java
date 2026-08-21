@@ -46,6 +46,8 @@ public class Life {
 	private static final String FUNCTION_UNDERWRITING = "demo.life.underwriting.evaluate";
 	private static final String FUNCTION_MAX_SUM = "demo.life.individual.maxSumAssured";
 	private static final String FUNCTION_WAITING_PERIOD = "demo.life.individual.effectiveWaitingPeriod";
+	private static final String FUNCTION_RISK_FACTOR = "demo.life.individual.riskFactor";
+	private static final String FUNCTION_RIDER_PREMIUM = "demo.life.individual.rider.premium";
 
 	private static final String PARAM_TARIFF_VERSION = "demo.life.tariff.version";
 	private static final String PARAM_RIDER_SUMS = "demo.life.individual.rider.sumsOffered";
@@ -256,8 +258,21 @@ public class Life {
 		// nie komunikat dla klienta (D-1).
 	}
 
-	/** Konfiguracja umów dodatkowych: pułap sumy i karencja liczone przez Higsona per umowa. */
+	/**
+	 * Konfiguracja umów dodatkowych: pułap sumy, karencja i składka — wszystko liczone przez
+	 * Higsona per umowa.
+	 *
+	 * Składka pozycji bierze się z tej samej funkcji, którą sumuje `ridersPremium`, a nie z drugiej
+	 * formuły tutaj. Do tej pory nie liczył jej nikt: flow zwracał wyłącznie łączną
+	 * `ridersPremium`, a Java ją logowała — więc podsumowanie po prawej wypisywało każdą wybraną
+	 * umowę za 0,00 zł, a pasek udziałów pokazywał umowę główną na całej szerokości.
+	 *
+	 * ⚠️ `riskFactor` liczony RAZ i przekazywany dalej, nie per umowa: to czynnik osoby, nie
+	 * umowy, a policzenie go siedem razy dałoby siedem szans na rozjazd zaokrągleń.
+	 */
 	private void readRiderConfiguration(LifeQuote quote) {
+		BigDecimal riskFactor = asDecimal(engine.call(FUNCTION_RISK_FACTOR, new LifeContext(quote)));
+
 		for (Rider rider : quote.getRiders()) {
 			LifeContext riderCtx = new LifeContext(quote, rider);
 
@@ -266,6 +281,12 @@ public class Life {
 			LifeContext waitingCtx = new LifeContext(quote, rider).withClaimCause(CAUSE_ILLNESS);
 			BigDecimal days = asDecimal(engine.call(FUNCTION_WAITING_PERIOD, waitingCtx));
 			rider.setWaitingPeriodDays(days == null ? null : days.intValue());
+
+			// Niewybrana umowa nie ma składki — null, a nie zero. Zero jest twierdzeniem
+			// „kosztuje nic", a to zupełnie co innego niż „nie jest w umowie".
+			rider.setPremium(rider.isSelected()
+				? asDecimal(engine.call(FUNCTION_RIDER_PREMIUM, riderCtx, riskFactor))
+				: null);
 		}
 	}
 

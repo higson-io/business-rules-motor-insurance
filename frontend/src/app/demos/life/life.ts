@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { LifeStore } from '../../core/life-store';
 import { LifeLineCode } from '../../models/life';
 import { LifeService } from '../../services/life-service';
+import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { EffectiveDate } from './effective-date/effective-date';
 import { Group } from './group/group';
 import { Individual } from './individual/individual';
@@ -32,7 +33,7 @@ const LINE_CODES: Record<LifePath, LifeLineCode> = {
  */
 @Component({
 	selector: 'app-life',
-	imports: [EffectiveDate, Group, Individual],
+	imports: [EffectiveDate, ErrorBanner, Group, Individual],
 	templateUrl: './life.html',
 	styleUrl: './life.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +43,9 @@ export class Life {
 	private readonly lifeService = inject(LifeService);
 
 	readonly path = signal<LifePath>('individual');
+
+	/** ⚠️ `error()`, nie `value()`. Zasób w stanie błędu rzuca z `value()` w Angularze 22. */
+	readonly loadError = computed(() => this.store.quote.error());
 
 	/**
 	 * ⛔ The switch is not local state. The backend holds the aggregate and decides which flow prices

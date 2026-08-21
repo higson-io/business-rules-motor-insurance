@@ -40,4 +40,15 @@ export class Comparison {
 	choose(variantCode: string): void {
 		void this.store.commit(firstValueFrom(this.propertyService.updateVariant(variantCode)));
 	}
+
+	// ⚠️ To samo formatowanie co w prawej szpalcie. Ta sama liczba pokazana raz jako „891.5", a raz
+	// jako „891,50" czyta się jak dwie różne ceny.
+	private readonly plnFormat = new Intl.NumberFormat('pl-PL', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+
+	premium(value: number | null): string {
+		return this.plnFormat.format(value ?? 0);
+	}
 }

@@ -30,8 +30,17 @@
 			<div class="date-band__figure">
 				<span class="date-band__number">{{ reading.catalogue }}</span>
 				<span class="date-band__unit">{{ reading.catalogueUnit }}</span>
+				<!--
+					⛔ Porównanie per liczba, nie per pasek. Wersjonowanie jest SELEKTYWNE: przy
+					wieku 35 lat obie wersje taryfy dają tę samą stawkę, więc pasek pokazywałby
+					„było 57" obok „57". Znacznik, który pojawia się, gdy nic się nie zmieniło,
+					przestaje znaczyć cokolwiek — a jego brak przy zmienionej nazwie wersji jest
+					sam w sobie informacją: ta akurat liczba nie zależy od wersji.
+				-->
 				@if (before(); as was) {
-					<span class="date-band__was">było {{ was.catalogue }}</span>
+					@if (was.catalogue !== reading.catalogue) {
+						<span class="date-band__was">było {{ was.catalogue }}</span>
+					}
 				}
 			</div>
 			@if (reading.price !== null) {
@@ -39,7 +48,7 @@
 					<span class="date-band__number">{{ reading.price }}</span>
 					<span class="date-band__unit">{{ reading.priceUnit }}</span>
 					@if (before(); as was) {
-						@if (was.price !== null) {
+						@if (was.price !== null && was.price !== reading.price) {
 							<span class="date-band__was">było {{ was.price }}</span>
 						}
 					}

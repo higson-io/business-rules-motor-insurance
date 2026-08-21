@@ -129,6 +129,10 @@
 }
 
 .policy__heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 10px;
 	margin: 22px 0 12px;
 	font-size: 0.75rem;
 	font-weight: 700;
@@ -137,12 +141,42 @@
 	color: @color-text-muted;
 }
 
+.policy__heading__count {
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	text-transform: none;
+}
+
 .policy__riders {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	display: grid;
 	gap: 10px;
+}
+
+// Siedem kart jedna pod drugą to ponad sześćset pikseli — na projektorze umowy dodatkowe kończą
+// się poniżej krawędzi ekranu i prowadzący musi przewijać, żeby pokazać, że w ogóle są. Od 1280 px
+// idą po dwie, a karta układa się wtedy w jedną kolumnę, bo wewnętrzna szpalta 220 px nie mieści
+// się w połówce.
+@media (min-width: 1280px) {
+	.policy__riders {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.policy__rider {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			'toggle'
+			'description'
+			'karencja'
+			'cover';
+		row-gap: 6px;
+	}
+
+	.policy__rider__cover {
+		width: 100%;
+	}
 }
 
 // A rider is a card that is on or off. The border carries the state rather than a badge: same
@@ -322,11 +356,19 @@
 	color: @color-accent;
 }
 
-// Required in substance if not in law: a Polish quotation screen that does not say this is asking to
-// be mistaken for an offer.
-.policy__disclaimer {
-	margin: 14px 0 0;
+// Cena, której nie można kupić, musi wyglądać inaczej niż cena, którą można. To jedyne miejsce na
+// ekranie, w którym widać różnicę między ACCEPT a REFER.
+.policy__rider__cap {
+	margin: 4px 0 0;
 	font-size: 0.6875rem;
-	line-height: 1.5;
 	color: @color-text-muted;
+}
+
+.policy__provisional {
+	margin: 8px 0 0;
+	padding: 8px 10px;
+	border-left: 3px solid @color-accent;
+	background: @color-gray-light;
+	font-size: 0.75rem;
+	line-height: 1.35;
 }

@@ -29,3 +29,21 @@
 		grid-template-columns: 340px minmax(0, 1fr);
 	}
 }
+
+// Od 1280 px kolumny wyrównują się do połowy każda, i to jest naprawa regresji, a nie zmiana zdania.
+//
+// `inputs.less` opisuje ten panel jako „input band" i tłumaczy, że zastąpił pionowy pasek boczny
+// właśnie dlatego, że tamten „zabierał ćwiartkę szerokości tabeli porównawczej". Panel wrócił
+// jednak do postaci paska: 340 px na dwanaście pól to około 1400 px wysokości, więc tabela kończy
+// się w jednej trzeciej strony, a pod nią zostaje pusty pas na tysiąc pikseli. Przy połówce (~700 px
+// na ekranie 1440) formularz układa pola po dwa w rzędzie, ma około 700 px wysokości i obie kolumny
+// kończą się mniej więcej w tym samym miejscu.
+//
+// ⚠️ Dopiero od 1280, nie od 992. Przy 992 połówka ma ~480 px: formularz nie zmieści dwóch pól obok
+// siebie, a tabela zejdzie poniżej swojego uczciwego minimum 560 px i zacznie się przewijać w
+// poziomie. Między 992 a 1280 pasek 340 px jest nadal lepszym z dwóch układów.
+@media (min-width: 1280px) {
+	.moto {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}

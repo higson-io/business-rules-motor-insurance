@@ -85,9 +85,20 @@
 					antyselekcję. Przy udziale poniżej 50% stawka rośnie.
 				</p>
 
-				<p class="group__insured" data-testid="group-insured">
-					Ubezpieczonych: <strong>{{ sum(insuredCount()) }}</strong>
-				</p>
+				<!--
+					⛔ Znika, gdy reguły nie podały liczby — a nie pokazuje wtedy zera.
+					`insuredCount` przychodzi z fazy przystąpień, której w Higsonie nie ma: flow
+					`demo.life.group.calculateQuote` zwraca wyłącznie `eligible` i `variants`, więc
+					pole jechało przez DTO puste i ekran wypisywał „Ubezpieczonych: 0". Zero jest
+					tu twierdzeniem, i to fałszywym — brak liczby nie jest liczbą zero.
+					To samo dotyczy `programCost` (decyzja D-2): dopóki nie ma rozkładu wyborów
+					pracowników, rzeczywistego kosztu programu nie ma z czego policzyć.
+				-->
+				@if (insuredCount(); as count) {
+					<p class="group__insured" data-testid="group-insured">
+						Ubezpieczonych: <strong>{{ sum(count) }}</strong>
+					</p>
+				}
 			</section>
 
 			<section class="inputs__group">
@@ -127,7 +138,7 @@
 
 					@for (variant of variants(); track variant.code) {
 						<th scope="col" class="quote__tier" data-testid="group-variant">
-							<span class="quote__tier__name">{{ variant.code }}</span>
+							<span class="quote__tier__name">{{ variant.name }}</span>
 
 							<span
 								class="quote__tier__gauge"
@@ -203,10 +214,5 @@
 
 		</table>
 		</div>
-
-		<p class="group__disclaimer">
-			Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
-			Kodeksu cywilnego.
-		</p>
 	</div>
 </div>

@@ -17,8 +17,6 @@
 .html-popover {
 	position: relative;
 	min-width: 340px;
-	// Room for the arrow, which is drawn outside the panel's left edge.
-	margin-left: 19px;
 	padding: 15px;
 	border: 1px solid var(--mat-sys-primary);
 	border-radius: 4px;
@@ -40,19 +38,15 @@
 	max-width: 480px;
 }
 
-// `tip-arrow` was an element; here the same 19×19 `imgs/arrow-tooltip.svg` is a pseudo-element,
-// which is what it always was in spirit — decoration with no content and no accessibility meaning.
-// The panel is anchored to the right edge of the coverage row and vertically centred on it
-// (`html-popover.ts`), so the arrow points back left at its origin.
-.html-popover::before {
-	content: '';
-	position: absolute;
-	top: 50%;
-	left: -19px;
-	width: 19px;
-	height: 19px;
-	transform: translateY(-50%);
-	background-image: url('imgs/arrow-tooltip.svg');
-	background-repeat: no-repeat;
-	background-position: right center;
-}
+// ⛔ STRZAŁKA USUNIĘTA, wraz z 19-pikselowym marginesem, który robił jej miejsce.
+//
+// Była przypięta na sztywno do `top: 50%; left: -19px`, czyli poprawna wyłącznie dla pozycji po
+// prawej stronie punktu zaczepienia — jedynej, jaką panel wtedy miał. Odkąd `html-popover.ts` ma
+// warianty awaryjne i domyślnie otwiera się POD etykietą, ta strzałka wskazywałaby w bok, na nic.
+//
+// Nie została przepisana pod każdą pozycję, tylko wycięta: panel, który pojawia się bezpośrednio
+// pod rzeczą, na którą patrzysz, nie potrzebuje wskaźnika. To resztka po `angular-tooltips`
+// (`tip-arrow`), przeniesiona z układu, w którym tooltip potrafił stanąć daleko od źródła.
+//
+// `imgs/arrow-tooltip.svg` przestaje mieć jakiegokolwiek odbiorcę — bundler wyemituje go tylko
+// wtedy, gdy coś się do niego odwoła, więc nic nie zostaje w artefakcie.

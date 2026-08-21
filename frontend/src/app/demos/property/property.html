@@ -10,6 +10,8 @@
 	</p>
 </header>
 
+<app-error-banner [loadError]="loadError()" testId="property-error-banner" />
+
 <app-property-effective-date />
 
 <div class="property">
@@ -49,7 +51,7 @@
 				<div class="property__price">
 					<p class="property__price-variant">{{ variant.name }}</p>
 					<p class="property__price-amount" data-testid="property-premium">
-						{{ variant.annualPremium }} zł
+						{{ premium(variant.annualPremium) }} zł
 					</p>
 					<p class="property__price-note">za wybrany okres ochrony</p>
 				</div>

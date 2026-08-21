@@ -67,9 +67,6 @@ export class QuoteStore {
 		loader: () => firstValueFrom(this.driverService.getDriver()),
 	});
 
-	/** Written by the mutation-error interceptor; rendered by the existing error banner. */
-	readonly mutationError = signal<string | null>(null);
-
 	/** Replaces `$scope.$emit('recalculate')` at all 11 emit sites. */
 	recalculate(): void {
 		this.reloadTrigger.update((n) => n + 1);

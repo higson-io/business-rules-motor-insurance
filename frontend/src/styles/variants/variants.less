@@ -182,6 +182,14 @@
 	font-weight: 400;
 }
 
+// ⛔ Zniżka dostaje akcent, składka przed zniżkami zostaje szara. Do tej pory obie były tym samym
+// wyciszonym szarym, więc jedyny wiersz mówiący, że reguły policzyły coś O TYM KIEROWCY, ważył tyle
+// samo co podsuma — i mniej niż wiersze ochron nad nim.
+.quote__row--discount .quote__cell {
+	color: @color-accent;
+	font-weight: 700;
+}
+
 .quote__row--total .quote__row__label {
 	padding-top: 14px;
 	padding-bottom: 22px;
@@ -239,4 +247,14 @@
 	.quote__cell--total {
 		font-size: 1.25rem;
 	}
+}
+
+// Różnica względem najtańszego wariantu. Drobna i pod ceną, bo jest odczytem, nie ofertą.
+.quote__delta {
+	display: block;
+	margin-top: 2px;
+	font-size: 0.6875rem;
+	font-weight: 400;
+	color: @color-text-muted;
+	font-variant-numeric: tabular-nums;
 }

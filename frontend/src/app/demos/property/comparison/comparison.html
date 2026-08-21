@@ -4,7 +4,7 @@
 -->
 @if (ready()) {
 	<div class="compare">
-		<h3 class="compare__title">Czym różnią się warianty</h3>
+		<h2 class="compare__title">Czym różnią się warianty</h2>
 
 		<div class="compare__scroll">
 			<table class="compare__table" data-testid="property-comparison">
@@ -42,7 +42,7 @@
 						@for (variant of variants(); track variant.code) {
 							<td [class.compare__col--picked]="variant.code === selected()">
 								@if (variant.available) {
-									{{ variant.annualPremium }} zł
+									{{ premium(variant.annualPremium) }} zł
 								} @else {
 									niedostępny
 								}

@@ -35,22 +35,34 @@
 			<div class="date-band__figure">
 				<span class="date-band__number">{{ reading.questions }}</span>
 				<span class="date-band__unit">pytań w ankiecie</span>
+				<!--
+					⛔ Porównanie per liczba, nie per pasek. Wersjonowanie jest SELEKTYWNE — kod
+					pocztowy z obszaru 50 daje tę samą sumę po obu stronach progu — więc znacznik
+					musi milczeć wszędzie tam, gdzie reżim się zmienił, a ta konkretna liczba nie.
+					Jego milczenie jest wtedy informacją.
+				-->
 				@if (before(); as was) {
-					<span class="date-band__was">było {{ was.questions }}</span>
+					@if (was.questions !== reading.questions) {
+						<span class="date-band__was">było {{ was.questions }}</span>
+					}
 				}
 			</div>
 			<div class="date-band__figure">
 				<span class="date-band__number">{{ reading.sections }}</span>
 				<span class="date-band__unit">sekcje</span>
 				@if (before(); as was) {
-					<span class="date-band__was">było {{ was.sections }}</span>
+					@if (was.sections !== reading.sections) {
+						<span class="date-band__was">było {{ was.sections }}</span>
+					}
 				}
 			</div>
 			<div class="date-band__figure">
 				<span class="date-band__number">{{ reading.justified ? 'tak' : 'nie' }}</span>
 				<span class="date-band__unit">pisemne uzasadnienie</span>
 				@if (before(); as was) {
-					<span class="date-band__was">było {{ was.justified ? 'tak' : 'nie' }}</span>
+					@if (was.justified !== reading.justified) {
+						<span class="date-band__was">było {{ was.justified ? 'tak' : 'nie' }}</span>
+					}
 				}
 			</div>
 		</div>

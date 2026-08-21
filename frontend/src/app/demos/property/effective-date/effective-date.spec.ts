@@ -191,6 +191,34 @@ describe('Property EffectiveDate', () => {
 		);
 	});
 
+	it('milczy o liczbie, która się nie zmieniła, choć reżim owszem', async () => {
+		// Wersjonowanie jest selektywne. Reżim przeskakuje, ale sekcje zostają dwie — i właśnie
+		// wtedy znacznik „było" przy sekcjach byłby szumem, a jego brak jest odpowiedzią.
+		const { element, reload } = await render(
+			quote(STATUTORY, [
+				question({ code: 'AREA', section: 'SUBJECT' }),
+				question({ code: 'BUDGET', section: 'NEEDS' }),
+			]),
+		);
+
+		await reload(
+			quote(KNF, [
+				question({ code: 'AREA', section: 'SUBJECT' }),
+				question({ code: 'POSTCODE', section: 'SUBJECT' }),
+				question({ code: 'BUDGET', section: 'NEEDS' }),
+			]),
+		);
+
+		const readout = element.querySelector('[data-testid="property-reading"]');
+		expect(readout?.textContent, 'liczba pytań się ruszyła, więc ma swój znacznik').toContain(
+			'było 2',
+		);
+		expect(
+			(readout?.textContent?.match(/było/g) ?? []).length,
+			'dokładnie jeden znacznik: sekcje zostały dwie, uzasadnienia jak nie było, tak nie ma',
+		).toBe(1);
+	});
+
 	it('nie pokazuje „było N", gdy reżim został ten sam a liczby się ruszyły', async () => {
 		const { element, reload } = await render(quote(STATUTORY, [question({ code: 'AREA' })]));
 

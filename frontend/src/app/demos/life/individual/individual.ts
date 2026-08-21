@@ -80,6 +80,9 @@ export class Individual {
 
 	readonly riders = computed<readonly LifeRiderDto[]>(() => this.loaded()?.riders ?? []);
 
+	/** Ile z siedmiu jest w umowie — przy stosie siedmiu kart licznik jest szybszy niż liczenie. */
+	readonly selectedCount = computed(() => this.riders().filter((rider) => rider.selected).length);
+
 	/** Sums offered for the main contract come from the rules, not from a constant here. */
 	readonly mainSums = computed<readonly number[]>(() => [
 		50_000, 100_000, 150_000, 200_000, 300_000, 500_000, 750_000, 1_000_000,
@@ -114,15 +117,30 @@ export class Individual {
 		return 'otyłość';
 	});
 
-	/** Each selected line's share of the monthly premium — the stacked bar above the total. */
+	/**
+	 * Udział każdej pozycji w składce miesięcznej — pasek nad sumą.
+	 *
+	 * ⛔ Umowa główna JEST tu pierwsza. Wcześniej funkcja mapowała wyłącznie umowy dodatkowe, więc
+	 * pasek otwierał się pustą szarą belką na kilkadziesiąt procent szerokości — a gałąź
+	 * `part.code === 'MAIN'` w szablonie nie miała jak się kiedykolwiek zapalić.
+	 *
+	 * Składka umowy głównej to reszta: suma z reguł minus składki umów dodatkowych z reguł. To
+	 * arytmetyka na zwróconych liczbach, nie druga wycena — i tylko taka daje pewność, że kawałki
+	 * paska sumują się do stu procent.
+	 */
 	readonly shares = computed(() => {
 		const total = this.premiumMonthly();
 		if (total <= 0) {
 			return [];
 		}
-		return this.riders()
-			.filter((rider) => rider.selected && rider.premium !== null)
-			.map((rider) => ({ code: rider.code, share: (rider.premium ?? 0) / total }));
+		const selected = this.riders().filter((rider) => rider.selected && rider.premium !== null);
+		const ridersTotal = selected.reduce((sum, rider) => sum + (rider.premium ?? 0), 0);
+		const main = Math.max(0, total - ridersTotal);
+
+		return [
+			{ code: 'MAIN', share: main / total },
+			...selected.map((rider) => ({ code: rider.code, share: (rider.premium ?? 0) / total })),
+		];
 	});
 
 	// ── Interaction ───────────────────────────────────────────────────────────────────────────

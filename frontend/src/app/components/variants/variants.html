@@ -86,6 +86,11 @@
 				</tbody>
 
 				<tfoot>
+					<!--
+						The three rows below are the only place the screen says the rules concluded
+						something ABOUT THIS DRIVER, rather than something about the product. They
+						were rendered quieter than the coverage rows above them.
+					-->
 					<tr class="quote__row quote__row--subtotal">
 						<th scope="row" class="quote__row__label">Price before discounts</th>
 						@for (option of m.options; track option.code) {
@@ -115,8 +120,26 @@
 					<tr class="quote__row quote__row--total">
 						<th scope="row" class="quote__row__label">Final price</th>
 						@for (option of m.options; track option.code) {
-							<td class="quote__cell quote__cell--total" data-testid="variant-premium">
-								{{ option.premium | number: '1.2-2' }}
+							<!--
+								⛔ `data-testid="variant-premium"` sits on the SPAN, not on the cell.
+								`e2e/support/app.ts:249` reads that element's text and compares it to
+								a committed golden, so the element must contain the figure and
+								nothing else — the delta below is a sibling for exactly that reason.
+							-->
+							<td class="quote__cell quote__cell--total">
+								<span data-testid="variant-premium">
+									{{ option.premium | number: '1.2-2' }}
+								</span>
+
+								<!--
+									⛔ A subtraction, not a verdict. See `deltaOf` for why this screen
+									must not carry a "recommended" badge.
+								-->
+								@if (deltaOf(option.premium); as delta) {
+									<span class="quote__delta" data-testid="variant-delta">
+										+{{ delta.amount | number: '1.2-2' }} vs {{ delta.base }}
+									</span>
+								}
 							</td>
 						}
 					</tr>

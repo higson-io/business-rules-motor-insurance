@@ -2,6 +2,8 @@
 	Data początku ochrony stoi NAD wyborem ścieżki, bo dotyczy obu. Kopia w każdej ścieżce
 	pozwoliłaby obu ekranom twierdzić, że wyceniają według innej wersji taryfy.
 -->
+<app-error-banner [loadError]="loadError()" testId="life-error-banner" />
+
 <app-life-effective-date />
 
 <!--
@@ -13,6 +15,8 @@
 		type="button"
 		role="tab"
 		class="life-paths__tab"
+		id="life-tab-individual"
+		aria-controls="life-panel-individual"
 		data-testid="life-path-individual"
 		[class.life-paths__tab--on]="path() === 'individual'"
 		[attr.aria-selected]="path() === 'individual'"
@@ -26,6 +30,8 @@
 		type="button"
 		role="tab"
 		class="life-paths__tab"
+		id="life-tab-group"
+		aria-controls="life-panel-group"
 		data-testid="life-path-group"
 		[class.life-paths__tab--on]="path() === 'group'"
 		[attr.aria-selected]="path() === 'group'"
@@ -36,11 +42,29 @@
 	</button>
 </div>
 
+<!--
+	⛔ role="tabpanel" wymaga id, na które wskazuje aria-controls zakładki, i aria-labelledby
+	wskazującego z powrotem. Bez tej pary czytnik ekranu ogłasza dwa przyciski i osierocony obszar,
+	czyli dokładnie to, czego role="tab" miało uniknąć.
+-->
 @switch (path()) {
 	@case ('group') {
-		<app-life-group />
+		<div id="life-panel-group" role="tabpanel" aria-labelledby="life-tab-group">
+			<app-life-group />
+		</div>
 	}
 	@default {
-		<app-life-individual />
+		<div id="life-panel-individual" role="tabpanel" aria-labelledby="life-tab-individual">
+			<app-life-individual />
+		</div>
 	}
 }
+
+<!--
+	Jedna klauzula na całe demo, a nie kopia w każdej ścieżce. Obie ścieżki miały własną, identyczną
+	co do słowa — dwa miejsca do rozjechania się w treści, która jest prawna.
+-->
+<p class="life__disclaimer">
+	Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66 Kodeksu
+	cywilnego.
+</p>

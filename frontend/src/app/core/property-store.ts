@@ -29,9 +29,6 @@ export class PropertyStore {
 		loader: () => firstValueFrom(this.propertyService.getQuote()),
 	});
 
-	/** Written by the mutation-error interceptor; rendered by the shared error banner. */
-	readonly mutationError = signal<string | null>(null);
-
 	/**
 	 * Every mutation goes through here: send the change, then reload. Sequencing matters — the GET
 	 * has to run after the PUT has been applied to the session bean, otherwise the screen shows the

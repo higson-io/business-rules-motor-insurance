@@ -3,6 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { MatCard } from '@angular/material/card';
 
 import { HtmlPopover } from '../../shared/html-popover/html-popover';
+import { MutationErrors } from '../../core/mutation-errors';
 import { QuoteStore } from '../../core/quote-store';
 import { bodyMessageOf } from '../../core/http-error-message';
 import { buildQuoteMatrix } from './quote-matrix';
@@ -32,6 +33,7 @@ const GENERIC_QUOTE_ERROR = 'The quote could not be calculated.';
 })
 export class Variants {
 	private readonly store = inject(QuoteStore);
+	private readonly mutationErrors = inject(MutationErrors);
 
 	/**
 	 * ⛔ DR-07 — the stale cards must vanish when the quote fails.
@@ -64,6 +66,29 @@ export class Variants {
 	readonly matrix = computed(() => buildQuoteMatrix(this.options()));
 
 	/**
+	 * What a tier costs over the cheapest one, or null for the cheapest itself.
+	 *
+	 * ⛔ Arithmetic over the returned figures, NOT a recommendation. The distinction matters on this
+	 * screen more than anywhere: `OptionDto` carries no recommendation flag, so a "best value" badge
+	 * would be a judgement invented in TypeScript, on the one screen whose entire claim is that
+	 * judgements live in configuration. A subtraction is checkable against the two numbers above it.
+	 *
+	 * ⚠️ The cheapest is found by price, not by position. The rules decide the order of the options
+	 * and are free to return a cheaper tier second.
+	 */
+	deltaOf(premium: number): { readonly amount: number; readonly base: string } | null {
+		const options = this.options();
+		if (options.length < 2) {
+			return null;
+		}
+		const cheapest = options.reduce((low, option) => (option.premium < low.premium ? option : low));
+		if (premium <= cheapest.premium) {
+			return null;
+		}
+		return { amount: premium - cheapest.premium, base: cheapest.code };
+	}
+
+	/**
 	 * ⚠️ Derived from the response, never from the column's position. The obvious shortcut is
 	 * `nth-child(1|2|3)` in CSS with the widths written by hand, which is a lie the moment the rules
 	 * return a fourth option or return them in another order — and the rules are exactly the thing
@@ -81,7 +106,7 @@ export class Variants {
 	 * it never becomes a tombstone.
 	 */
 	readonly errorMessage = computed<string | null>(() => {
-		const mutationFailure = this.store.mutationError();
+		const mutationFailure = this.mutationErrors.message();
 		if (mutationFailure !== null) {
 			return mutationFailure;
 		}

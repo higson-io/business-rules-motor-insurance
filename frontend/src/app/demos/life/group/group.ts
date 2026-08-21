@@ -68,7 +68,7 @@ export class Group {
 	);
 
 	readonly insuredCount = computed(() => this.loaded()?.insuredCount ?? null);
-	readonly eligible = computed(() => this.loaded()?.decision !== 'DECLINE');
+
 
 	/**
 	 * How many benefits a variant carries, against the richest — the gauge under each column

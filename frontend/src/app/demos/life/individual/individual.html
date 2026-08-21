@@ -63,11 +63,19 @@
 					</mat-form-field>
 				</div>
 
-				<!-- BMI is not asked for, it is shown: the two fields above already answer it. -->
-				<p class="life__bmi" data-testid="life-bmi">
-					BMI <strong>{{ bmiText() }}</strong>
-					<span class="life__bmi__band">{{ bmiLabel() }}</span>
-				</p>
+				<!--
+					BMI nie jest pytaniem, tylko odpowiedzią: dwa pola wyżej już je wyznaczają.
+
+					⛔ Za `ready()`, bo przed pierwszą odpowiedzią serwera wzrost i waga są zerami, a
+					`bmiLabel()` na zerze wypisuje pełnym zdaniem „niedowaga". Pierwszą rzeczą na
+					ekranie była więc diagnoza postawiona nikomu.
+				-->
+				@if (ready()) {
+					<p class="life__bmi" data-testid="life-bmi">
+						BMI <strong>{{ bmiText() }}</strong>
+						<span class="life__bmi__band">{{ bmiLabel() }}</span>
+					</p>
+				}
 			</section>
 
 			<section class="inputs__group">
@@ -126,7 +134,12 @@
 				</mat-form-field>
 			</section>
 
-			<h2 class="policy__heading">Umowy dodatkowe</h2>
+			<h2 class="policy__heading">
+				Umowy dodatkowe
+				<span class="policy__heading__count" data-testid="life-riders-selected">
+					wybrane {{ selectedCount() }} z {{ riders().length }}
+				</span>
+			</h2>
 
 			<ul class="policy__riders">
 				@for (rider of riders(); track rider.code) {
@@ -161,11 +174,24 @@
 										[value]="amountOf(rider)"
 										(selectionChange)="setAmount(rider, $event.value)"
 									>
-										@for (amount of rider.sums ?? []; track amount) {
+										@for (amount of rider.sums; track amount) {
 											<mat-option [value]="amount">{{ sum(amount) }} zł</mat-option>
 										}
 									</mat-select>
 								</mat-form-field>
+
+								<!--
+									⛔ Pułap sumy, a nie ozdobnik. Jest to MNIEJSZA z dwóch wartości:
+									pułapu produktowego względem umowy głównej (D-3) i pułapu
+									dochodowego (D-7). Backend liczy ją i niósł w DTO jako `maxSum`,
+									którego żaden szablon nie czytał — więc jedyne miejsce, w którym
+									dochód klienta widać na ekranie, nie istniało.
+								-->
+								@if (rider.selected && rider.maxSum !== null) {
+									<p class="policy__rider__cap">
+										Maksimum tutaj: {{ sum(rider.maxSum) }} zł
+									</p>
+								}
 							} @else {
 								<p class="policy__rider__flat">Pakiet usług — bez sumy ubezpieczenia</p>
 							}
@@ -173,11 +199,6 @@
 					</li>
 				}
 			</ul>
-
-			<p class="policy__disclaimer">
-				Wyliczenie poglądowe na potrzeby demonstracji. Nie stanowi oferty w rozumieniu art. 66
-				Kodeksu cywilnego.
-			</p>
 		</div>
 	</div>
 
@@ -227,9 +248,17 @@
 			</div>
 
 			<!--
-				⛔ binding, nie obecność składki. REFER wraca z pełną ceną i mimo to nie jest
-				wiążący — bez tego rozróżnienia ekran pokazałby cenę wstępną jak ofertę (D-1).
+				⛔ binding, nie obecność składki. REFER wraca z PEŁNĄ ceną i mimo to nie jest wiążący.
+				Do tej pory pole `binding` było liczone i nieużywane, więc ekran pokazywał cenę
+				wstępną dokładnie tak samo jak ofertę — czyli tracił dokładnie to rozróżnienie, dla
+				którego backend niesie osobne pole (D-1).
 			-->
+			@if (ready() && !binding()) {
+				<p class="policy__provisional" data-testid="life-not-binding">
+					Cena wstępna — wniosek wymaga decyzji underwritera i nie jest wiążący.
+				</p>
+			}
+
 			@if (message(); as text) {
 				<p class="policy__notice" data-testid="life-decision-message">{{ text }}</p>
 			}

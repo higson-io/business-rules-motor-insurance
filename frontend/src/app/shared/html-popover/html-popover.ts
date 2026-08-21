@@ -44,10 +44,26 @@ export class HtmlPopover implements OnDestroy {
 		}
 
 		this.overlayRef = this.overlay.create({
+			/*
+			 * ⛔ CZTERY pozycje, nie jedna, i pierwsza jest POD etykietą.
+			 *
+			 * Jedyną pozycją było wcześniej `end/center → start/center`: panel otwierał się w prawo
+			 * od punktu zaczepienia. Punktem zaczepienia jest komórka nagłówkowa wiersza, czyli
+			 * pierwsza kolumna tabeli porównawczej, a panel ma `min-width: 340px` — więc kładł się
+			 * dokładnie na składkach wariantów BRONZE i SILVER. Za każdym razem, na każdym wierszu,
+			 * przy każdej szerokości okna. Z jednym wpisem w `withPositions()` CDK nie ma na co
+			 * odbić: lista pozycji JEST listą wariantów awaryjnych.
+			 *
+			 * Pod etykietą panel mieści się w szerokości kolumny etykiet i nie zasłania żadnej
+			 * liczby. Bok zostaje na końcu, na wypadek wiersza tak nisko, że ani pod, ani nad nim
+			 * nie ma miejsca.
+			 */
 			positionStrategy: this.overlay
 				.position()
 				.flexibleConnectedTo(this.elementRef)
 				.withPositions([
+					{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' },
+					{ originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
 					{ originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center' },
 				]),
 			scrollStrategy: this.overlay.scrollStrategies.reposition(),

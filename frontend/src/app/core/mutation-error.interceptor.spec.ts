@@ -4,12 +4,14 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { mutationErrorInterceptor } from './mutation-error.interceptor';
-import { QuoteStore } from './quote-store';
+import { MutationErrors } from './mutation-errors';
 
 describe('mutationErrorInterceptor', () => {
-	// The store's resources only load once change detection runs, so this suite never calls
-	// TestBed.tick(): the only traffic it sees is the PUT under test.
-	it('writes a message into the store for a failed PUT and issues no retry', () => {
+	// ⛔ `httpTesting.verify()` at the end is what pins the second half of this: injecting
+	// `MutationErrors` must not start ANY other traffic. Back when the interceptor injected
+	// `QuoteStore`, a failed PUT in the life demo also instantiated the motor store and fetched a
+	// motor quote — this test would have caught it, and did not exist to.
+	it('writes a message for a failed PUT, issues no retry, and fetches nothing', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				provideZonelessChangeDetection(),
@@ -19,9 +21,9 @@ describe('mutationErrorInterceptor', () => {
 		});
 		const httpTesting = TestBed.inject(HttpTestingController);
 		const http = TestBed.inject(HttpClient);
-		const store = TestBed.inject(QuoteStore);
+		const errors = TestBed.inject(MutationErrors);
 
-		expect(store.mutationError(), 'no mutation has failed yet').toBeNull();
+		expect(errors.message(), 'no mutation has failed yet').toBeNull();
 
 		http.put('driver/address/city', 'Krakow').subscribe({
 			next: () => undefined,
@@ -35,7 +37,7 @@ describe('mutationErrorInterceptor', () => {
 			},
 		);
 
-		expect(store.mutationError(), 'the failed PUT surfaces its message through the store').toBe(
+		expect(errors.message(), 'the failed PUT surfaces its message').toBe(
 			'Driver address city not supplied.',
 		);
 		expect(
