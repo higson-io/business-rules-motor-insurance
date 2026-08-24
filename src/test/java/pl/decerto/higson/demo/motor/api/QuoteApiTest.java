@@ -37,7 +37,14 @@ class QuoteApiTest extends ApiContractTestSupport {
 	void quoteReturnsCoveragesAndDiscountsAlreadySortedByPosition() throws Exception {
 		JsonNode quote = getJson("/quote", newSession());
 
-		assertEquals(1, quote.size(), "QuoteDto must expose exactly one field: options");
+		// The exact count is the point: it is a lock, so that a field cannot join the wire surface
+		// unnoticed. It went from 1 to 3 deliberately, when the motor demo gained a needs analysis —
+		// `policyStartDate` because APK's regime is versioned by the policy date, and `apkRegime`
+		// because the screen must name the regime without knowing the threshold date itself.
+		assertEquals(3, quote.size(),
+				"QuoteDto must expose exactly three fields: options, policyStartDate and apkRegime");
+		assertTrue(quote.has("policyStartDate"), "the policy date selects the APK regime version");
+		assertTrue(quote.has("apkRegime"), "the regime comes from the rules, never from the client");
 		JsonNode options = quote.get("options");
 		assertEquals(3, options.size(), "the FULL plan must yield three rating options");
 

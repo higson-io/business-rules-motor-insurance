@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import pl.decerto.higson.demo.apk.api.RegimeDto;
 import pl.decerto.higson.demo.motor.api.dto.CoverageDto;
 import pl.decerto.higson.demo.motor.api.dto.DiscountDto;
 import pl.decerto.higson.demo.motor.api.dto.OptionDto;
@@ -22,6 +23,8 @@ public class QuoteConverter implements Converter<Quote, QuoteDto> {
 	public QuoteDto convert(Quote quote) {
 		Objects.requireNonNull(quote, "Quote can not be null");
 		QuoteDto dto = new QuoteDto();
+		dto.setPolicyStartDate(quote.getPolicyStartDate());
+		dto.setApkRegime(RegimeDto.of(quote.getApkRegime()));
 		dto.setOptions(quote.getOptions()
 			.stream()
 			.map(this::toOptionDto)

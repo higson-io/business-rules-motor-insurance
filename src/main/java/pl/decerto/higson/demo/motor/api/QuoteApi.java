@@ -1,7 +1,13 @@
 package pl.decerto.higson.demo.motor.api;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.decerto.higson.demo.motor.converter.QuoteConverter;
@@ -32,5 +38,22 @@ public class QuoteApi {
 		Quote quote = quoteService.getQuote();
 		motor.calculate(quote);
 		return quoteConverter.convert(quote);
+	}
+
+	/**
+	 * Data początku ochrony.
+	 *
+	 * ⛔ Przyjmuje OBIEKT daty, nie tekst — tak samo jak `PUT life/startDate` i
+	 * `PUT property/startDate`. String przyszedłby jako `text/plain` i Jackson odpowiada 415.
+	 *
+	 * ⚠️ Podłoga na dniu dzisiejszym jest celowa. Ta data trafia do `engine.setEffectiveDate`,
+	 * więc steruje także regionem MOTOR, którego próg leży 1 listopada 2020 r. Data z przeszłości
+	 * przełączyłaby taryfę na wersję 1 i zmieniła ceny — a polisa i tak nie może zacząć się wczoraj.
+	 */
+	@PutMapping("/startDate")
+	public void setStartDate(@RequestBody Date startDate) {
+		LocalDate value = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate today = LocalDate.now();
+		quoteService.getQuote().setPolicyStartDate(value.isBefore(today) ? today : value);
 	}
 }

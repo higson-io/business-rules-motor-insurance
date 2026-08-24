@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.decerto.higson.demo.apk.RegimeReader;
 import pl.decerto.higson.demo.motor.context.MotorContext;
 
 import java.math.BigDecimal;
@@ -30,6 +31,8 @@ import pl.decerto.higson.demo.motor.domain.Vehicle;
 public class Motor {
 
 	private static final Logger log = LoggerFactory.getLogger(Motor.class);
+
+	private static final String PARAM_APK_REGIME = "demo.moto.apk.regime";
 
 	private final HigsonEngine engine;
 
@@ -77,6 +80,26 @@ public class Motor {
 
 		quoteValidator.validateQuote(quote);
 		String planCode = quote.getPlan();
+
+		// Data polisy steruje wersją regionu. Ustawiana raz na całą wycenę, czyszczona w finally:
+		// effective date jest stanem silnika, nie żądania, i niewyczyszczona wyciekłaby na kolejną
+		// wycenę w tym samym wątku.
+		Date effective = Date.from(quote.getPolicyStartDate()
+			.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		engine.setEffectiveDate(effective);
+		try {
+			calculateWithEffectiveDate(quote, planCode);
+		} finally {
+			engine.clearEffectiveDate();
+		}
+	}
+
+	private void calculateWithEffectiveDate(Quote quote, String planCode) {
+
+		// ⛔ Reżim APK czytany PO setEffectiveDate. Wersjonuje go region APK_MOTOR, oś regulacyjna
+		// niezależna od taryfowego regionu MOTOR - próg 1 lipca 2027 to termin z §2 uchwały KNF
+		// 190/2026, a nie data zmiany cennika.
+		quote.setApkRegime(RegimeReader.read(engine, PARAM_APK_REGIME, new MotorContext(quote)));
 
 		// handle to plan
 		DomainObject plan = engine.getDomain("DEMO", "/").getChild("PLANS", planCode);

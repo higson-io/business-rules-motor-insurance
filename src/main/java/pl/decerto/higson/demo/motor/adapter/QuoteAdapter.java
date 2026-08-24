@@ -18,6 +18,7 @@ public class QuoteAdapter extends Adapter {
 	protected Mapping getMapping() {
 		return new Mapping()
 			.add("planCode", quote != null ? quote.getPlan() : null)
+			.add("policyStartDate", quote != null ? quote.getPolicyStartDate() : null)
 			.add("driver", new DriverAdapter(quote.getDriver()))
 			.add("vehicle", new VehicleAdapter(quote.getVehicle()))
 			.add("options", new CollectionAdapter(quote.getOptions(),
