@@ -1,7 +1,7 @@
 package pl.decerto.higson.demo.apk;
 
 import io.higson.runtime.core.HigsonEngine;
-import io.higson.runtime.engine.core.context.ParamContext;
+import io.higson.runtime.core.HigsonContext;
 import io.higson.runtime.engine.core.output.ParamValue;
 
 /**
@@ -16,7 +16,7 @@ public final class RegimeReader {
 	private RegimeReader() {
 	}
 
-	public static Regime read(HigsonEngine engine, String parameterCode, ParamContext ctx) {
+	public static Regime read(HigsonEngine engine, String parameterCode, HigsonContext ctx) {
 		ParamValue value = engine.get(parameterCode, ctx);
 		Regime regime = new Regime();
 		regime.setCode(value.getString("code"));

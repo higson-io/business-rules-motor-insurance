@@ -3,6 +3,7 @@ package pl.decerto.higson.demo.motor.api.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import pl.decerto.higson.demo.apk.api.QuestionDto;
 import pl.decerto.higson.demo.apk.api.RegimeDto;
 
 public class QuoteDto {
@@ -13,6 +14,17 @@ public class QuoteDto {
 
 	/** Reżim analizy potrzeb, z reguł. Front nie zna daty progu. */
 	private RegimeDto apkRegime;
+
+	/** Ankieta APK: pytania razem z odpowiedziami, w kolejności z reguł. */
+	private List<QuestionDto> apkQuestions;
+
+	public List<QuestionDto> getApkQuestions() {
+		return apkQuestions;
+	}
+
+	public void setApkQuestions(List<QuestionDto> apkQuestions) {
+		this.apkQuestions = apkQuestions;
+	}
 
 	public LocalDate getPolicyStartDate() {
 		return policyStartDate;

@@ -1,7 +1,14 @@
 package pl.decerto.higson.demo.motor.context;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.higson.runtime.core.HigsonContext;
 import org.apache.commons.lang3.StringUtils;
+
+import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Question;
 
 import pl.decerto.higson.demo.motor.adapter.CoverageAdapter;
 import pl.decerto.higson.demo.motor.adapter.OptionAdapter;
@@ -19,6 +26,20 @@ public class MotorContext extends HigsonContext {
 	private Driver driver;
 	private Option option;
 
+	/**
+	 * Odpowiedzi ankiety APK, zebrane pod ścieżkami, które podał Higson.
+	 *
+	 * ⛔ Bez adapterów per pole i to jest decyzja, nie skrót. Ścieżkę każdej odpowiedzi podaje
+	 * atrybut CONTEXT_PATH pytania — adapter wyliczający pola jeden po drugim przywróciłby
+	 * dokładnie to sprzężenie, którego cała ta konstrukcja się pozbywa: dołożenie pytania w Studio
+	 * wymagałoby wtedy zmiany w Javie i wdrożenia.
+	 */
+	private final Map<String, Object> apkValues = new HashMap<>();
+
+	private String questionCode;
+	private String answerValue;
+	private String reasonCode;
+
 
 	public MotorContext(Object... args) {
 		super(args);
@@ -26,6 +47,76 @@ public class MotorContext extends HigsonContext {
 
 	public MotorContext(Coverage coverage) {
 		this.coverage = coverage;
+	}
+
+	public MotorContext(Quote quote) {
+		this.quote = quote;
+		collectAnswers();
+	}
+
+	public MotorContext withQuestion(String code) {
+		this.questionCode = code;
+		return this;
+	}
+
+	public MotorContext withAnswer(String value) {
+		this.answerValue = value;
+		return this;
+	}
+
+	public MotorContext withReason(String code) {
+		this.reasonCode = code;
+		return this;
+	}
+
+	/**
+	 * Przepisuje odpowiedzi pod ścieżki podane przez pytania.
+	 *
+	 * ⚠️ Konwersja idzie po VALUE_TYPE, a NIE po KIND. Silnik nie konwertuje typów przy dopasowaniu
+	 * poziomu wejściowego, więc liczba wpisana jako tekst po prostu nie trafi w wiersz i tabela
+	 * spadnie na wartość domyślną — cicho.
+	 */
+	private void collectAnswers() {
+		if (quote == null) {
+			return;
+		}
+		apkValues.put("quote.apk.vehicleAge", vehicleAge());
+
+		for (Question question : quote.getApkQuestions()) {
+			String path = question.getContextPath();
+			if (path == null || path.isEmpty()) {
+				continue;
+			}
+			Answer answer = quote.getApkAnswers().get(question.getCode());
+			if (answer == null || !answer.isAnswered()) {
+				continue;
+			}
+			apkValues.put(path, convert(question.getValueType(), answer.getValue()));
+		}
+	}
+
+	/** Wiek pojazdu jest wyliczony, nie zapytany — rocznik już go zawiera. */
+	private Integer vehicleAge() {
+		if (quote.getVehicle() == null || quote.getVehicle().getProductionYear() <= 0) {
+			return null;
+		}
+		return quote.getPolicyStartDate().getYear() - quote.getVehicle().getProductionYear();
+	}
+
+	private Object convert(String valueType, String raw) {
+		if (raw == null || raw.isEmpty()) {
+			return null;
+		}
+		if ("INTEGER".equals(valueType)) {
+			return Integer.valueOf(raw);
+		}
+		if ("DECIMAL".equals(valueType)) {
+			return new BigDecimal(raw);
+		}
+		if ("BOOLEAN".equals(valueType)) {
+			return Boolean.valueOf(raw);
+		}
+		return raw;
 	}
 
 	public MotorContext(Option option) {
@@ -85,6 +176,21 @@ public class MotorContext extends HigsonContext {
 	 */
 	@Override
 	public Object get(String path) {
+		// Elementy iteracji i odpowiedzi ankiety rozwiązują się przed adapterami — nie mają
+		// i nie powinny mieć adapterów.
+		if ("question.code".equals(path)) {
+			return questionCode;
+		}
+		if ("answer.value".equals(path)) {
+			return answerValue;
+		}
+		if ("reason.code".equals(path)) {
+			return reasonCode;
+		}
+		if (apkValues.containsKey(path)) {
+			return apkValues.get(path);
+		}
+
 		String name = getFirstToken(path);
 		String subpath = skipFirstToken(path);
 

@@ -38,13 +38,24 @@ class QuoteApiTest extends ApiContractTestSupport {
 		JsonNode quote = getJson("/quote", newSession());
 
 		// The exact count is the point: it is a lock, so that a field cannot join the wire surface
-		// unnoticed. It went from 1 to 3 deliberately, when the motor demo gained a needs analysis —
-		// `policyStartDate` because APK's regime is versioned by the policy date, and `apkRegime`
-		// because the screen must name the regime without knowing the threshold date itself.
-		assertEquals(3, quote.size(),
-				"QuoteDto must expose exactly three fields: options, policyStartDate and apkRegime");
+		// unnoticed. It went from 1 to 4 deliberately, when the motor demo gained a needs analysis —
+		// `policyStartDate` because the APK regime is versioned by the policy date, `apkRegime`
+		// because the screen must name the regime without knowing the threshold date itself, and
+		// `apkQuestions` because the questionnaire is configuration rather than markup.
+		assertEquals(4, quote.size(),
+				"QuoteDto must expose exactly four fields: options, policyStartDate, apkRegime, apkQuestions");
 		assertTrue(quote.has("policyStartDate"), "the policy date selects the APK regime version");
 		assertTrue(quote.has("apkRegime"), "the regime comes from the rules, never from the client");
+
+		// ⛔ The count is what the rules currently show, not a number this test may adjust to fit.
+		// Eight before 1 July 2027 and twelve after — the four extra questions exist only in
+		// version 2 of region APK_MOTOR. A change here means the catalogue changed in Studio.
+		JsonNode questions = quote.get("apkQuestions");
+		assertEquals(8, questions.size(), "the statutory regime shows eight questions");
+		for (JsonNode question : questions) {
+			assertTrue(question.get("text").asText().length() > 0,
+					"question " + question.get("code").asText() + " must carry text from the rules");
+		}
 		JsonNode options = quote.get("options");
 		assertEquals(3, options.size(), "the FULL plan must yield three rating options");
 

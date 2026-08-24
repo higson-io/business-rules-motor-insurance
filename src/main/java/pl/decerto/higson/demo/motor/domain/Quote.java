@@ -2,8 +2,12 @@ package pl.decerto.higson.demo.motor.domain;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Regime;
 
 public class Quote {
@@ -27,6 +31,12 @@ public class Quote {
 	/** Reżim analizy potrzeb, czytany z reguł przy każdej wycenie. */
 	private Regime apkRegime = new Regime();
 
+	/** Katalog pytań APK. Czytany z domeny przy każdej wycenie — zależy od daty polisy. */
+	private List<Question> apkQuestions = new ArrayList<>();
+
+	/** Odpowiedzi, kluczowane kodem pytania. Java nie zna żadnego z tych kodów. */
+	private Map<String, Answer> apkAnswers = new LinkedHashMap<>();
+
 	public Quote() {
 	}
 
@@ -36,6 +46,18 @@ public class Quote {
 
 	public void setPolicyStartDate(LocalDate policyStartDate) {
 		this.policyStartDate = policyStartDate;
+	}
+
+	public List<Question> getApkQuestions() {
+		return apkQuestions;
+	}
+
+	public void setApkQuestions(List<Question> apkQuestions) {
+		this.apkQuestions = apkQuestions;
+	}
+
+	public Map<String, Answer> getApkAnswers() {
+		return apkAnswers;
 	}
 
 	public Regime getApkRegime() {

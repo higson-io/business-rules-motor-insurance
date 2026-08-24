@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.QuestionCatalogue;
 import pl.decerto.higson.demo.apk.RegimeReader;
 import pl.decerto.higson.demo.motor.context.MotorContext;
 
@@ -32,7 +35,11 @@ public class Motor {
 
 	private static final Logger log = LoggerFactory.getLogger(Motor.class);
 
+	private static final String PROFILE = "DEMO";
+	private static final String COLLECTION_APK_QUESTIONS = "APK_QUESTIONS";
+
 	private static final String PARAM_APK_REGIME = "demo.moto.apk.regime";
+	private static final String PARAM_APK_DEFAULT_ANSWER = "demo.moto.apk.question.defaultAnswer";
 
 	private final HigsonEngine engine;
 
@@ -94,12 +101,47 @@ public class Motor {
 		}
 	}
 
+	/**
+	 * Katalog pytań z domeny. Cztery pytania istnieją wyłącznie w drugiej wersji regionu
+	 * APK_MOTOR, więc ta lista zmienia długość wraz z datą polisy — i to jest cała demonstracja.
+	 */
+	private void loadApkQuestions(Quote quote) {
+		DomainObject root = engine.getDomain(PROFILE, "/");
+		quote.setApkQuestions(QuestionCatalogue.read(root, COLLECTION_APK_QUESTIONS,
+			code -> new MotorContext(quote).withQuestion(code)));
+	}
+
+	/**
+	 * Wypełnia nieudzielone odpowiedzi wartościami demonstracyjnymi z tabeli.
+	 *
+	 * Wartości są w Higsonie, a nie tutaj, z tego samego powodu co reszta: gdyby siedziały w
+	 * Javie, kod musiałby znać kody pytań, a nowe pytanie wymagałoby wdrożenia.
+	 */
+	private void seedApkDefaults(Quote quote) {
+		for (Question question : quote.getApkQuestions()) {
+			if (quote.getApkAnswers().containsKey(question.getCode())) {
+				continue;
+			}
+			MotorContext ctx = new MotorContext(quote).withQuestion(question.getCode());
+			String value = engine.get(PARAM_APK_DEFAULT_ANSWER, ctx).getString("value");
+			if (value == null || value.isEmpty()) {
+				continue;
+			}
+			quote.getApkAnswers().put(question.getCode(), new Answer(value));
+		}
+	}
+
 	private void calculateWithEffectiveDate(Quote quote, String planCode) {
 
 		// ⛔ Reżim APK czytany PO setEffectiveDate. Wersjonuje go region APK_MOTOR, oś regulacyjna
 		// niezależna od taryfowego regionu MOTOR - próg 1 lipca 2027 to termin z §2 uchwały KNF
 		// 190/2026, a nie data zmiany cennika.
 		quote.setApkRegime(RegimeReader.read(engine, PARAM_APK_REGIME, new MotorContext(quote)));
+		loadApkQuestions(quote);
+		seedApkDefaults(quote);
+		// Drugi odczyt katalogu: widoczność zależy od odpowiedzi, więc przed ich ustaleniem
+		// pytania warunkowe pokazałyby się w złym stanie.
+		loadApkQuestions(quote);
 
 		// handle to plan
 		DomainObject plan = engine.getDomain("DEMO", "/").getChild("PLANS", planCode);
