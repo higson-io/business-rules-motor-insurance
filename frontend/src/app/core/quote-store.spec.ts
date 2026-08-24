@@ -5,9 +5,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 
 import { QuoteStore } from './quote-store';
 import { DriverDto } from '../models/driver';
+import { APK_ABSENT } from '../testing/shell-harness';
 import { QuoteDto } from '../models/quote';
 
 const QUOTE: QuoteDto = {
+	...APK_ABSENT,
 	options: [
 		{
 			code: 'BRONZE',

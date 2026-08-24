@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { DriverDto } from '../../models/driver';
+import { APK_ABSENT } from '../../testing/shell-harness';
 import { QuoteDto } from '../../models/quote';
 import { QuoteStore } from '../../core/quote-store';
 import { Variants } from './variants';
@@ -18,6 +19,7 @@ import { Variants } from './variants';
  * falsifiable.
  */
 const SCRAMBLED: QuoteDto = {
+	...APK_ABSENT,
 	options: [
 		{
 			code: 'GOLD',

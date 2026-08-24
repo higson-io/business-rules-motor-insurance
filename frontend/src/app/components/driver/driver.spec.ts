@@ -9,6 +9,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Driver } from './driver';
 import { IsoDateAdapter, MOTOR_DATE_FORMATS } from '../../core/iso-date.adapter';
+import { APK_ABSENT } from '../../testing/shell-harness';
 import { DriverDto } from '../../models/driver';
 import { QuoteDto } from '../../models/quote';
 
@@ -27,7 +28,8 @@ const DRIVER: DriverDto = {
 	licenceObtainedAtAge: 18,
 };
 
-const QUOTE: QuoteDto = { options: [] };
+const QUOTE: QuoteDto = {
+	...APK_ABSENT, options: [] };
 
 describe('Driver form', () => {
 	let httpTesting: HttpTestingController;

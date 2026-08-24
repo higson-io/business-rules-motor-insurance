@@ -63,7 +63,31 @@ export const VEHICLE: VehicleDto = {
 	modelId: 218915,
 };
 
+/** Reżim ustawowy i pusta ankieta: te testy dotyczą powłoki, nie analizy potrzeb. */
+export const APK_STATUTORY = {
+	code: 'STATUTORY',
+	name: 'APK — minimum ustawowe',
+	legalBasis: 'art. 8 ustawy o dystrybucji ubezpieczeń',
+	requiresBudget: false,
+	requiresExclusionCheck: false,
+	requiresJustification: false,
+	requiresVariantDifferences: false,
+};
+
+/**
+ * Pola APK w kształcie „ankieta nieistotna dla tego testu".
+ *
+ * Rozsypane po pięciu specyfikacjach powtarzałyby się identycznie i przy każdym nowym polu
+ * trzeba by je poprawiać w pięciu miejscach — a żaden z tych testów nie dotyczy analizy potrzeb.
+ */
+export const APK_ABSENT = {
+	policyStartDate: '2026-08-24',
+	apkRegime: APK_STATUTORY,
+	apkQuestions: [],
+} satisfies Pick<QuoteDto, 'policyStartDate' | 'apkRegime' | 'apkQuestions'>;
+
 export const QUOTE: QuoteDto = {
+	...APK_ABSENT,
 	options: [
 		{
 			code: 'BRONZE',

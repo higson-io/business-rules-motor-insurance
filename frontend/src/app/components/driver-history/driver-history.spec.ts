@@ -7,6 +7,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { DriverHistory } from './driver-history';
 import { DriverDto } from '../../models/driver';
+import { APK_ABSENT } from '../../testing/shell-harness';
 import { QuoteDto } from '../../models/quote';
 
 const DRIVER: DriverDto = {
@@ -20,7 +21,8 @@ const DRIVER: DriverDto = {
 	licenceObtainedAtAge: 18,
 };
 
-const QUOTE: QuoteDto = { options: [] };
+const QUOTE: QuoteDto = {
+	...APK_ABSENT, options: [] };
 
 describe('Driver history numeric fields', () => {
 	let httpTesting: HttpTestingController;

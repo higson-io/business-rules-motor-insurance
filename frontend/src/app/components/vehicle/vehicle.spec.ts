@@ -7,6 +7,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Vehicle } from './vehicle';
 import { DictionaryEntryDto } from '../../models/dictionary-entry';
+import { APK_ABSENT } from '../../testing/shell-harness';
 import { DriverDto } from '../../models/driver';
 import { QuoteDto } from '../../models/quote';
 import { VehicleDto } from '../../models/vehicle';
@@ -32,7 +33,8 @@ const MAKES: DictionaryEntryDto[] = [
 const TYPES: DictionaryEntryDto[] = [{ code: '12360', name: '100 1.8 44' }];
 const MODELS: DictionaryEntryDto[] = [{ code: '44001', name: '100 1.8 44 (sed, 66hp)' }];
 
-const QUOTE: QuoteDto = { options: [] };
+const QUOTE: QuoteDto = {
+	...APK_ABSENT, options: [] };
 
 const DRIVER: DriverDto = {
 	firstName: 'John',

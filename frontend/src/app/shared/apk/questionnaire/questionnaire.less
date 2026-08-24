@@ -1,0 +1,148 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// Sekcja jest kartą, nie samym nagłówkiem. Ankieta rośnie z 9 do 16 pytań po przesunięciu daty,
+// więc granice sekcji muszą być widoczne bez czytania — inaczej „przybyły dwie sekcje" wygląda
+// jak „strona zrobiła się dłuższa".
+.apk__section {
+	margin-bottom: 16px;
+	padding: 16px 18px 12px;
+	background: @color-paper;
+	border: 1px solid @color-border-block;
+	border-radius: 6px;
+	box-shadow: @shadow-panel;
+}
+
+.apk__section-head {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 12px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid @color-border-block;
+}
+
+.apk__section-title {
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.apk__section-count {
+	padding: 1px 7px;
+	border-radius: 10px;
+	background: @color-gray-light;
+	font-size: 0.6875rem;
+	color: @color-text-muted;
+}
+
+// ⚠️ minmax(0, …), nie minmax(auto, …). Ślad domyślnej ścieżki grid to `auto`, czyli szerokość
+// min-content — a Material renderuje wartość selecta z `white-space: nowrap`, więc jedna długa
+// etykieta ustawiłaby podłogę i wypchnęła kolumnę poza kontener.
+.apk__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+	gap: 16px 20px;
+	align-items: start;
+}
+
+.apk__question {
+	min-width: 0;
+}
+
+// Wielokrotny wybór ma tyle opcji, ile ma — nie mieści się w jednej celi siatki.
+.apk__question--wide {
+	grid-column: 1 / -1;
+}
+
+.apk__question--refused .apk__field,
+.apk__question--refused .apk__options,
+.apk__question--refused .apk__toggle {
+	opacity: 0.5;
+}
+
+// Odstęp pod polem daje siatka, nie pole. Globalny `margin-bottom: 14px` z `_forms.less` jest
+// tu zbędny — sumowałby się z gap i rozjeżdżał wiersze, w których jedno pytanie jest polem,
+// a drugie przełącznikiem.
+.apk__field {
+	display: block;
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+// Treść pytania: zawija się, bo przychodzi z reguł i może mieć dowolną długość.
+.apk__label {
+	margin: 0 0 6px;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.35;
+}
+
+.apk__required {
+	color: @color-accent;
+}
+
+.apk__options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 20px;
+	margin-bottom: 8px;
+}
+
+.apk__toggle {
+	margin-bottom: 8px;
+}
+
+// Pomoc pochodzi z Higsona i jest tu widoczna zawsze — niezależnie od rodzaju kontrolki.
+.apk__help {
+	margin: 0;
+	font-size: 0.75rem;
+	line-height: 1.35;
+	color: @color-text-muted;
+}
+
+.apk__foot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 4px 12px;
+	margin-top: 4px;
+}
+
+.apk__prefill {
+	font-size: 0.6875rem;
+	font-style: italic;
+	color: @color-text-muted;
+}
+
+.apk__refuse {
+	margin-left: auto;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 0.6875rem;
+	color: @color-text-muted;
+	cursor: pointer;
+}
+
+// ⚠️ Bez podkreślenia w stanie spoczynku. Przy szesnastu pytaniach szesnaście podkreślonych
+// linków czyta się jak szesnaście rzeczy do zrobienia — a to jest wyjście awaryjne, nie krok.
+// Podkreślenie wraca na hover i na focus, więc nadal wygląda na klikalne wtedy, gdy o nie pytasz.
+.apk__refuse:hover,
+.apk__refuse:focus-visible {
+	color: @color-text;
+	text-decoration: underline;
+}
+
+.apk__refusal {
+	margin: 6px 0 0;
+	padding: 6px 8px;
+	border-left: 2px solid @color-accent-soft;
+	background: @color-gray-light;
+	font-size: 0.75rem;
+	line-height: 1.35;
+}

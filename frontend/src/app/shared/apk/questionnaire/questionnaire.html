@@ -1,0 +1,129 @@
+<!--
+	Ankieta APK renderowana z reguł — wspólna dla trzech linii produktowych.
+
+	⛔ Komponent nie wie, którego demo dotyczy. Dostaje listę pytań i zgłasza zmianę zdarzeniem;
+	wysyła gospodarz. To jedyny powód, dla którego ta sama ankieta obsługuje ubezpieczenie
+	majątkowe, komunikacyjne i życiowe.
+
+	⛔ Ani jedno pytanie nie jest tu wypisane. Kontrolka wybiera się po polu `kind`, etykieta i pomoc
+	przychodzą z Higsona, a widoczność jest gotową flagą z serwera — liczenie jej tutaj zamieniłoby
+	tabelę `apk.question.visibility` w martwy wiersz.
+
+	⛔ `track question.code` jest obowiązkowe. Bez stabilnego klucza przesunięcie daty polisy
+	przerysowuje wszystkie kontrolki i gubi focus dokładnie w chwili, w której widz ma patrzeć na
+	to, że ankieta się zmieniła.
+
+	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`, i nie idzie przez `mat-hint`.
+	Etykieta Material nie zawija się — ucina długie zdanie wielokropkiem — a hint jest
+	jednowierszowy i przy dłuższym tekście znika zupełnie. Obie treści pochodzą z Higsona i mogą
+	mieć dowolną długość, więc muszą trafiać w element, który się zawija. To także jedyny sposób,
+	żeby pytanie wyboru, liczbowe i tak/nie wyglądały tak samo.
+-->
+<div class="apk">
+	@for (section of sections(); track section.code) {
+		<section class="apk__section" [attr.data-section]="section.code">
+			<header class="apk__section-head">
+				<h2 class="apk__section-title">{{ section.title }}</h2>
+				<span class="apk__section-count">{{ section.questions.length }}</span>
+			</header>
+
+			<div class="apk__grid">
+				@for (question of section.questions; track question.code) {
+					<div
+						class="apk__question"
+						[class.apk__question--wide]="question.kind === 'MULTI'"
+						[class.apk__question--refused]="question.refused"
+						[attr.data-question]="question.code"
+					>
+						<p class="apk__label" [id]="'q-' + question.code">
+							{{ question.text }}
+							@if (question.required) {
+								<span class="apk__required" aria-hidden="true">*</span>
+							}
+						</p>
+
+						@switch (question.kind) {
+							@case ('CHOICE') {
+								<mat-form-field appearance="outline" class="apk__field">
+									<mat-select
+										[value]="question.value"
+										[attr.aria-labelledby]="'q-' + question.code"
+										(selectionChange)="answer(question, $event.value)"
+									>
+										@for (option of question.options; track option) {
+											<mat-option [value]="option">{{ label(question, option) }}</mat-option>
+										}
+									</mat-select>
+								</mat-form-field>
+							}
+
+							@case ('MULTI') {
+								<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
+									@for (option of question.options; track option) {
+										<mat-checkbox
+											[checked]="isChecked(question, option)"
+											(change)="toggle(question, option, $event.checked)"
+										>
+											{{ label(question, option) }}
+										</mat-checkbox>
+									}
+								</div>
+							}
+
+							@case ('BOOLEAN') {
+								<mat-button-toggle-group
+									class="apk__toggle"
+									[value]="question.value"
+									[attr.aria-labelledby]="'q-' + question.code"
+									(change)="answer(question, $event.value)"
+								>
+									<mat-button-toggle value="true">Tak</mat-button-toggle>
+									<mat-button-toggle value="false">Nie</mat-button-toggle>
+								</mat-button-toggle-group>
+							}
+
+							@default {
+								<mat-form-field appearance="outline" class="apk__field">
+									<input
+										matInput
+										[type]="question.kind === 'TEXT' ? 'text' : 'number'"
+										[value]="question.value"
+										[attr.aria-labelledby]="'q-' + question.code"
+										(change)="answer(question, $any($event.target).value)"
+									/>
+								</mat-form-field>
+							}
+						}
+
+						@if (question.help) {
+							<p class="apk__help">{{ question.help }}</p>
+						}
+
+						<footer class="apk__foot">
+							<!--
+								Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
+								powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
+							-->
+							@if (question.prefillSource) {
+								<span class="apk__prefill" data-testid="apk-prefill">
+									Podpowiedziane: {{ question.prefillSource }}
+								</span>
+							}
+
+							<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
+							<button type="button" class="apk__refuse" (click)="refuse(question)">
+								{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
+							</button>
+						</footer>
+
+						@if (question.refused && question.refusalMessage) {
+							<p class="apk__refusal" data-testid="apk-refusal">
+								{{ question.refusalMessage }}
+							</p>
+						}
+					</div>
+				}
+			</div>
+		</section>
+	}
+</div>

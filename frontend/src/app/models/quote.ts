@@ -1,3 +1,5 @@
+import { ApkQuestionDto, ApkRegimeDto } from './apk';
+
 /** Mirrors `api/dto/CoverageDto.java`. */
 export interface CoverageDto {
 	position: number;
@@ -41,4 +43,16 @@ export interface OptionDto {
 /** Mirrors `api/dto/QuoteDto.java`. */
 export interface QuoteDto {
 	options: OptionDto[];
+
+	/**
+	 * Data początku ochrony.
+	 *
+	 * ⛔ Wybiera wersję regionu APK_MOTOR, czyli reżim analizy potrzeb. Front NIE zna daty progu —
+	 * nazwę reżimu podaje `apkRegime`, a to, o co wolno zapytać, wynika z długości `apkQuestions`.
+	 */
+	policyStartDate: string;
+
+	apkRegime: ApkRegimeDto;
+
+	apkQuestions: ApkQuestionDto[];
 }

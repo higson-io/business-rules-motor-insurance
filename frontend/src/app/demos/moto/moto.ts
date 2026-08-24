@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Inputs } from '../../components/inputs/inputs';
 import { Variants } from '../../components/variants/variants';
+import { MotoApk } from './apk/moto-apk';
 
 /**
  * The motor-insurance demo — the screen the AngularJS application was, lifted out of `app.ts`
@@ -13,7 +14,7 @@ import { Variants } from '../../components/variants/variants';
  */
 @Component({
 	selector: 'app-moto',
-	imports: [Inputs, Variants],
+	imports: [Inputs, MotoApk, Variants],
 	templateUrl: './moto.html',
 	styleUrl: './moto.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,

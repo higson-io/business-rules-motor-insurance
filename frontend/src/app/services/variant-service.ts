@@ -15,4 +15,24 @@ export class VariantService {
 	getQuote(): Observable<QuoteDto> {
 		return this.http.get<QuoteDto>('quote');
 	}
+
+	/**
+	 * ⛔ Wysyła OBIEKT `Date`. `QuoteApi.setStartDate` to `@RequestBody Date`; string przyszedłby
+	 * jako `text/plain` i Jackson odpowiada 415. Ta sama zasada co w demo życiowym i majątkowym.
+	 */
+	updateStartDate(startDate: Date): Observable<void> {
+		return this.http.put<void>('quote/startDate', startDate);
+	}
+
+	/**
+	 * ⛔ Surowy string, bez `JSON.stringify`. Endpoint przyjmuje `@RequestBody String`, więc
+	 * cudzysłowy z JSON-a zapisałyby się jako część odpowiedzi.
+	 */
+	updateApkAnswer(code: string, value: string): Observable<void> {
+		return this.http.put<void>(`quote/apk/${code}`, value);
+	}
+
+	updateApkRefused(code: string, refused: boolean): Observable<void> {
+		return this.http.put<void>(`quote/apk/${code}/refused`, refused);
+	}
 }
