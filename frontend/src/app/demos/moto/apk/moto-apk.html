@@ -2,15 +2,16 @@
 	Analiza potrzeb nad tabelą porównawczą, bo w tej kolejności rozmawia się z klientem: najpierw
 	czego potrzebuje, potem ile to kosztuje.
 
-	⚠️ Ekran mieszany językowo — ta sekcja jest po polsku, tabela poniżej po angielsku. To nie jest
-	niedopatrzenie: ND-2 przypina angielskie etykiety demo komunikacyjnego jako świadomą decyzję
-	produktową, a treść tabeli przychodzi z Higsona po angielsku. Zapisane jako kwestia otwarta.
+	⛔ CAŁY ten ekran mówi po angielsku — napisy komponentu, treść pytań w Higsonie i tabela
+	porównawcza. ND-2 przypina angielskie etykiety demo komunikacyjnego, więc to on wyznacza język,
+	a nie odwrotnie. Demo życiowe i majątkowe są po polsku i to jest w porządku: język jest cechą
+	ekranu. Mieszanie dwóch języków na jednym ekranie nie jest.
 -->
 <section class="moto-apk">
 	<div class="date-band">
 		<div class="date-band__control">
 			<mat-form-field appearance="outline" class="date-band__field">
-				<mat-label>Data początku ochrony</mat-label>
+				<mat-label>Policy start date</mat-label>
 				<input
 					matInput
 					data-testid="moto-start-date"
@@ -25,7 +26,7 @@
 
 		@if (regime(); as regime) {
 			<div class="date-band__regime">
-				<p class="date-band__caption">Reżim analizy potrzeb</p>
+				<p class="date-band__caption">Needs analysis regime</p>
 				<p class="date-band__name" data-testid="moto-regime">{{ regime.name }}</p>
 				@if (regime.legalBasis; as basis) {
 					<p class="date-band__basis">{{ basis }}</p>
@@ -35,7 +36,7 @@
 			<div class="date-band__reading" data-testid="moto-reading">
 				<div class="date-band__figure">
 					<span class="date-band__number">{{ visibleCount() }}</span>
-					<span class="date-band__unit">pytań w ankiecie</span>
+					<span class="date-band__unit">questions asked</span>
 				</div>
 			</div>
 		}
@@ -44,6 +45,7 @@
 	@if (ready()) {
 		<app-apk-questionnaire
 			[questions]="questions()"
+			[copy]="copy"
 			(answered)="onAnswered($event)"
 			(refusalToggled)="onRefusalToggled($event)"
 		/>

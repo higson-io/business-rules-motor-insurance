@@ -7,19 +7,12 @@ import { MatOption, MatSelect } from '@angular/material/select';
 
 import {
 	ApkAnswerChange,
+	ApkCopy,
 	ApkMultiAnswerChange,
 	ApkQuestionDto,
 	ApkRefusalChange,
 	ApkSection,
 } from '../../../models/apk';
-
-/** Tytuły sekcji. Same sekcje pochodzą z reguł; tylko ich nazwy są tutaj. */
-const SECTION_TITLES: Record<ApkSection, string> = {
-	SUBJECT: 'Przedmiot ubezpieczenia',
-	SITUATION: 'Twoja sytuacja',
-	NEEDS: 'Czego potrzebujesz',
-	EXCLUSIONS: 'Co może ograniczyć ochronę',
-};
 
 /** Kolejność sekcji. Sekcja bez widocznych pytań nie jest renderowana wcale. */
 const SECTION_ORDER: readonly ApkSection[] = ['SUBJECT', 'SITUATION', 'NEEDS', 'EXCLUSIONS'];
@@ -61,6 +54,12 @@ interface Section {
 export class ApkQuestionnaire {
 	readonly questions = input.required<readonly ApkQuestionDto[]>();
 
+	/**
+	 * ⛔ Wymagane, bez wartości domyślnej. Ankieta obsługuje ekran polski i angielski, a jedynym
+	 * miejscem, które wie który jest który, jest gospodarz.
+	 */
+	readonly copy = input.required<ApkCopy>();
+
 	readonly answered = output<ApkAnswerChange>();
 	readonly multiAnswered = output<ApkMultiAnswerChange>();
 	readonly refusalToggled = output<ApkRefusalChange>();
@@ -69,7 +68,7 @@ export class ApkQuestionnaire {
 		const questions = this.questions();
 		return SECTION_ORDER.map((code) => ({
 			code,
-			title: SECTION_TITLES[code],
+			title: this.copy().sections[code],
 			questions: questions.filter((question) => question.section === code && question.visible),
 		})).filter((section) => section.questions.length > 0);
 	});

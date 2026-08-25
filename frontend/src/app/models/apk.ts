@@ -44,6 +44,27 @@ export interface ApkQuestionDto {
 	readonly refused: boolean;
 }
 
+/**
+ * Napisy własne ankiety — wszystko, czego NIE podają reguły.
+ *
+ * ⛔ Nie mają wartości domyślnych i to jest celowe. Gdyby komponent miał domyślną polszczyznę,
+ * ekran komunikacyjny — który jest po angielsku, bo ND-2 przypina jego etykiety, a treść tabeli
+ * przychodzi z Higsona po angielsku — dostałby dwa języki naraz i nikt by tego nie zauważył do
+ * pierwszej prezentacji. Gospodarz musi powiedzieć, w jakim języku mówi jego ekran.
+ *
+ * Treść pytań, pomoc, etykiety odpowiedzi i komunikaty o odmowie NIE są tutaj — te pochodzą
+ * z reguł, razem z pytaniem.
+ */
+export interface ApkCopy {
+	readonly sections: Readonly<Record<ApkSection, string>>;
+	readonly yes: string;
+	readonly no: string;
+	/** Rek. 8.3 — poprzedza nazwę źródła, np. „Podpowiedziane:" / „Prefilled from:". */
+	readonly prefilledFrom: string;
+	readonly refuse: string;
+	readonly unrefuse: string;
+}
+
 /** Co komponent ankiety zgłasza na zewnątrz. Sam nic nie wysyła — wysyła gospodarz. */
 export interface ApkAnswerChange {
 	readonly code: string;

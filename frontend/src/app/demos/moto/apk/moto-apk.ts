@@ -5,9 +5,31 @@ import { MatInput } from '@angular/material/input';
 import { firstValueFrom } from 'rxjs';
 
 import { QuoteStore } from '../../../core/quote-store';
-import { ApkAnswerChange, ApkRefusalChange } from '../../../models/apk';
+import { ApkAnswerChange, ApkCopy, ApkRefusalChange } from '../../../models/apk';
 import { VariantService } from '../../../services/variant-service';
 import { ApkQuestionnaire } from '../../../shared/apk/questionnaire/questionnaire';
+
+/**
+ * Napisy własne ankiety — po angielsku, bo cały ekran komunikacyjny jest po angielsku.
+ *
+ * ⛔ ND-2 przypina angielskie etykiety tego demo jako świadomą decyzję produktową, a treść tabeli
+ * porównawczej przychodzi z Higsona po angielsku. Polska sekcja nad angielską tabelą dawała ekran
+ * mówiący dwoma językami naraz. Demo życiowe i majątkowe zostają po polsku i mają własne napisy —
+ * język jest cechą ekranu, nie komponentu.
+ */
+const COPY: ApkCopy = {
+	sections: {
+		SUBJECT: 'What is being insured',
+		SITUATION: 'Your situation',
+		NEEDS: 'What you need',
+		EXCLUSIONS: 'What could limit your cover',
+	},
+	yes: 'Yes',
+	no: 'No',
+	prefilledFrom: 'Prefilled from:',
+	refuse: 'Prefer not to say',
+	unrefuse: "I'll answer",
+};
 
 /**
  * Analiza potrzeb klienta na demie komunikacyjnym.
@@ -42,6 +64,8 @@ export class MotoApk {
 	private readonly loaded = computed(() =>
 		this.store.quote.hasValue() ? this.store.quote.value() : null,
 	);
+
+	readonly copy = COPY;
 
 	readonly ready = computed(() => this.loaded() !== null);
 	readonly questions = computed(() => this.loaded()?.apkQuestions ?? []);

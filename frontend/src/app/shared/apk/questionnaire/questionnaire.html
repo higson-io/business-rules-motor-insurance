@@ -77,8 +77,8 @@
 									[attr.aria-labelledby]="'q-' + question.code"
 									(change)="answer(question, $event.value)"
 								>
-									<mat-button-toggle value="true">Tak</mat-button-toggle>
-									<mat-button-toggle value="false">Nie</mat-button-toggle>
+									<mat-button-toggle value="true">{{ copy().yes }}</mat-button-toggle>
+									<mat-button-toggle value="false">{{ copy().no }}</mat-button-toggle>
 								</mat-button-toggle-group>
 							}
 
@@ -106,13 +106,13 @@
 							-->
 							@if (question.prefillSource) {
 								<span class="apk__prefill" data-testid="apk-prefill">
-									Podpowiedziane: {{ question.prefillSource }}
+									{{ copy().prefilledFrom }} {{ question.prefillSource }}
 								</span>
 							}
 
 							<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
 							<button type="button" class="apk__refuse" (click)="refuse(question)">
-								{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
+								{{ question.refused ? copy().unrefuse : copy().refuse }}
 							</button>
 						</footer>
 
