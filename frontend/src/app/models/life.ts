@@ -1,3 +1,5 @@
+import { ApkQuestionDto, ApkRegimeDto } from './apk';
+
 /**
  * Wire model of `LifeApi`. Every field is what the backend actually sends — nullability included,
  * because `strictTemplates` turns a wrong guess here into a compile error rather than a blank cell.
@@ -119,6 +121,17 @@ export interface LifeQuoteDto {
 	 * te rzeczy naraz i robią to reguły (D-2).
 	 */
 	readonly enrolment: Readonly<Record<string, number>>;
+
+	/**
+	 * Reżim analizy potrzeb i ankieta.
+	 *
+	 * ⛔ Wersjonowane DRUGIM regionem — APK_LIFE, próg 1 lipca 2027. `tariffVersion` idzie przez
+	 * region LIFE z progiem 1 lipca 2026. Ta sama data polisy rozwiązuje obie osie niezależnie,
+	 * więc można przeciąć jedną bez drugiej.
+	 */
+	readonly apkRegime: ApkRegimeDto;
+
+	readonly apkQuestions: readonly ApkQuestionDto[];
 
 	readonly variants: readonly LifeVariantDto[];
 	readonly benefits: readonly LifeBenefitDto[];

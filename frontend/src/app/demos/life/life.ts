@@ -6,6 +6,7 @@ import { LifeLineCode } from '../../models/life';
 import { LifeService } from '../../services/life-service';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { EffectiveDate } from './effective-date/effective-date';
+import { LifeApk } from './apk/life-apk';
 import { Group } from './group/group';
 import { Individual } from './individual/individual';
 
@@ -33,7 +34,7 @@ const LINE_CODES: Record<LifePath, LifeLineCode> = {
  */
 @Component({
 	selector: 'app-life',
-	imports: [EffectiveDate, ErrorBanner, Group, Individual],
+	imports: [EffectiveDate, ErrorBanner, Group, Individual, LifeApk],
 	templateUrl: './life.html',
 	styleUrl: './life.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,

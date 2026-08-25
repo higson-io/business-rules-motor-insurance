@@ -116,6 +116,15 @@ export class LifeService {
 	 * żeby wrócić z fazy programu do fazy oferty. Pusta lista przystąpień jest tym, co te dwie
 	 * fazy odróżnia (D-2).
 	 */
+	/** ⛔ Surowy string, bez `JSON.stringify` — endpoint przyjmuje `@RequestBody String`. */
+	updateApkAnswer(code: string, value: string): Observable<void> {
+		return this.http.put<void>(`life/apk/${code}`, value);
+	}
+
+	updateApkRefused(code: string, refused: boolean): Observable<void> {
+		return this.http.put<void>(`life/apk/${code}/refused`, refused);
+	}
+
 	updateEnrolment(variantCode: string, count: number): Observable<void> {
 		return this.http.put<void>(`life/group/enrolment/${variantCode}`, count);
 	}

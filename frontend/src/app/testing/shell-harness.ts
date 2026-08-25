@@ -86,6 +86,12 @@ export const APK_ABSENT = {
 	apkQuestions: [],
 } satisfies Pick<QuoteDto, 'policyStartDate' | 'apkRegime' | 'apkQuestions'>;
 
+/** To samo co `APK_ABSENT`, dla demo życiowego — te testy też nie dotyczą analizy potrzeb. */
+export const APK_ABSENT_LIFE = {
+	apkRegime: APK_STATUTORY,
+	apkQuestions: [],
+};
+
 export const QUOTE: QuoteDto = {
 	...APK_ABSENT,
 	options: [
@@ -139,6 +145,7 @@ export const LIFE_QUOTE: LifeQuoteDto = {
 	tariffVersion: { code: 'V2', name: 'Taryfa 2026 H2', validFrom: '1 lipca 2026' },
 	// Pusta mapa = faza oferty, i tego dotyczą te testy: powłoka nie zna fazy programu.
 	enrolment: {},
+	...APK_ABSENT_LIFE,
 	mainSum: 300000,
 	paymentFrequency: 'MONTHLY',
 	birthDate: null,

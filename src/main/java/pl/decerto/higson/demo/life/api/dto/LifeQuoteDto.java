@@ -2,6 +2,9 @@ package pl.decerto.higson.demo.life.api.dto;
 
 import java.math.BigDecimal;
 import java.util.Map;
+
+import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RegimeDto;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -58,6 +61,17 @@ public class LifeQuoteDto {
 	 * a nie „nikt nie wybrał" — to rozróżnienie niesie D-2 i front musi je widzieć.
 	 */
 	private Map<String, Integer> enrolment;
+
+	/** Reżim analizy potrzeb — z reguł. Front nie zna daty progu. */
+	private RegimeDto apkRegime;
+
+	/** Ankieta APK: pytania razem z odpowiedziami, w kolejności z reguł. */
+	private List<QuestionDto> apkQuestions;
+
+	public RegimeDto getApkRegime() { return apkRegime; }
+	public void setApkRegime(RegimeDto apkRegime) { this.apkRegime = apkRegime; }
+	public List<QuestionDto> getApkQuestions() { return apkQuestions; }
+	public void setApkQuestions(List<QuestionDto> apkQuestions) { this.apkQuestions = apkQuestions; }
 
 	private List<LifeVariantDto> variants;
 	private List<LifeBenefitDto> benefits;

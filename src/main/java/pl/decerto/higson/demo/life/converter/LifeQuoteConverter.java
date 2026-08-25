@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RegimeDto;
 import pl.decerto.higson.demo.life.api.dto.LifeBenefitDto;
 import pl.decerto.higson.demo.life.api.dto.LifeQuoteDto;
 import pl.decerto.higson.demo.life.api.dto.LifeRiderDto;
@@ -65,6 +68,11 @@ public class LifeQuoteConverter implements Converter<LifeQuote, LifeQuoteDto> {
 		dto.setProgramCost(quote.getProgramCost());
 		dto.setTariffVersion(convertTariffVersion(quote));
 		dto.setEnrolment(convertEnrolment(quote));
+		dto.setApkRegime(RegimeDto.of(quote.getApkRegime()));
+		dto.setApkQuestions(quote.getApkQuestions()
+			.stream()
+			.map(question -> QuestionDto.of(question, quote.getApkAnswers().get(question.getCode())))
+			.collect(Collectors.toList()));
 
 		dto.setVariants(convertVariants(quote.getVariants()));
 		dto.setBenefits(convertBenefits(quote.getBenefits()));

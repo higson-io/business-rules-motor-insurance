@@ -2,7 +2,13 @@ package pl.decerto.higson.demo.life.domain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.Regime;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -48,6 +54,35 @@ public class LifeQuote {
 	private Integer insuredCount;
 
 	private TariffVersion tariffVersion = new TariffVersion();
+
+	/** Reżim analizy potrzeb — z reguł, wersjonowany regionem APK_LIFE. */
+	private Regime apkRegime = new Regime();
+
+	/** Katalog pytań APK. Czytany z domeny przy każdej wycenie, bo zależy od daty polisy. */
+	private List<Question> apkQuestions = new ArrayList<>();
+
+	/** Odpowiedzi, kluczowane kodem pytania. Java nie zna żadnego z tych kodów. */
+	private Map<String, Answer> apkAnswers = new LinkedHashMap<>();
+
+	public Regime getApkRegime() {
+		return apkRegime;
+	}
+
+	public void setApkRegime(Regime apkRegime) {
+		this.apkRegime = apkRegime;
+	}
+
+	public List<Question> getApkQuestions() {
+		return apkQuestions;
+	}
+
+	public void setApkQuestions(List<Question> apkQuestions) {
+		this.apkQuestions = apkQuestions;
+	}
+
+	public Map<String, Answer> getApkAnswers() {
+		return apkAnswers;
+	}
 
 	public TariffVersion getTariffVersion() {
 		return tariffVersion;

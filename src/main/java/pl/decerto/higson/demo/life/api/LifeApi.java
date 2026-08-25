@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.life.api.dto.LifeQuoteDto;
 import pl.decerto.higson.demo.life.converter.LifeQuoteConverter;
 import pl.decerto.higson.demo.life.domain.LifeQuote;
@@ -165,6 +166,25 @@ public class LifeApi {
 	 * jest deklaracją pracodawcy, a kosztu programu nie ma. Pierwsze zgłoszenie przełącza obie
 	 * te rzeczy naraz — i robią to reguły, nie ten endpoint.
 	 */
+	/**
+	 * Odpowiedź na jedno pytanie ankiety APK.
+	 *
+	 * ⛔ Kod pytania jest w ŚCIEŻCE. Endpoint per pole wymagałby dokładania metody przy każdym
+	 * nowym pytaniu — czyli tego wdrożenia, którego cała konstrukcja unika.
+	 */
+	@PutMapping("/apk/{code}")
+	public void setApkAnswer(@PathVariable String code, @RequestBody String value) {
+		quoteService.getQuote().getApkAnswers().put(code, new Answer(value));
+	}
+
+	/** „Nie chcę podać" — trzeci stan odpowiedzi (§ 9 ust. 2 OWU nadaje mu konsekwencję). */
+	@PutMapping("/apk/{code}/refused")
+	public void setApkRefused(@PathVariable String code, @RequestBody boolean refused) {
+		quoteService.getQuote().getApkAnswers()
+			.computeIfAbsent(code, key -> new Answer())
+			.setRefused(refused);
+	}
+
 	@PutMapping("/group/enrolment/{variantCode}")
 	public void setEnrolment(@PathVariable String variantCode, @RequestBody int count) {
 		quoteService.getQuote().getGroup().enrol(variantCode, count);

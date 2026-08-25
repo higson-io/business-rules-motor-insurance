@@ -18,6 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.QuestionCatalogue;
+import pl.decerto.higson.demo.apk.RegimeReader;
 import pl.decerto.higson.demo.life.context.LifeContext;
 import pl.decerto.higson.demo.life.domain.Benefit;
 import pl.decerto.higson.demo.life.domain.Insured;
@@ -49,7 +53,11 @@ public class Life {
 	private static final String FUNCTION_RISK_FACTOR = "demo.life.individual.riskFactor";
 	private static final String FUNCTION_RIDER_PREMIUM = "demo.life.individual.rider.premium";
 
+	private static final String COLLECTION_APK_QUESTIONS = "APK_QUESTIONS";
+
 	private static final String PARAM_TARIFF_VERSION = "demo.life.tariff.version";
+	private static final String PARAM_APK_REGIME = "demo.life.apk.regime";
+	private static final String PARAM_APK_DEFAULT_ANSWER = "demo.life.apk.question.defaultAnswer";
 	private static final String PARAM_RIDER_SUMS = "demo.life.individual.rider.sumsOffered";
 	private static final String PARAM_BENEFIT_AVAILABILITY = "demo.life.group.benefit.availability";
 	private static final String PARAM_BENEFIT_SUM = "demo.life.group.benefit.sumAssured";
@@ -198,6 +206,15 @@ public class Life {
 			// Po setEffectiveDate, nigdy przed: to region rozstrzyga, która wersja odpowiada.
 			loadTariffVersion(quote);
 
+			// ⛔ Reżim i katalog pytań idą przez DRUGI region — APK_LIFE, oś regulacyjna z progiem
+			// 1 lipca 2027. Region LIFE niesie oś taryfową z progiem 1 lipca 2026. Ta sama data
+			// polisy rozwiązuje obie, niezależnie od siebie.
+			quote.setApkRegime(RegimeReader.read(engine, PARAM_APK_REGIME, new LifeContext(quote)));
+			loadApkQuestions(quote);
+			seedApkDefaults(quote);
+			// Drugi odczyt: widoczność zależy od odpowiedzi i od ścieżki.
+			loadApkQuestions(quote);
+
 			if (LifeQuote.LINE_GROUP.equals(quote.getLineCode())) {
 				calculateGroup(quote);
 			} else {
@@ -222,6 +239,31 @@ public class Life {
 		version.setName(value.getString("name"));
 		version.setValidFrom(value.getString("validFrom"));
 		quote.setTariffVersion(version);
+	}
+
+	/**
+	 * Katalog pytań z domeny. Pięć pytań istnieje wyłącznie w drugiej wersji regionu APK_LIFE,
+	 * więc długość tej listy zmienia się wraz z datą polisy.
+	 */
+	private void loadApkQuestions(LifeQuote quote) {
+		DomainObject root = engine.getDomain(PROFILE, "/");
+		quote.setApkQuestions(QuestionCatalogue.read(root, COLLECTION_APK_QUESTIONS,
+			code -> new LifeContext(quote).withQuestion(code)));
+	}
+
+	/** Odpowiedzi demonstracyjne z tabeli — w Higsonie, żeby Java nie znała kodów pytań. */
+	private void seedApkDefaults(LifeQuote quote) {
+		for (Question question : quote.getApkQuestions()) {
+			if (quote.getApkAnswers().containsKey(question.getCode())) {
+				continue;
+			}
+			LifeContext ctx = new LifeContext(quote).withQuestion(question.getCode());
+			String value = engine.get(PARAM_APK_DEFAULT_ANSWER, ctx).getString("value");
+			if (value == null || value.isEmpty()) {
+				continue;
+			}
+			quote.getApkAnswers().put(question.getCode(), new Answer(value));
+		}
 	}
 
 	private void calculateIndividual(LifeQuote quote) {

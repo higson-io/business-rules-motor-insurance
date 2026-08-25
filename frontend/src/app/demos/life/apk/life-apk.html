@@ -1,0 +1,33 @@
+<!--
+	Analiza potrzeb nad wyceną — najpierw czego klient potrzebuje, potem ile to kosztuje.
+
+	Pasek reżimu jest tu węższy niż pasek daty nad nim: data ma własny, wspólny z demem majątkowym
+	blok i to ona jest kontrolką. Tutaj pokazujemy tylko, co z tej daty wynika po stronie
+	regulacyjnej — bo w tym demie ta sama data rozwiązuje DWIE osie naraz.
+-->
+<section class="life-apk">
+	@if (regime(); as regime) {
+		<div class="life-apk__regime" data-testid="life-apk-regime">
+			<div>
+				<p class="life-apk__caption">Reżim analizy potrzeb</p>
+				<p class="life-apk__name">{{ regime.name }}</p>
+				@if (regime.legalBasis; as basis) {
+					<p class="life-apk__basis">{{ basis }}</p>
+				}
+			</div>
+			<div class="life-apk__figure">
+				<span class="life-apk__number">{{ visibleCount() }}</span>
+				<span class="life-apk__unit">pytań w ankiecie</span>
+			</div>
+		</div>
+	}
+
+	@if (ready()) {
+		<app-apk-questionnaire
+			[questions]="questions()"
+			[copy]="copy"
+			(answered)="onAnswered($event)"
+			(refusalToggled)="onRefusalToggled($event)"
+		/>
+	}
+</section>

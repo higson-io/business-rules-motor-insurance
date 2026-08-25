@@ -1,0 +1,58 @@
+@import '_variables';
+
+:host {
+	display: block;
+	margin-bottom: 22px;
+}
+
+// Węższy niż pasek daty i bez akcentowej krechy — data jest kontrolką, to jest tylko odczyt.
+.life-apk__regime {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px 24px;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	background: @color-gray-light;
+	border-radius: var(--mat-sys-corner-medium);
+}
+
+.life-apk__caption {
+	margin: 0;
+	font-size: 0.6875rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.life-apk__name {
+	margin: 2px 0 0;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.life-apk__basis {
+	margin: 2px 0 0;
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}
+
+.life-apk__figure {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.life-apk__number {
+	font-size: 1.25rem;
+	font-weight: 600;
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+}
+
+.life-apk__unit {
+	font-size: 0.75rem;
+	color: @color-text-muted;
+}
