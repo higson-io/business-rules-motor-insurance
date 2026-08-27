@@ -155,29 +155,6 @@
 	gap: 10px;
 }
 
-// Siedem kart jedna pod drugą to ponad sześćset pikseli — na projektorze umowy dodatkowe kończą
-// się poniżej krawędzi ekranu i prowadzący musi przewijać, żeby pokazać, że w ogóle są. Od 1280 px
-// idą po dwie, a karta układa się wtedy w jedną kolumnę, bo wewnętrzna szpalta 220 px nie mieści
-// się w połówce.
-@media (min-width: 1280px) {
-	.policy__riders {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.policy__rider {
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-areas:
-			'toggle'
-			'description'
-			'karencja'
-			'cover';
-		row-gap: 6px;
-	}
-
-	.policy__rider__cover {
-		width: 100%;
-	}
-}
 
 // A rider is a card that is on or off. The border carries the state rather than a badge: same
 // information, less furniture, and it reads at a glance down a list of seven.
@@ -371,4 +348,39 @@
 	background: @color-gray-light;
 	font-size: 0.75rem;
 	line-height: 1.35;
+}
+
+// ⛔ NA KOŃCU PLIKU, po regułach bazowych, i to jest jedyne miejsce, w którym działa.
+//
+// Media query NIE podnosi specyficzności. Ten sam blok wstawiony wyżej — tuż pod `.policy__riders`,
+// gdzie logicznie pasuje — przegrywał kolejnością z bazową `.policy__rider` kilkanaście linii
+// niżej. Karty ustawiały się wtedy po dwie, ale ZOSTAWAŁY dwukolumnowe w środku: przy 370 px
+// szerokości i szpalcie 220 px na sumę na nazwę zostawało ~130 px, więc nazwy umów były ucięte,
+// a opisy łamały się po jednym słowie w pionie.
+//
+// Siedem kart jedna pod drugą to ponad sześćset pikseli — na projektorze umowy dodatkowe kończą
+// się poniżej krawędzi ekranu. Od 1280 px idą po dwie, a karta układa się wtedy w jedną kolumnę,
+// bo wewnętrzna szpalta 220 px nie mieści się w połówce.
+@media (min-width: 1280px) {
+	.policy__riders {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.policy__rider {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			'toggle'
+			'description'
+			'karencja'
+			'cover';
+		row-gap: 6px;
+	}
+
+	.policy__rider__cover {
+		width: 100%;
+		// ⚠️ Pływająca etykieta `mat-form-field` wychodzi ponad ramkę pola, więc przy row-gap 6px
+		// nachodziła na wiersz z karencją. To jedyne miejsce, w którym te dwa elementy stoją
+		// jeden nad drugim — w układzie dwukolumnowym karencja jest obok, nie nad.
+		margin-top: 10px;
+	}
 }
