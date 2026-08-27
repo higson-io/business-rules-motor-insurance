@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.Recommendation;
+import pl.decerto.higson.demo.apk.Warning;
 import pl.decerto.higson.demo.apk.Regime;
 
 public class Quote {
@@ -37,6 +40,15 @@ public class Quote {
 	/** Odpowiedzi, kluczowane kodem pytania. Java nie zna żadnego z tych kodów. */
 	private Map<String, Answer> apkAnswers = new LinkedHashMap<>();
 
+	/** Potrzeby wyprowadzone z odpowiedzi (rek. 8.2.b). */
+	private List<Need> apkNeeds = new ArrayList<>();
+
+	/** Konfrontacja sytuacji klienta z wyłączeniami OWU (rek. 8.2.c). */
+	private List<Warning> apkWarnings = new ArrayList<>();
+
+	/** Propozycja wraz z uzasadnieniem (rek. 8.2.d i 8.7). */
+	private Recommendation apkRecommendation = new Recommendation();
+
 	public Quote() {
 	}
 
@@ -58,6 +70,30 @@ public class Quote {
 
 	public Map<String, Answer> getApkAnswers() {
 		return apkAnswers;
+	}
+
+	public List<Need> getApkNeeds() {
+		return apkNeeds;
+	}
+
+	public void setApkNeeds(List<Need> apkNeeds) {
+		this.apkNeeds = apkNeeds;
+	}
+
+	public List<Warning> getApkWarnings() {
+		return apkWarnings;
+	}
+
+	public void setApkWarnings(List<Warning> apkWarnings) {
+		this.apkWarnings = apkWarnings;
+	}
+
+	public Recommendation getApkRecommendation() {
+		return apkRecommendation;
+	}
+
+	public void setApkRecommendation(Recommendation apkRecommendation) {
+		this.apkRecommendation = apkRecommendation;
 	}
 
 	public Regime getApkRegime() {

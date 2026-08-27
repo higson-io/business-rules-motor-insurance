@@ -14,13 +14,13 @@ import pl.decerto.higson.demo.property.api.dto.PropertyRecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyWarningDto;
-import pl.decerto.higson.demo.property.domain.Answer;
+import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
-import pl.decerto.higson.demo.property.domain.Need;
+import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
-import pl.decerto.higson.demo.property.domain.Question;
+import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.property.domain.Variant;
-import pl.decerto.higson.demo.property.domain.Warning;
+import pl.decerto.higson.demo.apk.Warning;
 
 @Component
 public class PropertyQuoteConverter implements Converter<PropertyQuote, PropertyQuoteDto> {

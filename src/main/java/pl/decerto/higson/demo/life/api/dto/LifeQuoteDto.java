@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.apk.api.RegimeDto;
 import java.time.LocalDate;
 import java.util.List;
@@ -67,6 +68,12 @@ public class LifeQuoteDto {
 
 	/** Ankieta APK: pytania razem z odpowiedziami, w kolejności z reguł. */
 	private List<QuestionDto> apkQuestions;
+
+	/** Wynik analizy: potrzeby, wyłączenia, propozycja i uzasadnienie. */
+	private RecommendationDto apkRecommendation;
+
+	public RecommendationDto getApkRecommendation() { return apkRecommendation; }
+	public void setApkRecommendation(RecommendationDto apkRecommendation) { this.apkRecommendation = apkRecommendation; }
 
 	public RegimeDto getApkRegime() { return apkRegime; }
 	public void setApkRegime(RegimeDto apkRegime) { this.apkRegime = apkRegime; }

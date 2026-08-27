@@ -10,6 +10,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.apk.api.RegimeDto;
 import pl.decerto.higson.demo.life.api.dto.LifeBenefitDto;
 import pl.decerto.higson.demo.life.api.dto.LifeQuoteDto;
@@ -73,6 +74,8 @@ public class LifeQuoteConverter implements Converter<LifeQuote, LifeQuoteDto> {
 			.stream()
 			.map(question -> QuestionDto.of(question, quote.getApkAnswers().get(question.getCode())))
 			.collect(Collectors.toList()));
+		dto.setApkRecommendation(RecommendationDto.of(
+			quote.getApkRecommendation(), quote.getApkNeeds(), quote.getApkWarnings()));
 
 		dto.setVariants(convertVariants(quote.getVariants()));
 		dto.setBenefits(convertBenefits(quote.getBenefits()));

@@ -7,9 +7,9 @@ import java.util.Map;
 
 import io.higson.runtime.core.HigsonContext;
 
-import pl.decerto.higson.demo.property.domain.Answer;
+import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
-import pl.decerto.higson.demo.property.domain.Question;
+import pl.decerto.higson.demo.apk.Question;
 
 /**
  * Kontekst profilu PROPERTY — jedyne miejsce, które wie, jak model wniosku odwzorowuje się na
@@ -127,8 +127,6 @@ public class PropertyContext extends HigsonContext {
 
 		values.put("quote.risk.factor", quote.getRiskFactor());
 
-		values.put("quote.apk.answers", quote.getApkAnswers());
-		values.put("quote.apk.premiums", quote.getApkPremiums());
 	}
 
 	/** Dwie pierwsze cyfry kodu pocztowego — klucz obu stref. */

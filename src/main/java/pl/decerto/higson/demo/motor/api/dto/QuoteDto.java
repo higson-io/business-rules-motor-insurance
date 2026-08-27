@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.apk.api.RegimeDto;
 
 public class QuoteDto {
@@ -17,6 +18,17 @@ public class QuoteDto {
 
 	/** Ankieta APK: pytania razem z odpowiedziami, w kolejności z reguł. */
 	private List<QuestionDto> apkQuestions;
+
+	/** Wynik analizy: potrzeby, wyłączenia, propozycja i uzasadnienie. */
+	private RecommendationDto apkRecommendation;
+
+	public RecommendationDto getApkRecommendation() {
+		return apkRecommendation;
+	}
+
+	public void setApkRecommendation(RecommendationDto apkRecommendation) {
+		this.apkRecommendation = apkRecommendation;
+	}
 
 	public List<QuestionDto> getApkQuestions() {
 		return apkQuestions;

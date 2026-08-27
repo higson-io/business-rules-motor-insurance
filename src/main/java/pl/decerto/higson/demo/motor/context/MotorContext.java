@@ -15,6 +15,7 @@ import pl.decerto.higson.demo.motor.adapter.OptionAdapter;
 import pl.decerto.higson.demo.motor.adapter.QuoteAdapter;
 import pl.decerto.higson.demo.motor.domain.Driver;
 import pl.decerto.higson.demo.motor.domain.Option;
+import pl.decerto.higson.demo.motor.domain.OptionPricing;
 import pl.decerto.higson.demo.motor.domain.Quote;
 import pl.decerto.higson.demo.motor.domain.Coverage;
 import io.higson.runtime.ext.adapter.Adapter;
@@ -39,6 +40,8 @@ public class MotorContext extends HigsonContext {
 	private String questionCode;
 	private String answerValue;
 	private String reasonCode;
+	private String coverageCode;
+	private String optionCode;
 
 
 	public MotorContext(Object... args) {
@@ -70,6 +73,23 @@ public class MotorContext extends HigsonContext {
 	}
 
 	/**
+	 * Pokrycie i wariant jako elementy iteracji — potrzebne, żeby zapytać tabelę dostępności
+	 * o KONKRETNĄ parę bez powoływania obiektu Coverage.
+	 *
+	 * ⚠️ Ustawiają `coverageCode`/`optionCode`, a nie adaptery: adapter `coverage.*` rozwiązuje
+	 * całe pokrycie razem ze składką, a tutaj chodzi wyłącznie o kod.
+	 */
+	public MotorContext withCoverage(String code) {
+		this.coverageCode = code;
+		return this;
+	}
+
+	public MotorContext withOption(String code) {
+		this.optionCode = code;
+		return this;
+	}
+
+	/**
 	 * Przepisuje odpowiedzi pod ścieżki podane przez pytania.
 	 *
 	 * ⚠️ Konwersja idzie po VALUE_TYPE, a NIE po KIND. Silnik nie konwertuje typów przy dopasowaniu
@@ -94,6 +114,7 @@ public class MotorContext extends HigsonContext {
 			apkValues.put(path, convert(question.getValueType(), answer.getValue()));
 		}
 	}
+
 
 	/** Wiek pojazdu jest wyliczony, nie zapytany — rocznik już go zawiera. */
 	private Integer vehicleAge() {
@@ -186,6 +207,12 @@ public class MotorContext extends HigsonContext {
 		}
 		if ("reason.code".equals(path)) {
 			return reasonCode;
+		}
+		if (coverageCode != null && "coverage.code".equals(path)) {
+			return coverageCode;
+		}
+		if (optionCode != null && "option.code".equals(path)) {
+			return optionCode;
 		}
 		if (apkValues.containsKey(path)) {
 			return apkValues.get(path);

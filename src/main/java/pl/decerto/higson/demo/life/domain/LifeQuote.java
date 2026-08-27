@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import pl.decerto.higson.demo.apk.Answer;
+import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.Recommendation;
+import pl.decerto.higson.demo.apk.Warning;
 import pl.decerto.higson.demo.apk.Regime;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -64,6 +67,10 @@ public class LifeQuote {
 	/** Odpowiedzi, kluczowane kodem pytania. Java nie zna żadnego z tych kodów. */
 	private Map<String, Answer> apkAnswers = new LinkedHashMap<>();
 
+	private List<Need> apkNeeds = new ArrayList<>();
+	private List<Warning> apkWarnings = new ArrayList<>();
+	private Recommendation apkRecommendation = new Recommendation();
+
 	public Regime getApkRegime() {
 		return apkRegime;
 	}
@@ -82,6 +89,30 @@ public class LifeQuote {
 
 	public Map<String, Answer> getApkAnswers() {
 		return apkAnswers;
+	}
+
+	public List<Need> getApkNeeds() {
+		return apkNeeds;
+	}
+
+	public void setApkNeeds(List<Need> apkNeeds) {
+		this.apkNeeds = apkNeeds;
+	}
+
+	public List<Warning> getApkWarnings() {
+		return apkWarnings;
+	}
+
+	public void setApkWarnings(List<Warning> apkWarnings) {
+		this.apkWarnings = apkWarnings;
+	}
+
+	public Recommendation getApkRecommendation() {
+		return apkRecommendation;
+	}
+
+	public void setApkRecommendation(Recommendation apkRecommendation) {
+		this.apkRecommendation = apkRecommendation;
 	}
 
 	public TariffVersion getTariffVersion() {

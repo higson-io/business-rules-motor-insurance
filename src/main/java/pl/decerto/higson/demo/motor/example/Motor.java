@@ -11,13 +11,18 @@ import org.springframework.stereotype.Component;
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.QuestionCatalogue;
+import pl.decerto.higson.demo.apk.ApkAnalysis;
+import pl.decerto.higson.demo.apk.Need;
+import pl.decerto.higson.demo.apk.Recommendation;
 import pl.decerto.higson.demo.apk.RegimeReader;
 import pl.decerto.higson.demo.motor.context.MotorContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +33,7 @@ import pl.decerto.higson.demo.motor.domain.Quote;
 import pl.decerto.higson.demo.motor.domain.Address;
 import pl.decerto.higson.demo.motor.domain.Coverage;
 import pl.decerto.higson.demo.motor.domain.Option;
+import pl.decerto.higson.demo.motor.domain.OptionPricing;
 import pl.decerto.higson.demo.motor.domain.Vehicle;
 
 @Component
@@ -40,6 +46,13 @@ public class Motor {
 
 	private static final String PARAM_APK_REGIME = "demo.moto.apk.regime";
 	private static final String PARAM_APK_DEFAULT_ANSWER = "demo.moto.apk.question.defaultAnswer";
+
+	private static final String PARAM_APK_NEED = "demo.moto.apk.need.derive";
+	private static final String PARAM_APK_EXCLUSION = "demo.moto.apk.exclusion.conflict";
+	private static final String PARAM_APK_REASON = "demo.moto.apk.recommendation.reason";
+	private static final String PARAM_COVERAGE_AVAILABILITY = "demo.motor.coverage.availability";
+
+	private static final String PATH_BUDGET = "quote.apk.budget";
 
 	private final HigsonEngine engine;
 
@@ -99,6 +112,151 @@ public class Motor {
 		} finally {
 			engine.clearEffectiveDate();
 		}
+	}
+
+	/**
+	 * Analiza potrzeb: potrzeby, konfrontacja z wyłączeniami, dobór wariantu i uzasadnienie.
+	 *
+	 * ⛔ To, KTÓRE kroki się odbywają, rozstrzyga reżim — a reżim jest wersjonowany datą polisy.
+	 * Przed 1 lipca 2027 nie ma ani konfrontacji z wyłączeniami, ani pisemnego uzasadnienia,
+	 * i to nie jest uproszczenie demo, tylko różnica między art. 8 ustawy a rekomendacjami KNF.
+	 */
+	private void recommend(Quote quote) {
+		List<Question> questions = quote.getApkQuestions();
+		Map<String, Answer> answers = quote.getApkAnswers();
+
+		List<Need> needs = ApkAnalysis.deriveNeeds(engine, PARAM_APK_NEED, questions, answers,
+			(question, value) -> new MotorContext(quote).withQuestion(question).withAnswer(value));
+		quote.setApkNeeds(needs);
+
+		quote.setApkWarnings(quote.getApkRegime().isRequiresExclusionCheck()
+			? ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION, questions, answers,
+				(question, value) -> new MotorContext(quote).withQuestion(question).withAnswer(value))
+			: new ArrayList<>());
+
+		quote.setApkRecommendation(propose(quote, needs));
+	}
+
+	/**
+	 * Rek. 8.2.d i 8.5 — wariant najlepiej dopasowany do potrzeb, a przy remisie tańszy.
+	 *
+	 * ⚠️ Gdy najlepsze dopasowanie nie mieści się w budżecie, propozycja SCHODZI do najdroższego
+	 * wariantu, który się mieści — a uzasadnienie mówi to wprost. Milczenie nie jest propozycją.
+	 */
+	private Recommendation propose(Quote quote, List<Need> needs) {
+		List<Option> options = new ArrayList<>(quote.getOptions());
+		options.sort(Comparator.comparingInt(Option::getOrder));
+
+		Recommendation recommendation = new Recommendation();
+		if (options.isEmpty() || needs.isEmpty()) {
+			return recommendation;
+		}
+
+		Option best = options.get(0);
+		int bestCovered = -1;
+		for (Option option : options) {
+			int covered = ApkAnalysis.score(needs,
+				cover -> coverageAvailable(cover, option.getCode(), quote)).getCovered();
+			if (covered > bestCovered) {
+				best = option;
+				bestCovered = covered;
+			}
+		}
+
+		Option proposed = best;
+		String outcome = "BUDGET_ABSENT";
+		BigDecimal budget = quote.getApkRegime().isRequiresBudget() ? budgetOf(quote) : null;
+		if (budget != null && budget.signum() > 0) {
+			if (OptionPricing.finalPremium(best).compareTo(budget) <= 0) {
+				outcome = "BUDGET_FIT";
+			} else {
+				outcome = "BUDGET_EXCEEDED";
+				proposed = options.get(0);
+				for (Option option : options) {
+					if (OptionPricing.finalPremium(option).compareTo(budget) <= 0) {
+						proposed = option;
+					}
+				}
+			}
+		}
+
+		Option picked = proposed;
+		ApkAnalysis.Score score = ApkAnalysis.score(needs,
+			cover -> coverageAvailable(cover, picked.getCode(), quote));
+		recommendation.setVariantCode(picked.getCode());
+		recommendation.setCoveredNeeds(score.getCovered());
+		recommendation.setTotalNeeds(score.getTotal());
+		recommendation.setMissingCovers(score.getMissing());
+		recommendation.setBudgetOutcome(outcome);
+
+		if (quote.getApkRegime().isRequiresJustification()) {
+			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+				reasons(quote, picked, best, score, budget, outcome),
+				reason -> new MotorContext(quote).withReason(reason)));
+		}
+		return recommendation;
+	}
+
+	/** Powody uzasadnienia: kody i liczby. Ani jednego zdania — te są w tabeli. */
+	private List<ApkAnalysis.Reason> reasons(Quote quote, Option proposed, Option best,
+			ApkAnalysis.Score score, BigDecimal budget, String outcome) {
+
+		DomainObject plan = engine.getDomain(PROFILE, "/PLANS[FULL]");
+		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
+		reasons.add(new ApkAnalysis.Reason("COVERS_NEEDS",
+			nameOf(plan, "OPTIONS", proposed.getCode()), score.getCovered(), score.getTotal()));
+
+		if (!score.getMissing().isEmpty()) {
+			List<String> names = new ArrayList<>();
+			for (String cover : score.getMissing()) {
+				names.add(nameOf(plan, "COVERAGES", cover));
+			}
+			reasons.add(new ApkAnalysis.Reason("MISSING_COVER", String.join(", ", names)));
+		}
+
+		if ("BUDGET_FIT".equals(outcome)) {
+			reasons.add(new ApkAnalysis.Reason("BUDGET_OK",
+				OptionPricing.finalPremium(proposed), budget));
+		} else if ("BUDGET_EXCEEDED".equals(outcome)) {
+			// Cena wariantu NAJLEPIEJ dopasowanego, nie proponowanego — to jego przekroczenie
+			// budżetu jest powodem, dla którego propozycja zeszła niżej.
+			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED",
+				OptionPricing.finalPremium(best), budget,
+				nameOf(plan, "OPTIONS", proposed.getCode())));
+		}
+
+		if (!quote.getApkWarnings().isEmpty()) {
+			reasons.add(new ApkAnalysis.Reason("EXCLUSION_WARNING", quote.getApkWarnings().size()));
+		}
+		reasons.add(new ApkAnalysis.Reason("REGIME", quote.getApkRegime().getName()));
+		return reasons;
+	}
+
+	/** Nazwa elementu domeny, a nie jego kod — uzasadnienie czyta klient. */
+	private String nameOf(DomainObject parent, String collection, String code) {
+		for (DomainObject child : parent.getChildren(collection)) {
+			if (child.getCode().equals(code)) {
+				return child.getName();
+			}
+		}
+		return code;
+	}
+
+	/** Czy pokrycie wchodzi w skład wariantu. Odpowiada ta sama tabela, co buduje porównanie. */
+	private boolean coverageAvailable(String cover, String optionCode, Quote quote) {
+		try {
+			return Boolean.TRUE.equals(engine.get(PARAM_COVERAGE_AVAILABILITY,
+				new MotorContext(quote).withCoverage(cover).withOption(optionCode))
+				.getBoolean("available"));
+		} catch (RuntimeException e) {
+			// Tabela ma matchRequired, a brak wiersza znaczy po prostu „tego wariant nie zawiera".
+			return false;
+		}
+	}
+
+	private BigDecimal budgetOf(Quote quote) {
+		Object value = new MotorContext(quote).get(PATH_BUDGET);
+		return value instanceof BigDecimal ? (BigDecimal) value : null;
 	}
 
 	/**
@@ -188,6 +346,11 @@ public class Motor {
 
 			option.getDiscounts().sort(Comparator.comparingInt(Discount::getPosition));
 		}
+
+		// ⛔ Rekomendacja PO wycenie, nie przed. Dobór wariantu porównuje składkę z budżetem
+		// klienta (rek. 8.5), więc przed policzeniem cen nie miałby czego porównać — i po cichu
+		// wybrałby najbogatszy wariant jako "mieszczący się".
+		recommend(quote);
 
 		log.info("quote after calculation: {}", quote.print());
 	}

@@ -1,5 +1,17 @@
 package pl.decerto.higson.demo.property.domain;
 
+import pl.decerto.higson.demo.apk.Regime;
+
+import pl.decerto.higson.demo.apk.Answer;
+
+import pl.decerto.higson.demo.apk.Question;
+
+import pl.decerto.higson.demo.apk.Recommendation;
+
+import pl.decerto.higson.demo.apk.Warning;
+
+import pl.decerto.higson.demo.apk.Need;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -44,9 +56,6 @@ public class PropertyQuote {
 	 */
 	private boolean buildingSumOverridden;
 
-	/** Materiał wejściowy dla reguł APK: "KOD=WARTOŚĆ;…" oraz "WARIANT=SKŁADKA;…". */
-	private String apkAnswers = "";
-	private String apkPremiums = "";
 
 	public Policy getPolicy() {
 		return policy;
@@ -154,21 +163,5 @@ public class PropertyQuote {
 
 	public void setBuildingSumOverridden(boolean buildingSumOverridden) {
 		this.buildingSumOverridden = buildingSumOverridden;
-	}
-
-	public String getApkAnswers() {
-		return apkAnswers;
-	}
-
-	public void setApkAnswers(String apkAnswers) {
-		this.apkAnswers = apkAnswers;
-	}
-
-	public String getApkPremiums() {
-		return apkPremiums;
-	}
-
-	public void setApkPremiums(String apkPremiums) {
-		this.apkPremiums = apkPremiums;
 	}
 }

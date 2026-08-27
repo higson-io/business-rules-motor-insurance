@@ -41,11 +41,15 @@ class QuoteApiTest extends ApiContractTestSupport {
 		// unnoticed. It went from 1 to 4 deliberately, when the motor demo gained a needs analysis —
 		// `policyStartDate` because the APK regime is versioned by the policy date, `apkRegime`
 		// because the screen must name the regime without knowing the threshold date itself, and
-		// `apkQuestions` because the questionnaire is configuration rather than markup.
-		assertEquals(4, quote.size(),
-				"QuoteDto must expose exactly four fields: options, policyStartDate, apkRegime, apkQuestions");
+		// `apkQuestions` because the questionnaire is configuration rather than markup. The fifth,
+		// `apkRecommendation`, arrived with the recommendation screen: needs, exclusion warnings and
+		// the justification the KNF regime requires all travel in it.
+		assertEquals(5, quote.size(),
+				"QuoteDto must expose exactly five fields: options, policyStartDate, apkRegime, "
+						+ "apkQuestions, apkRecommendation");
 		assertTrue(quote.has("policyStartDate"), "the policy date selects the APK regime version");
 		assertTrue(quote.has("apkRegime"), "the regime comes from the rules, never from the client");
+		assertTrue(quote.has("apkRecommendation"), "the proposal is a rules output, not a screen decision");
 
 		// ⛔ The count is what the rules currently show, not a number this test may adjust to fit.
 		// Eight before 1 July 2027 and twelve after — the four extra questions exist only in

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.life.domain.Variant;
 
 import pl.decerto.higson.demo.life.adapter.LifeQuoteAdapter;
 import pl.decerto.higson.demo.life.adapter.RiderAdapter;
@@ -85,6 +86,7 @@ public class LifeContext extends HigsonContext {
 			apkValues.put(path, convertApk(question.getValueType(), answer.getValue()));
 		}
 	}
+
 
 	private Object convertApk(String valueType, String raw) {
 		if (raw == null || raw.isEmpty()) {

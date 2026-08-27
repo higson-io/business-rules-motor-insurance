@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
 import pl.decerto.higson.demo.property.converter.PropertyQuoteConverter;
-import pl.decerto.higson.demo.property.domain.Answer;
+import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.property.example.Property;
 import pl.decerto.higson.demo.property.service.PropertyQuoteService;

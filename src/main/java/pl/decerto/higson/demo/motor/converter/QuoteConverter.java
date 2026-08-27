@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import pl.decerto.higson.demo.apk.api.QuestionDto;
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.apk.api.RegimeDto;
 import pl.decerto.higson.demo.motor.api.dto.CoverageDto;
 import pl.decerto.higson.demo.motor.api.dto.DiscountDto;
@@ -15,6 +16,7 @@ import pl.decerto.higson.demo.motor.domain.Discount;
 import pl.decerto.higson.demo.motor.domain.Quote;
 import pl.decerto.higson.demo.motor.domain.Coverage;
 import pl.decerto.higson.demo.motor.domain.Option;
+import pl.decerto.higson.demo.motor.domain.OptionPricing;
 import pl.decerto.higson.demo.motor.api.dto.QuoteDto;
 
 @Component
@@ -30,6 +32,8 @@ public class QuoteConverter implements Converter<Quote, QuoteDto> {
 			.stream()
 			.map(question -> QuestionDto.of(question, quote.getApkAnswers().get(question.getCode())))
 			.collect(Collectors.toList()));
+		dto.setApkRecommendation(RecommendationDto.of(
+			quote.getApkRecommendation(), quote.getApkNeeds(), quote.getApkWarnings()));
 		dto.setOptions(quote.getOptions()
 			.stream()
 			.map(this::toOptionDto)
@@ -43,10 +47,9 @@ public class QuoteConverter implements Converter<Quote, QuoteDto> {
 		dto.setCoverages(convertCoverages(option.getCoverages()));
 		dto.setDiscounts(convertDiscounts(option.getDiscounts()));
 		dto.setOrder(option.getOrder());
-		BigDecimal optionPremium = getOptionPremium(option);
-		dto.setPremium(optionPremium);
-		dto.setPremiumBeforeDiscounts(optionPremium);
-		updateOptionWithDiscounts(dto);
+		BigDecimal beforeDiscounts = OptionPricing.beforeDiscounts(option);
+		dto.setPremium(OptionPricing.finalPremium(option));
+		dto.setPremiumBeforeDiscounts(beforeDiscounts);
 		return dto;
 	}
 
@@ -85,19 +88,5 @@ public class QuoteConverter implements Converter<Quote, QuoteDto> {
 		return dto;
 	}
 
-	private BigDecimal getOptionPremium(Option option) {
-		return option.getCoverages()
-				.stream()
-				.map(Coverage::getPremium)
-				.reduce(BigDecimal::add)
-				.orElse(BigDecimal.ZERO);
-	}
 
-	private void updateOptionWithDiscounts(OptionDto option) {
-		List<DiscountDto> discounts = option.getDiscounts();
-		for (DiscountDto discount : discounts) {
-			BigDecimal oldOptionPremium = option.getPremium();
-			option.setPremium(oldOptionPremium.subtract(discount.getValue()));
-		}
-	}
 }

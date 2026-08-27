@@ -17,15 +17,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import pl.decerto.higson.demo.property.context.PropertyContext;
-import pl.decerto.higson.demo.property.domain.Answer;
+import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
-import pl.decerto.higson.demo.property.domain.Need;
+import pl.decerto.higson.demo.apk.ApkAnalysis;
+import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
-import pl.decerto.higson.demo.property.domain.Question;
-import pl.decerto.higson.demo.property.domain.Recommendation;
-import pl.decerto.higson.demo.property.domain.Regime;
+import pl.decerto.higson.demo.apk.Question;
+import pl.decerto.higson.demo.apk.Recommendation;
+import pl.decerto.higson.demo.apk.Regime;
 import pl.decerto.higson.demo.property.domain.Variant;
-import pl.decerto.higson.demo.property.domain.Warning;
+import pl.decerto.higson.demo.apk.Warning;
 
 /**
  * Orkiestrator profilu PROPERTY. Cała wiedza produktowa siedzi w Higsonie — ta klasa buduje
@@ -60,7 +61,21 @@ public class Property {
 	private static final String FUNCTION_LIMIT = "demo.property.limit.effective";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
-	private static final String FLOW_RECOMMEND = "demo.property.apk.recommend";
+	private static final String PARAM_APK_NEED = "demo.property.apk.need.derive";
+	private static final String PARAM_APK_EXCLUSION = "demo.property.apk.exclusion.conflict";
+	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
+	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
+	private static final String PARAM_FLOOD_AVAILABILITY = "demo.property.flood.availability";
+	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
+
+	private static final String OUTCOME_ABSENT = "BUDGET_ABSENT";
+	private static final String OUTCOME_FIT = "BUDGET_FIT";
+	private static final String OUTCOME_EXCEEDED = "BUDGET_EXCEEDED";
+
+	private static final String PATH_BUDGET = "quote.needs.budget";
+	private static final String PATH_AREA = "quote.property.area";
+	private static final String PATH_SUM_BUILDING = "quote.sums.building";
+	private static final String PATH_SUM_SUGGESTED = "quote.sums.suggestedBuilding";
 
 	private final HigsonEngine engine;
 
@@ -256,7 +271,6 @@ public class Property {
 		}
 		variants.sort(Comparator.comparingInt(Variant::getPosition));
 		quote.setVariants(variants);
-		quote.setApkPremiums(String.join(";", priced));
 	}
 
 	/**
@@ -280,99 +294,171 @@ public class Property {
 	}
 
 	/**
-	 * Analiza potrzeb. Ten sam flow obsługuje obie wersje regionu — różnicę robią przełączniki
-	 * z apk.regime, a nie drugi algorytm.
+	 * Analiza potrzeb. Ten sam algorytm obsługuje obie wersje regionu — różnicę robią
+	 * przełączniki z apk.regime, a nie drugi kod.
+	 *
+	 * ⛔ Java chodzi po listach, tabele rozstrzygają. Ani jednego kodu pytania, progu ani zdania
+	 * dla klienta nie ma w tym pliku — wszystkie siedzą w `demo.property.apk.*`.
 	 */
 	private void recommend(PropertyQuote quote) {
-		quote.setApkAnswers(buildAnswerString(quote));
+		List<Need> needs = ApkAnalysis.deriveNeeds(engine, PARAM_APK_NEED,
+			quote.getQuestions(), quote.getAnswers(),
+			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value));
+		quote.setNeeds(needs);
 
-		Map<String, Object> result = engine.flow(FLOW_RECOMMEND, new PropertyContext(quote)).getResult();
+		quote.setWarnings(quote.getRegime().isRequiresExclusionCheck()
+			? ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION,
+				quote.getQuestions(), quote.getAnswers(),
+				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value))
+			: new ArrayList<>());
 
-		quote.setNeeds(parseNeeds(asString(result.get("needs"))));
-		quote.setWarnings(parseWarnings(asString(result.get("warnings"))));
-		quote.setRecommendation(parseRecommendation(asString(result.get("recommendation")),
-			asString(result.get("justification"))));
+		quote.setRecommendation(propose(quote, needs));
 
 		if (quote.getSelectedVariant() == null) {
 			quote.setSelectedVariant(quote.getRecommendation().getVariantCode());
 		}
 	}
 
-	/** "KOD=WARTOŚĆ;…" — wielokrotny wybór rozwija się na jedną pozycję na wartość. */
-	private String buildAnswerString(PropertyQuote quote) {
-		List<String> parts = new ArrayList<>();
-		for (Question question : quote.getQuestions()) {
-			Answer answer = quote.getAnswers().get(question.getCode());
-			if (answer == null || !answer.isAnswered()) {
-				continue;
-			}
-			if (!answer.getValues().isEmpty()) {
-				for (String value : answer.getValues()) {
-					parts.add(question.getCode() + "=" + value);
-				}
-			} else {
-				parts.add(question.getCode() + "=" + answer.getValue());
-			}
-		}
-		return String.join(";", parts);
-	}
-
-	private List<Need> parseNeeds(String raw) {
-		List<Need> needs = new ArrayList<>();
-		if (raw == null || raw.isEmpty()) {
-			return needs;
-		}
-		for (String entry : raw.split(";")) {
-			String[] parts = entry.split("\\|", -1);
-			if (parts.length >= 3) {
-				needs.add(new Need(parts[0], parts[1], Integer.parseInt(parts[2].trim())));
-			}
-		}
-		return needs;
-	}
-
-	private List<Warning> parseWarnings(String raw) {
-		List<Warning> warnings = new ArrayList<>();
-		if (raw == null || raw.isEmpty()) {
-			return warnings;
-		}
-		for (String entry : raw.split(";;")) {
-			String[] parts = entry.split("\\|", -1);
-			if (parts.length >= 4) {
-				warnings.add(new Warning(parts[0], Integer.parseInt(parts[1].trim()), parts[2], parts[3]));
-			}
-		}
-		warnings.sort(Comparator.comparingInt(Warning::getSeverity).reversed());
-		return warnings;
-	}
-
-
-	private Recommendation parseRecommendation(String raw, String justification) {
+	/**
+	 * Rek. 8.2.d — dobór do potrzeb i możliwości finansowych.
+	 *
+	 * ⛔ Przy remisie wygrywa NIŻSZY szczebel drabinki, czyli tańszy. A gdy nic nie mieści się
+	 * w budżecie, propozycją zostaje najtańszy wariant Z KOMUNIKATEM — milczenie nie jest
+	 * propozycją.
+	 */
+	private Recommendation propose(PropertyQuote quote, List<Need> needs) {
 		Recommendation recommendation = new Recommendation();
-		if (raw == null || raw.isEmpty()) {
+		List<Variant> ladder = new ArrayList<>();
+		for (Variant variant : quote.getVariants()) {
+			if (variant.isAvailable() && variant.getAnnualPremium() != null) {
+				ladder.add(variant);
+			}
+		}
+		if (ladder.isEmpty() || needs.isEmpty()) {
 			return recommendation;
 		}
-		String[] parts = raw.split("\\|", -1);
-		recommendation.setVariantCode(parts[0]);
-		recommendation.setCoveredNeeds(Integer.parseInt(parts[1].trim()));
-		recommendation.setTotalNeeds(Integer.parseInt(parts[2].trim()));
-		recommendation.setMissingCovers(split(parts[3]));
-		recommendation.setBudgetOutcome(parts[4]);
-		recommendation.setJustification(parseJustification(justification));
+		ladder.sort(Comparator.comparingInt(Variant::getPosition));
+
+		Variant best = ladder.get(0);
+		ApkAnalysis.Score bestScore = ApkAnalysis.score(needs, best.getCovers()::contains);
+		for (Variant variant : ladder) {
+			ApkAnalysis.Score score = ApkAnalysis.score(needs, variant.getCovers()::contains);
+			if (score.getCovered() > bestScore.getCovered()) {
+				best = variant;
+				bestScore = score;
+			}
+		}
+
+		Variant proposed = best;
+		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
+		if (!quote.getRegime().isRequiresBudget() || budget == null || budget.signum() <= 0) {
+			recommendation.setBudgetOutcome(OUTCOME_ABSENT);
+		} else if (best.getAnnualPremium().compareTo(budget) <= 0) {
+			recommendation.setBudgetOutcome(OUTCOME_FIT);
+		} else {
+			recommendation.setBudgetOutcome(OUTCOME_EXCEEDED);
+			proposed = ladder.get(0);
+			int covered = ApkAnalysis.score(needs, proposed.getCovers()::contains).getCovered();
+			for (Variant variant : ladder) {
+				int score = ApkAnalysis.score(needs, variant.getCovers()::contains).getCovered();
+				if (variant.getAnnualPremium().compareTo(budget) <= 0 && score >= covered) {
+					proposed = variant;
+					covered = score;
+				}
+			}
+		}
+
+		ApkAnalysis.Score score = ApkAnalysis.score(needs, proposed.getCovers()::contains);
+		recommendation.setVariantCode(proposed.getCode());
+		recommendation.setCoveredNeeds(score.getCovered());
+		recommendation.setTotalNeeds(score.getTotal());
+		recommendation.setMissingCovers(score.getMissing());
+
+		if (quote.getRegime().isRequiresJustification()) {
+			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+				reasons(quote, proposed, best, score, recommendation.getBudgetOutcome()),
+				reason -> new PropertyContext(quote).withReason(reason)));
+		}
 		return recommendation;
 	}
 
-	/** Zdania przychodzą z prefiksem pozycji, żeby dały się posortować bez drugiej listy. */
-	private List<String> parseJustification(String raw) {
-		List<String> lines = new ArrayList<>();
-		if (raw == null || raw.isEmpty()) {
-			return lines;
+	/**
+	 * Powody uzasadnienia: kody i liczby. Ani jednego zdania — te są w
+	 * `demo.property.apk.recommendation.reason`, razem z pozycją, która je sortuje.
+	 */
+	private List<ApkAnalysis.Reason> reasons(PropertyQuote quote, Variant proposed, Variant best,
+			ApkAnalysis.Score score, String outcome) {
+
+		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
+
+		if (score.getMissing().isEmpty()) {
+			reasons.add(new ApkAnalysis.Reason("NEEDS_MATCHED",
+				nameOf(product, COLLECTION_VARIANTS, proposed.getCode()), score.getCovered()));
+		} else {
+			List<String> names = new ArrayList<>();
+			for (String cover : score.getMissing()) {
+				names.add(nameOf(product, COLLECTION_COVERS, cover));
+			}
+			reasons.add(new ApkAnalysis.Reason("NEEDS_PARTIAL",
+				nameOf(product, COLLECTION_VARIANTS, proposed.getCode()),
+				score.getCovered(), score.getTotal(), String.join(", ", names)));
 		}
-		for (String entry : raw.split(";;")) {
-			int separator = entry.indexOf('|');
-			lines.add(separator < 0 ? entry : entry.substring(separator + 1));
+
+		PropertyContext ctx = new PropertyContext(quote);
+		reasons.add(new ApkAnalysis.Reason("SUM_COMPUTED", ctx.get(PATH_AREA),
+			engine.get(PARAM_RATE_PER_SQM, new PropertyContext(quote)).getBigDecimal("rate")));
+
+		// Suma podniesiona albo obniżona ręcznie — klient ma wiedzieć, że odszedł od wyliczenia.
+		BigDecimal chosen = decimalAt(quote, PATH_SUM_BUILDING);
+		BigDecimal suggested = decimalAt(quote, PATH_SUM_SUGGESTED);
+		if (chosen != null && suggested != null && chosen.compareTo(suggested) > 0) {
+			reasons.add(new ApkAnalysis.Reason("SUM_RAISED"));
+		} else if (chosen != null && suggested != null && chosen.compareTo(suggested) < 0) {
+			reasons.add(new ApkAnalysis.Reason("SUM_LOWERED"));
 		}
-		return lines;
+
+		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
+		if (OUTCOME_FIT.equals(outcome)) {
+			reasons.add(new ApkAnalysis.Reason("BUDGET_FIT", proposed.getAnnualPremium(), budget));
+		} else if (OUTCOME_EXCEEDED.equals(outcome)) {
+			// Cena wariantu NAJLEPIEJ dopasowanego, nie proponowanego — to jego przekroczenie
+			// budżetu jest powodem, dla którego propozycja zeszła niżej.
+			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED", best.getAnnualPremium(), budget,
+				nameOf(product, COLLECTION_VARIANTS, proposed.getCode())));
+		} else {
+			reasons.add(new ApkAnalysis.Reason("BUDGET_ABSENT"));
+		}
+
+		ParamValue flood = engine.get(PARAM_FLOOD_AVAILABILITY, new PropertyContext(quote));
+		if (!Boolean.TRUE.equals(flood.getBoolean("available"))) {
+			reasons.add(new ApkAnalysis.Reason("FLOOD_UNAVAILABLE"));
+		} else if (Boolean.TRUE.equals(flood.getBoolean("requiresDeductible"))) {
+			reasons.add(new ApkAnalysis.Reason("FLOOD_DEDUCTIBLE", flood.getBigDecimal("minDeductible")));
+		}
+		reasons.add(new ApkAnalysis.Reason("FLOOD_WAITING",
+			engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
+
+		if (!quote.getWarnings().isEmpty()) {
+			reasons.add(new ApkAnalysis.Reason("EXCLUSIONS_FOUND", quote.getWarnings().size()));
+		}
+		reasons.add(new ApkAnalysis.Reason("LEGAL_BASIS", quote.getRegime().getLegalBasis()));
+		return reasons;
+	}
+
+	/** Nazwa elementu domeny. Kod, którego nie ma w drzewie, zostaje sobą — nie wywala zdania. */
+	private String nameOf(DomainObject product, String collection, String code) {
+		for (DomainObject child : product.getChildren(collection)) {
+			if (child.getCode().equals(code)) {
+				return child.getName();
+			}
+		}
+		return code;
+	}
+
+	private BigDecimal decimalAt(PropertyQuote quote, String path) {
+		Object value = new PropertyContext(quote).get(path);
+		return value instanceof BigDecimal ? (BigDecimal) value : null;
 	}
 
 	private void applyBreakdown(Variant variant, String raw) {
