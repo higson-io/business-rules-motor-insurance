@@ -1834,3 +1834,67 @@ Ta sama sesja, zmieniana wyłącznie datą polisy:
 
 Ostatni wiersz jest tu z tego samego powodu, co w §7.4: wersjonowanie ma być widocznie
 **selektywne**, a nie globalnym przełącznikiem.
+
+---
+
+## 14. Analiza potrzeb wychodzi z Groovy'ego (2026-08-27)
+
+Konfiguracja opisana wyżej się nie zmieniła — zmieniło się, **kto ją wykonuje**.
+
+### 14.1 Co zniknęło
+
+Siedem funkcji Groovy i jeden flow:
+
+| Usunięte | Co robiło |
+|---|---|
+| `demo.property.apk.deriveNeeds` | pętla po odpowiedziach + odczyt `apk.need.derive` |
+| `demo.property.apk.checkExclusions` | to samo dla `apk.exclusion.conflict` |
+| `demo.property.apk.scoreVariants` | zliczanie pokrytych potrzeb per wariant |
+| `demo.property.apk.pickVariant` | wybór wariantu i konfrontacja z budżetem |
+| `demo.property.apk.justify` | zebranie powodów i podstawienie `{0}` |
+| `demo.property.apk.requiresExclusionCheck` | przełącznik reżimu — YES/NO dla flow |
+| `demo.property.apk.requiresJustification` | jw. |
+| flow `demo.property.apk.recommend` | spięcie powyższych |
+
+**Powód: to nie były reguły.** `deriveNeeds` miał 43 linie, z czego 6 czytało tabelę,
+a 19 składało i rozbierało łańcuchy `KOD=WARTOŚĆ;KOD=WARTOŚĆ`. Ta marszałka istniała
+wyłącznie dlatego, że flow zwraca skalary, a Groovy był jedynym miejscem z pętlą.
+Na demie dla biznesu pokazywało to dokładnie odwrotność tezy: zamiast reguły widocznej
+w tabeli — 90 linii kodu.
+
+### 14.2 Co zostało
+
+**Wszystkie tabele.** Ani jeden wiersz nie ruszył się z `demo.property.apk.*`. Zostały też
+funkcje, które naprawdę liczą: `sum.suggest`, `risk.factor`, `limit.effective`,
+`zone.resolve`, `tariff.*`, `util.buildingAge`, `variant.isAvailable`,
+`variant.unavailableReason`.
+
+Kryterium podziału: **funkcja zostaje, jeżeli zawiera regułę biznesową** (wzór, mnożnik,
+próg). Funkcja znika, jeżeli tylko chodziła po liście i sklejała łańcuchy.
+
+### 14.3 Gdzie to teraz jest
+
+`pl.decerto.higson.demo.apk.ApkAnalysis` — jedna klasa dla trzech profili, cztery przejścia:
+`deriveNeeds`, `checkExclusions`, `score`, `justify`.
+
+⛔ **Klasa nie zna ani jednej reguły**: żadnego kodu pytania, kodu pokrycia, progu, mnożnika
+ani zdania dla klienta. Dostaje kod tabeli i kontekst, a decyduje silnik. Sprawdzian: dodanie
+pytania w Studio nadal nie wymaga rekompilacji, a `grep -c 'PROPERTY\|HOME\|FLOOD' ApkAnalysis.java`
+zwraca 0.
+
+`Property.recommend()` woła te cztery przejścia i składa `Recommendation`. Semantyka
+`pickVariant` przeniesiona co do joty: kolejność z `variant.position`, przy remisie **niższy
+szczebel drabinki**, a przy przekroczonym budżecie propozycja schodzi do najtańszego, który
+się mieści, i **mówi to wprost** — uzasadnienie podaje cenę wariantu NAJLEPIEJ dopasowanego,
+bo to jego przekroczenie budżetu jest powodem zejścia.
+
+### 14.4 Zweryfikowane, nie tylko skompilowane
+
+Obie wersje regionu na działającej aplikacji, przed i po:
+
+| Data polisy | Reżim | Pytań | Uzasadnienie | Wariant |
+|---|---|---|---|---|
+| 2026-06-15 | minimum ustawowe | 9 | brak (reżim nie wymaga) | STANDARD, 1 z 1 |
+| 2028-01-15 | Rekomendacje KNF | 16 | 5 zdań | COMPLETE, 4 z 4 |
+
+Wersjonowanie działa tak samo jak przed zmianą — bo zmiana go nie dotyczyła.

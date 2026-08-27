@@ -118,12 +118,58 @@ Bazowy pakiet: `pl.decerto.higson.demo.motor`
 - **Rola**: wyjątki własne + `GlobalExceptionHandler` (`@RestControllerAdvice`) mapujący je na odpowiedzi HTTP z ciałem `ErrorDto` (`{"message": …}`)
 - **Uwaga historyczna**: do sierpnia 2026 r. był to `@ControllerAdvice` zwracający `String`. Spring traktował zwróconą wartość jako **nazwę widoku**, więc nieudana walidacja kończyła się `404` z pustym ciałem, a komunikat walidatora nigdy nie docierał do użytkownika. Poprawka (`ErrorDto` + `@RestControllerAdvice`) jest jedyną zmianą backendu w całej migracji frontendu
 
+### Analiza potrzeb — jedna implementacja na trzy linie
+
+Cała mechanika APK żyje w `pl.decerto.higson.demo.apk`: `Question`, `Answer`, `Regime`,
+`Need`, `Warning`, `Recommendation`, `QuestionCatalogue`, `RegimeReader` oraz
+**`ApkAnalysis`** — cztery przejścia (wyprowadź potrzeby, skonfrontuj z wyłączeniami,
+policz pokrycie, uzasadnij), z których korzystają wszystkie trzy profile.
+
+⛔ **`ApkAnalysis` nie zna ani jednej reguły.** Żadnego kodu pytania, kodu pokrycia, progu,
+mnożnika ani zdania, które przeczyta klient. Java chodzi po listach, tabele rozstrzygają.
+Sprawdzian jest mechaniczny: `grep -c 'MOTOR\|LIFE\|PROPERTY\|COMP\|MAIN_COVER'` na tym
+pliku zwraca 0.
+
+Podział został przeprowadzony 27 sierpnia 2026 r.: **dwanaście funkcji Groovy i trzy flow**
+zniknęły, bo w większości składały i rozbierały łańcuchy `KOD=WARTOŚĆ;KOD=WARTOŚĆ` — flow
+zwraca skalary, a Groovy był jedynym miejscem z pętlą. Ani jedna tabela decyzyjna się przy
+tym nie ruszyła. Kryterium: **funkcja zostaje, jeżeli zawiera regułę** (wzór, mnożnik, próg);
+znika, jeżeli tylko chodziła po liście.
+
+Na drucie jedziemy jednym `RecommendationDto` — potrzeby, ostrzeżenia i uzasadnienie razem,
+bo razem są jedną analizą; trzy osobne pola najwyższego poziomu kusiły, żeby pokazać jedno
+bez drugiego.
+
 ### Frontend — SPA
 
 - **Lokalizacja**: `frontend/` (workspace Angular CLI); wynik builda ląduje w korzeniu WAR-a
-- **Framework**: Angular 22.1.0, komponenty standalone, bez `NgModule` i **bez routera** (jeden, nieadresowalny ekran)
+- **Framework**: Angular 22.1.0, komponenty standalone, bez `NgModule` i **bez routera** (ekrany są nieadresowalne — patrz niżej)
 - **Komponenty** (TS + HTML + LESS współlokowane w jednym katalogu, nazwanym jak komponent):
-  `app-root` (powłoka — sam layout), `app-sidebar` (panel wejściowy), `app-vehicle`, `app-driver`, `app-driver-history`, `app-variants` (warianty cenowe), `app-coverage`, `app-discount`, `app-spinner`, oraz dyrektywa `[appHtmlPopover]` na CDK Overlay
+  `app-root` (powłoka — sam layout), `app-demo-picker` (ekran startowy), trzy gospodarze dem (`app-moto`, `app-life`, `app-property`), `app-inputs` (panel wejściowy), `app-vehicle`, `app-driver`, `app-driver-history`, `app-variants` (warianty cenowe), `app-coverage`, `app-discount`, `app-spinner`, oraz dyrektywa `[appHtmlPopover]` na CDK Overlay
+- **Wspólne dla trzech dem** (`shared/`): `app-step-bar`, `app-apk-questionnaire`, `app-apk-recommendation`, `app-error-banner`
+
+#### Trzy kroki: analiza potrzeb → rekomendacja → składka
+
+Każde demo jest podzielone na te same trzy kroki, w kolejności, w jakiej biegnie analiza,
+a **nie** w kolejności, w jakiej robi to typowy kalkulator. Ekran otwierający się na cenie
+przestaje być analizą potrzeb — o tę odwrotność chodzi w rek. 8 KNF.
+
+- **Krok jest sygnałem, nie adresem** (ND-7). Wstecz przeglądarki go nie cofa, tak samo jak
+  przy wyborze demo.
+- ⛔ **Każdy krok osiągalny zawsze**, także zanim wycena się wczyta. Pasek pokazuje POZYCJĘ,
+  nie uprawnienie: prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia
+  się propozycja. Ekrany dalsze mają własne stany puste i własny baner błędu, więc blokada
+  niczego nie chroni, a produkuje kliknięcia bez skutku.
+- **Data polisy stoi NAD paskiem** we wszystkich trzech demach (`app-*-effective-date`,
+  wspólny partial `styles/_date-band.less`). Jest kontekstem całej wyceny, a nie odpowiedzią
+  na pytanie: przesunięcie jej przez próg zmienia reżim, zestaw pytań i rekomendację naraz.
+- **`app-apk-recommendation` nie zna żadnego produktu.** Dostaje gotową analizę i nazwy do
+  wypisania, dlatego ten sam plik renderuje propozycję Z wariantem (majątek, życie grupowe)
+  i BEZ wariantu (życie indywidualne, gdzie propozycją jest zestaw umów dodatkowych,
+  a `variantCode` jest pusty **celowo**).
+- Wygląd paska wzięty z `step-bar` z `higson-agent-portal-demo-frontend`, z jedną świadomą
+  różnicą: tamten jest napędzany routerem i nieklikalny, bo kolejność wymusza proces
+  sprzedaży. Tutaj nic jej nie wymusza.
 - **Serwisy**: `DictionaryService`, `DriverService`, `VehicleService`, `VariantService` — jedyne klasy wstrzykujące `HttpClient`; jedna metoda na endpoint, URL-e względne bez wiodącego ukośnika
 - **Stan współdzielony**: `QuoteStore` — patrz niżej
 - **Przekrojowe**: dwa funkcyjne interceptory HTTP — licznik żądań w locie (zasila jeden globalny spinner i `aria-busy` powłoki) oraz przechwytywanie błędów mutacji (zapisuje komunikat do `QuoteStore`, **bez ponowień**)

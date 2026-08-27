@@ -27,7 +27,7 @@ Technology choices with rationale for the **Business Rules for Motor Insurance**
 **Read before** adding dependencies, bumping Higson or Spring Boot versions, touching the build, or making any technology decision.
 
 ### Architecture (`project/architecture.md`)
-System architecture of the single-module Spring Boot WAR application. Covers: the layered MVC monolith with the **Adapter pattern** as the rules-engine boundary (API → Converter → Service → Domain → Adapter → Context → Higson Engine → JDBC), and the core principle that all pricing logic lives in Higson rules rather than Java; per-layer package breakdown under `pl.decerto.higson.demo.motor` (REST controllers `QuoteApi`/`DriverApi`/`VehicleApi`/`DictionaryApi`/`ProfilersApi`, DTOs, hand-written converters, `@SessionScope QuoteService` holding the `Quote` aggregate between requests, the domain model, `*Adapter` classes as the only code aware of Higson context paths, `MotorContext`, the `Motor` calculation orchestrator, and `GlobalExceptionHandler` — now `@RestControllerAdvice` returning `ErrorDto`, with the history of why); the **Angular 22 SPA inventory** — standalone components, the four HTTP services, the two HTTP interceptors, and the **`QuoteStore` signal store** that replaced the `$emit`/`$broadcast` event bus, including the `RELOADS_QUOTE` table that encodes the vehicle-cascade reload asymmetry; the end-to-end recalculation data flow with its two deliberate exceptions (blur-commit, model-only reload); external integrations; the deliberate absence of an application-owned DB schema and migrations, with the warning that snapshot-based versioning is aspirational because the snapshot is never committed; configuration layering; and deployment (WAR artifact with the frontend build wired in, `all_in_one` profile, Docker image, compose topology, limited observability, no CI).
+System architecture of the single-module Spring Boot WAR application. Covers: the layered MVC monolith with the **Adapter pattern** as the rules-engine boundary (API → Converter → Service → Domain → Adapter → Context → Higson Engine → JDBC), and the core principle that all pricing logic lives in Higson rules rather than Java; per-layer package breakdown under `pl.decerto.higson.demo.motor` (REST controllers `QuoteApi`/`DriverApi`/`VehicleApi`/`DictionaryApi`/`ProfilersApi`, DTOs, hand-written converters, `@SessionScope QuoteService` holding the `Quote` aggregate between requests, the domain model, `*Adapter` classes as the only code aware of Higson context paths, `MotorContext`, the `Motor` calculation orchestrator, and `GlobalExceptionHandler` — now `@RestControllerAdvice` returning `ErrorDto`, with the history of why); the **shared APK layer** (`pl.decerto.higson.demo.apk`) whose `ApkAnalysis` runs the needs analysis for all three lines and **knows no rule at all**; the **Angular 22 SPA inventory** — standalone components, the shared `step-bar` / `apk-questionnaire` / `apk-recommendation`, the **three-step flow (needs analysis → recommendation → premium)** with every step always reachable and the policy date pinned above the bar, the four HTTP services, the two HTTP interceptors, and the **`QuoteStore` signal store** that replaced the `$emit`/`$broadcast` event bus, including the `RELOADS_QUOTE` table that encodes the vehicle-cascade reload asymmetry; the end-to-end recalculation data flow with its two deliberate exceptions (blur-commit, model-only reload); external integrations; the deliberate absence of an application-owned DB schema and migrations, with the warning that snapshot-based versioning is aspirational because the snapshot is never committed; configuration layering; and deployment (WAR artifact with the frontend build wired in, `all_in_one` profile, Docker image, compose topology, limited observability, no CI).
 **Read before** adding endpoints, changing the domain model, touching adapters or context paths, altering how the application talks to the rules engine, or changing how the SPA triggers recalculation.
 
 ### Profil LIFE — projekt konfiguracji (`project/higson-life-profile.md`)
@@ -81,9 +81,14 @@ dochód wchodzi jako **drugi** pułap dla SZP i NDP, obowiązujący łącznie z 
 Z D-3/D-4/D-5/D-7 wyłania się nazwany wzorzec **„reguła bazowa × reguła modyfikująca"**: nowy wymiar
 dokłada się drugą tabelą i złożeniem we flow, zamiast rozsadzać macierz bazową o kolejny poziom.
 ⚠️ D-2 unieważnia etykietę „Koszt programu miesięcznie" na obecnym ekranie grupowym SPA (W-4).
-**Read before** touching anything related to the LIFE demo's rules, and read **§13** before assuming
-a given piece exists in Studio — the body of the document is the design, §13 is what was built
-afterwards, and the two are close but not identical.
+**§14 (2026-08-27)** takes the needs analysis out of Groovy — six functions and the
+`apk.recommend` flow deleted, `suggestSum` kept — and adds **`demo.life.apk.cover.equivalent`**,
+a two-row table translating the individual dictionary into the group one (`MAIN_COVER` → `DEATH`).
+Without it a need met by the base group benefit reported as unmet and the raw code reached the
+client in a customer-facing sentence.
+**Read before** touching anything related to the LIFE demo's rules, and read **§13 and §14** before
+assuming a given piece exists in Studio — the body of the document is the design, §13 and §14 are
+what was built afterwards, and the two are close but not identical.
 
 ### Profil PROPERTY — projekt konfiguracji (`project/higson-property-profile.md`)
 > ⚙️ **Zbudowane i działające** w profilu `PROPERTY` (2026-08-21), zweryfikowane przeglądarką.
@@ -100,7 +105,7 @@ mury/elementy stałe jako **trzy niezależne parametry** (a nie jedna decyzja), 
 z metrażu i stawki zł/m², strefa powodziowa jako **przełącznik dostępności** obok strefy
 kradzieżowej jako czynnika, pytanie jako element domeny, wersjonowanie obejmujące **oba** wymiary
 naraz, odmowa odpowiedzi jako trzeci stan, przekroczony budżet z **nazwaną luką**, franszyza
-w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie.
+w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie, a **§14 — zdjęcie analizy potrzeb z Groovy'ego (2026-08-27)**: siedem funkcji i flow `apk.recommend` usunięte, wszystkie tabele nietknięte.
 ⚠️ Wszystkie stawki są **demonstracyjne** (W-2); jedyne liczby przepisane z OWU to limity z PZU §46.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added without `CONTEXT_PATH` and `VALUE_TYPE` will not
@@ -215,6 +220,9 @@ These standards apply to the **Angular 22** SPA under `frontend/` and its build.
 
 #### Components (`standards/frontend/components.md`)
 Standalone components — **never write `standalone: true`**, it is the v22 default; signal inputs via `input()` / `input.required()` and `output()` instead of `@Input`/`@Output`; `inject()` rather than constructor parameters; built-in `@if` / `@for` / `@switch` control flow with a **mandatory stable `track`** and no client-side sort (the backend already orders); `OnPush` on every component and host bindings in the `host` object; co-located same-named files with no `.component` suffix and an `app-root` selector that is never a real HTML tag. ⛔ Contains the load-bearing behavioural rule: **recalculation runs through `QuoteStore`**, and the **vehicle-cascade asymmetry** (only a *model* change reloads the quote) is encoded as an exhaustive `RELOADS_QUOTE` table — losing it is a failed migration. Ends with an open item: `AC-S1`'s explicit-`OnPush` requirement versus current Angular guidance.
+Since August 2026 the shared demo chrome lives in `frontend/src/app/shared/`: `app-step-bar`,
+`app-apk-questionnaire` and `app-apk-recommendation`. The recommendation component knows no product —
+it renders a proposal with a variant and one without from the same file.
 **Read before** writing any component or template.
 
 #### Services & HTTP (`standards/frontend/services.md`)
@@ -337,4 +345,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-08-10 (AngularJS → Angular 22 migration, task group G13)
+**Last regenerated**: 2026-08-27 (needs analysis moved out of Groovy; three-step demo flow)

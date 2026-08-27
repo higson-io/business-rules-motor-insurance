@@ -2024,3 +2024,53 @@ pokazuje pierwszą oś: słabe przystąpienie podnosi stawkę przez `factor.part
 > i nie jest bezpieczny wątkowo: trzy równoległe PUT-y czytają tę samą `ArrayList`, każdy usuwa
 > swoją pozycję i odkłada wynik, więc przeżywa jeden zapis. Zmierzone — z trzech wariantów czyścił
 > się jeden. Każda inna mutacja w tym API jest pojedynczym PUT-em i dlatego nigdy na to nie trafiła.
+
+---
+
+## 14. Analiza potrzeb wychodzi z Groovy'ego (2026-08-27)
+
+To samo cięcie co w profilu PROPERTY (§14 tamtego dokumentu) i z tego samego powodu:
+sześć funkcji APK plus flow `demo.life.apk.recommend` były w większości marszałką łańcuchów,
+a nie regułą. Usunięte: `deriveNeeds`, `checkExclusions`, `regimeFlag`, `scoreCovers`,
+`pickCover`, `justify`.
+
+**`demo.life.apk.suggestSum` ZOSTAJE.** Ona naprawdę liczy — a wszystkie mnożniki i tak
+siedzą w `demo.life.apk.sum.multiplier`, nie w niej.
+
+### 14.1 Nowa tabela: `demo.life.apk.cover.equivalent`
+
+Cięcie odsłoniło regułę, której **nigdy nie było**, a która była potrzebna.
+
+Ankieta powstała w słowniku ochrony **indywidualnej**, gdzie śmierć to `MAIN_COVER`.
+Polisa **grupowa** nazywa to samo świadczenie `DEATH`, a trwały uszczerbek —
+`IMPAIRMENT_PER_PERCENT` zamiast `PERMANENT_IMPAIRMENT`. Skutek na ekranie grupowym:
+potrzeba pokryta przez podstawowe świadczenie raportowała się jako **niezaspokojona**
+(1 z 2 zamiast 2 z 2), a surowy kod wychodził do klienta w zdaniu
+„Poza zakresem zostaje: MAIN_COVER".
+
+| line | cover | code |
+|---|---|---|
+| `GROUP` | `MAIN_COVER` | `DEATH` |
+| `GROUP` | `PERMANENT_IMPAIRMENT` | `IMPAIRMENT_PER_PERCENT` |
+
+`matchRequired = false`, dwa wiersze, brak wiersza domyślnego. **Brak dopasowania znaczy
+„nazywa się tak samo"** — a nie błąd.
+
+⛔ Nie przez dołożenie kolumny `line` do `demo.life.apk.need.derive`: to zdublowałoby
+dziewięć wierszy potrzeb wraz z ich treścią. Wzorzec **„reguła bazowa × reguła
+modyfikująca"** z D-3/D-4/D-5/D-7 — tabela bazowa mówi CZEGO klient potrzebuje, ta mówi
+JAK to się nazywa tam, gdzie sprzedajemy.
+
+### 14.2 Kształt propozycji
+
+⛔ **`variantCode` zostaje pusty w ochronie indywidualnej i to nie jest brak danych.**
+Tam nie ma czego wybierać z półki — propozycją jest ZESTAW umów dodatkowych. Ekran
+rekomendacji ma dwa nagłówki i wybiera po obecności wariantu, a nie po linii produktowej.
+
+### 14.3 Zweryfikowane na działającej aplikacji
+
+| Ścieżka | Budżet | Wynik |
+|---|---|---|
+| INDYWIDUALNA | brak | „Proponowany zakres ochrony", 2 z 2 |
+| GRUPOWA | brak | wariant Rozszerzony, **2 z 2** (przed zmianą 1 z 2) |
+| GRUPOWA | 45 zł | wariant Podstawowy, `BUDGET_EXCEEDED`, uzasadnienie podaje 61 zł jako cenę najlepiej dopasowanego |
