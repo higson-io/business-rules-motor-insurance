@@ -6,12 +6,12 @@
 
 // Nagłówek sekcji ostrzeżeń — ten sam krój co pozostałe podtytuły w tym komponencie.
 .reco__section-title {
-	margin: 0 0 6px;
-	font-size: @font-sm;
-	font-weight: 600;
+	margin: 0 0 8px;
+	font-size: @font-xs;
+	font-weight: 700;
 	color: @color-text-muted;
 	text-transform: uppercase;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.05em;
 }
 
 // Brak propozycji nie jest błędem: przed odpowiedzią na pierwsze pytanie nie ma czego proponować.
@@ -30,15 +30,15 @@
 // Nad propozycją i wizualnie od niej oddzielone — dotyczą decyzji, nie wyniku.
 .reco__warnings {
 	padding: @space-panel;
-	margin-bottom: 12px;
+	margin-bottom: @space-gap;
 	background: @color-paper;
 	border-radius: @radius-panel;
 	box-shadow: @shadow-panel;
 }
 
 .reco__warning {
-	padding: 10px 12px;
-	margin-bottom: 6px;
+	padding: 14px 16px;
+	margin-bottom: 8px;
 	border: 1px solid @color-border-block;
 	// Karta wewnątrz białego panelu musi mieć inne tło niż panel, inaczej granica jest niewidoczna.
 	border-left: 3px solid @color-text-muted;
@@ -47,26 +47,26 @@
 }
 
 .reco__warning--severe {
-	border-left-color: @color-accent;
+	border-left-color: @color-warn;
 }
 
 .reco__warning-text {
 	margin: 0;
-	font-size: 0.875rem;
-	line-height: 1.4;
+	font-size: @font-md;
+	line-height: 1.5;
 }
 
 .reco__warning-remedy {
 	margin: 4px 0 0;
-	font-size: 0.8125rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }
 
+// Panel portalu: 8px, 1.5rem, bez obrysu — patrz `.apk__section`.
 .reco__pick {
 	padding: @space-panel;
 	background: @color-paper;
-	border: 1px solid @color-border-block;
-	border-radius: 6px;
+	border-radius: @radius-panel;
 	box-shadow: @shadow-panel;
 }
 
@@ -75,17 +75,20 @@
 	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 4px 12px;
-	padding-bottom: 10px;
+	padding-bottom: 12px;
 	border-bottom: 1px solid @color-border-block;
 }
 
+// Tytuł panelu — turkus `--primary-150`, tak jak `.panel-title` w portalu.
 .reco__title {
 	margin: 0;
-	font-size: 1.0625rem;
+	font-size: @font-xl;
+	font-weight: 600;
+	color: @color-panel-title;
 }
 
 .reco__coverage {
-	font-size: 0.8125rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }
 
@@ -109,20 +112,20 @@
 }
 
 .reco__subtitle {
-	margin: 0 0 6px;
-	font-size: 0.8125rem;
-	font-weight: 600;
+	margin: 0 0 8px;
+	font-size: @font-xs;
+	font-weight: 700;
 	color: @color-text-muted;
 	text-transform: uppercase;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.05em;
 }
 
 .reco__needs,
 .reco__justification {
 	margin: 0;
 	padding-left: 18px;
-	font-size: 0.875rem;
-	line-height: 1.45;
+	font-size: @font-md;
+	line-height: 1.5;
 }
 
 .reco__justification li {
@@ -131,6 +134,6 @@
 
 .reco__missing {
 	margin: 8px 0 0;
-	font-size: 0.8125rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }

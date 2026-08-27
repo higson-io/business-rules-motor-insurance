@@ -11,13 +11,14 @@
 .property__title {
 	margin: 0;
 	font-size: 1.5rem;
+	font-weight: 600;
 	line-height: 1.2;
 }
 
 .property__lead {
 	margin: 4px 0 0;
 	max-width: 68ch;
-	font-size: 0.875rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }
 
@@ -57,17 +58,20 @@
 	gap: 20px;
 }
 
+// Panel portalu: 8px, 1.5rem, bez obrysu — patrz `.apk__section`.
 .property__summary {
-	padding: 16px 18px;
+	padding: @space-panel;
 	background: @color-paper;
-	border: 1px solid @color-border-block;
-	border-radius: 6px;
+	border-radius: @radius-panel;
 	box-shadow: @shadow-panel;
 }
 
+// Tytuł panelu — turkus, jak `.panel-title` w portalu.
 .property__summary-title {
-	margin: 0 0 12px;
-	font-size: 1rem;
+	margin: 0 0 16px;
+	font-size: @font-lg;
+	font-weight: 600;
+	color: @color-panel-title;
 }
 
 // Liczba, po którą się w tę szpaltę patrzy. Wcześniej stała jako jeden z sześciu wierszy listy
@@ -146,53 +150,6 @@
 	margin-top: 0;
 }
 
-// Nawigacja kroku. Przycisk „dalej" jest jedynym akcentem na ekranie — prowadzący ma go trafić
-// wzrokiem z drugiego końca sali, nie szukać.
-.property__nav {
-	display: flex;
-	justify-content: space-between;
-	gap: 12px;
-	margin-top: 20px;
-}
-
-.property__nav:has(.property__next:only-child) {
-	justify-content: flex-end;
-}
-
-.property__next,
-.property__back {
-	padding: 10px 18px;
-	border-radius: 6px;
-	font-size: @font-sm;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.property__next {
-	border: 0;
-	background: @color-accent-text;
-	color: @color-paper;
-
-	&:hover {
-		filter: brightness(1.08);
-	}
-}
-
-.property__back {
-	border: 1px solid @color-border-block;
-	background: @color-paper;
-	color: @color-text-muted;
-
-	&:hover {
-		color: @color-text;
-	}
-}
-
-.property__next:focus-visible,
-.property__back:focus-visible {
-	outline: 2px solid @color-teal;
-	outline-offset: 2px;
-}
 
 // ⛔ Krok ankiety nie ma podsumowania obok, więc nie może zostawiać po nim pustej kolumny —
 // pytania wchodzą wtedy w trzy wąskie kolumny zamiast w trzy wygodne. `:has()` zamiast klasy na

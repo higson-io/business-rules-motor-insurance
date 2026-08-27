@@ -26,8 +26,8 @@
 			@case ('apk') {
 				<app-property-questionnaire />
 
-				<div class="property__nav">
-					<button type="button" class="property__next" data-testid="to-recommendation" (click)="goTo('reco')">
+				<div class="step-nav">
+					<button type="button" class="step-nav__next" data-testid="to-recommendation" (click)="goTo('reco')">
 						Zobacz rekomendację →
 					</button>
 				</div>
@@ -41,9 +41,9 @@
 					[missingNames]="missingNames()"
 				/>
 
-				<div class="property__nav">
-					<button type="button" class="property__back" (click)="goTo('apk')">← Wróć do ankiety</button>
-					<button type="button" class="property__next" data-testid="to-price" (click)="goTo('price')">
+				<div class="step-nav">
+					<button type="button" class="step-nav__back" (click)="goTo('apk')">← Wróć do ankiety</button>
+					<button type="button" class="step-nav__next" data-testid="to-price" (click)="goTo('price')">
 						Zobacz składkę →
 					</button>
 				</div>
@@ -52,8 +52,8 @@
 			@case ('price') {
 				<app-property-comparison />
 
-				<div class="property__nav">
-					<button type="button" class="property__back" (click)="goTo('reco')">
+				<div class="step-nav">
+					<button type="button" class="step-nav__back" (click)="goTo('reco')">
 						← Wróć do rekomendacji
 					</button>
 				</div>

@@ -51,27 +51,45 @@
 	width: 100%;
 	height: 100%;
 	padding: 2rem 1.5rem;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
+	// Obrys `--Outline-Grey`, jak `.product` w portalu — tam karta wyboru ma widoczną krawędź,
+	// a nie sam cień.
+	border: 1px solid @color-outline;
+	border-radius: @radius-panel;
 	background: @color-paper;
 	box-shadow: @shadow-panel;
 	font: inherit;
 	color: @color-text;
 	text-align: center;
 	cursor: pointer;
-	transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 // ⚠️ Unlike the variant cards — which look clickable and are not (DR-15) — these genuinely are, so
 // the hover affordance is correct here rather than a false promise. No `:disabled` variant: every
 // demo in the catalogue is built, so the greyed-out state could never render.
+//
+// ⛔ Karta ZALEWA SIĘ turkusem, a nie unosi cieniem. To jest zachowanie `.product` z portalu
+// (`common.scss`: `&:hover { background-color: var(--primary-150); color: var(--p-primary-900) }`)
+// i jedna z dwóch rzeczy, po których tamten interfejs poznaje się od razu — druga to miętowa
+// krecha pod krokiem bieżącym.
+.demo-picker__tile {
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
+		border-color 0.2s ease-in-out;
+}
+
 .demo-picker__tile:hover {
-	box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.25);
-	transform: translateY(-2px);
+	background: @color-action;
+	border-color: @color-action;
+	color: @color-white;
+}
+
+.demo-picker__tile:hover .demo-picker__icon,
+.demo-picker__tile:hover .demo-picker__step,
+.demo-picker__tile:hover .demo-picker__summary {
+	color: inherit;
 }
 
 .demo-picker__tile:focus-visible {
-	outline: 2px solid @color-accent;
+	outline: 2px solid @color-action;
 	outline-offset: 3px;
 }
 
@@ -81,7 +99,7 @@
 	display: block;
 	width: 56px;
 	height: 56px;
-	color: @color-accent;
+	color: @color-action;
 
 	svg {
 		width: 100%;

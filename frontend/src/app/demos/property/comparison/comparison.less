@@ -2,12 +2,21 @@
 
 :host {
 	display: block;
-	margin-top: 26px;
+	// Tabela mieszka w panelu portalu, a nie luzem na tle: 8px, 1.5rem, biel, cień, bez obrysu.
+	// Przedtem sama tabela nosiła obrys i promień, przez co jako jedyny obiekt na ekranie nie
+	// wyglądała jak karta obok siebie stojących kart.
+	padding: @space-panel;
+	background: @color-paper;
+	border-radius: @radius-panel;
+	box-shadow: @shadow-panel;
 }
 
+// Tytuł panelu — turkus `--primary-150`, jak `.panel-title` w portalu.
 .compare__title {
-	margin: 0 0 10px;
-	font-size: 1rem;
+	margin: 0 0 16px;
+	font-size: @font-lg;
+	font-weight: 600;
+	color: @color-panel-title;
 }
 
 // Szeroka tabela przewija się we własnym kontenerze, a nie stroną.
@@ -18,10 +27,7 @@
 .compare__table {
 	width: 100%;
 	border-collapse: collapse;
-	font-size: 0.875rem;
-	background: @color-paper;
-	border: 1px solid @color-border-block;
-	border-radius: 6px;
+	font-size: @font-sm;
 }
 
 .compare__table th,
@@ -41,15 +47,15 @@
 
 .compare__badge {
 	display: block;
-	font-size: 0.6875rem;
+	font-size: @font-xs;
 	font-weight: 600;
-	color: @color-accent-text;
+	color: @color-action;
 	text-transform: uppercase;
 }
 
 .compare__limit {
 	display: block;
-	font-size: 0.6875rem;
+	font-size: @font-xs;
 	font-weight: 400;
 	color: @color-text-muted;
 }
@@ -58,17 +64,32 @@
 	font-weight: 600;
 }
 
+// Przycisk wyboru wariantu — `.second-button` z portalu: przezroczyste tło, obrys i tekst
+// w kolorze akcji, hover przez przezroczystość.
 .compare__pick {
-	padding: 4px 10px;
-	border: 1px solid @color-border-block;
-	border-radius: 4px;
-	background: @color-white;
-	font-size: 0.75rem;
+	padding: 6px 16px;
+	border: 1px solid @color-action;
+	border-radius: @radius-button;
+	background: transparent;
+	font-family: inherit;
+	font-size: @font-sm;
+	font-weight: 600;
+	color: @color-action;
 	cursor: pointer;
+	transition: opacity 0.15s ease;
+
+	&:hover {
+		opacity: 0.8;
+	}
+
+	&:focus-visible {
+		outline: 2px solid @color-action;
+		outline-offset: 2px;
+	}
 }
 
 .compare__reason {
 	margin: 10px 0 0;
-	font-size: 0.8125rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }

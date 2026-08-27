@@ -17,9 +17,9 @@
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
-	padding: 12px 18px;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
+	padding: 14px 20px;
+	border: 1px solid @color-outline;
+	border-radius: @radius-panel;
 	background: @color-paper;
 	box-shadow: @shadow-panel;
 	font: inherit;
@@ -35,14 +35,14 @@
 }
 
 .life-paths__tab:focus-visible {
-	outline: 2px solid @color-accent;
+	outline: 2px solid @color-action;
 	outline-offset: 2px;
 }
 
 // The selected path. Border and text carry it rather than a fill: the accent on this screen belongs
 // to the premium, and a filled tab would put a second loud thing above it.
 .life-paths__tab--on {
-	border-color: fade(@color-accent, 55%);
+	border-color: @color-action;
 	color: @color-text;
 }
 
@@ -72,53 +72,6 @@
 	margin-top: 0;
 }
 
-// Nawigacja kroku — ta sama konstrukcja i te same odległości co w demie majątkowym, żeby
-// prowadzący nie szukał przycisku w innym miejscu po zmianie demo.
-.life__nav {
-	display: flex;
-	justify-content: space-between;
-	gap: 12px;
-	margin-top: 20px;
-}
-
-.life__nav:has(.life__next:only-child) {
-	justify-content: flex-end;
-}
-
-.life__next,
-.life__back {
-	padding: 10px 18px;
-	border-radius: 6px;
-	font-size: @font-sm;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.life__next {
-	border: 0;
-	background: @color-accent-text;
-	color: @color-paper;
-
-	&:hover {
-		filter: brightness(1.08);
-	}
-}
-
-.life__back {
-	border: 1px solid @color-border-block;
-	background: @color-paper;
-	color: @color-text-muted;
-
-	&:hover {
-		color: @color-text;
-	}
-}
-
-.life__next:focus-visible,
-.life__back:focus-visible {
-	outline: 2px solid @color-teal;
-	outline-offset: 2px;
-}
 
 // Nagłówek demo — ta sama konstrukcja co w pozostałych dwóch.
 .life__head {
@@ -127,7 +80,8 @@
 
 .life__title {
 	margin: 0;
-	font-size: @font-panel-title;
+	font-size: 1.5rem;
+	font-weight: 600;
 	line-height: 1.2;
 }
 

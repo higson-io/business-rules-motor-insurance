@@ -58,53 +58,6 @@
 	margin-top: 0;
 }
 
-// Step navigation — same construction and same distances as the other two demos, so a presenter
-// switching demos does not have to look for the button in a new place.
-.moto__nav {
-	display: flex;
-	justify-content: space-between;
-	gap: 12px;
-	margin-top: 20px;
-}
-
-.moto__nav:has(.moto__next:only-child) {
-	justify-content: flex-end;
-}
-
-.moto__next,
-.moto__back {
-	padding: 10px 18px;
-	border-radius: 6px;
-	font-size: @font-sm;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.moto__next {
-	border: 0;
-	background: @color-accent-text;
-	color: @color-paper;
-
-	&:hover {
-		filter: brightness(1.08);
-	}
-}
-
-.moto__back {
-	border: 1px solid @color-border-block;
-	background: @color-paper;
-	color: @color-text-muted;
-
-	&:hover {
-		color: @color-text;
-	}
-}
-
-.moto__next:focus-visible,
-.moto__back:focus-visible {
-	outline: 2px solid @color-teal;
-	outline-offset: 2px;
-}
 
 // Nagłówek demo — ta sama konstrukcja co w pozostałych dwóch, żeby przejście między demami nie
 // wyglądało jak przejście do innej aplikacji.
@@ -114,7 +67,8 @@
 
 .moto__title {
 	margin: 0;
-	font-size: @font-panel-title;
+	font-size: 1.5rem;
+	font-weight: 600;
 	line-height: 1.2;
 }
 

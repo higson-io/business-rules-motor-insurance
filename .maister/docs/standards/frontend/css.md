@@ -31,6 +31,41 @@ The migration replaced every control on the screen with Angular Material (decisi
 
 The brand seed in `theme.scss` exists so the application still looks like itself — recognisability, not parity.
 
+### ⛔ The Action Colour Is the Portal's Teal, Not Red
+
+The demos take their palette from `higson-agent-portal-demo-frontend/src/styles/colors.scss`, so the
+two applications read as one family. **The single value that decides whether a screen looks like the
+portal is the action colour, and it is teal.** `colors.scss` sets
+`--p-button-primary-background: var(--p-primary-150)` = `#3F8797`, and every primary button, selected
+state, focus ring and panel title in the portal uses it.
+
+`--accent-500` (`#FF0000`) is an **accent** there: it appears in the brand gradient and nowhere else —
+no button, no border, no selected state. This application read that backwards for a while and painted
+its buttons, focus rings, prices and required markers red, which is exactly what made the demos stop
+looking like the portal. Structural red is now gone from every screen; `@color-accent` stays declared
+in `_variables.less` because it is a real portal token, and is used nowhere.
+
+Alongside it: panel titles take `@color-panel-title` (the same teal), a discount or other favourable
+outcome takes `@color-success`, and anything that says *something is missing* takes `@color-warn` —
+never the action colour, which promises an interaction.
+
+### ⚠️ Contrast Is Measured on Every Background, Not Just White
+
+Two of the portal's published values do not clear the 4.5:1 floor `accessibility.md` sets:
+`--primary-150` (`#3F8797`) measures **4.10:1** against white, and `--slate-grey` (`#6D8196`)
+measures **4.01:1**. Both are darkened by the smallest step that passes — `#317989` and `#5b6f84` —
+holding the hue, and both `_variables.less` and `theme.scss` record the measured figures.
+
+The trap worth remembering: **the same text sits on two grounds.** Muted copy appears inside a white
+panel and directly on `@color-ground` (`#f5f5f5`), and the grey ground costs roughly 0.4 of a point.
+A first attempt at the muted tone passed on white (4.55) and failed on the ground (4.18) — invisible
+unless both are measured. Check any new foreground against `#ffffff`, `#f5f5f5` **and** whatever
+tinted fill it may land on.
+
+⚠️ When measuring in the browser, resolve backgrounds honestly: the motor comparison table stripes
+rows with `rgba(91, 111, 132, 0.04)`, and a probe that treats a translucent colour as opaque reports
+a dark background and a fabricated failure.
+
 ---
 
 ## General CSS Guidance

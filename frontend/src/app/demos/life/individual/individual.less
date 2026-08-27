@@ -30,7 +30,10 @@
 // policy column wider than either side.
 @media (min-width: 992px) {
 	.life {
-		grid-template-columns: 280px minmax(0, 1fr) 260px;
+		// ⚠️ Szerokości podniesione o 12px, gdy panele przeszły na wyściółkę portalu (1.5rem
+		// zamiast 18px). Bez tego sufiks pola („lat", „cm", „kg") wychodził poza obrys i był
+		// przycinany — kolumna została ta sama, a treści ubyło miejsca po obu stronach.
+		grid-template-columns: 292px minmax(0, 1fr) 272px;
 	}
 
 	.life__summary {
@@ -42,7 +45,7 @@
 
 @media (min-width: 1280px) {
 	.life {
-		grid-template-columns: 320px minmax(0, 1fr) 300px;
+		grid-template-columns: 332px minmax(0, 1fr) 312px;
 	}
 }
 
@@ -53,9 +56,13 @@
 	column-gap: 12px;
 }
 
+// ⚠️ `flex: 0 0 auto` i `white-space: nowrap` są tu nośne: bez nich Material pozwala sufiksowi
+// się skurczyć, a wtedy trzyliterowe „lat" zostaje ucięte w połowie zamiast zwęzić pole.
 .life__suffix {
-	padding-left: 6px;
-	font-size: 0.8125rem;
+	flex: 0 0 auto;
+	padding: 0 4px 0 6px;
+	font-size: @font-sm;
+	white-space: nowrap;
 	color: @color-text-muted;
 }
 
@@ -87,9 +94,8 @@
 // ── The policy being assembled ────────────────────────────────────────────────────────────────
 
 .policy {
-	padding: 22px;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
+	padding: @space-panel;
+	border-radius: @radius-panel;
 	background: @color-paper;
 	box-shadow: @shadow-panel;
 }
@@ -175,8 +181,8 @@
 }
 
 .policy__rider--on {
-	border-color: fade(@color-accent, 45%);
-	background: fade(@color-accent, 3%);
+	border-color: @color-action;
+	background: @color-action-soft;
 }
 
 .policy__rider__toggle {
@@ -238,9 +244,8 @@
 // Its own card, beside the policy rather than inside it. The stickiness lives on the column
 // (`.life__summary`); this is just the panel.
 .policy__summary {
-	padding: 20px;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
+	padding: @space-panel;
+	border-radius: @radius-panel;
 	background: @color-paper;
 	box-shadow: @shadow-panel;
 }
@@ -258,15 +263,18 @@
 
 .policy__stack__part {
 	height: 100%;
-	background: @color-accent-soft;
+	background: fade(@color-blue, 65%);
 	// A hairline between the parts, so adjacent riders of similar size stay countable.
 	box-shadow: inset -1px 0 0 @color-paper;
 	transition: width 0.35s ease;
 }
 
 // The main contract is the floor the rest sits on, so it reads at full strength.
+//
+// `@color-action-fill`, nie `@color-action`: to jest pasek, na którym nie leży żaden tekst,
+// więc może wziąć odcień portalu co do bitu, bez korekty kontrastu.
 .policy__stack__part--main {
-	background: @color-accent;
+	background: @color-action-fill;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -330,7 +338,7 @@
 	font-size: 1.75rem;
 	font-weight: 800;
 	letter-spacing: -0.02em;
-	color: @color-accent;
+	color: @color-text;
 }
 
 // Cena, której nie można kupić, musi wyglądać inaczej niż cena, którą można. To jedyne miejsce na
@@ -344,7 +352,7 @@
 .policy__provisional {
 	margin: 8px 0 0;
 	padding: 8px 10px;
-	border-left: 3px solid @color-accent;
+	border-left: 3px solid @color-warn;
 	background: @color-gray-light;
 	font-size: 0.75rem;
 	line-height: 1.35;

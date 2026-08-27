@@ -7,12 +7,15 @@
 // Sekcja jest kartą, nie samym nagłówkiem. Ankieta rośnie z 9 do 16 pytań po przesunięciu daty,
 // więc granice sekcji muszą być widoczne bez czytania — inaczej „przybyły dwie sekcje" wygląda
 // jak „strona zrobiła się dłuższa".
+// ⛔ Wymiary panelu przepisane z portalu (`common.scss`, `.section-block`): białe tło, promień
+// 8px, wyściółka 1.5rem i BRAK OBRYSU — portal oddziela panel od tła samym cieniem. Obrys plus
+// cień daje kartę o dwa stopnie cięższą niż tam i to jest pierwsza rzecz, po której widać, że
+// ekran nie pochodzi z tej samej rodziny.
 .apk__section {
-	margin-bottom: 16px;
-	padding: 16px 18px 12px;
+	margin-bottom: @space-gap;
+	padding: @space-panel;
 	background: @color-paper;
-	border: 1px solid @color-border-block;
-	border-radius: 6px;
+	border-radius: @radius-panel;
 	box-shadow: @shadow-panel;
 }
 
@@ -20,23 +23,35 @@
 	display: flex;
 	align-items: baseline;
 	gap: 8px;
-	margin-bottom: 12px;
-	padding-bottom: 8px;
+	margin-bottom: 18px;
+	padding-bottom: 10px;
 	border-bottom: 1px solid @color-border-block;
 }
 
+// Portal koloruje tytuł panelu na `--primary-150` (`.panel-title`, `.title`). To jedyne miejsce,
+// w którym turkus występuje jako TEKST — reszta to przyciski i stany.
 .apk__section-title {
 	margin: 0;
-	font-size: 0.9375rem;
+	font-size: @font-lg;
 	font-weight: 600;
+	color: @color-panel-title;
 }
 
+// Kółko z liczbą — portal rysuje tak numery pytań (`.number-question`): obrys `--Outline-Grey`,
+// tekst `--grid-header-txt-color`, tło białe.
 .apk__section-count {
-	padding: 1px 7px;
-	border-radius: 10px;
-	background: @color-gray-light;
-	font-size: 0.6875rem;
-	color: @color-text-muted;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 24px;
+	height: 24px;
+	padding: 0 6px;
+	border: 2px solid @color-outline;
+	border-radius: 12px;
+	background: @color-paper;
+	font-size: @font-xs;
+	font-weight: 700;
+	color: @color-action;
 }
 
 // ⚠️ minmax(0, …), nie minmax(auto, …). Ślad domyślnej ścieżki grid to `auto`, czyli szerokość
@@ -45,7 +60,7 @@
 .apk__grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-	gap: 16px 20px;
+	gap: 18px 20px;
 	align-items: start;
 }
 
@@ -81,8 +96,12 @@
 	line-height: 1.35;
 }
 
+// ⛔ Gwiazdka NIE dostaje koloru akcji. Portal rezerwuje `--warn-500` dla wszystkiego, co mówi
+// „tu czegoś brakuje" (`--p-form-field-invalid-border-color`, `--p-floatlabel-invalid-color`),
+// a turkus dla tego, co można kliknąć. Wymagalność pomalowana kolorem akcji przestaje być
+// ostrzeżeniem i staje się dekoracją.
 .apk__required {
-	color: @color-accent-text;
+	color: @color-warn;
 }
 
 .apk__options {
@@ -141,7 +160,7 @@
 .apk__refusal {
 	margin: 6px 0 0;
 	padding: 6px 8px;
-	border-left: 2px solid @color-accent-soft;
+	border-left: 2px solid fade(@color-blue, 65%);
 	background: @color-gray-light;
 	font-size: 0.75rem;
 	line-height: 1.35;

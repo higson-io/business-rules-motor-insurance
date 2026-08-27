@@ -59,7 +59,10 @@
 	width: 22px;
 	height: 22px;
 	border-radius: 50%;
-	background: @color-border-block;
+	// ⚠️ `@color-ground`, nie `@color-border-block`. Numer kroku jeszcze nieodwiedzonego jest
+	// najmniejszym napisem w pasku (12px), więc to on pierwszy wypada z progu kontrastu —
+	// na `#edeff0` schodził do 3.95:1. Jaśniejsze kółko zwraca 4.75:1 bez zmiany koloru cyfry.
+	background: @color-ground;
 	color: @color-text-muted;
 	font-size: @font-xs;
 	line-height: 1;

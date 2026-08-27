@@ -17,14 +17,20 @@ html {
 	@include mat.theme(
 		(
 			// Material generates a full tonal palette from a hue, and that ramp is what colours
-			// every hover, container and focus ring — a single hex cannot. `$red-palette` is the
-			// stock palette nearest the Agent Portal's `--rgb-accent-500` (#FF0000), which the
-			// override below pins. `$cyan-palette` carries the portal's `--primary-150` (#3F8797)
-			// into the tertiary role: in the portal that teal marks progress and panel titles, so
-			// it needs a seat of its own rather than being mixed out of the primary ramp.
+			// every hover, container and focus ring — a single hex cannot.
+			//
+			// ⛔ PRIMARY IS THE PORTAL'S TEAL, not red. `colors.scss` sets
+			// `--p-button-primary-background: var(--p-primary-150)` = #3F8797, and every primary
+			// button, selected state and focus border in the portal uses it. `--accent-500`
+			// (#FF0000) is an ACCENT there — it appears in the brand gradient and nowhere else.
+			// This application read that backwards for a while and painted its buttons red, which
+			// is precisely what made the demos stop looking like the portal.
+			//
+			// `$azure-palette` sits in the tertiary seat for the cool blue (`--blue-color`,
+			// #5DC7D5) the portal uses on bars and timelines.
 			color: (
-					primary: mat.$red-palette,
-					tertiary: mat.$cyan-palette,
+					primary: mat.$cyan-palette,
+					tertiary: mat.$azure-palette,
 				),
 			// Manrope, self-hosted in `styles/_typography.less`. Material's typography tokens are
 			// independent of the `body` font rule, so without this every control on the screen —
@@ -42,19 +48,22 @@ html {
 	// Everything downstream references these tokens rather than re-declaring the values —
 	// `var(--mat-sys-primary)` and `var(--mat-sys-corner-medium)` appear throughout the LESS.
 	//
-	// ⚠️ NOT the portal's #FF0000 as published. Pure red measures ~4.0:1 on white — below the
-	// 4.5:1 floor for the small copy Material puts in field labels (`accessibility.md`). #d50000
-	// holds the hue and reaches ~4.6:1, and it is the SAME value `_variables.less` exposes as
-	// `@color-accent-text`: one accent for words, one hex, so a control and the number it produces
-	// cannot drift apart. `@color-accent` keeps the portal's pure #FF0000 for marks and large
-	// figures, where 4.0:1 is legal.
+	// The SAME value `_variables.less` exposes as `@color-action` — one action colour, one hex,
+	// so a control and the button beside it cannot drift apart.
 	//
-	// It drives interaction only — focus rings, the datepicker selection, the popover border. Static
-	// headings are neutral; a screen that tints every title has no way left to say "this one".
-	--mat-sys-primary: #d50000;
-	// 8px is the portal's `.panel-block` radius, unchanged — the one token that already matched.
+	// ⚠️ NOT the portal's `#3F8797` as published. Measured, that value gives 4.10:1 against white
+	// and 3.76:1 against the page ground — under the 4.5:1 floor `accessibility.md` sets for the
+	// small copy Material puts in field labels. `#317989` is the first darkening step that clears
+	// both (4.97:1 and 4.56:1) and holds the hue; side by side the two are indistinguishable.
+	--mat-sys-primary: #317989;
+
+	// Three radii, all three copied from the portal's tokens rather than guessed:
+	//   `--p-button-border-radius: .5rem`     → 8px, and `.panel-block`'s radius is 8px too
+	//   `--p-form-field-border-radius: .75rem` → 12px, which is what `medium` drives here
+	// A field at 8px and a field at 12px are visibly different controls; this is the token that
+	// most distinguishes a portal screen from a stock Material one.
 	--mat-sys-corner-extra-small: 8px;
 	--mat-sys-corner-small: 8px;
-	--mat-sys-corner-medium: 8px;
-	--mat-sys-corner-large: 8px;
+	--mat-sys-corner-medium: 12px;
+	--mat-sys-corner-large: 12px;
 }

@@ -1,0 +1,69 @@
+/* Przyciski nawigacji krokami — wspólne dla trzech dem.
+
+   Globalny partial, a nie trzy kopie w trzech komponentach, z tego samego powodu co `_date-band`:
+   te przyciski mają wyglądać IDENTYCZNIE, a trzy kopie rozjeżdżają się przy pierwszej edycji.
+   Przedtem stały w `moto.less`, `life.less` i `property.less` jako trzy niemal identyczne bloki.
+
+   Odwzorowanie portalu (`common.scss`, `p-button`):
+     główny  → tło `--primary-150`, brak obrysu, font-weight 600, hover przez `opacity: .8`
+     drugi   → tło przezroczyste, obrys 1px `--primary-150`, tekst `--primary-150` (`.second-button`)
+     wstecz  → bez tła i bez obrysu, tekst `--primary-50` (granat) (`.back-button`)
+
+   ⛔ Hover jest robiony PRZEZROCZYSTOŚCIĄ, a nie drugim odcieniem. Portal robi dokładnie to
+   (`opacity: .8`), więc druga wartość heksadecymalna byłaby dodatkowym miejscem do rozjazdu
+   przy zmianie palety. */
+
+.step-nav {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: @space-gap;
+}
+
+// Sam przycisk „dalej", bez „wstecz" — ma zostać po prawej, a nie skoczyć na lewą krawędź.
+.step-nav:has(.step-nav__next:only-child) {
+	justify-content: flex-end;
+}
+
+.step-nav__next,
+.step-nav__back {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0.7rem 1.5rem;
+	border-radius: @radius-button;
+	font-family: inherit;
+	font-size: @font-md;
+	font-weight: 600;
+	line-height: 1.2;
+	cursor: pointer;
+	transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.step-nav__next {
+	border: 0;
+	background: @color-action;
+	color: @color-white;
+
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+// Wstecz jest cichy: bez tła i bez obrysu, jak `.back-button` w portalu. Krok wstecz nie
+// konkuruje o uwagę z krokiem naprzód.
+.step-nav__back {
+	border: 0;
+	background: transparent;
+	color: @color-text;
+
+	&:hover {
+		opacity: 0.7;
+	}
+}
+
+.step-nav__next:focus-visible,
+.step-nav__back:focus-visible {
+	outline: 2px solid @color-action;
+	outline-offset: 2px;
+}

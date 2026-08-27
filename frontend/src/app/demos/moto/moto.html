@@ -28,8 +28,8 @@
 		@case ('apk') {
 			<app-moto-apk />
 
-			<div class="moto__nav">
-				<button type="button" class="moto__next" data-testid="to-recommendation" (click)="goTo('reco')">
+			<div class="step-nav">
+				<button type="button" class="step-nav__next" data-testid="to-recommendation" (click)="goTo('reco')">
 					See the recommendation →
 				</button>
 			</div>
@@ -43,9 +43,9 @@
 				[missingNames]="missingNames()"
 			/>
 
-			<div class="moto__nav">
-				<button type="button" class="moto__back" (click)="goTo('apk')">← Back to the questions</button>
-				<button type="button" class="moto__next" data-testid="to-price" (click)="goTo('price')">
+			<div class="step-nav">
+				<button type="button" class="step-nav__back" (click)="goTo('apk')">← Back to the questions</button>
+				<button type="button" class="step-nav__next" data-testid="to-price" (click)="goTo('price')">
 					See the premium →
 				</button>
 			</div>
@@ -70,8 +70,8 @@
 				</div>
 			</div>
 
-			<div class="moto__nav">
-				<button type="button" class="moto__back" (click)="goTo('reco')">
+			<div class="step-nav">
+				<button type="button" class="step-nav__back" (click)="goTo('reco')">
 					← Back to the recommendation
 				</button>
 			</div>

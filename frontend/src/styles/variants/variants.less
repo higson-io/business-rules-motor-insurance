@@ -37,8 +37,7 @@
 	// and no vertical rules are needed to guide the eye down a column.
 	border-collapse: collapse;
 	background: @color-paper;
-	border: 1px solid @color-border-block;
-	border-radius: var(--mat-sys-corner-medium);
+	border-radius: @radius-panel;
 	box-shadow: @shadow-panel;
 	// `border-radius` has no effect on a table's own corners once cells paint over them.
 	overflow: hidden;
@@ -136,7 +135,7 @@
 // (`accessibility.md`). The directive only puts a row in the tab order when it has something to
 // show, so this never marks an inert element.
 .quote__row__label:focus-visible {
-	outline: 2px solid @color-accent;
+	outline: 2px solid @color-action;
 	outline-offset: -2px;
 }
 
@@ -185,8 +184,12 @@
 // ⛔ Zniżka dostaje akcent, składka przed zniżkami zostaje szara. Do tej pory obie były tym samym
 // wyciszonym szarym, więc jedyny wiersz mówiący, że reguły policzyły coś O TYM KIEROWCY, ważył tyle
 // samo co podsuma — i mniej niż wiersze ochron nad nim.
+//
+// ⛔ Zieleń `--success-500`, a NIE kolor akcji. Turkus w portalu znaczy „to można kliknąć";
+// zniżka nie jest kontrolką, tylko wynikiem korzystnym dla klienta, a na to portal ma osobny
+// token. Wiersz pomalowany kolorem akcji obiecuje interakcję, której tu nie ma.
 .quote__row--discount .quote__cell {
-	color: @color-accent-text;
+	color: @color-success;
 	font-weight: 700;
 }
 
@@ -208,7 +211,7 @@
 	font-size: 1.625rem;
 	font-weight: 800;
 	letter-spacing: -0.02em;
-	color: @color-accent;
+	color: @color-text;
 }
 
 // The footer rows carry their own emphasis, so the striping stops at the body.

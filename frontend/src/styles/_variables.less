@@ -46,30 +46,73 @@
 /// granat portalu — `--rgb-p-surface-900`. Kontrast 14:1 na bieli.
 @color-text: #112639;
 
-/// drugorzędny — portal `--slate-grey`. 4.8:1 na bieli, legalny dla drobnego druku.
-@color-text-muted: #6d8196;
+/// drugorzędny — portal `--slate-grey`, przyciemniony o jeden stopień z tego samego powodu
+/// co `@color-action`.
+///
+/// ⚠️ Zmierzone: `#6D8196` daje **4.01:1** na bieli, a ten kolor niesie CAŁY drobny druk ekranu —
+/// pomoc pod pytaniem, podpisy, źródła podpowiedzi, strzałkę powrotu.
+///
+/// ⛔ Próg trzeba trafić na DWÓCH tłach, nie na jednym. Ten sam napis stoi raz w białym panelu,
+/// a raz wprost na `@color-ground` — a szare tło zjada około 0.4 punktu kontrastu. Pierwszy
+/// przymiar (`#64788d`) przechodził na bieli (4.55) i wykładał się na tle strony (4.18), czego
+/// nie widać, dopóki się nie zmierzy obu. `#5b6f84` daje 5.18 na bieli i 4.75 na tle.
+@color-text-muted: #5b6f84;
 
-// ── Akcenty ───────────────────────────────────────────────────────────────────────────────────
+// ── Kolor akcji ───────────────────────────────────────────────────────────────────────────────
 
-/// portal `--rgb-accent-500`. ⚠️ Czysta czerwień daje 4.0:1 na bieli — to WYSTARCZA dla dużego
-/// tekstu i znaczników, ale NIE dla drobnego druku (`accessibility.md` wymaga 4.5:1).
-/// Do tekstu jest `@color-accent-text`.
-@color-accent: #ff0000;
+/// portal `--primary-150`, czyli `--p-button-primary-background`, przyciemniony o jeden stopień.
+///
+/// ⛔ **TO JEST kolor akcji w portalu** — przyciski główne, stan wybrany, obrys focusa, nagłówki
+/// paneli i ikony postępu. Nie czerwień. Demo miało wcześniej czerwone przyciski i to była
+/// pomyłka w czytaniu palety: `--accent-500` (#FF0000) figuruje w `colors.scss` jako AKCENT,
+/// a `--p-button-primary-background` wskazuje na `--p-primary-150`.
+///
+/// ⚠️ **NIE jest to `#3F8797` co do bitu i to jest zmierzone, nie przybliżone.** Wartość portalu
+/// daje 4.10:1 z bielą i 3.76:1 na tle strony — poniżej progu 4.5:1, którego wymaga
+/// `accessibility.md` dla tekstu tej wielkości (biały napis 16px/600 na przycisku i turkusowy
+/// tytuł panelu 18px/600 nie kwalifikują się jako „duży tekst" w rozumieniu WCAG). `#317989` to
+/// PIERWSZY stopień przyciemnienia, który przechodzi w obu układach: 4.97:1 z bielą i 4.56:1 na
+/// `@color-ground`. Odcień zostaje ten sam — różnicy nie widać obok siebie, a kontrast jest
+/// legalny. Ten sam wzorzec, co przy każdej innej wartości portalu, której nie da się wziąć
+/// wprost.
+@color-action: #317989;
 
-/// ta sama czerwień przyciemniona do 4.6:1 — wyłącznie tam, gdzie akcent niesie SŁOWA.
-@color-accent-text: #d50000;
+/// portal `--primary-150` bez korekty — do WYPEŁNIEŃ, na których nie leży tekst
+/// (paski, kreski, tła stanów). Tam próg kontrastu nie obowiązuje, więc odcień może być dokładny.
+@color-action-fill: #3f8797;
 
-/// akcent w wadze faktury, na paski udziałów
-@color-accent-soft: fade(#ff0000, 38%);
+/// portal `--primary-150` na tekst nagłówka panelu (`.panel-title`, `.title`)
+@color-panel-title: @color-action;
 
-/// portal `--primary-150`. Nagłówki paneli i ikony postępu.
-@color-teal: #3f8797;
+/// portal `--light-blue-green` / `--blue-light-color` — tło stanu wybranego i podświetleń
+@color-action-soft: rgba(93, 199, 213, 0.12);
 
-/// portal `--mint-green`. Krecha pod krokiem ukończonym — jedyne miejsce, gdzie się pojawia.
+/// portal `--blue-color`, akcent chłodny na paski i osie czasu
+@color-blue: #5dc7d5;
+
+/// portal `--mint-green`. Krecha pod krokiem ukończonym i znacznik postępu.
 @color-mint: #89fcc5;
 
-/// portal `--blue-light-color`, tło kroku bieżącego
-@color-step-current: rgba(93, 199, 213, 0.12);
+/// portal `--Outline-Grey`. Obrys kółek numerów pytań i kart wyboru.
+@color-outline: #c3d3e2;
+
+/// portal `--blue-light-color`, tło kroku bieżącego w pasku kroków
+@color-step-current: @color-action-soft;
+
+/// zachowany alias — teal jest też kolorem nagłówków paneli
+@color-teal: @color-action;
+
+// ── Czerwień ──────────────────────────────────────────────────────────────────────────────────
+
+/// portal `--rgb-accent-500`.
+///
+/// ⛔ **Nieużywana w strukturze i tak ma zostać.** W portalu czerwień pojawia się w gradiencie
+/// marki i nigdzie indziej — żaden przycisk, obrys ani stan wybrany jej nie używa. Token stoi
+/// tutaj, bo jest w palecie portalu; gdyby kiedyś była potrzebna na pojedynczy znacznik,
+/// ma być wzięta stąd, a nie wpisana z palca.
+///
+/// ⚠️ Czysta czerwień daje 4.0:1 na bieli — dość na duże znaczniki, za mało na drobny druk.
+@color-accent: #ff0000;
 
 // ── Stany ─────────────────────────────────────────────────────────────────────────────────────
 
@@ -86,8 +129,23 @@
 /// portal `--yellow-100`
 @color-attention-soft: rgba(254, 240, 192, 0.5);
 
+/// portal `--alert-color`, mocniejszy od `--warn-500`, na sytuacje naprawdę czerwone
+@color-alert: #b42318;
+
 /// wypełnienie neutralne: przełączniki, tła drugorzędne — portal `--rgb-p-surface-100`
 @color-gray-light: #f5f5f5;
+
+// ── Kształty ──────────────────────────────────────────────────────────────────────────────────
+// Portal ma trzy promienie i wszystkie trzy są tu przepisane co do wartości.
+
+/// portal `--p-button-border-radius: .5rem`
+@radius-button: 8px;
+
+/// portal `--p-form-field-border-radius: .75rem`
+@radius-field: 12px;
+
+/// odstęp między panelami — portal `.section-wrapper { gap: 1.5rem }`
+@space-gap: 1.5rem;
 
 // ── Typografia ────────────────────────────────────────────────────────────────────────────────
 // Skala portalu, co do piksela: 12 / 14 / 16 / 18 / 20, plus 22 na tytuł panelu.
