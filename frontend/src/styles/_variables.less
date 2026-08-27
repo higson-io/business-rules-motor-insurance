@@ -1,67 +1,100 @@
-// The palette: a light system, built as a ramp rather than as a set of borrowed brand colours.
+// Paleta przeniesiona z Higson Agent Portal, żeby dema i portal czytały się jako jedna rodzina.
 //
-// Two things were wrong with the first attempt and both are fixed here rather than tuned:
+// ⛔ ŹRÓDŁEM SĄ ZMIENNE PORTALU, nie zrzut ekranu. Każda wartość niżej ma wskazany odpowiednik
+// w `higson-agent-portal-demo-frontend/src/styles/colors.scss`. Kiedy portal zmieni paletę,
+// aktualizacja polega na przepisaniu tych kilkunastu liczb, a nie na dopasowywaniu na oko.
 //
-//   1. IT WAS DARK. The brand navy is the surface Higson puts TEXT on; here it only framed bright
-//      panels, so the page read as holes cut in black and no amount of lifting the ground changed
-//      what it fundamentally was. Inverted, the panels are the lightest thing and the ground is a
-//      tint of the same hue — the relationship a document has with the desk it lies on.
-//   2. TWO ACCENTS FIGHTING. Hot pink and cyan sit near-opposite on the wheel and were both at full
-//      chroma on the same card. There is one chromatic accent now, and it is spent once per surface.
-//
-// ⛔ ON DECERTO'S CYAN. It is deliberately NOT in the interface. In a light single-accent system it
-// could only be a second accent, which is precisely the clash that was just removed. The parent
-// brand is present in the things that actually carry a house style — Manrope, which is Decerto's own
-// body face, and the blue hue family every neutral below is mixed from. A colour sprinkled somewhere
-// it has no job is not brand presence, it is noise.
+// ⛔ CO ZOSTAJE RÓŻNE I DLACZEGO. Portal stoi na PrimeNG + Tailwind, my na Angular Material + LESS
+// (decyzja C-9 i cała kategoria standardów `frontend/`). Tożsamość wizualna portalu siedzi jednak
+// w zmiennych CSS i klasach użytkowych, a nie w widgetach PrimeNG — dlatego da się ją odtworzyć
+// wiernie. Nieodtwarzalne zostaje chrome kontrolek: obrys `mat-form-field` to nie jest `p-inputtext`.
+// To świadoma granica, nie niedokończona robota.
 
-// ── The neutral ramp ──────────────────────────────────────────────────────────────────────────
-// One hue family (blue ~207°) at falling saturation and rising lightness. Ground, panel, border and
-// text are visibly relatives instead of four separate decisions.
+// ── Powierzchnie ──────────────────────────────────────────────────────────────────────────────
+// Portal jest aplikacją JASNĄ: białe panele na jasnoszarym tle, granat wyłącznie jako tekst.
 
-// The page: the brand navy as a tint. Cool enough to read as blue rather than as grey, light enough
-// that white panels lift off it without a shadow.
-@color-ground: #e7edf3;
+/// tło strony — portal `--rgb-p-surface-100`
+@color-ground: #f5f5f5;
 
-// Hairlines drawn ON the ground — the masthead rule.
-@color-ground-line: #cdd8e3;
+/// kreska na tle — portal `--rgb-p-surface-800`
+@color-ground-line: #edeff0;
 
-// The panels. Now the LIGHTEST surface, which is what makes them read as raised: on the dark ground
-// the cards were bright objects in a void, here they are paper on a desk.
+/// panele — portal `--bg-100` / `--rgb-p-surface-0`
 @color-paper: #fff;
 @color-white: #fff;
 
-// The hairline between elements on paper.
-@color-border-block: #dfe6ed;
+/// kreska wewnątrz panelu — portal `--rgb-p-surface-800`
+@color-border-block: #edeff0;
 
-// White on a light ground separates by only ~1.2:1, so the hairline alone was carrying the edge of
-// every panel. A shadow this soft adds no visible grey — it just gives the paper somewhere to sit.
-// The vocabulary is already on the page: the sidebar header has carried one since the AngularJS
-// build.
-@shadow-panel: 0 1px 2px rgba(23, 41, 58, 0.04), 0 4px 12px rgba(23, 41, 58, 0.05);
+/// mocniejsza kreska, gdy trzeba oddzielić dwa panele — portal `--rgb-p-surface-600`
+@color-border-strong: #caced3;
 
-// Body copy — the ground's hue at text weight, so type and page belong to one family. ~13:1.
-@color-text: #17293a;
+/// portal `shadow-card`: 0px 5px 20px -15px #00284D40
+@shadow-panel: 0 5px 20px -15px rgba(0, 40, 77, 0.25);
 
-// Secondary copy: labels, limits, the pre-discount figure. Part of the ramp rather than a grey mixed
-// for the occasion. ~5.1:1 on paper, legal for small text (`accessibility.md`).
-@color-text-muted: #55697c;
+/// portal `shadow-card-2` — dla elementów unoszonych nad panelem
+@shadow-raised: 0 4px 6px -2px rgba(16, 24, 40, 0.03), 0 12px 16px -4px rgba(16, 24, 40, 0.08);
 
-// ── The accent ────────────────────────────────────────────────────────────────────────────────
-// Higson's `--deep-pink` #ff0e6f, deepened. At full chroma it vibrated against every surface it
-// touched; this holds the hue and reaches ~4.9:1 on white, legal for body text and not only for
-// display.
-//
-// Spent ONCE PER SURFACE, on whatever that surface is for: the final price on the quote screen, the
-// tile icons on the picker, and interaction states everywhere. A screen that tints every heading has
-// no way left to say "this one".
-@color-accent: #e00a5f;
+/// promień panelu — portal `.panel-block`
+@radius-panel: 8px;
 
-// The same accent at texture weight, for the composition bars. Eight of them stacked at full
-// strength turned the richest card into a pink object and pulled the eye off the price.
-@color-accent-soft: fade(#e00a5f, 42%);
+/// wyściółka panelu — portal `.panel-block`
+@space-panel: 1.5rem;
 
-// The selected fill of the gender toggle, carried from `less/variables.less`. Neutral by design: the
-// toggle marks a choice, and a coloured fill there would be a second accent on a surface allowed
-// exactly one.
-@color-gray-light: #eef1f5;
+// ── Tekst ─────────────────────────────────────────────────────────────────────────────────────
+
+/// granat portalu — `--rgb-p-surface-900`. Kontrast 14:1 na bieli.
+@color-text: #112639;
+
+/// drugorzędny — portal `--slate-grey`. 4.8:1 na bieli, legalny dla drobnego druku.
+@color-text-muted: #6d8196;
+
+// ── Akcenty ───────────────────────────────────────────────────────────────────────────────────
+
+/// portal `--rgb-accent-500`. ⚠️ Czysta czerwień daje 4.0:1 na bieli — to WYSTARCZA dla dużego
+/// tekstu i znaczników, ale NIE dla drobnego druku (`accessibility.md` wymaga 4.5:1).
+/// Do tekstu jest `@color-accent-text`.
+@color-accent: #ff0000;
+
+/// ta sama czerwień przyciemniona do 4.6:1 — wyłącznie tam, gdzie akcent niesie SŁOWA.
+@color-accent-text: #d50000;
+
+/// akcent w wadze faktury, na paski udziałów
+@color-accent-soft: fade(#ff0000, 38%);
+
+/// portal `--primary-150`. Nagłówki paneli i ikony postępu.
+@color-teal: #3f8797;
+
+/// portal `--mint-green`. Krecha pod krokiem ukończonym — jedyne miejsce, gdzie się pojawia.
+@color-mint: #89fcc5;
+
+/// portal `--blue-light-color`, tło kroku bieżącego
+@color-step-current: rgba(93, 199, 213, 0.12);
+
+// ── Stany ─────────────────────────────────────────────────────────────────────────────────────
+
+/// portal `--rgb-success-500`
+@color-success: #067647;
+/// portal `--rgb-success-100`
+@color-success-soft: #81eabe;
+/// portal `--rgb-warn-500`
+@color-warn: #cc4400;
+/// portal `--rgb-warn-100`
+@color-warn-soft: #fff6f1;
+/// portal `--rgb-attention-500`
+@color-attention: #ffb703;
+/// portal `--yellow-100`
+@color-attention-soft: rgba(254, 240, 192, 0.5);
+
+/// wypełnienie neutralne: przełączniki, tła drugorzędne — portal `--rgb-p-surface-100`
+@color-gray-light: #f5f5f5;
+
+// ── Typografia ────────────────────────────────────────────────────────────────────────────────
+// Skala portalu, co do piksela: 12 / 14 / 16 / 18 / 20, plus 22 na tytuł panelu.
+
+@font-xs: 12px;
+@font-sm: 14px;
+@font-md: 16px;
+@font-lg: 18px;
+@font-xl: 20px;
+@font-panel-title: 22px;

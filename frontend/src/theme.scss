@@ -16,13 +16,14 @@
 html {
 	@include mat.theme(
 		(
-			// Material generates a full tonal palette from a hue. `$magenta-palette` is the stock
-			// palette nearest Higson's `--deep-pink` #ff0e6f, which the override below pins; the
-			// palette supplies the surrounding tones (containers, hovers, focus rings) that a
-			// single hex cannot. `$cyan-palette` carries Decerto's `--decerto-cyan-200` into the
-			// tertiary role, so the two brands each have a seat rather than one being interpreted.
+			// Material generates a full tonal palette from a hue, and that ramp is what colours
+			// every hover, container and focus ring — a single hex cannot. `$red-palette` is the
+			// stock palette nearest the Agent Portal's `--rgb-accent-500` (#FF0000), which the
+			// override below pins. `$cyan-palette` carries the portal's `--primary-150` (#3F8797)
+			// into the tertiary role: in the portal that teal marks progress and panel titles, so
+			// it needs a seat of its own rather than being mixed out of the primary ramp.
 			color: (
-					primary: mat.$magenta-palette,
+					primary: mat.$red-palette,
 					tertiary: mat.$cyan-palette,
 				),
 			// Manrope, self-hosted in `styles/_typography.less`. Material's typography tokens are
@@ -41,15 +42,17 @@ html {
 	// Everything downstream references these tokens rather than re-declaring the values —
 	// `var(--mat-sys-primary)` and `var(--mat-sys-corner-medium)` appear throughout the LESS.
 	//
-	// ⚠️ NOT Higson's #ff0e6f as published. At full chroma it vibrated against both the ground and
-	// the panels, and it measures ~3.9:1 on paper — below the 4.5:1 floor for the small copy
-	// Material puts in field labels (`accessibility.md`). #e00a5f holds the hue, reaches ~4.9:1, and
-	// is the SAME value the LESS uses for the price and the bars: one accent, one hex, so a control
-	// and the number it produces cannot drift apart.
+	// ⚠️ NOT the portal's #FF0000 as published. Pure red measures ~4.0:1 on white — below the
+	// 4.5:1 floor for the small copy Material puts in field labels (`accessibility.md`). #d50000
+	// holds the hue and reaches ~4.6:1, and it is the SAME value `_variables.less` exposes as
+	// `@color-accent-text`: one accent for words, one hex, so a control and the number it produces
+	// cannot drift apart. `@color-accent` keeps the portal's pure #FF0000 for marks and large
+	// figures, where 4.0:1 is legal.
 	//
 	// It drives interaction only — focus rings, the datepicker selection, the popover border. Static
 	// headings are neutral; a screen that tints every title has no way left to say "this one".
-	--mat-sys-primary: #e00a5f;
+	--mat-sys-primary: #d50000;
+	// 8px is the portal's `.panel-block` radius, unchanged — the one token that already matched.
 	--mat-sys-corner-extra-small: 8px;
 	--mat-sys-corner-small: 8px;
 	--mat-sys-corner-medium: 8px;
