@@ -59,8 +59,6 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 		suggestedSumBuilding: 100000,
 		covers: [],
 		variants: [],
-		needs: [],
-		warnings: [],
 		recommendation: {
 			variantCode: null,
 			coveredNeeds: 0,
@@ -68,6 +66,8 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 			missingCovers: [],
 			budgetOutcome: null,
 			justification: [],
+			needs: [],
+			warnings: [],
 		},
 		selectedVariant: null,
 	};

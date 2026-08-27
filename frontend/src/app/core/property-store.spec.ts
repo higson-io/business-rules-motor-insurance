@@ -29,8 +29,6 @@ const QUOTE: PropertyQuoteDto = {
 	suggestedSumBuilding: 474000,
 	covers: [],
 	variants: [],
-	needs: [],
-	warnings: [],
 	recommendation: {
 		variantCode: null,
 		coveredNeeds: 0,
@@ -38,6 +36,8 @@ const QUOTE: PropertyQuoteDto = {
 		missingCovers: [],
 		budgetOutcome: null,
 		justification: [],
+		needs: [],
+		warnings: [],
 	},
 	selectedVariant: null,
 };

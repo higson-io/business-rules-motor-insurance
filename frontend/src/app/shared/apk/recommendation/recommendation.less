@@ -4,17 +4,45 @@
 	display: block;
 }
 
-// Ostrzeżenia nad propozycją i wizualnie od niej oddzielone — dotyczą decyzji, nie wyniku.
+// Nagłówek sekcji ostrzeżeń — ten sam krój co pozostałe podtytuły w tym komponencie.
+.reco__section-title {
+	margin: 0 0 6px;
+	font-size: @font-sm;
+	font-weight: 600;
+	color: @color-text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+}
+
+// Brak propozycji nie jest błędem: przed odpowiedzią na pierwsze pytanie nie ma czego proponować.
+.reco__empty {
+	margin: 0;
+	padding: 18px;
+	background: @color-paper;
+	border: 1px dashed @color-border-block;
+	border-radius: @radius-panel;
+	color: @color-text-muted;
+	font-size: @font-sm;
+}
+
+// ⛔ Ostrzeżenia dostają WŁASNY panel, a nie leżą wprost na tle. Bez niego nagłówek sekcji siedział
+// na szarym tle tuż pod paskiem kroków i wyglądał jak błąd renderowania, a nie jak treść.
+// Nad propozycją i wizualnie od niej oddzielone — dotyczą decyzji, nie wyniku.
 .reco__warnings {
+	padding: @space-panel;
 	margin-bottom: 12px;
+	background: @color-paper;
+	border-radius: @radius-panel;
+	box-shadow: @shadow-panel;
 }
 
 .reco__warning {
 	padding: 10px 12px;
 	margin-bottom: 6px;
 	border: 1px solid @color-border-block;
-	border-left: 3px solid @color-ground-line;
-	background: @color-paper;
+	// Karta wewnątrz białego panelu musi mieć inne tło niż panel, inaczej granica jest niewidoczna.
+	border-left: 3px solid @color-text-muted;
+	background: @color-ground;
 	border-radius: 0 6px 6px 0;
 }
 
@@ -35,7 +63,7 @@
 }
 
 .reco__pick {
-	padding: 16px 18px;
+	padding: @space-panel;
 	background: @color-paper;
 	border: 1px solid @color-border-block;
 	border-radius: 6px;

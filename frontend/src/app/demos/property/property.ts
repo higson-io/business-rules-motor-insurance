@@ -1,28 +1,70 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
+import { ApkRecommendationCopy } from '../../models/apk';
 import { PropertyStore } from '../../core/property-store';
+import { ApkRecommendation } from '../../shared/apk/recommendation/recommendation';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
+import { Step, StepBar } from '../../shared/step-bar/step-bar';
 import { Comparison } from './comparison/comparison';
 import { EffectiveDate } from './effective-date/effective-date';
 import { Questionnaire } from './questionnaire/questionnaire';
-import { Recommendation } from './recommendation/recommendation';
+
+/**
+ * Napisy ramki ekranu rekomendacji. Treść merytoryczna przychodzi z reguł — tu są tylko
+ * nagłówki i zdania łączące (patrz `ApkRecommendationCopy`).
+ */
+const RECOMMENDATION_COPY: ApkRecommendationCopy = {
+	proposal: 'Proponujemy wariant {0}',
+	proposalNoVariant: 'Proponowany zakres ochrony',
+	coverage: 'Pokrywa {0} z {1} Twoich potrzeb',
+	needsTitle: 'Potrzeby wynikające z odpowiedzi',
+	missing: 'Poza zakresem zostaje: {0}.',
+	justificationTitle: 'Dlaczego ta propozycja',
+	warningsTitle: 'Zanim zdecydujesz',
+	empty: 'Odpowiedz na pytania ankiety — propozycja pojawi się tutaj.',
+};
 
 /**
  * Demo majątkowe: ubezpieczenie domu i mieszkania, w którym analiza potrzeb klienta jest
  * konfiguracją, a nie formularzem.
  *
- * ⛔ NO ROUTER, konsekwentnie z resztą aplikacji (ND-7). Kroki są sekcjami jednej strony, więc
- * widz widzi naraz ankietę i to, co z niej wynika — a o to w tym demo chodzi.
+ * ⛔ NO ROUTER, konsekwentnie z resztą aplikacji (ND-7). Krok jest sygnałem, nie adresem — więc
+ * wstecz przeglądarki go nie cofa, dokładnie tak samo jak przy wyborze demo.
+ *
+ * ⛔ Trzy kroki, w kolejności analizy, a nie w kolejności ekranów: najpierw pytamy (APK), potem
+ * pokazujemy, co z odpowiedzi wynika (rekomendacja), a cena jest na końcu. To jest odwrotność
+ * kolejności, w jakiej robi się to zwykle w kalkulatorach — i o tę odwrotność chodzi w rek. 8
+ * KNF. Ekran, który zaczyna od ceny, przestaje być analizą potrzeb.
  */
 @Component({
 	selector: 'app-property',
-	imports: [Comparison, EffectiveDate, ErrorBanner, Questionnaire, Recommendation],
+	imports: [ApkRecommendation, Comparison, EffectiveDate, ErrorBanner, Questionnaire, StepBar],
 	templateUrl: './property.html',
 	styleUrl: './property.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Property {
 	private readonly store = inject(PropertyStore);
+
+	readonly copy = RECOMMENDATION_COPY;
+
+	readonly step = signal<string>('apk');
+
+	/**
+	 * ⛔ Kolejność jest argumentem: najpierw pytamy, potem pokazujemy, co z odpowiedzi wynika,
+	 * a cena jest na końcu. Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny
+	 * zawsze, bo prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się
+	 * propozycja.
+	 */
+	readonly steps: readonly Step[] = [
+		{ key: 'apk', label: 'Analiza potrzeb' },
+		{ key: 'reco', label: 'Rekomendacja' },
+		{ key: 'price', label: 'Składka' },
+	];
+
+	goTo(step: string): void {
+		this.step.set(step);
+	}
 
 	/** ⚠️ `hasValue()` first — a resource in the error state throws from `value()`. */
 	private readonly loaded = computed(() =>
@@ -38,6 +80,28 @@ export class Property {
 	readonly sumFixtures = computed(() => this.money(this.loaded()?.sumFixtures));
 	readonly sumContents = computed(() => this.money(this.loaded()?.sumContents));
 	readonly floodZone = computed(() => this.loaded()?.floodZone ?? null);
+
+	readonly recommendation = computed(() => this.loaded()?.recommendation ?? null);
+
+	/** Nazwa wariantu, nie kod — komponent rekomendacji nie wie, gdzie w tym modelu leżą nazwy. */
+	readonly recommendedName = computed(() => {
+		const quote = this.loaded();
+		if (quote === null) {
+			return null;
+		}
+		const code = quote.recommendation.variantCode;
+		return quote.variants.find((variant) => variant.code === code)?.name ?? code;
+	});
+
+	readonly missingNames = computed(() => {
+		const quote = this.loaded();
+		if (quote === null) {
+			return [];
+		}
+		return quote.recommendation.missingCovers.map(
+			(code) => quote.covers.find((cover) => cover.code === code)?.name ?? code,
+		);
+	});
 
 	readonly chosen = computed(() => {
 		const quote = this.loaded();

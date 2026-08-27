@@ -1,4 +1,4 @@
-import { ApkQuestionDto, ApkRegimeDto } from './apk';
+import { ApkQuestionDto, ApkRecommendationDto, ApkRegimeDto } from './apk';
 
 /** Mirrors `api/dto/CoverageDto.java`. */
 export interface CoverageDto {
@@ -55,4 +55,12 @@ export interface QuoteDto {
 	apkRegime: ApkRegimeDto;
 
 	apkQuestions: ApkQuestionDto[];
+
+	/**
+	 * Wynik analizy potrzeb: potrzeby, ostrzeżenia o wyłączeniach i uzasadnienie.
+	 *
+	 * ⛔ `null` przed pierwszym przeliczeniem. Nie jest `null` w reżimie ustawowym — tam po prostu
+	 * nie ma uzasadnienia ani ostrzeżeń, i ta pustka jest treścią demonstracji, a nie brakiem.
+	 */
+	apkRecommendation: ApkRecommendationDto | null;
 }

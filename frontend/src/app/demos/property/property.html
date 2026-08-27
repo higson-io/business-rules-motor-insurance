@@ -1,6 +1,10 @@
 <!--
-	Układ: tytuł, potem data ochrony nad wszystkim, bo przełącza reżim; ankieta i rekomendacja w
-	kolumnie roboczej; podsumowanie przyklejone po prawej, tak jak w demo LIFE.
+	Układ: tytuł, data ochrony nad wszystkim (bo przełącza reżim, a więc i zawartość każdego
+	z trzech kroków), pasek kroków, a pod nim jeden krok naraz.
+
+	⛔ Data stoi NAD paskiem, nie w pierwszym kroku. Jest kontekstem całej wyceny, nie odpowiedzią
+	na pytanie — przesunięcie jej przez 1 lipca 2027 zmienia zestaw pytań, reżim i treść
+	rekomendacji naraz, więc musi być widoczna, w którym kroku by się nie stało.
 -->
 <header class="property__head">
 	<h1 class="property__title">Ubezpieczenie domu i mieszkania</h1>
@@ -14,23 +18,61 @@
 
 <app-property-effective-date />
 
+<app-step-bar [steps]="steps" [current]="step()" (selected)="goTo($event)" />
+
 <div class="property">
 	<div class="property__work">
-		<app-property-questionnaire />
-		<app-property-recommendation />
-		<app-property-comparison />
+		@switch (step()) {
+			@case ('apk') {
+				<app-property-questionnaire />
+
+				<div class="property__nav">
+					<button type="button" class="property__next" data-testid="to-recommendation" (click)="goTo('reco')">
+						Zobacz rekomendację →
+					</button>
+				</div>
+			}
+
+			@case ('reco') {
+				<app-apk-recommendation
+					[recommendation]="recommendation()"
+					[copy]="copy"
+					[variantName]="recommendedName()"
+					[missingNames]="missingNames()"
+				/>
+
+				<div class="property__nav">
+					<button type="button" class="property__back" (click)="goTo('apk')">← Wróć do ankiety</button>
+					<button type="button" class="property__next" data-testid="to-price" (click)="goTo('price')">
+						Zobacz składkę →
+					</button>
+				</div>
+			}
+
+			@case ('price') {
+				<app-property-comparison />
+
+				<div class="property__nav">
+					<button type="button" class="property__back" (click)="goTo('reco')">
+						← Wróć do rekomendacji
+					</button>
+				</div>
+			}
+		}
 	</div>
 
-	@if (ready()) {
+	<!--
+		Podsumowanie towarzyszy rekomendacji i składce, ale NIE ankiecie: podczas odpowiadania sumy
+		jeszcze się przeliczają przy każdym kliknięciu i migotanie liczb odciąga od pytań.
+	-->
+	@if (ready() && step() !== 'apk') {
 		<aside class="property__summary" data-testid="property-summary">
 			<h2 class="property__summary-title">Podsumowanie</h2>
 
 			<!--
 				Suma murów wybita, bo to ona jest liczona przez reguły z odpowiedzi klienta, a nie
 				wpisywana. Reszta to jej rozbicie i wejścia, które ją wyznaczyły — dlatego niżej i
-				drobniej. Wiek budynku i strefa kradzieżowa wypadły stąd: obie są odpowiedziami z
-				ankiety, widocznymi kilkanaście centymetrów obok, a tutaj tylko rozcieńczały liczbę,
-				po którą się w tę szpaltę patrzy.
+				drobniej.
 			-->
 			<p class="property__headline-label">Suma ubezpieczenia murów</p>
 			<p class="property__headline" data-testid="property-sum-building">{{ sumBuilding() }} zł</p>

@@ -1,0 +1,19 @@
+<!--
+	`nav` + `aria-current="step"`: pasek jest nawigacją po krokach, a nie ozdobą (accessibility.md).
+-->
+<nav class="step-bar" aria-label="Kroki" data-testid="step-bar">
+	@for (step of steps(); track step.key; let i = $index) {
+		<button
+			type="button"
+			class="step-bar__step"
+			[class.step-bar__step--current]="step.key === current()"
+			[class.step-bar__step--done]="isDone(step)"
+			[attr.aria-current]="step.key === current() ? 'step' : null"
+			[attr.data-testid]="'step-' + step.key"
+			(click)="go(step)"
+		>
+			<span class="step-bar__mark" aria-hidden="true">{{ isDone(step) ? '✓' : i + 1 }}</span>
+			<span class="step-bar__label">{{ step.label }}</span>
+		</button>
+	}
+</nav>

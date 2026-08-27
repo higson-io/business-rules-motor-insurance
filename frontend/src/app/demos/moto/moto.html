@@ -1,27 +1,80 @@
 <!--
-	Inputs on the left, the comparison beside them.
+	Three steps, one at a time. The step bar sits directly on the panel below it, so nothing
+	separates them.
 
-	⛔ The input panel no longer scrolls inside itself. `less/sidebar/sidebar.less:23-26`'s
-	`height: 83vh; overflow: auto` put a scrollable region inside the page's own scroll, so the
-	reader could never see the whole input state and a touch device stopped scrolling the page
-	whenever a finger landed on the form. The panel is simply as tall as its fields now, and the
-	fields were compacted enough (`_forms.less`) that it is no longer a problem worth solving.
-
-	⛔ Pure layout. No handlers, no bindings. `main.js:21-23`'s recalculate relay was deleted rather
-	than ported; `QuoteStore` replaced the whole bus.
+	⛔ Pure layout in every branch. No handlers beyond navigation, no bindings into the quote —
+	`main.js:21-23`'s recalculate relay was deleted rather than ported, and `QuoteStore` replaced
+	the whole bus.
 -->
+<header class="moto__head">
+	<h1 class="moto__title">Motor insurance</h1>
+	<p class="moto__lead">
+		Every price and every tier below comes from decision tables, not from code. Change anything —
+		the whole quote is recalculated by the rules engine.
+	</p>
+</header>
+
 <!--
-	Analiza potrzeb stoi NAD dwiema kolumnami, bo dotyczy obu: wynika z niej i to, o co pytamy
-	w formularzu, i to, który wariant ma sens.
+	⛔ The policy date stands ABOVE the step bar, not inside the first step. It is context for the
+	whole quote: moving it across 1 July 2027 changes the regime, the question set and the
+	recommendation at once, so it has to stay visible whichever step is open.
 -->
-<app-moto-apk />
+<app-moto-effective-date />
 
-<div class="moto">
-	<aside class="moto__inputs">
-		<app-inputs />
-	</aside>
+<app-step-bar [steps]="steps" [current]="step()" (selected)="goTo($event)" />
 
-	<div class="moto__results">
-		<app-variants />
-	</div>
+<div class="moto__step">
+	@switch (step()) {
+		@case ('apk') {
+			<app-moto-apk />
+
+			<div class="moto__nav">
+				<button type="button" class="moto__next" data-testid="to-recommendation" (click)="goTo('reco')">
+					See the recommendation →
+				</button>
+			</div>
+		}
+
+		@case ('reco') {
+			<app-apk-recommendation
+				[recommendation]="recommendation()"
+				[copy]="copy"
+				[variantName]="recommendedName()"
+				[missingNames]="missingNames()"
+			/>
+
+			<div class="moto__nav">
+				<button type="button" class="moto__back" (click)="goTo('apk')">← Back to the questions</button>
+				<button type="button" class="moto__next" data-testid="to-price" (click)="goTo('price')">
+					See the premium →
+				</button>
+			</div>
+		}
+
+		@case ('price') {
+			<!--
+				Inputs on the left, the comparison beside them.
+
+				⛔ The input panel does not scroll inside itself. `less/sidebar/sidebar.less:23-26`'s
+				`height: 83vh; overflow: auto` put a scrollable region inside the page's own scroll,
+				so the reader could never see the whole input state and a touch device stopped
+				scrolling the page whenever a finger landed on the form.
+			-->
+			<div class="moto">
+				<aside class="moto__inputs">
+					<app-inputs />
+				</aside>
+
+				<div class="moto__results">
+					<app-variants />
+				</div>
+			</div>
+
+			<div class="moto__nav">
+				<button type="button" class="moto__back" (click)="goTo('reco')">
+					← Back to the recommendation
+				</button>
+			</div>
+		}
+	}
 </div>

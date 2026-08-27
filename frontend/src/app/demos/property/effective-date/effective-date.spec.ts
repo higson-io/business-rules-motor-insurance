@@ -81,8 +81,6 @@ function quote(
 		suggestedSumBuilding: 100000,
 		covers: [],
 		variants: [],
-		needs: [],
-		warnings: [],
 		recommendation: {
 			variantCode: null,
 			coveredNeeds: 0,
@@ -90,6 +88,8 @@ function quote(
 			missingCovers: [],
 			budgetOutcome: null,
 			justification,
+			needs: [],
+			warnings: [],
 		},
 		selectedVariant: null,
 	};

@@ -1,0 +1,39 @@
+<!--
+	⛔ The WHOLE motor screen speaks English — component labels, the question text in Higson and the
+	comparison table. ND-2 pins the English labels of this demo, so it sets the language rather than
+	the other way round. The life and property demos are in Polish and that is fine: language is a
+	property of the screen. Mixing two on one screen is not.
+-->
+<div class="date-band">
+	<div class="date-band__control">
+		<mat-form-field appearance="outline" class="date-band__field">
+			<mat-label>Policy start date</mat-label>
+			<input
+				matInput
+				data-testid="moto-start-date"
+				[matDatepicker]="picker"
+				[value]="startDate()"
+				(dateChange)="pickDate($event.value)"
+			/>
+			<mat-datepicker-toggle matIconSuffix [for]="picker" />
+			<mat-datepicker #picker />
+		</mat-form-field>
+	</div>
+
+	@if (regime(); as regime) {
+		<div class="date-band__regime">
+			<p class="date-band__caption">Needs analysis regime</p>
+			<p class="date-band__name" data-testid="moto-regime">{{ regime.name }}</p>
+			@if (regime.legalBasis; as basis) {
+				<p class="date-band__basis">{{ basis }}</p>
+			}
+		</div>
+
+		<div class="date-band__reading" data-testid="moto-reading">
+			<div class="date-band__figure">
+				<span class="date-band__number">{{ visibleCount() }}</span>
+				<span class="date-band__unit">questions asked</span>
+			</div>
+		</div>
+	}
+</div>

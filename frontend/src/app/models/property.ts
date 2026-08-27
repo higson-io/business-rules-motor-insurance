@@ -8,6 +8,8 @@
  * regulator's decision back into a build artefact.
  */
 
+import { ApkRecommendationDto } from './apk';
+
 /** How to render the control. Comes from the question's KIND attribute. */
 export type QuestionKind = 'CHOICE' | 'MULTI' | 'NUMBER' | 'MONEY' | 'BOOLEAN' | 'TEXT';
 
@@ -65,28 +67,8 @@ export interface PropertyVariantDto {
 	readonly covers: readonly string[];
 }
 
-export interface PropertyNeedDto {
-	readonly coverCode: string;
-	readonly text: string;
-	readonly weight: number;
-}
-
-export interface PropertyWarningDto {
-	readonly code: string;
-	/** 2 = the cover you asked for is excluded, 1 = a limitation worth knowing about. */
-	readonly severity: number;
-	readonly text: string;
-	readonly remedy: string;
-}
-
-export interface PropertyRecommendationDto {
-	readonly variantCode: string | null;
-	readonly coveredNeeds: number;
-	readonly totalNeeds: number;
-	readonly missingCovers: readonly string[];
-	readonly budgetOutcome: string | null;
-	readonly justification: readonly string[];
-}
+// Potrzeby, ostrzeżenia i rekomendacja majątkowa NIE mają już własnych typów: to jest ta sama
+// analiza co w pozostałych dwóch demach, więc jedzie tym samym `ApkRecommendationDto`.
 
 /** The APK regime in force for the chosen policy date. Versioned by the region, not by the clock. */
 export interface PropertyRegimeDto {
@@ -119,8 +101,6 @@ export interface PropertyQuoteDto {
 
 	readonly covers: readonly PropertyCoverDto[];
 	readonly variants: readonly PropertyVariantDto[];
-	readonly needs: readonly PropertyNeedDto[];
-	readonly warnings: readonly PropertyWarningDto[];
-	readonly recommendation: PropertyRecommendationDto;
+	readonly recommendation: ApkRecommendationDto;
 	readonly selectedVariant: string | null;
 }

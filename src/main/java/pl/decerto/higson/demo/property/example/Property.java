@@ -314,7 +314,9 @@ public class Property {
 
 		quote.setRecommendation(propose(quote, needs));
 
-		if (quote.getSelectedVariant() == null) {
+		// Dopóki nikt nie wybrał sam, pokazywany wariant IDZIE ZA rekomendacją — także wtedy, gdy
+		// rekomendacja się zmieniła, bo zmieniła się data polisy albo odpowiedź w ankiecie.
+		if (!quote.isVariantChosen()) {
 			quote.setSelectedVariant(quote.getRecommendation().getVariantCode());
 		}
 	}

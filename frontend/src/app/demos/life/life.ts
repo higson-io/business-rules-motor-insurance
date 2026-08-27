@@ -2,13 +2,28 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { firstValueFrom } from 'rxjs';
 
 import { LifeStore } from '../../core/life-store';
+import { ApkRecommendationCopy } from '../../models/apk';
 import { LifeLineCode } from '../../models/life';
 import { LifeService } from '../../services/life-service';
+import { ApkRecommendation } from '../../shared/apk/recommendation/recommendation';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
+import { Step, StepBar } from '../../shared/step-bar/step-bar';
 import { EffectiveDate } from './effective-date/effective-date';
 import { LifeApk } from './apk/life-apk';
 import { Group } from './group/group';
 import { Individual } from './individual/individual';
+
+/** Napisy ramki ekranu rekomendacji. Treść merytoryczna przychodzi z reguł. */
+const RECOMMENDATION_COPY: ApkRecommendationCopy = {
+	proposal: 'Proponujemy wariant {0}',
+	proposalNoVariant: 'Proponowany zakres ochrony',
+	coverage: 'Pokrywa {0} z {1} Twoich potrzeb',
+	needsTitle: 'Potrzeby wynikające z odpowiedzi',
+	missing: 'Poza zakresem zostaje: {0}.',
+	justificationTitle: 'Dlaczego ta propozycja',
+	warningsTitle: 'Zanim zdecydujesz',
+	empty: 'Odpowiedz na pytania ankiety — propozycja pojawi się tutaj.',
+};
 
 /** The two ways life cover is bought in Poland, and they are genuinely different products. */
 export type LifePath = 'individual' | 'group';
@@ -34,7 +49,7 @@ const LINE_CODES: Record<LifePath, LifeLineCode> = {
  */
 @Component({
 	selector: 'app-life',
-	imports: [EffectiveDate, ErrorBanner, Group, Individual, LifeApk],
+	imports: [ApkRecommendation, EffectiveDate, ErrorBanner, Group, Individual, LifeApk, StepBar],
 	templateUrl: './life.html',
 	styleUrl: './life.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +59,62 @@ export class Life {
 	private readonly lifeService = inject(LifeService);
 
 	readonly path = signal<LifePath>('individual');
+
+	readonly copy = RECOMMENDATION_COPY;
+
+	readonly step = signal<string>('apk');
+
+	/** ⚠️ `hasValue()` first — zasób w stanie błędu rzuca z `value()`. */
+	private readonly loaded = computed(() =>
+		this.store.quote.hasValue() ? this.store.quote.value() : null,
+	);
+
+	/**
+	 * ⛔ Kolejność jest argumentem: najpierw pytamy, potem pokazujemy, co z odpowiedzi wynika,
+	 * a cena jest na końcu. Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny
+	 * zawsze, bo prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się
+	 * propozycja.
+	 */
+	readonly steps: readonly Step[] = [
+		{ key: 'apk', label: 'Analiza potrzeb' },
+		{ key: 'reco', label: 'Rekomendacja' },
+		{ key: 'price', label: 'Składka' },
+	];
+
+	readonly recommendation = computed(() => this.loaded()?.apkRecommendation ?? null);
+
+	/**
+	 * ⛔ Nazwa wariantu tylko w ścieżce GRUPOWEJ. Ochrona indywidualna nie ma wariantów — jej
+	 * propozycją jest ZESTAW umów dodatkowych, więc `variantCode` przychodzi pusty i nagłówek
+	 * ekranu rekomendacji ma to uszanować, a nie wypisać pustkę po słowie „wariant".
+	 */
+	readonly recommendedName = computed(() => {
+		const quote = this.loaded();
+		const code = quote?.apkRecommendation?.variantCode;
+		if (!quote || !code) {
+			return null;
+		}
+		return quote.variants.find((variant) => variant.code === code)?.name ?? code;
+	});
+
+	readonly missingNames = computed(() => {
+		const quote = this.loaded();
+		if (quote === null) {
+			return [];
+		}
+		const names = new Map<string, string>();
+		for (const benefit of quote.benefits) {
+			names.set(benefit.code, benefit.name);
+		}
+		for (const rider of quote.riders) {
+			names.set(rider.code, rider.name);
+		}
+		return (quote.apkRecommendation?.missingCovers ?? []).map((code) => names.get(code) ?? code);
+	});
+
+	goTo(step: string): void {
+		this.step.set(step);
+	}
 
 	/** ⚠️ `error()`, nie `value()`. Zasób w stanie błędu rzuca z `value()` w Angularze 22. */
 	readonly loadError = computed(() => this.store.quote.error());

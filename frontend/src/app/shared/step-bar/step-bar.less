@@ -1,0 +1,74 @@
+@import '_variables';
+
+// Zaokrąglone TYLKO górne rogi i zero dolnego marginesu: pasek ma siedzieć na panelu treści jak
+// jego nagłówek, dokładnie tak jak w portalu. Panel pod nim domyka dolne rogi.
+.step-bar {
+	display: flex;
+	background: @color-paper;
+	border-radius: @radius-panel @radius-panel 0 0;
+	overflow: hidden;
+	box-shadow: @shadow-panel;
+}
+
+.step-bar__step {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 14px 12px;
+	border: 0;
+	// Przezroczysta krawędź od początku — inaczej krok bieżący byłby o 2px wyższy od pozostałych
+	// i pasek drgałby przy przejściu.
+	border-bottom: 2px solid transparent;
+	background: transparent;
+	color: @color-text-muted;
+	font-size: @font-sm;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		background: @color-border-block;
+	}
+
+	&:focus-visible {
+		outline: 2px solid @color-teal;
+		outline-offset: -2px;
+	}
+}
+
+.step-bar__step--current {
+	background: @color-step-current;
+	border-bottom-color: @color-mint;
+	color: @color-text;
+}
+
+.step-bar__step--done {
+	color: @color-text;
+
+	.step-bar__mark {
+		background: @color-mint;
+		color: @color-text;
+	}
+}
+
+.step-bar__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: @color-border-block;
+	color: @color-text-muted;
+	font-size: @font-xs;
+	line-height: 1;
+}
+
+// Poniżej 720px numer wystarcza za etykietę — trzy pełne nazwy kroków łamią się na dwie linie
+// i pasek zjada pół ekranu telefonu (responsive.md).
+@media (max-width: 720px) {
+	.step-bar__label {
+		display: none;
+	}
+}

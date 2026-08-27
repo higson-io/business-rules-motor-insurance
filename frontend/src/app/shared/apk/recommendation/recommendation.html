@@ -1,0 +1,66 @@
+<!--
+	Kolejność jest argumentem: najpierw ostrzeżenia, bo dotyczą decyzji, której klient jeszcze nie
+	podjął; potem propozycja; na końcu uzasadnienie, bo to ono jest dokumentem, a nie nagłówkiem.
+
+	Rek. 8.2.c, 8.2.b i 8.7 — trzy bloki, wszystkie z reguł.
+-->
+@if (recommendation(); as reco) {
+	<div class="reco">
+		@if (warnings().length > 0) {
+			<section class="reco__warnings" data-testid="apk-warnings">
+				<h3 class="reco__section-title">{{ copy().warningsTitle }}</h3>
+				@for (warning of warnings(); track warning.code) {
+					<div
+						class="reco__warning"
+						[class.reco__warning--severe]="warning.severity >= 2"
+						[attr.data-warning]="warning.code"
+					>
+						<p class="reco__warning-text">{{ warning.text }}</p>
+						<p class="reco__warning-remedy">{{ warning.remedy }}</p>
+					</div>
+				}
+			</section>
+		}
+
+		@if (hasProposal()) {
+			<section class="reco__pick" data-testid="apk-recommendation">
+				<div class="reco__head">
+					<h2 class="reco__title">{{ heading() }}</h2>
+					@if (coverage(); as coverage) {
+						<span class="reco__coverage" data-testid="apk-coverage">{{ coverage }}</span>
+					}
+				</div>
+
+				<div class="reco__body">
+					@if (needs().length > 0) {
+						<div class="reco__col">
+							<h3 class="reco__subtitle">{{ copy().needsTitle }}</h3>
+							<ul class="reco__needs" data-testid="apk-needs">
+								@for (need of needs(); track need.coverCode) {
+									<li>{{ need.text }}</li>
+								}
+							</ul>
+							@if (missingLine(); as missing) {
+								<p class="reco__missing" data-testid="apk-missing">{{ missing }}</p>
+							}
+						</div>
+					}
+
+					<!-- Pusta lista nie renderuje ramki. Brak uzasadnienia jest informacją. -->
+					@if (justification().length > 0) {
+						<div class="reco__col" data-testid="apk-justification">
+							<h3 class="reco__subtitle">{{ copy().justificationTitle }}</h3>
+							<ol class="reco__justification">
+								@for (line of justification(); track line) {
+									<li>{{ line }}</li>
+								}
+							</ol>
+						</div>
+					}
+				</div>
+			</section>
+		} @else {
+			<p class="reco__empty" data-testid="apk-empty">{{ copy().empty }}</p>
+		}
+	</div>
+}

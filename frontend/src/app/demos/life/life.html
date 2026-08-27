@@ -2,19 +2,22 @@
 	Data początku ochrony stoi NAD wyborem ścieżki, bo dotyczy obu. Kopia w każdej ścieżce
 	pozwoliłaby obu ekranom twierdzić, że wyceniają według innej wersji taryfy.
 -->
+<header class="life__head">
+	<h1 class="life__title">Ubezpieczenie na życie</h1>
+	<p class="life__lead">
+		Ten sam silnik sprzedaje zupełnie inny produkt. Data polisy rozwiązuje tu DWIE niezależne osie:
+		wersję taryfy i reżim analizy potrzeb — można przeciąć jedną bez drugiej.
+	</p>
+</header>
+
 <app-error-banner [loadError]="loadError()" testId="life-error-banner" />
 
 <app-life-effective-date />
 
 <!--
-	Analiza potrzeb nad wyborem ścieżki, bo dotyczy obu — tak samo jak data. Ścieżka grupowa widzi
-	inny zestaw pytań i rozstrzyga o tym reguła, nie ten szablon.
--->
-<app-life-apk />
-
-<!--
-	The two paths. Tabs rather than a dropdown: there are two, both are always available, and the
-	choice is worth showing rather than hiding behind a control that has to be opened.
+	⛔ Wybór ścieżki stoi NAD paskiem kroków, bo nie jest krokiem. Ochrona indywidualna i program
+	grupowy to dwa różne produkty, a nie dwa etapy jednej sprzedaży — pytają o co innego, wyceniają
+	się na czym innym i odpowiadają innym kształtem. Trzy kroki poniżej dotyczą już wybranego.
 -->
 <div class="life-paths" role="tablist" aria-label="Rodzaj ubezpieczenia">
 	<button
@@ -48,23 +51,63 @@
 	</button>
 </div>
 
-<!--
-	⛔ role="tabpanel" wymaga id, na które wskazuje aria-controls zakładki, i aria-labelledby
-	wskazującego z powrotem. Bez tej pary czytnik ekranu ogłasza dwa przyciski i osierocony obszar,
-	czyli dokładnie to, czego role="tab" miało uniknąć.
--->
-@switch (path()) {
-	@case ('group') {
-		<div id="life-panel-group" role="tabpanel" aria-labelledby="life-tab-group">
-			<app-life-group />
-		</div>
+<app-step-bar [steps]="steps" [current]="step()" (selected)="goTo($event)" />
+
+<div class="life__step">
+	@switch (step()) {
+		@case ('apk') {
+			<app-life-apk />
+
+			<div class="life__nav">
+				<button type="button" class="life__next" data-testid="to-recommendation" (click)="goTo('reco')">
+					Zobacz rekomendację →
+				</button>
+			</div>
+		}
+
+		@case ('reco') {
+			<app-apk-recommendation
+				[recommendation]="recommendation()"
+				[copy]="copy"
+				[variantName]="recommendedName()"
+				[missingNames]="missingNames()"
+			/>
+
+			<div class="life__nav">
+				<button type="button" class="life__back" (click)="goTo('apk')">← Wróć do ankiety</button>
+				<button type="button" class="life__next" data-testid="to-price" (click)="goTo('price')">
+					Zobacz składkę →
+				</button>
+			</div>
+		}
+
+		@case ('price') {
+			<!--
+				⛔ role="tabpanel" wymaga id, na które wskazuje aria-controls zakładki, i
+				aria-labelledby wskazującego z powrotem. Bez tej pary czytnik ekranu ogłasza dwa
+				przyciski i osierocony obszar, czyli dokładnie to, czego role="tab" miało uniknąć.
+			-->
+			@switch (path()) {
+				@case ('group') {
+					<div id="life-panel-group" role="tabpanel" aria-labelledby="life-tab-group">
+						<app-life-group />
+					</div>
+				}
+				@default {
+					<div id="life-panel-individual" role="tabpanel" aria-labelledby="life-tab-individual">
+						<app-life-individual />
+					</div>
+				}
+			}
+
+			<div class="life__nav">
+				<button type="button" class="life__back" (click)="goTo('reco')">
+					← Wróć do rekomendacji
+				</button>
+			</div>
+		}
 	}
-	@default {
-		<div id="life-panel-individual" role="tabpanel" aria-labelledby="life-tab-individual">
-			<app-life-individual />
-		</div>
-	}
-}
+</div>
 
 <!--
 	Jedna klauzula na całe demo, a nie kopia w każdej ścieżce. Obie ścieżki miały własną, identyczną

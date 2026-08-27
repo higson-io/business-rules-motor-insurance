@@ -30,10 +30,27 @@ describe('App shell', () => {
 		openMoto();
 		const startup = settleShell(httpTesting);
 
-		expect(elements('app-inputs').length, 'the shell composes exactly one sidebar').toBe(1);
-		expect(elements('app-variants').length, 'the shell composes exactly one variants panel').toBe(
-			1,
-		);
+		// ⛔ The motor demo opens on the NEEDS ANALYSIS, not on the price. The pricing panel — the
+		// sidebar and the comparison — belongs to the third step and is deliberately absent until
+		// the presenter walks there. A demo that opened on the premium would have stopped being a
+		// needs analysis, which is exactly what KNF recommendation 8 is about.
+		expect(elements('app-step-bar').length, 'the demo composes exactly one step bar').toBe(1);
+		expect(elements('app-moto-apk').length, 'the first step is the questionnaire').toBe(1);
+		expect(elements('app-inputs').length, 'the sidebar belongs to the pricing step').toBe(0);
+		expect(elements('app-variants').length, 'the comparison belongs to the pricing step').toBe(0);
+
+		// …and it is still exactly one of each once you get there. The count is the point: it is a
+		// lock against a second copy arriving in another branch of the step switch.
+		// ⚠️ `TestBed.tick()`, nie `fixture.detectChanges()`: the step is a signal, and the
+		// harness note in `test-writing.md` applies here too.
+		(el('[data-testid="step-price"]') as HTMLButtonElement).click();
+		TestBed.tick();
+
+		expect(elements('app-inputs').length, 'the pricing step composes exactly one sidebar').toBe(1);
+		expect(
+			elements('app-variants').length,
+			'the pricing step composes exactly one variants panel',
+		).toBe(1);
 		expect(
 			el('.menubar [data-testid="app-wordmark"]')?.textContent?.trim(),
 			'the menubar carries the product wordmark (parity checklist §1, now industry-neutral)',

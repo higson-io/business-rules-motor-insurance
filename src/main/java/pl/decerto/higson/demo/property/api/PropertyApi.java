@@ -115,8 +115,10 @@ public class PropertyApi {
 		quoteService.getQuote().setBuildingSumOverridden(true);
 	}
 
+	/** ⛔ Wybór człowieka. Od tego momentu rekomendacja go nie nadpisuje — patrz `variantChosen`. */
 	@PutMapping("/variant")
 	public void setVariant(@RequestBody String variantCode) {
 		quoteService.getQuote().setSelectedVariant(variantCode);
+		quoteService.getQuote().setVariantChosen(true);
 	}
 }

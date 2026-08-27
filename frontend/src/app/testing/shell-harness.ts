@@ -84,12 +84,14 @@ export const APK_ABSENT = {
 	policyStartDate: '2026-08-24',
 	apkRegime: APK_STATUTORY,
 	apkQuestions: [],
-} satisfies Pick<QuoteDto, 'policyStartDate' | 'apkRegime' | 'apkQuestions'>;
+	apkRecommendation: null,
+} satisfies Pick<QuoteDto, 'policyStartDate' | 'apkRegime' | 'apkQuestions' | 'apkRecommendation'>;
 
 /** To samo co `APK_ABSENT`, dla demo życiowego — te testy też nie dotyczą analizy potrzeb. */
 export const APK_ABSENT_LIFE = {
 	apkRegime: APK_STATUTORY,
 	apkQuestions: [],
+	apkRecommendation: null,
 };
 
 export const QUOTE: QuoteDto = {

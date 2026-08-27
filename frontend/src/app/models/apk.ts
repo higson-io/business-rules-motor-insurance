@@ -80,3 +80,59 @@ export interface ApkRefusalChange {
 	readonly code: string;
 	readonly refused: boolean;
 }
+
+/** Potrzeba wyprowadzona z odpowiedzi (rek. 8.2.b). */
+export interface ApkNeedDto {
+	readonly coverCode: string;
+	readonly text: string;
+	readonly weight: number;
+}
+
+/** Wyłączenie kolidujące z sytuacją klienta (rek. 8.2.c). Bez `remedy` byłoby niedokończone. */
+export interface ApkWarningDto {
+	readonly code: string;
+	readonly severity: number;
+	readonly text: string;
+	readonly remedy: string;
+}
+
+export interface ApkRecommendationDto {
+	/**
+	 * `null` albo puste w ochronie indywidualnej — tam propozycją jest ZESTAW umów, nie wariant
+	 * z półki. To nie jest brak danych; ekran rekomendacji ma to uszanować nagłówkiem bez wariantu.
+	 */
+	readonly variantCode: string | null;
+	readonly coveredNeeds: number;
+	readonly totalNeeds: number;
+	readonly missingCovers: readonly string[];
+	/** `null`, gdy reżim nie wymaga pytania o budżet — wtedy nie ma czego z czym porównywać. */
+	readonly budgetOutcome: string | null;
+	readonly justification: readonly string[];
+	readonly needs: readonly ApkNeedDto[];
+	readonly warnings: readonly ApkWarningDto[];
+}
+
+/**
+ * Napisy własne ekranu rekomendacji — nagłówki sekcji i zdania łączące, czyli wszystko, czego
+ * NIE podają reguły. Ta sama zasada i ten sam powód co przy `ApkCopy`: bez domyślnych.
+ *
+ * ⛔ Treść merytoryczna — potrzeby, ostrzeżenia, uzasadnienie — tutaj NIE trafia. Te zdania
+ * przychodzą z `demo.*.apk.*` i mają tam zostać; to one są dowodem, że dokument dla klienta jest
+ * konfiguracją. Tutaj są wyłącznie napisy ramki ekranu.
+ *
+ * `{0}`, `{1}` — te same podstawienia co w tabelach powodów, dla jednego mechanizmu w całym demo.
+ */
+export interface ApkRecommendationCopy {
+	/** `{0}` — nazwa wariantu. Używane, gdy propozycja MA wariant. */
+	readonly proposal: string;
+	/** Nagłówek, gdy wariantu nie ma (ochrona indywidualna: propozycją jest zestaw umów). */
+	readonly proposalNoVariant: string;
+	/** `{0}` pokryte, `{1}` wszystkie. */
+	readonly coverage: string;
+	readonly needsTitle: string;
+	/** `{0}` — lista nazw po przecinku. */
+	readonly missing: string;
+	readonly justificationTitle: string;
+	readonly warningsTitle: string;
+	readonly empty: string;
+}

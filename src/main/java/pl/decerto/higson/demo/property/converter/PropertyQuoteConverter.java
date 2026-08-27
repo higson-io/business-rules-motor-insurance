@@ -7,13 +7,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import pl.decerto.higson.demo.property.api.dto.PropertyCoverDto;
-import pl.decerto.higson.demo.property.api.dto.PropertyNeedDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuestionDto;
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
-import pl.decerto.higson.demo.property.api.dto.PropertyRecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
-import pl.decerto.higson.demo.property.api.dto.PropertyWarningDto;
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
 import pl.decerto.higson.demo.apk.Need;
@@ -47,9 +45,9 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 
 		dto.setCovers(convertCovers(quote.getCovers()));
 		dto.setVariants(convertVariants(quote.getVariants()));
-		dto.setNeeds(convertNeeds(quote.getNeeds()));
-		dto.setWarnings(convertWarnings(quote.getWarnings()));
-		dto.setRecommendation(convertRecommendation(quote));
+		// Trzy listy jadą razem, bo razem są jedną analizą — patrz RecommendationDto.
+		dto.setRecommendation(RecommendationDto.of(
+			quote.getRecommendation(), quote.getNeeds(), quote.getWarnings()));
 		dto.setSelectedVariant(quote.getSelectedVariant());
 
 		return dto;
@@ -135,39 +133,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		return result;
 	}
 
-	private List<PropertyNeedDto> convertNeeds(List<Need> needs) {
-		List<PropertyNeedDto> result = new ArrayList<>();
-		for (Need need : needs) {
-			PropertyNeedDto dto = new PropertyNeedDto();
-			dto.setCoverCode(need.getCoverCode());
-			dto.setText(need.getText());
-			dto.setWeight(need.getWeight());
-			result.add(dto);
-		}
-		return result;
-	}
 
-	private List<PropertyWarningDto> convertWarnings(List<Warning> warnings) {
-		List<PropertyWarningDto> result = new ArrayList<>();
-		for (Warning warning : warnings) {
-			PropertyWarningDto dto = new PropertyWarningDto();
-			dto.setCode(warning.getCode());
-			dto.setSeverity(warning.getSeverity());
-			dto.setText(warning.getText());
-			dto.setRemedy(warning.getRemedy());
-			result.add(dto);
-		}
-		return result;
-	}
 
-	private PropertyRecommendationDto convertRecommendation(PropertyQuote quote) {
-		PropertyRecommendationDto dto = new PropertyRecommendationDto();
-		dto.setVariantCode(quote.getRecommendation().getVariantCode());
-		dto.setCoveredNeeds(quote.getRecommendation().getCoveredNeeds());
-		dto.setTotalNeeds(quote.getRecommendation().getTotalNeeds());
-		dto.setMissingCovers(quote.getRecommendation().getMissingCovers());
-		dto.setBudgetOutcome(quote.getRecommendation().getBudgetOutcome());
-		dto.setJustification(quote.getRecommendation().getJustification());
-		return dto;
-	}
 }

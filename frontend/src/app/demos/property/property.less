@@ -134,3 +134,72 @@
 	font-size: 0.75rem;
 	color: @color-text-muted;
 }
+
+// Pasek kroków domyka się z panelem pracy: zaokrągla tylko górne rogi, więc treść pod nim musi
+// zaczynać się bez odstępu, inaczej pasek wisi w powietrzu.
+:host app-step-bar {
+	display: block;
+	margin-top: 16px;
+}
+
+.property {
+	margin-top: 0;
+}
+
+// Nawigacja kroku. Przycisk „dalej" jest jedynym akcentem na ekranie — prowadzący ma go trafić
+// wzrokiem z drugiego końca sali, nie szukać.
+.property__nav {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.property__nav:has(.property__next:only-child) {
+	justify-content: flex-end;
+}
+
+.property__next,
+.property__back {
+	padding: 10px 18px;
+	border-radius: 6px;
+	font-size: @font-sm;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.property__next {
+	border: 0;
+	background: @color-accent-text;
+	color: @color-paper;
+
+	&:hover {
+		filter: brightness(1.08);
+	}
+}
+
+.property__back {
+	border: 1px solid @color-border-block;
+	background: @color-paper;
+	color: @color-text-muted;
+
+	&:hover {
+		color: @color-text;
+	}
+}
+
+.property__next:focus-visible,
+.property__back:focus-visible {
+	outline: 2px solid @color-teal;
+	outline-offset: 2px;
+}
+
+// ⛔ Krok ankiety nie ma podsumowania obok, więc nie może zostawiać po nim pustej kolumny —
+// pytania wchodzą wtedy w trzy wąskie kolumny zamiast w trzy wygodne. `:has()` zamiast klasy na
+// gospodarzu: układ ma zależeć od tego, co NAPRAWDĘ jest w drzewie, a nie od drugiej kopii tej
+// wiedzy w komponencie.
+@media (min-width: 992px) {
+	.property:not(:has(.property__summary)) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

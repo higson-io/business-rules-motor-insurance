@@ -1,16 +1,17 @@
-/* Pasek daty polisy — wspólny dla demo LIFE i PROPERTY.
+/* Pasek daty polisy — wspólny dla wszystkich trzech dem.
 
-   Globalny partial, a nie style komponentu, z jednego powodu: te dwa paski mają wyglądać
+   Globalny partial, a nie style komponentu, z jednego powodu: te paski mają wyglądać
    IDENTYCZNIE. Dwie kopie w dwóch plikach komponentów rozjechały się już raz (jeden miał
    akcentową krechę i odczyt 0.8125rem, drugi nie miał krechy i miał 0.9375rem), a rozjazd
-   podważa tezę, którą pasek niesie: że w obu demach działa ten sam mechanizm.
+   podważa tezę, którą pasek niesie: że we wszystkich trzech demach działa ten sam mechanizm.
 
    To nie jest pole formularza. To przełącznik konfiguracji silnika — data trafia do
    engine.setEffectiveDate i wybiera wersję regionu. Dlatego stoi nad wszystkim, ma własne tło
    i jest najgłośniejszym obiektem na ekranie. */
 
-// Oba komponenty-gospodarze są tu, a nie w dwóch plikach po jednej regule.
+// Wszyscy trzej gospodarze są tu, a nie w trzech plikach po jednej regule.
 app-life-effective-date,
+app-moto-effective-date,
 app-property-effective-date {
 	display: block;
 }

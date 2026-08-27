@@ -1,4 +1,4 @@
-import { ApkQuestionDto, ApkRegimeDto } from './apk';
+import { ApkQuestionDto, ApkRecommendationDto, ApkRegimeDto } from './apk';
 
 /**
  * Wire model of `LifeApi`. Every field is what the backend actually sends — nullability included,
@@ -132,6 +132,14 @@ export interface LifeQuoteDto {
 	readonly apkRegime: ApkRegimeDto;
 
 	readonly apkQuestions: readonly ApkQuestionDto[];
+
+	/**
+	 * Wynik analizy potrzeb: potrzeby, ostrzeżenia o wyłączeniach i uzasadnienie.
+	 *
+	 * ⛔ `variantCode` jest PUSTY w ochronie indywidualnej i to nie jest brak danych. Tam nie ma
+	 * czego wybierać z półki — propozycją jest zestaw umów dodatkowych.
+	 */
+	readonly apkRecommendation: ApkRecommendationDto | null;
 
 	readonly variants: readonly LifeVariantDto[];
 	readonly benefits: readonly LifeBenefitDto[];

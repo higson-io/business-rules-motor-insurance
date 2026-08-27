@@ -1,5 +1,7 @@
 package pl.decerto.higson.demo.property.api.dto;
 
+import pl.decerto.higson.demo.apk.api.RecommendationDto;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,9 +27,7 @@ public class PropertyQuoteDto {
 
 	private List<PropertyCoverDto> covers;
 	private List<PropertyVariantDto> variants;
-	private List<PropertyNeedDto> needs;
-	private List<PropertyWarningDto> warnings;
-	private PropertyRecommendationDto recommendation;
+	private RecommendationDto recommendation;
 	private String selectedVariant;
 
 	public LocalDate getStartDate() {
@@ -143,27 +143,13 @@ public class PropertyQuoteDto {
 		this.variants = variants;
 	}
 
-	public List<PropertyNeedDto> getNeeds() {
-		return needs;
-	}
 
-	public void setNeeds(List<PropertyNeedDto> needs) {
-		this.needs = needs;
-	}
 
-	public List<PropertyWarningDto> getWarnings() {
-		return warnings;
-	}
-
-	public void setWarnings(List<PropertyWarningDto> warnings) {
-		this.warnings = warnings;
-	}
-
-	public PropertyRecommendationDto getRecommendation() {
+	public RecommendationDto getRecommendation() {
 		return recommendation;
 	}
 
-	public void setRecommendation(PropertyRecommendationDto recommendation) {
+	public void setRecommendation(RecommendationDto recommendation) {
 		this.recommendation = recommendation;
 	}
 

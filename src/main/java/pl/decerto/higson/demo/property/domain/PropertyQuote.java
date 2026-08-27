@@ -48,6 +48,15 @@ public class PropertyQuote {
 	private String selectedVariant;
 
 	/**
+	 * Czy wariant wybrał człowiek.
+	 *
+	 * ⛔ Bez tego pola wybór podpowiedziany przez rekomendację niczym się nie różnił od wyboru
+	 * klienta — więc gdy zmiana daty polisy przestawiała rekomendację, podsumowanie zostawało przy
+	 * poprzednim wariancie i ekran przeczył sam sobie: „proponujemy Pełny" nad ceną Standardowego.
+	 */
+	private boolean variantChosen;
+
+	/**
 	 * Czy klient sam ustawił sumę murów.
 	 *
 	 * ⚠️ Bez tej flagi wyliczona suma zamarzłaby na wartości z pierwszej wyceny — a wtedy zmiana
@@ -155,6 +164,14 @@ public class PropertyQuote {
 
 	public void setSelectedVariant(String selectedVariant) {
 		this.selectedVariant = selectedVariant;
+	}
+
+	public boolean isVariantChosen() {
+		return variantChosen;
+	}
+
+	public void setVariantChosen(boolean variantChosen) {
+		this.variantChosen = variantChosen;
 	}
 
 	public boolean isBuildingSumOverridden() {
