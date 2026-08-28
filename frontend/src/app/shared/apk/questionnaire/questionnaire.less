@@ -57,15 +57,58 @@
 // ⚠️ minmax(0, …), nie minmax(auto, …). Ślad domyślnej ścieżki grid to `auto`, czyli szerokość
 // min-content — a Material renderuje wartość selecta z `white-space: nowrap`, więc jedna długa
 // etykieta ustawiłaby podłogę i wypchnęła kolumnę poza kontener.
+//
+// ⛔ `row-gap: 0`, bo odstęp między pytaniami robi margines pod stopką, a NIE odstęp siatki.
+// Powód poniżej: pytania używają `subgrid`, a subgrid dziedziczy odstęp wierszy od rodzica —
+// 18px trafiłoby wtedy między etykietę a kontrolkę każdego pytania, nie między pytania.
 .apk__grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-	gap: 18px 20px;
-	align-items: start;
+	column-gap: 20px;
+	row-gap: 0;
 }
 
+// ⛔ **To jest miejsce, w którym kontrolki przestają się rozjeżdżać.** Wcześniej każde pytanie
+// było własnym pudełkiem o wysokości swojej treści, więc pytanie z dwuwierszową etykietą
+// spychało swoje pole 20px niżej niż sąsiad z jednowierszową — i to samo powtarzało się przy
+// pomocy i przy „nie chcę podać". Na ekranie z szesnastoma pytaniami dawało to kilkanaście
+// drobnych uskoków.
+//
+// Każde pytanie zajmuje teraz PIĘĆ ścieżek wiersza rodzica i rozkłada na nich swoje części
+// przez `subgrid`. Ścieżki są wspólne dla całego pasma, więc wysokość każdej wyznacza
+// najwyższa treść w wierszu: etykiety kończą się na tej samej wysokości, kontrolki zaczynają
+// na tej samej, stopki stoją równo.
+//
+// ⚠️ Przypisanie wierszy jest JAWNE, a nie z kolejności. Pomoc i komunikat o odmowie są
+// opcjonalne — przy automatycznym rozmieszczeniu pytanie bez pomocy wsunęłoby stopkę do
+// ścieżki 3 i rozjechało się dokładnie tak, jak przedtem.
 .apk__question {
+	display: grid;
+	grid-row: span 5;
+	grid-template-rows: subgrid;
 	min-width: 0;
+}
+
+.apk__label {
+	grid-row: 1;
+}
+
+.apk__field,
+.apk__options,
+.apk__toggle {
+	grid-row: 2;
+}
+
+.apk__help {
+	grid-row: 3;
+}
+
+.apk__foot {
+	grid-row: 4;
+}
+
+.apk__refusal {
+	grid-row: 5;
 }
 
 // Wielokrotny wybór ma tyle opcji, ile ma — nie mieści się w jednej celi siatki.
@@ -83,13 +126,19 @@
 // tu zbędny — sumowałby się z gap i rozjeżdżał wiersze, w których jedno pytanie jest polem,
 // a drugie przełącznikiem.
 .apk__field {
+	align-self: start;
 	display: block;
 	width: 100%;
 	margin-bottom: 8px;
 }
 
 // Treść pytania: zawija się, bo przychodzi z reguł i może mieć dowolną długość.
+//
+// `align-self: start` — w paśmie, w którym któraś etykieta ma dwa wiersze, ścieżka jest wysoka
+// na dwa wiersze; bez tego jednowierszowa etykieta wyśrodkowałaby się w niej i odkleiła od
+// swojego pola.
 .apk__label {
+	align-self: start;
 	margin: 0 0 6px;
 	font-size: 0.875rem;
 	font-weight: 500;
@@ -105,6 +154,7 @@
 }
 
 .apk__options {
+	align-self: start;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 2px 20px;
@@ -112,24 +162,39 @@
 }
 
 .apk__toggle {
+	align-self: start;
+	justify-self: start;
+	width: 100%;
 	margin-bottom: 8px;
 }
 
 // Pomoc pochodzi z Higsona i jest tu widoczna zawsze — niezależnie od rodzaju kontrolki.
 .apk__help {
+	align-self: start;
 	margin: 0;
 	font-size: 0.75rem;
 	line-height: 1.35;
 	color: @color-text-muted;
 }
 
+// ⛔ Dolny margines stopki JEST odstępem między pytaniami — siatka ma `row-gap: 0`, bo jej
+// odstęp trafiłby też między części pojedynczego pytania.
+//
+// ⚠️ `flex-start`, nie `space-between`, i BEZ odpychania czegokolwiek do prawej. Przy
+// `space-between` pytanie bez podpowiedzi zostawiało „nie chcę podać" przyklejone do prawej
+// krawędzi, a przy pytaniu wielokrotnego wyboru — zajmującym całą szerokość — guzik lądował metr
+// od pytania, którego dotyczy. Wyrównanie do lewej daje jedną pionową linię przez cały wiersz
+// siatki: tam, gdzie podpowiedź jest, stoi przed guzikiem; tam, gdzie jej nie ma, guzik zaczyna
+// od tej samej krawędzi co sąsiedzi.
 .apk__foot {
+	align-self: end;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	justify-content: space-between;
+	justify-content: flex-start;
 	gap: 4px 12px;
 	margin-top: 4px;
+	margin-bottom: 20px;
 }
 
 .apk__prefill {
@@ -139,7 +204,6 @@
 }
 
 .apk__refuse {
-	margin-left: auto;
 	padding: 0;
 	border: 0;
 	background: none;

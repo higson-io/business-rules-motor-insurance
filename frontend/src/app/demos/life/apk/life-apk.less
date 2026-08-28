@@ -5,22 +5,31 @@
 	margin-bottom: 22px;
 }
 
-// Węższy niż pasek daty i bez akcentowej krechy — data jest kontrolką, to jest tylko odczyt.
+// Bez akcentowej krechy — data jest kontrolką, to jest tylko odczyt.
+//
+// ⛔ BIAŁY PANEL, nie szare tło. Przedtem ten pasek miał `@color-gray-light`, czyli dokładnie
+// kolor tła strony, i stał tuż pod paskiem kroków — czytał się więc jako brak kafla, jedyny
+// taki obiekt na trzech demach. Teraz jest panelem portalu: 8px, 1.5rem, cień.
+//
+// ⚠️ `flex-start`, nie `space-between`. Liczba pytań opisuje reżim stojący obok, a przy
+// `space-between` odlatywała na drugi koniec ekranu — półtora tysiąca pikseli od zdania,
+// którego dotyczy. Ten sam układ, co w pasku daty nad nią.
 .life-apk__regime {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	justify-content: space-between;
-	gap: 12px 24px;
-	padding: 12px 16px;
-	margin-bottom: 16px;
-	background: @color-gray-light;
-	border-radius: var(--mat-sys-corner-medium);
+	justify-content: flex-start;
+	gap: 12px 40px;
+	padding: @space-panel;
+	margin-bottom: @space-gap;
+	background: @color-paper;
+	border-radius: @radius-panel;
+	box-shadow: @shadow-panel;
 }
 
 .life-apk__caption {
 	margin: 0;
-	font-size: 0.6875rem;
+	font-size: @font-xs;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: @color-text-muted;
@@ -28,31 +37,31 @@
 
 .life-apk__name {
 	margin: 2px 0 0;
-	font-size: 1rem;
+	font-size: @font-lg;
 	font-weight: 600;
 	line-height: 1.25;
 }
 
 .life-apk__basis {
 	margin: 2px 0 0;
-	font-size: 0.75rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }
 
 .life-apk__figure {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	align-items: flex-start;
 }
 
 .life-apk__number {
-	font-size: 1.25rem;
+	font-size: 1.5rem;
 	font-weight: 600;
 	line-height: 1.1;
 	font-variant-numeric: tabular-nums;
 }
 
 .life-apk__unit {
-	font-size: 0.75rem;
+	font-size: @font-sm;
 	color: @color-text-muted;
 }

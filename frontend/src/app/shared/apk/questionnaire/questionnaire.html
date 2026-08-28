@@ -35,11 +35,19 @@
 						[class.apk__question--refused]="question.refused"
 						[attr.data-question]="question.code"
 					>
+						<!--
+							⛔ Gwiazdka doklejona TWARDĄ SPACJĄ do treści pytania, a nie postawiona
+							jako osobne słowo. Zwykła spacja pozwalała jej zawinąć się na własny
+							wiersz — „Powierzchnia użytkowa w metrach kwadratowych" kończyło się
+							linijką zawierającą samą gwiazdkę, co dokładało pytaniu wysokości
+							i rozjeżdżało kontrolki w całym wierszu siatki.
+						-->
 						<p class="apk__label" [id]="'q-' + question.code">
-							{{ question.text }}
-							@if (question.required) {
-								<span class="apk__required" aria-hidden="true">*</span>
-							}
+							{{ question.text }}@if (question.required) {<span
+								class="apk__required"
+								aria-hidden="true"
+								>&nbsp;*</span
+							>}
 						</p>
 
 						@switch (question.kind) {

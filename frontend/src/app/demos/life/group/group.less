@@ -19,13 +19,19 @@
 
 @media (min-width: 992px) {
 	.group {
-		grid-template-columns: 340px minmax(0, 1fr);
+		// +12px, gdy panele wzięły wyściółkę portalu — inaczej sufiksy pól tracą miejsce.
+		grid-template-columns: 352px minmax(0, 1fr);
 	}
 }
 
+// ⚠️ `flex: 0 0 auto` i `white-space: nowrap` są nośne, tak samo jak w demie indywidualnym:
+// bez nich Material pozwala sufiksowi się skurczyć i „osób" zostaje ucięte w połowie zamiast
+// zwęzić pole. Prawy odstęp oddziela go od obrysu.
 .group__suffix {
-	padding-left: 6px;
-	font-size: 0.8125rem;
+	flex: 0 0 auto;
+	padding: 0 4px 0 6px;
+	font-size: @font-sm;
+	white-space: nowrap;
 	color: @color-text-muted;
 }
 
@@ -86,6 +92,26 @@
 
 	.quote__table {
 		overflow: visible;
+
+		// ⛔ Promień musi namalować SKRAJNE KOMÓRKI, a nie tabela. Wspólny styl tabeli zaokrągla
+		// róg przez `overflow: hidden`, a to — punkt 2 wyżej — po cichu wyłącza `position: sticky`
+		// nagłówka. Bez tego bloku tabela ma kwadratowe rogi obok zaokrąglonej karty formularza
+		// i jako jedyny obiekt na trzech demach nie wygląda na kafel.
+		thead tr:first-child > :first-child {
+			border-top-left-radius: @radius-panel;
+		}
+
+		thead tr:first-child > :last-child {
+			border-top-right-radius: @radius-panel;
+		}
+
+		tbody tr:last-child > :first-child {
+			border-bottom-left-radius: @radius-panel;
+		}
+
+		tbody tr:last-child > :last-child {
+			border-bottom-right-radius: @radius-panel;
+		}
 	}
 
 	thead {

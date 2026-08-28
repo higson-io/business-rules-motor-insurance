@@ -32,11 +32,16 @@
 							[class.apk__question--refused]="question.refused"
 							[attr.data-question]="question.code"
 						>
+							<!--
+								⛔ Gwiazdka doklejona TWARDĄ SPACJĄ — patrz komentarz we wspólnej
+								ankiecie. Zwykła spacja pozwalała jej zawinąć się na własny wiersz.
+							-->
 							<p class="apk__label" [id]="'q-' + question.code">
-								{{ question.text }}
-								@if (question.required) {
-									<span class="apk__required" aria-hidden="true">*</span>
-								}
+								{{ question.text }}@if (question.required) {<span
+									class="apk__required"
+									aria-hidden="true"
+									>&nbsp;*</span
+								>}
 							</p>
 
 							@switch (question.kind) {
