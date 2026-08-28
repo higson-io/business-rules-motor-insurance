@@ -13,6 +13,7 @@ public class PropertyQuoteDto {
 	private BigDecimal deductible;
 
 	private PropertyRegimeDto regime;
+	private List<PropertySectionDto> sections;
 	private List<PropertyQuestionDto> questions;
 
 	private String floodZone;
@@ -71,6 +72,14 @@ public class PropertyQuoteDto {
 
 	public void setRegime(PropertyRegimeDto regime) {
 		this.regime = regime;
+	}
+
+	public List<PropertySectionDto> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<PropertySectionDto> sections) {
+		this.sections = sections;
 	}
 
 	public List<PropertyQuestionDto> getQuestions() {

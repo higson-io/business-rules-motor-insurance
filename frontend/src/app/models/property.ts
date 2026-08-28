@@ -106,6 +106,22 @@ export interface PropertyOfferDto {
 }
 
 /** Ubezpieczający. Dane demonstracyjne — w prawdziwym wdrożeniu z CRM, nie z reguł. */
+/**
+ * Sekcja ankiety — **gałąź drzewa domeny**, nie wartość atrybutu na pytaniu.
+ *
+ * ⛔ Tytuł przychodzi z reguł. Wcześniej cztery tytuły były stałą w komponencie, więc dołożenie
+ * sekcji w Studio wymagało wdrożenia frontu — dokładnie tego, czemu to demo zaprzecza.
+ *
+ * ⚠️ `visible` (reguła `demo.property.apk.section.visibility`) to co innego niż NIEOBECNOŚĆ
+ * sekcji na liście: sekcji spoza wersji regionu nie ma tu wcale, razem z jej pytaniami.
+ */
+export interface PropertySectionDto {
+	readonly code: string;
+	readonly title: string;
+	readonly position: number;
+	readonly visible: boolean;
+}
+
 export interface PropertyPolicyholderDto {
 	readonly firstName: string;
 	readonly lastName: string;
@@ -138,6 +154,7 @@ export interface PropertyQuoteDto {
 	readonly deductible: number;
 
 	readonly regime: PropertyRegimeDto;
+	readonly sections: readonly PropertySectionDto[];
 	readonly questions: readonly PropertyQuestionDto[];
 
 	readonly floodZone: string | null;

@@ -18,6 +18,7 @@ const QUOTE: PropertyQuoteDto = {
 		requiresJustification: false,
 		requiresVariantDifferences: false,
 	},
+	sections: [],
 	questions: [],
 	floodZone: 'Z0',
 	theftZone: 'T1',

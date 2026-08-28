@@ -32,6 +32,9 @@ public class PropertyQuote {
 	private final Zone zone = new Zone();
 
 	private Regime regime = new Regime();
+	/** Sekcje ankiety — gałęzie drzewa domeny. Patrz `Section`. */
+	private List<Section> sections = new ArrayList<>();
+
 	private List<Question> questions = new ArrayList<>();
 
 	/** Klucz to kod pytania — jedyne miejsce, gdzie kod pytania w ogóle występuje po stronie Javy. */
@@ -90,6 +93,14 @@ public class PropertyQuote {
 
 	public void setRegime(Regime regime) {
 		this.regime = regime;
+	}
+
+	public List<Section> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
 	}
 
 	public List<Question> getQuestions() {

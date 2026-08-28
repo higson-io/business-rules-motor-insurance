@@ -70,6 +70,14 @@ function quote(
 		startDate: '2026-08-21',
 		deductible: 0,
 		regime,
+		// ⛔ Sekcje wyprowadzone z pytań, nie wypisane obok nich — inaczej rozjechałyby się
+		// przy pierwszym teście dodającym pytanie w nowej sekcji.
+		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
+			code,
+			title: `Sekcja ${code}`,
+			position: (index + 1) * 10,
+			visible: true,
+		})),
 		questions,
 		floodZone: 'Z0',
 		theftZone: 'T1',

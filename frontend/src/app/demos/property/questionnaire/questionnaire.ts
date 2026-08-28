@@ -7,22 +7,17 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
 
 import { PropertyStore } from '../../../core/property-store';
-import { PropertyQuestionDto, QuestionSection } from '../../../models/property';
+import { PropertyQuestionDto } from '../../../models/property';
 import { PropertyService } from '../../../services/property-service';
 
-/** Section headings. The sections themselves come from the rules; only their titles live here. */
-const SECTION_TITLES: Record<QuestionSection, string> = {
-	SUBJECT: 'Przedmiot ubezpieczenia',
-	SITUATION: 'Twoja sytuacja',
-	NEEDS: 'Czego potrzebujesz',
-	EXCLUSIONS: 'Co może ograniczyć ochronę',
-};
-
-/** The order sections appear in. A section with no visible questions is not rendered at all. */
-const SECTION_ORDER: readonly QuestionSection[] = ['SUBJECT', 'SITUATION', 'NEEDS', 'EXCLUSIONS'];
-
+/**
+ * ⛔ Nie ma tu ani listy sekcji, ani ich tytułów, ani kolejności — i to jest cała zmiana.
+ * Do 28 sierpnia 2026 stały tu cztery tytuły i tablica `SECTION_ORDER`, więc dołożenie sekcji
+ * w Studio wymagało wdrożenia frontu. Sekcja jest teraz gałęzią drzewa domeny: przychodzi
+ * z serwera z tytułem, kolejnością i własną regułą widoczności.
+ */
 interface Section {
-	readonly code: QuestionSection;
+	readonly code: string;
 	readonly title: string;
 	readonly questions: readonly PropertyQuestionDto[];
 }
@@ -68,13 +63,26 @@ export class Questionnaire {
 
 	readonly ready = computed(() => this.loaded() !== null);
 
+	/**
+	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer, a lista sekcji z serwera —
+	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
+	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
+	 */
 	readonly sections = computed<readonly Section[]>(() => {
-		const questions = this.loaded()?.questions ?? [];
-		return SECTION_ORDER.map((code) => ({
-			code,
-			title: SECTION_TITLES[code],
-			questions: questions.filter((question) => question.section === code && question.visible),
-		})).filter((section) => section.questions.length > 0);
+		const quote = this.loaded();
+		if (quote === null) {
+			return [];
+		}
+		return quote.sections
+			.filter((section) => section.visible)
+			.map((section) => ({
+				code: section.code,
+				title: section.title,
+				questions: quote.questions.filter(
+					(question) => question.section === section.code && question.visible,
+				),
+			}))
+			.filter((section) => section.questions.length > 0);
 	});
 
 	label(question: PropertyQuestionDto, option: string): string {

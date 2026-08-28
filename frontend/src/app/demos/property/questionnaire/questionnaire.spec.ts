@@ -48,6 +48,15 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 			requiresJustification: false,
 			requiresVariantDifferences: false,
 		},
+		// ⛔ Sekcje wyprowadzone z pytań, a nie wypisane obok nich. Wypisana lista rozjechałaby się
+		// z pytaniami przy pierwszym teście, który doda pytanie w nowej sekcji — a wtedy test
+		// przechodziłby albo nie z powodu, którego nie bada.
+		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
+			code,
+			title: `Sekcja ${code}`,
+			position: (index + 1) * 10,
+			visible: true,
+		})),
 		questions,
 		floodZone: 'Z0',
 		theftZone: 'T1',

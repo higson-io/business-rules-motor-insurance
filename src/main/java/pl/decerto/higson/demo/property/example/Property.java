@@ -27,6 +27,7 @@ import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.Offer;
 import pl.decerto.higson.demo.property.service.DocumentNumbers;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
+import pl.decerto.higson.demo.property.domain.Section;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
 import pl.decerto.higson.demo.apk.Regime;
@@ -51,6 +52,7 @@ public class Property {
 	private static final String PROFILE = "PROPERTY";
 	private static final String PRODUCT_PATH = "/PRODUCTS[HOME]";
 
+	private static final String COLLECTION_SECTIONS = "SECTIONS";
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
@@ -142,45 +144,80 @@ public class Property {
 		quote.setRegime(regime);
 	}
 
+	/**
+	 * Katalog pytań — czytany przez SEKCJE, bo sekcja jest gałęzią drzewa, a nie wartością
+	 * atrybutu na pytaniu.
+	 *
+	 * ⛔ Ta zmiana kupuje trzy rzeczy naraz, których atrybut dać nie mógł:
+	 *
+	 * 1. **Dołożenie sekcji to dołożenie gałęzi.** Wcześniej trzeba było dopisać wartość do
+	 *    słownika w opisie atrybutu, dodać tytuł w kodzie ekranu i pamiętać o kolejności.
+	 * 2. **Sekcja ma własne ustawienia** — tytuł, kolejność i regułę widoczności, tak samo jak
+	 *    pytanie. Tytuły sekcji były zaszyte w komponencie Angulara; teraz przychodzą z domeny.
+	 * 3. **Wersjonowanie obejmuje całą sekcję.** `NEEDS` i `EXCLUSIONS` są przypięte do wersji 2
+	 *    regionu, więc przed 1 lipca 2027 nie ma ich w drzewie WCALE — razem z pytaniami. Przedtem
+	 *    znikało siedem pojedynczych pytań, a sekcje trzeba było wygaszać domyślaniem się z
+	 *    pustej listy.
+	 *
+	 * ⚠️ Widoczność sekcji i nieistnienie sekcji to DWA RÓŻNE mechanizmy. Pierwszy to reguła
+	 * (`demo.property.apk.section.visibility`), drugi to wersja regionu. Zlanie ich w jedno
+	 * odebrałoby demonstracji połowę sensu.
+	 */
 	private void loadQuestions(PropertyQuote quote) {
 		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
 		if (product == null) {
 			return;
 		}
+		List<Section> sections = new ArrayList<>();
 		List<Question> questions = new ArrayList<>();
-		for (DomainObject definition : product.getChildren(COLLECTION_QUESTIONS)) {
-			// W-22: nawigacja po domenie nie wstrzykuje kodu elementu do kontekstu, więc atrybut
-			// kluczowany question.code nie miałby się z czego rozwiązać. Kontekst budujemy sami.
-			PropertyContext ctx = new PropertyContext(quote).withQuestion(definition.getCode());
 
-			Question question = new Question();
-			question.setCode(definition.getCode());
-			question.setText(attrString(definition, "TEXT", ctx));
-			question.setKind(attrString(definition, "KIND", ctx));
-			question.setSection(attrString(definition, "SECTION", ctx));
-			question.setHelp(attrString(definition, "HELP", ctx));
-			question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
-			// ⛔ NOŚNE. Bez `VALUE_TYPE` odpowiedź wchodzi do kontekstu jako łańcuch, a
-			// `PropertyContext.convert` konwertuje PO TYPIE WARTOŚCI — więc „400" nie stawało się
-			// `BigDecimal`, `decimalAt` zwracało null i budżet klienta znikał w drodze do
-			// rekomendacji. Skutek był widoczny dopiero w dokumencie: przy podanych 400 zł
-			// uzasadnienie mówiło „Nie podałeś akceptowalnej składki", a propozycja szła na
-			// 2912,65 zł. Cała gałąź BUDGET_EXCEEDED (D-7) była nieosiągalna.
-			//
-			// Ta linia jest tu, bo profil majątkowy ma własną kopię czytnika katalogu; wspólny
-			// `QuestionCatalogue.read` (MOTO, LIFE) ustawia ją od początku.
-			question.setValueType(attrString(definition, "VALUE_TYPE", ctx));
-			question.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
-			question.setVisible(Boolean.TRUE.equals(definition.getAttrBoolean("IS_VISIBLE", ctx)));
-			question.setRequired(Boolean.TRUE.equals(definition.getAttrBoolean("IS_REQUIRED", ctx)));
-			question.setOptions(split(attrString(definition, "OPTIONS", ctx)));
-			question.setOptionLabels(split(attrString(definition, "OPTION_LABELS", ctx)));
-			question.setPrefillSource(attrString(definition, "PREFILL_SOURCE", ctx));
-			question.setRefusalMessage(attrString(definition, "REFUSAL_MESSAGE", ctx));
-			questions.add(question);
+		for (DomainObject branch : product.getChildren(COLLECTION_SECTIONS)) {
+			PropertyContext sectionCtx = new PropertyContext(quote).withSection(branch.getCode());
+
+			Section section = new Section();
+			section.setCode(branch.getCode());
+			section.setTitle(attrString(branch, "TITLE", sectionCtx));
+			section.setPosition(intOrZero(branch.getAttrInteger("POSITION", sectionCtx)));
+			section.setVisible(Boolean.TRUE.equals(branch.getAttrBoolean("IS_VISIBLE", sectionCtx)));
+			sections.add(section);
+
+			for (DomainObject definition : branch.getChildren(COLLECTION_QUESTIONS)) {
+				questions.add(readQuestion(quote, definition, branch.getCode()));
+			}
 		}
+
+		sections.sort(Comparator.comparingInt(Section::getPosition));
 		questions.sort(Comparator.comparingInt(Question::getPosition));
+		quote.setSections(sections);
 		quote.setQuestions(questions);
+	}
+
+	/** Jedno pytanie. Sekcję niesie GAŁĄŹ, w której pytanie wisi — nie jego własny atrybut. */
+	private Question readQuestion(PropertyQuote quote, DomainObject definition, String sectionCode) {
+		// W-22: nawigacja po domenie nie wstrzykuje kodu elementu do kontekstu, więc atrybut
+		// kluczowany question.code nie miałby się z czego rozwiązać. Kontekst budujemy sami.
+		PropertyContext ctx = new PropertyContext(quote).withQuestion(definition.getCode());
+
+		Question question = new Question();
+		question.setCode(definition.getCode());
+		question.setSection(sectionCode);
+		question.setText(attrString(definition, "TEXT", ctx));
+		question.setKind(attrString(definition, "KIND", ctx));
+		question.setHelp(attrString(definition, "HELP", ctx));
+		question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
+		// ⛔ NOŚNE. Bez `VALUE_TYPE` odpowiedź wchodzi do kontekstu jako łańcuch, a
+		// `PropertyContext.convert` konwertuje PO TYPIE WARTOŚCI — więc „400" nie stawało się
+		// `BigDecimal`, `decimalAt` zwracało null i budżet klienta znikał w drodze do
+		// rekomendacji. Cała gałąź BUDGET_EXCEEDED (D-7) była nieosiągalna.
+		question.setValueType(attrString(definition, "VALUE_TYPE", ctx));
+		question.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
+		question.setVisible(Boolean.TRUE.equals(definition.getAttrBoolean("IS_VISIBLE", ctx)));
+		question.setRequired(Boolean.TRUE.equals(definition.getAttrBoolean("IS_REQUIRED", ctx)));
+		question.setOptions(split(attrString(definition, "OPTIONS", ctx)));
+		question.setOptionLabels(split(attrString(definition, "OPTION_LABELS", ctx)));
+		question.setPrefillSource(attrString(definition, "PREFILL_SOURCE", ctx));
+		question.setRefusalMessage(attrString(definition, "REFUSAL_MESSAGE", ctx));
+		return question;
 	}
 
 	/**
