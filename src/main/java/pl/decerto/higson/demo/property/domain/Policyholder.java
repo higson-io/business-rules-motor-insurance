@@ -13,24 +13,37 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * tutaj, a nie w Higsonie. Ta granica jest tezą całego demo, więc łamanie jej dla wygody
  * kosztowałoby więcej, niż warte jest jedno pole mniej w Javie.
  *
- * ⚠️ Osoba fikcyjna. PESEL ma poprawną sumę kontrolną, bo formularz z niepoprawnym numerem wygląda
- * na zepsuty, a nie na demonstracyjny; numer dowodu i adres są wymyślone.
+ * ⛔ **Każda dana ma być NIEMOŻLIWA, a nie tylko wymyślona.** Wymyślony numer, który przypadkiem
+ * jest poprawny, może należeć do prawdziwej osoby — i wtedy demo pokazuje na rzutniku czyjeś dane.
+ * Dlatego:
+ *
+ * • **PESEL ma CELOWO błędną sumę kontrolną.** `12345678901` wymaga cyfry kontrolnej 3, a kończy
+ *   się na 1, więc nie jest i nie może być niczyim numerem. To odwrotność pierwszego odruchu
+ *   („niech wygląda poprawnie"), i to ten odruch był tu błędem. ⚠️ Uwaga na `00000000000` —
+ *   wygląda na oczywisty wypełniacz, a sumę kontrolną ma POPRAWNĄ.
+ * • **Telefon ma prefiks `000`**, którego polski plan numeracji nie przydziela.
+ * • **Kod pocztowy `00-000`** nie jest przypisany do żadnej miejscowości.
+ * • **Domena `example.com`** jest zarezerwowana przez RFC 2606 właśnie do takich zastosowań.
+ * • Ulica, numer dowodu i nazwisko są czytelnymi wypełniaczami, a nie prawdopodobnymi danymi.
+ *
+ * Formularz wygląda przez to na demonstracyjny, i o to chodzi: na prezentacji nikt nie ma prawa
+ * zastanawiać się, czyje to dane.
  */
 public class Policyholder {
 
 	private String firstName = "Anna";
-	private String lastName = "Kowalska";
-	private String pesel = "85092612346";
-	private LocalDate birthDate = LocalDate.of(1985, 9, 26);
-	private String idDocument = "AZS 481920";
+	private String lastName = "Przykładowa";
+	private String pesel = "12345678901";
+	private LocalDate birthDate = LocalDate.of(1990, 1, 1);
+	private String idDocument = "ABC 123456";
 
-	private String street = "Marszałkowska 84/92";
-	private String flat = "37";
-	private String postcode = "00-950";
+	private String street = "ul. Przykładowa 1";
+	private String flat = "2";
+	private String postcode = "00-000";
 	private String city = "Warszawa";
 
-	private String email = "anna.kowalska@example.com";
-	private String phone = "+48 601 234 567";
+	private String email = "anna.przykladowa@example.com";
+	private String phone = "+48 000 000 000";
 
 	/**
 	 * Rek. 8.3 — skąd wzięły się dane, skoro klient ich tu nie wpisywał.
