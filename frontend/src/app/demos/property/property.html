@@ -39,6 +39,7 @@
 					[copy]="copy"
 					[variantName]="recommendedName()"
 					[missingNames]="missingNames()"
+					[premium]="proposedPremium()"
 				/>
 
 				<div class="step-nav">
@@ -89,7 +90,13 @@
 				<dd data-testid="property-flood-zone">{{ floodZone() }}</dd>
 			</dl>
 
-			@if (chosen(); as variant) {
+			<!--
+				⛔ Cena TYLKO na kroku składki. Na kroku rekomendacji ta sama kwota stoi już
+				w nagłówku propozycji, gdzie należy do rek. 8.2.d — dwa razy ta sama liczba
+				z tym samym podpisem, kilkanaście centymetrów od siebie, czyta się jak usterka,
+				a nie jak podsumowanie. Podsumowanie zostaje przy swoim: sumach z reguł.
+			-->
+			@if (step() === 'price' && chosen(); as variant) {
 				<div class="property__price">
 					<p class="property__price-variant">{{ variant.name }}</p>
 					<p class="property__price-amount" data-testid="property-premium">

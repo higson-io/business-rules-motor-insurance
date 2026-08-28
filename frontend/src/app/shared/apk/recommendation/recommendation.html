@@ -25,9 +25,25 @@
 		@if (hasProposal()) {
 			<section class="reco__pick" data-testid="apk-recommendation">
 				<div class="reco__head">
-					<h2 class="reco__title">{{ heading() }}</h2>
-					@if (coverage(); as coverage) {
-						<span class="reco__coverage" data-testid="apk-coverage">{{ coverage }}</span>
+					<div class="reco__head__text">
+						<h2 class="reco__title">{{ heading() }}</h2>
+						@if (coverage(); as coverage) {
+							<span class="reco__coverage" data-testid="apk-coverage">{{ coverage }}</span>
+						}
+					</div>
+
+					<!--
+						⛔ Składka JEST częścią rekomendacji, nie tylko ekranu ceny — rek. 8.2.d żąda
+						doboru „z uwzględnieniem akceptowalnej dla klienta wartości składki".
+						Jedna liczba, dotycząca tej jednej propozycji; porównanie wariantów zostaje
+						w kroku trzecim.
+					-->
+					@if (premium(); as premium) {
+						<div class="reco__premium" data-testid="apk-premium">
+							<p class="reco__premium__label">{{ copy().premiumLabel }}</p>
+							<p class="reco__premium__value">{{ premium }}</p>
+							<p class="reco__premium__note">{{ copy().premiumNote }}</p>
+						</div>
 					}
 				</div>
 
@@ -35,9 +51,22 @@
 					@if (needs().length > 0) {
 						<div class="reco__col">
 							<h3 class="reco__subtitle">{{ copy().needsTitle }}</h3>
+							<!--
+								Znacznik przy każdej potrzebie: pokryta czy nie. Rek. 8.2.d ma być
+								widoczna na jednej liście, a nie składana z dwóch akapitów.
+							-->
 							<ul class="reco__needs" data-testid="apk-needs">
-								@for (need of needs(); track need.coverCode) {
-									<li>{{ need.text }}</li>
+								@for (row of needRows(); track row.coverCode) {
+									<li
+										class="reco__need"
+										[class.reco__need--missing]="!row.covered"
+										[attr.data-covered]="row.covered"
+									>
+										<span class="reco__need__mark" aria-hidden="true">{{
+											row.covered ? copy().needCovered : copy().needMissing
+										}}</span>
+										<span>{{ row.text }}</span>
+									</li>
 								}
 							</ul>
 							@if (missingLine(); as missing) {

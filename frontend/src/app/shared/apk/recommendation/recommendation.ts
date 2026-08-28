@@ -40,6 +40,17 @@ export class ApkRecommendation {
 	/** Nazwy pokryć, których w propozycji brakuje. Gospodarz tłumaczy kody na nazwy. */
 	readonly missingNames = input<readonly string[]>([]);
 
+	/**
+	 * Składka proponowanego zakresu, **już sformatowana**.
+	 *
+	 * ⛔ Gotowy łańcuch, a nie liczba: każde demo liczy co innego (rocznie, miesięcznie, za
+	 * pracownika, za okres) i formatuje w innej lokalizacji — komponent nie ma jak tego wiedzieć,
+	 * a zgadywanie skończyłoby się „57" tam, gdzie ma być „57,00 zł miesięcznie".
+	 *
+	 * `null` znaczy „jeszcze nie wyliczona" i wtedy blok po prostu nie powstaje.
+	 */
+	readonly premium = input<string | null>(null);
+
 	readonly needs = computed<readonly ApkNeedDto[]>(() => this.recommendation()?.needs ?? []);
 
 	/** Ostrzeżenia przychodzą już posortowane wagą malejąco — sortowania po stronie klienta brak. */
@@ -72,6 +83,22 @@ export class ApkRecommendation {
 	readonly missingLine = computed(() => {
 		const names = this.missingNames();
 		return names.length === 0 ? null : fill(this.copy().missing, names.join(', '));
+	});
+
+	/**
+	 * Potrzeby ze znacznikiem, czy propozycja je pokrywa.
+	 *
+	 * ⛔ To jest rek. 8.2.d pokazana wprost: nie „oto czego potrzebujesz" i osobno „oto co
+	 * proponujemy", tylko jedno przy drugim. Braki i tak jadą już w `missingCovers` — tutaj
+	 * wracają na tę samą listę, żeby dało się przejechać wzrokiem, co zostaje niezaspokojone.
+	 */
+	readonly needRows = computed(() => {
+		const missing = new Set(this.recommendation()?.missingCovers ?? []);
+		return this.needs().map((need) => ({
+			text: need.text,
+			coverCode: need.coverCode,
+			covered: !missing.has(need.coverCode),
+		}));
 	});
 }
 

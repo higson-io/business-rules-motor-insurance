@@ -167,6 +167,20 @@ przestaje być analizą potrzeb — o tę odwrotność chodzi w rek. 8 KNF.
   wypisania, dlatego ten sam plik renderuje propozycję Z wariantem (majątek, życie grupowe)
   i BEZ wariantu (życie indywidualne, gdzie propozycją jest zestaw umów dodatkowych,
   a `variantCode` jest pusty **celowo**).
+- ⛔ **Składka proponowanego zakresu stoi na ekranie rekomendacji i to NIE jest odstępstwo od
+  rek. 8.** Rekomendacja 8.2.d żąda doboru „z uwzględnieniem akceptowalnej dla klienta wartości
+  składki", a uzasadnienie i tak cytuje kwoty („Składka 61 zł miesięcznie przekracza podany budżet
+  45 zł") — propozycja bez ceny była w tej części niekompletna, a ekran świecił pustką w reżimie
+  ustawowym, gdzie uzasadnienia nie ma.
+
+  Granica przebiega gdzie indziej: **jedna liczba dotycząca jednej propozycji**, a nie zestawienie
+  wariantów. Porównanie cen zostaje w kroku trzecim. Ekran rekomendacji, który otwiera się tabelą
+  cen, przestaje być analizą potrzeb i staje się dokładnie tym, czemu rek. 8 miała zapobiec.
+
+  Liczba jest podawana jako **gotowy łańcuch**: każde demo liczy co innego (rocznie, miesięcznie,
+  za pracownika, za okres) i formatuje w innej lokalizacji, a komponent nie ma jak tego wiedzieć.
+- Potrzeby niosą znacznik pokrycia (`✓` / `—`) zamiast punktora — 8.2.d ma być widoczna na jednej
+  liście, a nie składana przez czytelnika z dwóch akapitów.
 - Wygląd paska wzięty z `step-bar` z `higson-agent-portal-demo-frontend`, z jedną świadomą
   różnicą: tamten jest napędzany routerem i nieklikalny, bo kolejność wymusza proces
   sprzedaży. Tutaj nic jej nie wymusza.

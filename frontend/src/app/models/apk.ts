@@ -135,4 +135,24 @@ export interface ApkRecommendationCopy {
 	readonly justificationTitle: string;
 	readonly warningsTitle: string;
 	readonly empty: string;
+
+	/**
+	 * Podpis nad składką proponowanego zakresu, np. „Składka miesięczna".
+	 *
+	 * ⛔ Składka NALEŻY do rekomendacji, a nie tylko do ekranu ceny. Rek. 8.2.d żąda doboru
+	 * „z uwzględnieniem akceptowalnej dla klienta wartości składki" — propozycja, która nie mówi,
+	 * ile kosztuje, jest w tej części niekompletna, a uzasadnienie i tak już cytuje kwoty
+	 * („Składka 61 zł miesięcznie przekracza podany budżet 45 zł").
+	 *
+	 * ⚠️ To JEDNA liczba, dotycząca jednej propozycji — nie tabela porównawcza. Porównanie
+	 * wariantów zostaje w kroku trzecim: ekran rekomendacji, który zaczyna od zestawienia cen,
+	 * przestaje być analizą potrzeb i staje się tym, czemu rek. 8 miała zapobiec.
+	 */
+	readonly premiumLabel: string;
+	/** Doprecyzowanie okresu pod kwotą, np. „za wybrany okres ochrony". */
+	readonly premiumNote: string;
+	/** Znacznik przy potrzebie, którą propozycja pokrywa. */
+	readonly needCovered: string;
+	/** Znacznik przy potrzebie, której propozycja nie pokrywa. */
+	readonly needMissing: string;
 }

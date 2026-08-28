@@ -22,6 +22,10 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	justificationTitle: 'Why this proposal',
 	warningsTitle: 'Before you decide',
 	empty: 'Answer the questions — the proposal will appear here.',
+	premiumLabel: 'Premium',
+	premiumNote: 'for the twelve-month term',
+	needCovered: '✓',
+	needMissing: '—',
 };
 
 /**
@@ -96,6 +100,26 @@ export class Moto {
 			}
 		}
 		return (quote.apkRecommendation?.missingCovers ?? []).map((code) => names.get(code) ?? code);
+	});
+
+	/**
+	 * Składka proponowanego wariantu — rek. 8.2.d: dobór ma uwzględniać akceptowalną dla klienta
+	 * wartość składki, więc propozycja bez ceny jest w tej części niekompletna.
+	 *
+	 * ⚠️ Formatowanie `en-US`, tak jak w tabeli porównawczej — ND-2 przypina angielskie etykiety
+	 * tego demo, a goldeny przypinają tamto formatowanie. Dwie konwencje na jednym ekranie
+	 * byłyby gorsze niż jedna nie-polska.
+	 */
+	readonly premium = computed(() => {
+		const quote = this.loaded();
+		const code = quote?.apkRecommendation?.variantCode;
+		const option = code ? quote?.options.find((o) => o.code === code) : undefined;
+		return option ? this.money.format(option.premium) + ' zł' : null;
+	});
+
+	private readonly money = new Intl.NumberFormat('en-US', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
 	});
 
 	goTo(step: string): void {

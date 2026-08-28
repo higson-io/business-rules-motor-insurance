@@ -23,6 +23,10 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	justificationTitle: 'Dlaczego ta propozycja',
 	warningsTitle: 'Zanim zdecydujesz',
 	empty: 'Odpowiedz na pytania ankiety — propozycja pojawi się tutaj.',
+	premiumLabel: 'Składka miesięczna',
+	premiumNote: 'za jedną osobę',
+	needCovered: '✓',
+	needMissing: '—',
 };
 
 /** The two ways life cover is bought in Poland, and they are genuinely different products. */
@@ -110,6 +114,30 @@ export class Life {
 			names.set(rider.code, rider.name);
 		}
 		return (quote.apkRecommendation?.missingCovers ?? []).map((code) => names.get(code) ?? code);
+	});
+
+	/**
+	 * Składka proponowanego zakresu — rek. 8.2.d.
+	 *
+	 * ⛔ Obie ścieżki podają liczbę ZA JEDNĄ OSOBĘ i to nie jest uproszczenie. W ochronie
+	 * indywidualnej jest tylko jedna osoba, a w programie grupowym pracownik płaci właśnie tyle;
+	 * koszt całego programu należy do ekranu składki, bo jest liczbą pracodawcy, nie tej analizy.
+	 */
+	readonly premium = computed(() => {
+		const quote = this.loaded();
+		if (quote === null) {
+			return null;
+		}
+		const code = quote.apkRecommendation?.variantCode;
+		const amount = code
+			? (quote.variants.find((variant) => variant.code === code)?.perEmployee ?? null)
+			: quote.premiumMonthly;
+		return amount === null ? null : this.money.format(amount) + ' zł';
+	});
+
+	private readonly money = new Intl.NumberFormat('pl-PL', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
 	});
 
 	goTo(step: string): void {

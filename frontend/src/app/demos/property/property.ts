@@ -22,6 +22,10 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	justificationTitle: 'Dlaczego ta propozycja',
 	warningsTitle: 'Zanim zdecydujesz',
 	empty: 'Odpowiedz na pytania ankiety — propozycja pojawi się tutaj.',
+	premiumLabel: 'Składka',
+	premiumNote: 'za wybrany okres ochrony',
+	needCovered: '✓',
+	needMissing: '—',
 };
 
 /**
@@ -61,6 +65,19 @@ export class Property {
 		{ key: 'reco', label: 'Rekomendacja' },
 		{ key: 'price', label: 'Składka' },
 	];
+
+	/**
+	 * Składka proponowanego wariantu — rek. 8.2.d, patrz `ApkRecommendationCopy.premiumLabel`.
+	 *
+	 * ⚠️ `proposedPremium`, nie `premium`: `premium(value)` to metoda formatująca, używana przez
+	 * podsumowanie po prawej. Dwie różne rzeczy pod jedną nazwą to zaproszenie do pomyłki.
+	 */
+	readonly proposedPremium = computed(() => {
+		const quote = this.loaded();
+		const code = quote?.recommendation.variantCode;
+		const variant = code ? quote?.variants.find((v) => v.code === code) : undefined;
+		return variant?.annualPremium == null ? null : this.plnFormat.format(variant.annualPremium) + ' zł';
+	});
 
 	goTo(step: string): void {
 		this.step.set(step);

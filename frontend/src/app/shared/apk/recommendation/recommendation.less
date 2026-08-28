@@ -73,10 +73,50 @@
 .reco__head {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 4px 12px;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px 24px;
 	padding-bottom: 12px;
 	border-bottom: 1px solid @color-border-block;
+}
+
+.reco__head__text {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 12px;
+}
+
+// Składka wyrównana do prawej krawędzi nagłówka: czyta się jako cena TEJ propozycji, a nie jako
+// kolejny wiersz opisu. `tabular-nums`, bo liczba przeskakuje przy każdej zmianie odpowiedzi
+// i bez tego drga w poziomie.
+.reco__premium {
+	text-align: right;
+}
+
+.reco__premium__label {
+	margin: 0;
+	font-size: @font-xs;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.reco__premium__value {
+	margin: 2px 0 0;
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+	color: @color-text;
+}
+
+.reco__premium__note {
+	margin: 2px 0 0;
+	font-size: @font-xs;
+	color: @color-text-muted;
 }
 
 // Tytuł panelu — turkus `--primary-150`, tak jak `.panel-title` w portalu.
@@ -120,12 +160,42 @@
 	letter-spacing: 0.05em;
 }
 
-.reco__needs,
 .reco__justification {
 	margin: 0;
 	padding-left: 18px;
 	font-size: @font-md;
 	line-height: 1.5;
+}
+
+// Lista potrzeb rezygnuje z punktora na rzecz znacznika pokrycia — punktor i „✓" obok siebie
+// mówiłyby to samo dwa razy.
+.reco__needs {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: @font-md;
+	line-height: 1.5;
+}
+
+.reco__need {
+	display: grid;
+	grid-template-columns: 20px minmax(0, 1fr);
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.reco__need__mark {
+	font-weight: 700;
+	color: @color-success;
+}
+
+// Potrzeba niepokryta zostaje czytelna, ale przestaje wyglądać na załatwioną.
+.reco__need--missing {
+	color: @color-text-muted;
+
+	.reco__need__mark {
+		color: @color-warn;
+	}
 }
 
 .reco__justification li {
