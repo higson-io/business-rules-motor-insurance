@@ -316,7 +316,11 @@ public class Property {
 			applyCovers(quote, variant);
 
 			Map<String, Object> result = engine.flow(FLOW_QUOTE, ctx).getResult();
-			boolean available = "YES".equals(asString(result.get("available")));
+			// ⛔ Boolean, nie „YES". Flow czyta dostępność TABELĄ WPROST, odkąd zniknęła nakładka
+			// `variant.isAvailable`, która nie robiła nic poza odczytem tej samej tabeli i
+			// przepisaniem wyniku na łańcuch. Wartość wraca jako `true`/`false` — porównanie
+			// z „YES" dawałoby ciche `false` dla każdego wariantu.
+			boolean available = Boolean.parseBoolean(asString(result.get("available")));
 			variant.setAvailable(available);
 
 			if (available) {
