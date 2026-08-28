@@ -63,4 +63,14 @@ export class PropertyService {
 	updateVariant(variantCode: string): Observable<void> {
 		return this.http.put<void>('property/variant', variantCode);
 	}
+
+	/**
+	 * Wystawienie polisy albo cofnięcie do oferty.
+	 *
+	 * ⛔ `boolean`, nie łańcuch — endpoint bierze `@RequestBody boolean`, a nie tekst, więc tu
+	 * NIE stosuje się reguły o surowych stringach z komentarza wyżej.
+	 */
+	updatePolicyIssued(issued: boolean): Observable<void> {
+		return this.http.put<void>('property/policy/issued', issued);
+	}
 }

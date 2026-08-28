@@ -105,7 +105,7 @@ mury/elementy stałe jako **trzy niezależne parametry** (a nie jedna decyzja), 
 z metrażu i stawki zł/m², strefa powodziowa jako **przełącznik dostępności** obok strefy
 kradzieżowej jako czynnika, pytanie jako element domeny, wersjonowanie obejmujące **oba** wymiary
 naraz, odmowa odpowiedzi jako trzeci stan, przekroczony budżet z **nazwaną luką**, franszyza
-w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie, a **§14 — zdjęcie analizy potrzeb z Groovy'ego (2026-08-27)**: siedem funkcji i flow `apk.recommend` usunięte, wszystkie tabele nietknięte.
+w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie, **§14 — zdjęcie analizy potrzeb z Groovy'ego (2026-08-27)**: siedem funkcji i flow `apk.recommend` usunięte, wszystkie tabele nietknięte, a **§15 — domknięcie procesu ofertą i polisą (2026-08-28)**: czwarty krok tylko w tym profilu, nowa tabela `demo.property.offer.terms` **kluczowana kodem reżimu**, dzięki czemu wersjonuje się bez własnego progu — po 1 lipca 2027 oferta niesie załącznik z analizą potrzeb (rek. 8.7). Numer dokumentu celowo NIE jest regułą; wystawienie polisy zamraża wariant i składkę.
 ⚠️ Wszystkie stawki są **demonstracyjne** (W-2); jedyne liczby przepisane z OWU to limity z PZU §46.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added without `CONTEXT_PATH` and `VALUE_TYPE` will not

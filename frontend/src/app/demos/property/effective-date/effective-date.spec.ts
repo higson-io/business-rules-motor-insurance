@@ -91,6 +91,19 @@ function quote(
 			needs: [],
 			warnings: [],
 		},
+		offer: {
+			number: null,
+			issuedOn: null,
+			validUntil: null,
+			paymentDueOn: null,
+			statement: null,
+			needsAnalysisAttached: false,
+			policyNumber: null,
+			coverFrom: null,
+			coverTo: null,
+			variantCode: null,
+			premium: null,
+		},
 		selectedVariant: null,
 	};
 }

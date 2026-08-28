@@ -1,6 +1,7 @@
 package pl.decerto.higson.demo.property.example;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
 import pl.decerto.higson.demo.apk.ApkAnalysis;
 import pl.decerto.higson.demo.apk.Need;
+import pl.decerto.higson.demo.property.domain.Offer;
+import pl.decerto.higson.demo.property.service.DocumentNumbers;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
@@ -67,6 +70,10 @@ public class Property {
 	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
 	private static final String PARAM_FLOOD_AVAILABILITY = "demo.property.flood.availability";
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
+	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
+	private static final String PARAM_PERIOD = "demo.property.factor.period";
+
+	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
 
 	private static final String OUTCOME_ABSENT = "BUDGET_ABSENT";
 	private static final String OUTCOME_FIT = "BUDGET_FIT";
@@ -78,9 +85,11 @@ public class Property {
 	private static final String PATH_SUM_SUGGESTED = "quote.sums.suggestedBuilding";
 
 	private final HigsonEngine engine;
+	private final DocumentNumbers numbers;
 
-	public Property(HigsonEngine engine) {
+	public Property(HigsonEngine engine, DocumentNumbers numbers) {
 		this.engine = engine;
+		this.numbers = numbers;
 	}
 
 	/**
@@ -109,6 +118,7 @@ public class Property {
 			loadCovers(quote);
 			priceVariants(quote);
 			recommend(quote);
+			prepareOffer(quote);
 		} finally {
 			// Effective date jest stanem silnika, nie żądania — niewyczyszczony wyciekłby na
 			// kolejną wycenę w tym samym wątku.
@@ -446,6 +456,84 @@ public class Property {
 		}
 		reasons.add(new ApkAnalysis.Reason("LEGAL_BASIS", quote.getRegime().getLegalBasis()));
 		return reasons;
+	}
+
+	/**
+	 * Warunki oferty: ważność, termin płatności, treść oświadczenia i to, czy do oferty dołącza
+	 * się dokument analizy potrzeb.
+	 *
+	 * ⛔ Wszystkie cztery przychodzą z `demo.property.offer.terms`, kluczowanej KODEM REŻIMU.
+	 * Reżim jest wersjonowany regionem PROPERTY, więc przesunięcie daty polisy przez 1 lipca 2027
+	 * przestawia treść oferty — bez wersjonowania tabeli ofertowej i bez drugiego progu w kodzie.
+	 *
+	 * ⚠️ Numer i daty przelicza się przy każdej wycenie, ale TYLKO dopóki polisa nie jest
+	 * wystawiona: po wystawieniu dokument jest już wydany i zmiana odpowiedzi nie ma prawa
+	 * przestawić mu numeru ani okresu ochrony.
+	 */
+	private void prepareOffer(PropertyQuote quote) {
+		Offer offer = quote.getOffer();
+		if (offer.isIssued()) {
+			return;
+		}
+
+		ParamValue terms = engine.get(PARAM_OFFER_TERMS, new PropertyContext(quote));
+		LocalDate today = LocalDate.now();
+
+		offer.setNumber(offer.getNumber() == null ? numbers.nextOffer(today) : offer.getNumber());
+		offer.setIssuedOn(today);
+		offer.setValidUntil(today.plusDays(terms.getInteger("validityDays")));
+		offer.setPaymentDueOn(today.plusDays(terms.getInteger("paymentDays")));
+		offer.setStatement(terms.getString("statement"));
+		offer.setNeedsAnalysisAttached(Boolean.TRUE.equals(terms.getBoolean("needsAnalysisAttached")));
+	}
+
+	/**
+	 * Akceptacja oferty: ten sam dokument dostaje numer polisy i okres ochrony.
+	 *
+	 * ⛔ Długość okresu bierze się z `demo.property.factor.period`, czyli z tej samej tabeli, która
+	 * wycenia czynnik okresu i liczbę rat. Wyliczanie go drugi raz w Javie dałoby dwie prawdy
+	 * o tym, jak długo trwa ochrona — i rozjechałyby się przy pierwszej zmianie oferty.
+	 */
+	public void issuePolicy(PropertyQuote quote) {
+		Offer offer = quote.getOffer();
+		if (offer.isIssued() || offer.getNumber() == null) {
+			return;
+		}
+		LocalDate from = quote.getPolicy().getStartDate();
+		offer.setPolicyNumber(numbers.policyFor(offer.getNumber()));
+		offer.setCoverFrom(from);
+		offer.setCoverTo(from.plusMonths(periodMonths(quote)).minusDays(1));
+
+		// Zamrożenie: od tej chwili dokument niesie SWOJE liczby, a nie liczby żywej wyceny.
+		String code = quote.getSelectedVariant() == null
+			? quote.getRecommendation().getVariantCode()
+			: quote.getSelectedVariant();
+		offer.setVariantCode(code);
+		for (Variant variant : quote.getVariants()) {
+			if (variant.getCode().equals(code)) {
+				offer.setPremium(variant.getAnnualPremium());
+			}
+		}
+	}
+
+	/** Cofnięcie do stanu oferty — demo musi dać się przejść drugi raz, a warunki przeliczyć. */
+	public void withdrawPolicy(PropertyQuote quote) {
+		Offer offer = quote.getOffer();
+		offer.setPolicyNumber(null);
+		offer.setCoverFrom(null);
+		offer.setCoverTo(null);
+		offer.setVariantCode(null);
+		offer.setPremium(null);
+	}
+
+	private int periodMonths(PropertyQuote quote) {
+		Object answered = new PropertyContext(quote).get(PATH_PERIOD_MONTHS);
+		if (answered instanceof Number) {
+			return ((Number) answered).intValue();
+		}
+		// Tabela okresu ma wiersz domyślny, więc odpowiedź bez wartości nadal daje sensowny okres.
+		Integer months = engine.get(PARAM_PERIOD, new PropertyContext(quote)).getInteger("installments");
+		return months == null ? 12 : months * 12;
 	}
 
 	/** Nazwa elementu domeny. Kod, którego nie ma w drzewie, zostaje sobą — nie wywala zdania. */

@@ -28,7 +28,16 @@ public class PropertyQuoteDto {
 	private List<PropertyCoverDto> covers;
 	private List<PropertyVariantDto> variants;
 	private RecommendationDto recommendation;
+	private PropertyOfferDto offer;
 	private String selectedVariant;
+
+	public PropertyOfferDto getOffer() {
+		return offer;
+	}
+
+	public void setOffer(PropertyOfferDto offer) {
+		this.offer = offer;
+	}
 
 	public LocalDate getStartDate() {
 		return startDate;

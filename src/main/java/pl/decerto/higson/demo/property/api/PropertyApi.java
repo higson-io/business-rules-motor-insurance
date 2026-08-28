@@ -115,6 +115,24 @@ public class PropertyApi {
 		quoteService.getQuote().setBuildingSumOverridden(true);
 	}
 
+	/**
+	 * Akceptacja oferty albo cofnięcie do niej.
+	 *
+	 * ⛔ Jeden `PUT` jednego pola, tak jak każda inna mutacja w tym API — a nie `POST /policy`.
+	 * Wystawienie polisy nie tworzy tu nowego zasobu: to ta sama oferta, która zmienia stan.
+	 *
+	 * Cofnięcie istnieje, bo demo musi dać się przejść drugi raz bez restartu przeglądarki.
+	 */
+	@PutMapping("/policy/issued")
+	public void setPolicyIssued(@RequestBody boolean issued) {
+		PropertyQuote quote = quoteService.getQuote();
+		if (issued) {
+			property.issuePolicy(quote);
+		} else {
+			property.withdrawPolicy(quote);
+		}
+	}
+
 	/** ⛔ Wybór człowieka. Od tego momentu rekomendacja go nie nadpisuje — patrz `variantChosen`. */
 	@PutMapping("/variant")
 	public void setVariant(@RequestBody String variantCode) {

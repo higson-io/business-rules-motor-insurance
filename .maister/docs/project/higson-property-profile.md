@@ -1898,3 +1898,69 @@ Obie wersje regionu na działającej aplikacji, przed i po:
 | 2028-01-15 | Rekomendacje KNF | 16 | 5 zdań | COMPLETE, 4 z 4 |
 
 Wersjonowanie działa tak samo jak przed zmianą — bo zmiana go nie dotyczyła.
+
+---
+
+## 15. Domknięcie procesu: oferta i polisa (2026-08-28)
+
+Demo pokazywało analizę, rekomendację i składkę, po czym urywało się w miejscu, w którym
+w prawdziwej sprzedaży coś się dopiero zaczyna. Czwarty krok — **tylko w tym profilu** —
+domyka proces ofertą, którą da się zaakceptować.
+
+### 15.1 Nowa tabela: `demo.property.offer.terms`
+
+| code | validityDays | paymentDays | needsAnalysisAttached | statement |
+|---|---|---|---|---|
+| `*` | 30 | 14 | false | Potwierdzam otrzymanie OWU i akceptuję warunki oferty. |
+| `KNF_190_2026` | 30 | 14 | **true** | Potwierdzam otrzymanie OWU **oraz dokumentu analizy potrzeb wraz z pisemnym uzasadnieniem rekomendacji** i akceptuję warunki oferty. |
+
+⛔ **Kluczowana KODEM REŻIMU, nie datą — i to jest cała konstrukcja.** Kod przychodzi
+z `demo.property.apk.regime`, które JEST wersjonowane regionem PROPERTY, więc ta tabela dostaje
+wersjonowanie za darmo. Przesunięcie daty polisy przez 1 lipca 2027 dokłada do oferty **załącznik
+z analizą potrzeb** (rek. 8.7) i zmienia oświadczenie klienta — bez wersjonowania tabeli ofertowej
+i **bez drugiego progu**, który rozjechałby się przy pierwszej zmianie terminu z uchwały.
+
+To ten sam wzorzec „reguła bazowa × reguła modyfikująca", co przy `demo.life.apk.cover.equivalent`:
+nowy wymiar dokłada się tabelą, która czyta wynik poprzedniej.
+
+⚠️ Liczby dni są **demonstracyjne** (W-2). Jedyne, co niesie treść regulacyjną, to
+`needsAnalysisAttached` i `statement`.
+
+### 15.2 Czego świadomie NIE ma w regułach
+
+**Numeru dokumentu.** `OF/2026/000001` i `POL/2026/000001` generuje `DocumentNumbers` w Javie.
+Numer nie zależy od odpowiedzi klienta, nie zmienia ceny i nie ma wersji datą — jest
+identyfikatorem, a nie regułą. Wrzucenie go do tabeli rozmyłoby granicę, którą to demo pokazuje:
+w regułach siedzi to, co rozstrzyga o produkcie, a nie wszystko, co da się skonfigurować.
+
+**Długości okresu ochrony** — bierze się z `demo.property.factor.period`, czyli z tej samej tabeli,
+która wycenia czynnik okresu. Drugie wyliczenie w Javie dałoby dwie prawdy o tym, jak długo trwa
+ochrona.
+
+### 15.3 Oferta i polisa to jeden dokument
+
+`Offer` ma `policyNumber == null` dopóki jest ofertą. Osobnego pola stanu nie ma i nie powinno
+być — rozbicie na dwie klasy kusiłoby do przepisywania wszystkiego z jednej do drugiej.
+
+⛔ **Wystawienie ZAMRAŻA wariant i składkę.** Bez tego wystarczyło wrócić do ankiety, zmienić
+metraż i polisa cicho pokazywała inną składkę niż ta, na którą klient się zgodził. Zmierzone:
+po zmianie metrażu z 60 na 120 m² żywa wycena idzie z 2912,65 zł na 5753,31 zł, a dokument
+zostaje przy 2912,65 zł. Żeby zmienić ochronę, trzeba dokument cofnąć — i po to jest „Wróć
+do oferty", które przy okazji pozwala przejść demo drugi raz bez restartu.
+
+### 15.4 Zweryfikowane na działającej aplikacji
+
+| Data polisy | Reżim | Załącznik APK | Oświadczenie | Wariant |
+|---|---|---|---|---|
+| 2026-08-28 | minimum ustawowe | brak | krótkie | Standardowy, 891,50 zł |
+| 2028-01-15 | Rekomendacje KNF | **jest** | z dokumentem APK | Pełny, 2912,65 zł |
+
+Wystawienie polisy: `POL/2026/000001`, ochrona 15.01.2028 — 14.01.2029 (12 miesięcy z tabeli
+okresu), cofnięcie wraca do oferty.
+
+### 15.5 Dlaczego tylko majątek
+
+Pozostałe dwa dema zatrzymują się na składce świadomie. To samo domknięcie powtórzone trzy razy
+nie dodałoby ani jednej nowej rzeczy do pokazania, a kosztowałoby trzy komplety ekranów do
+utrzymania. Majątek jest właściwym miejscem, bo to jego osią jest APK — a rek. 8.7 mówi
+o **dokumencie wydawanym klientowi**, więc to tutaj widać, po co ta analiza w ogóle powstaje.

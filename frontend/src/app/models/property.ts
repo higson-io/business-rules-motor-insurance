@@ -70,6 +70,29 @@ export interface PropertyVariantDto {
 // Potrzeby, ostrzeżenia i rekomendacja majątkowa NIE mają już własnych typów: to jest ta sama
 // analiza co w pozostałych dwóch demach, więc jedzie tym samym `ApkRecommendationDto`.
 
+export interface PropertyOfferDto {
+	readonly number: string | null;
+	readonly issuedOn: string | null;
+	readonly validUntil: string | null;
+	readonly paymentDueOn: string | null;
+	readonly statement: string | null;
+	/** Rek. 8.7 — czy oferta niesie dokument analizy potrzeb. Z reguł, zmienia się z reżimem. */
+	readonly needsAnalysisAttached: boolean;
+
+	readonly policyNumber: string | null;
+	readonly coverFrom: string | null;
+	readonly coverTo: string | null;
+
+	/**
+	 * Wariant i składka zamrożone przy wystawieniu — puste, dopóki to oferta.
+	 *
+	 * ⛔ Wydany dokument niesie SWOJE liczby. Bez tego wystarczyło wrócić do ankiety i zmienić
+	 * metraż, żeby polisa cicho pokazała inną składkę niż ta, na którą klient się zgodził.
+	 */
+	readonly variantCode: string | null;
+	readonly premium: number | null;
+}
+
 /** The APK regime in force for the chosen policy date. Versioned by the region, not by the clock. */
 export interface PropertyRegimeDto {
 	readonly code: string | null;
@@ -102,5 +125,13 @@ export interface PropertyQuoteDto {
 	readonly covers: readonly PropertyCoverDto[];
 	readonly variants: readonly PropertyVariantDto[];
 	readonly recommendation: ApkRecommendationDto;
+
+	/**
+	 * Oferta, a po akceptacji — polisa.
+	 *
+	 * ⛔ `policyNumber` puste znaczy „jeszcze oferta". Osobnego pola stanu nie ma i nie powinno
+	 * być: to jeden dokument, który zmienia stan, a nie dwa byty do zsynchronizowania.
+	 */
+	readonly offer: PropertyOfferDto;
 	readonly selectedVariant: string | null;
 }

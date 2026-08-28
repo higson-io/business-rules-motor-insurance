@@ -43,6 +43,9 @@ public class PropertyQuote {
 	private List<Warning> warnings = new ArrayList<>();
 	private Recommendation recommendation = new Recommendation();
 
+	/** Oferta i — po akceptacji — polisa. Patrz `Offer`: jeden obiekt na oba stany. */
+	private Offer offer = new Offer();
+
 	private BigDecimal riskFactor;
 	private Integer buildingAge;
 	private String selectedVariant;
@@ -132,6 +135,14 @@ public class PropertyQuote {
 
 	public void setWarnings(List<Warning> warnings) {
 		this.warnings = warnings;
+	}
+
+	public Offer getOffer() {
+		return offer;
+	}
+
+	public void setOffer(Offer offer) {
+		this.offer = offer;
 	}
 
 	public Recommendation getRecommendation() {

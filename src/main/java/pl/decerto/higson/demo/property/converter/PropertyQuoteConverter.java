@@ -9,12 +9,14 @@ import org.springframework.stereotype.Component;
 import pl.decerto.higson.demo.property.api.dto.PropertyCoverDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuestionDto;
 import pl.decerto.higson.demo.apk.api.RecommendationDto;
+import pl.decerto.higson.demo.property.api.dto.PropertyOfferDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
 import pl.decerto.higson.demo.apk.Need;
+import pl.decerto.higson.demo.property.domain.Offer;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.property.domain.Variant;
@@ -48,8 +50,25 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		// Trzy listy jadą razem, bo razem są jedną analizą — patrz RecommendationDto.
 		dto.setRecommendation(RecommendationDto.of(
 			quote.getRecommendation(), quote.getNeeds(), quote.getWarnings()));
+		dto.setOffer(convertOffer(quote.getOffer()));
 		dto.setSelectedVariant(quote.getSelectedVariant());
 
+		return dto;
+	}
+
+	private PropertyOfferDto convertOffer(Offer offer) {
+		PropertyOfferDto dto = new PropertyOfferDto();
+		dto.setNumber(offer.getNumber());
+		dto.setIssuedOn(offer.getIssuedOn());
+		dto.setValidUntil(offer.getValidUntil());
+		dto.setPaymentDueOn(offer.getPaymentDueOn());
+		dto.setStatement(offer.getStatement());
+		dto.setNeedsAnalysisAttached(offer.isNeedsAnalysisAttached());
+		dto.setPolicyNumber(offer.getPolicyNumber());
+		dto.setCoverFrom(offer.getCoverFrom());
+		dto.setCoverTo(offer.getCoverTo());
+		dto.setVariantCode(offer.getVariantCode());
+		dto.setPremium(offer.getPremium());
 		return dto;
 	}
 

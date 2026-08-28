@@ -1,0 +1,128 @@
+<!--
+	Dokument, a nie kolejny panel z wynikami. Układ celowo przypomina papier: nagłówek z numerem
+	i datami, potem przedmiot i zakres, na końcu oświadczenie i podpis.
+
+	⛔ Wszystko, co mówi o warunkach — ważność, termin płatności, treść oświadczenia i to, czy
+	dołączony jest dokument analizy potrzeb — przychodzi z `demo.property.offer.terms`. Ekran nie
+	zna ani jednej z tych liczb.
+-->
+@if (offer(); as offer) {
+	<article class="offer" [class.offer--issued]="issued()" data-testid="property-offer">
+		<header class="offer__head">
+			<div>
+				<p class="offer__kind">{{ issued() ? 'Polisa' : 'Oferta' }}</p>
+				<p class="offer__number" data-testid="offer-number">
+					{{ issued() ? offer.policyNumber : offer.number }}
+				</p>
+			</div>
+
+			@if (issued()) {
+				<div class="offer__stamp" data-testid="offer-stamp">
+					<p class="offer__stamp__label">Ochrona</p>
+					<p class="offer__stamp__value">
+						{{ date(offer.coverFrom) }} — {{ date(offer.coverTo) }}
+					</p>
+				</div>
+			} @else {
+				<dl class="offer__dates">
+					<dt>Wystawiona</dt>
+					<dd>{{ date(offer.issuedOn) }}</dd>
+					<dt>Ważna do</dt>
+					<dd data-testid="offer-valid-until">{{ date(offer.validUntil) }}</dd>
+					<dt>Płatność do</dt>
+					<dd>{{ date(offer.paymentDueOn) }}</dd>
+				</dl>
+			}
+		</header>
+
+		@if (variant(); as variant) {
+			<section class="offer__block">
+				<h3 class="offer__block__title">Zakres ochrony — wariant {{ variant.name }}</h3>
+
+				<table class="offer__covers">
+					<tbody>
+						@for (cover of covers(); track cover.code) {
+							<tr>
+								<th scope="row">
+									{{ cover.name }}
+									@if (cover.capLabel) {
+										<span class="offer__covers__cap">{{ cover.capLabel }}</span>
+									}
+								</th>
+								<td>{{ money(cover.amount) }}</td>
+							</tr>
+						}
+						<tr class="offer__covers__deductible">
+							<th scope="row">Franszyza redukcyjna</th>
+							<td>{{ money(deductible()) }}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="offer__premium">
+					<p class="offer__premium__label">Składka za okres ochrony</p>
+					<p class="offer__premium__value" data-testid="offer-premium">
+						{{ premium(documentPremium()) }}
+					</p>
+					@if (instalment(); as instalment) {
+						<p class="offer__premium__note">albo w ratach po {{ premium(instalment) }}</p>
+					}
+				</div>
+			</section>
+		}
+
+		<!--
+			⛔ Rek. 8.7 — dokument analizy potrzeb jest ZAŁĄCZNIKIEM do oferty, a nie osobnym
+			ekranem, i pojawia się tylko wtedy, gdy tak mówią reguły. W reżimie ustawowym go nie
+			ma i to jest ta sama demonstracja, co brak uzasadnienia na ekranie rekomendacji.
+		-->
+		@if (offer.needsAnalysisAttached) {
+			<section class="offer__block" data-testid="offer-apk">
+				<h3 class="offer__block__title">Załącznik — analiza potrzeb klienta</h3>
+
+				<div class="offer__apk">
+					<div>
+						<h4 class="offer__apk__title">Zgłoszone potrzeby</h4>
+						<ul class="offer__apk__list">
+							@for (need of needs(); track need.coverCode) {
+								<li>{{ need.text }}</li>
+							}
+						</ul>
+					</div>
+
+					<div>
+						<h4 class="offer__apk__title">Uzasadnienie rekomendacji</h4>
+						<ol class="offer__apk__list">
+							@for (line of justification(); track line) {
+								<li>{{ line }}</li>
+							}
+						</ol>
+					</div>
+				</div>
+			</section>
+		}
+
+		<footer class="offer__foot">
+			@if (issued()) {
+				<p class="offer__issued" data-testid="offer-issued">
+					Polisa wystawiona. Ochrona obowiązuje od {{ date(offer.coverFrom) }}.
+				</p>
+				<button type="button" class="step-nav__back" (click)="withdraw()">
+					← Wróć do oferty
+				</button>
+			} @else {
+				@if (offer.statement) {
+					<p class="offer__statement" data-testid="offer-statement">{{ offer.statement }}</p>
+				}
+				<button
+					type="button"
+					class="step-nav__next"
+					data-testid="offer-accept"
+					(click)="issue()"
+				>
+					Akceptuję i wystawiam polisę →
+				</button>
+			}
+		</footer>
+	</article>
+}

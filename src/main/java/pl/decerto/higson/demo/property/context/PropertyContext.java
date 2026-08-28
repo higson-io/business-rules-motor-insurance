@@ -82,6 +82,12 @@ public class PropertyContext extends HigsonContext {
 		if ("variant.code".equals(path)) {
 			return variantCode;
 		}
+		// Kod reżimu APK — tym kluczują się warunki oferty. Reżim jest wersjonowany regionem,
+		// więc tabela ofertowa dostaje wersjonowanie za darmo, bez drugiego progu.
+		if ("regime.code".equals(path)) {
+			return quote.getRegime().getCode();
+		}
+
 		if ("reason.code".equals(path)) {
 			return reasonCode;
 		}

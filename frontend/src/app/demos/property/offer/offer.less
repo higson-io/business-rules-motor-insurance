@@ -1,0 +1,229 @@
+@import '_variables';
+
+:host {
+	display: block;
+}
+
+// Panel portalu, jak każdy inny na tych ekranach. Wystawiona polisa dostaje miętową krechę
+// u góry — ten sam kolor, którym pasek kroków oznacza krok ukończony, więc znaczenie jest już
+// na ekranie nauczone.
+.offer {
+	padding: @space-panel;
+	background: @color-paper;
+	border-radius: @radius-panel;
+	box-shadow: @shadow-panel;
+}
+
+.offer--issued {
+	border-top: 3px solid @color-mint;
+}
+
+.offer__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px 32px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid @color-border-block;
+}
+
+.offer__kind {
+	margin: 0;
+	font-size: @font-xs;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: @color-panel-title;
+}
+
+// Numer dokumentu czyta się z sali, więc jest największym obiektem nagłówka. `tabular-nums`,
+// bo cyfry mają stać w kolumnie, gdy numer się zmienia.
+.offer__number {
+	margin: 4px 0 0;
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+}
+
+.offer__dates {
+	display: grid;
+	grid-template-columns: auto auto;
+	gap: 2px 16px;
+	margin: 0;
+	font-size: @font-sm;
+
+	dt {
+		color: @color-text-muted;
+	}
+
+	dd {
+		margin: 0;
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+// Okres ochrony wystawionej polisy — jedyna rzecz w nagłówku, która ma tło. To ona jest
+// odpowiedzią na pytanie „i co z tego wyszło".
+.offer__stamp {
+	padding: 10px 16px;
+	border-radius: @radius-button;
+	background: @color-action-soft;
+	text-align: right;
+}
+
+.offer__stamp__label {
+	margin: 0;
+	font-size: @font-xs;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.offer__stamp__value {
+	margin: 2px 0 0;
+	font-size: @font-lg;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.offer__block {
+	margin-top: @space-gap;
+}
+
+.offer__block__title {
+	margin: 0 0 12px;
+	font-size: @font-lg;
+	font-weight: 600;
+	color: @color-panel-title;
+}
+
+.offer__covers {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: @font-md;
+
+	th,
+	td {
+		padding: 10px 0;
+		text-align: left;
+		border-bottom: 1px solid @color-border-block;
+		font-weight: 400;
+	}
+
+	td {
+		text-align: right;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+}
+
+// Limit z OWU pod nazwą pokrycia: to jest granica ochrony, a nie przypis.
+.offer__covers__cap {
+	display: block;
+	font-size: @font-xs;
+	color: @color-text-muted;
+}
+
+.offer__covers__deductible th,
+.offer__covers__deductible td {
+	border-bottom: 0;
+	color: @color-text-muted;
+}
+
+.offer__premium {
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: 1px solid @color-border-block;
+	text-align: right;
+}
+
+.offer__premium__label {
+	margin: 0;
+	font-size: @font-xs;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.offer__premium__value {
+	margin: 2px 0 0;
+	font-size: 2rem;
+	font-weight: 700;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+}
+
+.offer__premium__note {
+	margin: 2px 0 0;
+	font-size: @font-sm;
+	color: @color-text-muted;
+}
+
+// Załącznik APK w dwóch szpaltach — potrzeby obok uzasadnienia, tak samo jak na ekranie
+// rekomendacji, żeby widz rozpoznał ten sam dokument.
+.offer__apk {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 16px 28px;
+	padding: 16px 18px;
+	border-radius: @radius-button;
+	background: @color-ground;
+}
+
+@media (min-width: 768px) {
+	.offer__apk {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+	}
+}
+
+.offer__apk__title {
+	margin: 0 0 6px;
+	font-size: @font-xs;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.offer__apk__list {
+	margin: 0;
+	padding-left: 18px;
+	font-size: @font-sm;
+	line-height: 1.5;
+}
+
+.offer__foot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 24px;
+	margin-top: @space-gap;
+	padding-top: 16px;
+	border-top: 1px solid @color-border-block;
+}
+
+// Oświadczenie klienta — treść z reguł, więc nie ma tu ani jednego słowa na stałe.
+.offer__statement {
+	flex: 1 1 320px;
+	margin: 0;
+	font-size: @font-sm;
+	line-height: 1.45;
+	color: @color-text-muted;
+}
+
+.offer__issued {
+	flex: 1 1 320px;
+	margin: 0;
+	font-size: @font-md;
+	font-weight: 600;
+	color: @color-success;
+}

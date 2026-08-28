@@ -57,6 +57,19 @@
 					<button type="button" class="step-nav__back" (click)="goTo('reco')">
 						← Wróć do rekomendacji
 					</button>
+					<button type="button" class="step-nav__next" data-testid="to-offer" (click)="goTo('offer')">
+						Przejdź do oferty →
+					</button>
+				</div>
+			}
+
+			@case ('offer') {
+				<app-property-offer />
+
+				<div class="step-nav">
+					<button type="button" class="step-nav__back" (click)="goTo('price')">
+						← Wróć do składki
+					</button>
 				</div>
 			}
 		}
@@ -66,7 +79,7 @@
 		Podsumowanie towarzyszy rekomendacji i składce, ale NIE ankiecie: podczas odpowiadania sumy
 		jeszcze się przeliczają przy każdym kliknięciu i migotanie liczb odciąga od pytań.
 	-->
-	@if (ready() && step() !== 'apk') {
+	@if (ready() && step() !== 'apk' && step() !== 'offer') {
 		<aside class="property__summary" data-testid="property-summary">
 			<h2 class="property__summary-title">Podsumowanie</h2>
 

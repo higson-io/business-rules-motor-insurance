@@ -7,6 +7,7 @@ import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { Step, StepBar } from '../../shared/step-bar/step-bar';
 import { Comparison } from './comparison/comparison';
 import { EffectiveDate } from './effective-date/effective-date';
+import { Offer } from './offer/offer';
 import { Questionnaire } from './questionnaire/questionnaire';
 
 /**
@@ -42,7 +43,15 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
  */
 @Component({
 	selector: 'app-property',
-	imports: [ApkRecommendation, Comparison, EffectiveDate, ErrorBanner, Questionnaire, StepBar],
+	imports: [
+		ApkRecommendation,
+		Comparison,
+		EffectiveDate,
+		ErrorBanner,
+		Offer,
+		Questionnaire,
+		StepBar,
+	],
 	templateUrl: './property.html',
 	styleUrl: './property.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,11 +68,17 @@ export class Property {
 	 * a cena jest na końcu. Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny
 	 * zawsze, bo prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się
 	 * propozycja.
+	 *
+	 * ⛔ Czwarty krok TYLKO w demie majątkowym. Domyka proces ofertą i polisą, czyli pokazuje, że
+	 * reguły nie kończą się na składce — mówią też, ile oferta jest ważna i co dokument musi
+	 * zawierać. Pozostałe dwa dema zatrzymują się na składce świadomie: to samo domknięcie
+	 * powtórzone trzy razy nie dodałoby ani jednej nowej rzeczy do pokazania.
 	 */
 	readonly steps: readonly Step[] = [
 		{ key: 'apk', label: 'Analiza potrzeb' },
 		{ key: 'reco', label: 'Rekomendacja' },
 		{ key: 'price', label: 'Składka' },
+		{ key: 'offer', label: 'Oferta' },
 	];
 
 	/**
