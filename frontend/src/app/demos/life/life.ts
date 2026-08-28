@@ -1,9 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	inject,
+	linkedSignal,
+	signal,
+} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { LifeStore } from '../../core/life-store';
 import { ApkRecommendationCopy } from '../../models/apk';
-import { LifeLineCode } from '../../models/life';
+import { LifeLineCode, LifeQuoteDto } from '../../models/life';
 import { LifeService } from '../../services/life-service';
 import { ApkRecommendation } from '../../shared/apk/recommendation/recommendation';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
@@ -62,8 +69,6 @@ export class Life {
 	private readonly store = inject(LifeStore);
 	private readonly lifeService = inject(LifeService);
 
-	readonly path = signal<LifePath>('individual');
-
 	readonly copy = RECOMMENDATION_COPY;
 
 	readonly step = signal<string>('apk');
@@ -72,6 +77,27 @@ export class Life {
 	private readonly loaded = computed(() =>
 		this.store.quote.hasValue() ? this.store.quote.value() : null,
 	);
+
+	/**
+	 * Wybrana ścieżka — **wyprowadzona z linii, którą trzyma serwer**, a nie z lokalnego stanu.
+	 *
+	 * ⛔ `linkedSignal`, nie `signal`. Wycena jest w sesji po stronie serwera i przeżywa wyjście
+	 * z demo: kto raz przełączył na grupowe i wrócił przez „Wszystkie dema", dostawał zakładkę
+	 * „Indywidualne" nad ankietą grupową i grupową ceną. Zakładka kłamała o tym, co jest liczone —
+	 * i nie miała jak tego zauważyć, bo nikt jej nie pytał serwera.
+	 *
+	 * Zapis lokalny nadal działa: `open()` ustawia ścieżkę od razu, a `computation` przelicza się
+	 * dopiero, gdy `PUT life/line` wróci z nową wyceną — więc w locie nie ma migotania.
+	 */
+	readonly path = linkedSignal<LifeQuoteDto | null, LifePath>({
+		source: this.loaded,
+		computation: (quote, previous) =>
+			quote === null
+				? (previous?.value ?? 'individual')
+				: quote.lineCode === 'GROUP'
+					? 'group'
+					: 'individual',
+	});
 
 	/**
 	 * ⛔ Kolejność jest argumentem: najpierw pytamy, potem pokazujemy, co z odpowiedzi wynika,
