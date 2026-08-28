@@ -46,6 +46,9 @@ public class PropertyQuote {
 	/** Oferta i — po akceptacji — polisa. Patrz `Offer`: jeden obiekt na oba stany. */
 	private Offer offer = new Offer();
 
+	/** Ubezpieczający — dane demonstracyjne, patrz `Policyholder`. */
+	private final Policyholder policyholder = new Policyholder();
+
 	private BigDecimal riskFactor;
 	private Integer buildingAge;
 	private String selectedVariant;
@@ -135,6 +138,10 @@ public class PropertyQuote {
 
 	public void setWarnings(List<Warning> warnings) {
 		this.warnings = warnings;
+	}
+
+	public Policyholder getPolicyholder() {
+		return policyholder;
 	}
 
 	public Offer getOffer() {

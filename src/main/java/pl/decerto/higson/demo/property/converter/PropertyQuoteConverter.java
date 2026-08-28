@@ -10,6 +10,7 @@ import pl.decerto.higson.demo.property.api.dto.PropertyCoverDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuestionDto;
 import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyOfferDto;
+import pl.decerto.higson.demo.property.api.dto.PropertyPolicyholderDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
@@ -17,6 +18,7 @@ import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
 import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.Offer;
+import pl.decerto.higson.demo.property.domain.Policyholder;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.property.domain.Variant;
@@ -51,6 +53,7 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setRecommendation(RecommendationDto.of(
 			quote.getRecommendation(), quote.getNeeds(), quote.getWarnings()));
 		dto.setOffer(convertOffer(quote.getOffer()));
+		dto.setPolicyholder(convertPolicyholder(quote.getPolicyholder()));
 		dto.setSelectedVariant(quote.getSelectedVariant());
 
 		return dto;
@@ -67,8 +70,30 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setPolicyNumber(offer.getPolicyNumber());
 		dto.setCoverFrom(offer.getCoverFrom());
 		dto.setCoverTo(offer.getCoverTo());
+		dto.setChoiceKind(offer.getChoiceKind());
+		dto.setChoiceLabel(offer.getChoiceLabel());
+		dto.setChoiceText(offer.getChoiceText());
+		dto.setChoiceRequiresAcknowledgement(offer.isChoiceRequiresAcknowledgement());
+		dto.setUnmetNeeds(offer.getUnmetNeeds());
 		dto.setVariantCode(offer.getVariantCode());
 		dto.setPremium(offer.getPremium());
+		return dto;
+	}
+
+	private PropertyPolicyholderDto convertPolicyholder(Policyholder source) {
+		PropertyPolicyholderDto dto = new PropertyPolicyholderDto();
+		dto.setFirstName(source.getFirstName());
+		dto.setLastName(source.getLastName());
+		dto.setPesel(source.getPesel());
+		dto.setBirthDate(source.getBirthDate());
+		dto.setIdDocument(source.getIdDocument());
+		dto.setStreet(source.getStreet());
+		dto.setFlat(source.getFlat());
+		dto.setPostcode(source.getPostcode());
+		dto.setCity(source.getCity());
+		dto.setEmail(source.getEmail());
+		dto.setPhone(source.getPhone());
+		dto.setSource(source.getSource());
 		return dto;
 	}
 

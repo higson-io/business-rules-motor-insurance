@@ -1,6 +1,7 @@
 package pl.decerto.higson.demo.property.example;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.higson.runtime.core.HigsonEngine;
@@ -71,6 +73,7 @@ public class Property {
 	private static final String PARAM_FLOOD_AVAILABILITY = "demo.property.flood.availability";
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
 	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
+	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
 	private static final String PARAM_PERIOD = "demo.property.factor.period";
 
 	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
@@ -157,6 +160,16 @@ public class Property {
 			question.setSection(attrString(definition, "SECTION", ctx));
 			question.setHelp(attrString(definition, "HELP", ctx));
 			question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
+			// ⛔ NOŚNE. Bez `VALUE_TYPE` odpowiedź wchodzi do kontekstu jako łańcuch, a
+			// `PropertyContext.convert` konwertuje PO TYPIE WARTOŚCI — więc „400" nie stawało się
+			// `BigDecimal`, `decimalAt` zwracało null i budżet klienta znikał w drodze do
+			// rekomendacji. Skutek był widoczny dopiero w dokumencie: przy podanych 400 zł
+			// uzasadnienie mówiło „Nie podałeś akceptowalnej składki", a propozycja szła na
+			// 2912,65 zł. Cała gałąź BUDGET_EXCEEDED (D-7) była nieosiągalna.
+			//
+			// Ta linia jest tu, bo profil majątkowy ma własną kopię czytnika katalogu; wspólny
+			// `QuestionCatalogue.read` (MOTO, LIFE) ustawia ją od początku.
+			question.setValueType(attrString(definition, "VALUE_TYPE", ctx));
 			question.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
 			question.setVisible(Boolean.TRUE.equals(definition.getAttrBoolean("IS_VISIBLE", ctx)));
 			question.setRequired(Boolean.TRUE.equals(definition.getAttrBoolean("IS_REQUIRED", ctx)));
@@ -432,11 +445,11 @@ public class Property {
 
 		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
 		if (OUTCOME_FIT.equals(outcome)) {
-			reasons.add(new ApkAnalysis.Reason("BUDGET_FIT", proposed.getAnnualPremium(), budget));
+			reasons.add(new ApkAnalysis.Reason("BUDGET_FIT", money(proposed.getAnnualPremium()), money(budget)));
 		} else if (OUTCOME_EXCEEDED.equals(outcome)) {
 			// Cena wariantu NAJLEPIEJ dopasowanego, nie proponowanego — to jego przekroczenie
 			// budżetu jest powodem, dla którego propozycja zeszła niżej.
-			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED", best.getAnnualPremium(), budget,
+			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED", money(best.getAnnualPremium()), money(budget),
 				nameOf(product, COLLECTION_VARIANTS, proposed.getCode())));
 		} else {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_ABSENT"));
@@ -446,7 +459,7 @@ public class Property {
 		if (!Boolean.TRUE.equals(flood.getBoolean("available"))) {
 			reasons.add(new ApkAnalysis.Reason("FLOOD_UNAVAILABLE"));
 		} else if (Boolean.TRUE.equals(flood.getBoolean("requiresDeductible"))) {
-			reasons.add(new ApkAnalysis.Reason("FLOOD_DEDUCTIBLE", flood.getBigDecimal("minDeductible")));
+			reasons.add(new ApkAnalysis.Reason("FLOOD_DEDUCTIBLE", money(flood.getBigDecimal("minDeductible"))));
 		}
 		reasons.add(new ApkAnalysis.Reason("FLOOD_WAITING",
 			engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
@@ -485,6 +498,69 @@ public class Property {
 		offer.setPaymentDueOn(today.plusDays(terms.getInteger("paymentDays")));
 		offer.setStatement(terms.getString("statement"));
 		offer.setNeedsAnalysisAttached(Boolean.TRUE.equals(terms.getBoolean("needsAnalysisAttached")));
+
+		describeChoice(quote, offer);
+	}
+
+	/**
+	 * Rek. 9.3 — czy klient wziął wariant, który rekomendowaliśmy, i co to znaczy.
+	 *
+	 * ⛔ Java liczy tylko KIERUNEK, i to arytmetyką: porównuje pozycje w drabince, które i tak
+	 * przyszły z `demo.property.variant.position`. Co ten kierunek znaczy i jakimi słowami się to
+	 * mówi klientowi, rozstrzyga `demo.property.offer.choice` — bo to jest treść dokumentu,
+	 * a nie działanie na liczbach.
+	 */
+	private void describeChoice(PropertyQuote quote, Offer offer) {
+		String recommended = quote.getRecommendation().getVariantCode();
+		String chosen = quote.getSelectedVariant() == null ? recommended : quote.getSelectedVariant();
+		if (recommended == null || chosen == null) {
+			offer.setChoiceKind(null);
+			return;
+		}
+
+		String kind = "MATCHES";
+		if (!chosen.equals(recommended)) {
+			kind = positionOf(quote, chosen) > positionOf(quote, recommended) ? "RICHER" : "POORER";
+		}
+
+		ParamValue note = engine.get(PARAM_OFFER_CHOICE, new PropertyContext(quote).withChoice(kind));
+		offer.setChoiceKind(kind);
+		offer.setChoiceLabel(note.getString("label"));
+		offer.setChoiceText(note.getString("text"));
+		offer.setChoiceRequiresAcknowledgement(
+			Boolean.TRUE.equals(note.getBoolean("requiresAcknowledgement")));
+
+		offer.setUnmetNeeds(unmetBy(quote, chosen));
+	}
+
+	/**
+	 * Nazwy potrzeb, których wybrany wariant NIE pokrywa.
+	 *
+	 * ⛔ Punktowanie idzie przez `ApkAnalysis.score`, tę samą metodę, którą liczy się pokrycie
+	 * rekomendacji. Drugie, ręczne porównanie list dałoby drugą definicję słowa „pokryta".
+	 */
+	private List<String> unmetBy(PropertyQuote quote, String variantCode) {
+		List<String> names = new ArrayList<>();
+		for (Variant variant : quote.getVariants()) {
+			if (!variant.getCode().equals(variantCode)) {
+				continue;
+			}
+			DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+			ApkAnalysis.Score score = ApkAnalysis.score(quote.getNeeds(), variant.getCovers()::contains);
+			for (String cover : score.getMissing()) {
+				names.add(nameOf(product, COLLECTION_COVERS, cover));
+			}
+		}
+		return names;
+	}
+
+	private int positionOf(PropertyQuote quote, String code) {
+		for (Variant variant : quote.getVariants()) {
+			if (variant.getCode().equals(code)) {
+				return variant.getPosition();
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -534,6 +610,24 @@ public class Property {
 		// Tabela okresu ma wiersz domyślny, więc odpowiedź bez wartości nadal daje sensowny okres.
 		Integer months = engine.get(PARAM_PERIOD, new PropertyContext(quote)).getInteger("installments");
 		return months == null ? 12 : months * 12;
+	}
+
+	/**
+	 * Kwota w zapisie polskim.
+	 *
+	 * ⛔ Formatuje GOSPODARZ, a nie `ApkAnalysis`. Wspólna klasa podstawia argumenty przez
+	 * `String.valueOf`, co jest właściwe dla demo komunikacyjnego (angielskie „1381.19"), ale
+	 * w polskim dokumencie dawało „2912.65 zł" z kropką — w zdaniu, które klient dostaje
+	 * na piśmie. Język jest cechą ekranu, więc i separator dziesiętny jest.
+	 */
+	private String money(BigDecimal value) {
+		if (value == null) {
+			return "—";
+		}
+		NumberFormat format = NumberFormat.getNumberInstance(new Locale("pl", "PL"));
+		format.setMinimumFractionDigits(value.stripTrailingZeros().scale() > 0 ? 2 : 0);
+		format.setMaximumFractionDigits(2);
+		return format.format(value);
 	}
 
 	/** Nazwa elementu domeny. Kod, którego nie ma w drzewie, zostaje sobą — nie wywala zdania. */

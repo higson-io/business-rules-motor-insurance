@@ -113,6 +113,23 @@ export class Offer {
 
 	readonly deductible = computed(() => this.loaded()?.deductible ?? null);
 
+	readonly policyholder = computed(() => this.loaded()?.policyholder ?? null);
+
+	/** Rek. 9.3 — notatka o zgodności wyboru z rekomendacją. */
+	readonly choice = computed(() => {
+		const offer = this.offer();
+		if (offer === null || offer.choiceKind === null) {
+			return null;
+		}
+		return {
+			kind: offer.choiceKind,
+			label: offer.choiceLabel,
+			text: offer.choiceText,
+			acknowledge: offer.choiceRequiresAcknowledgement,
+			unmet: offer.unmetNeeds,
+		};
+	});
+
 	issue(): void {
 		void this.store.commit(firstValueFrom(this.propertyService.updatePolicyIssued(true)));
 	}

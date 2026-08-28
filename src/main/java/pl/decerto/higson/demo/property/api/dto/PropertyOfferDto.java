@@ -2,6 +2,8 @@ package pl.decerto.higson.demo.property.api.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Oferta na drucie. `policyNumber` puste znaczy „jeszcze oferta" — patrz `Offer`, jeden obiekt
@@ -23,6 +25,13 @@ public class PropertyOfferDto {
 	/** Zamrożone przy wystawieniu — patrz `Offer`. Puste, dopóki to oferta. */
 	private String variantCode;
 	private BigDecimal premium;
+
+	/** Rek. 9.3 — notatka o zgodności wyboru z rekomendacją. */
+	private String choiceKind;
+	private String choiceLabel;
+	private String choiceText;
+	private boolean choiceRequiresAcknowledgement;
+	private List<String> unmetNeeds = new ArrayList<>();
 
 	public String getNumber() { return number; }
 	public void setNumber(String number) { this.number = number; }
@@ -46,4 +55,14 @@ public class PropertyOfferDto {
 	public void setVariantCode(String variantCode) { this.variantCode = variantCode; }
 	public BigDecimal getPremium() { return premium; }
 	public void setPremium(BigDecimal premium) { this.premium = premium; }
+	public String getChoiceKind() { return choiceKind; }
+	public void setChoiceKind(String choiceKind) { this.choiceKind = choiceKind; }
+	public String getChoiceLabel() { return choiceLabel; }
+	public void setChoiceLabel(String choiceLabel) { this.choiceLabel = choiceLabel; }
+	public String getChoiceText() { return choiceText; }
+	public void setChoiceText(String choiceText) { this.choiceText = choiceText; }
+	public List<String> getUnmetNeeds() { return unmetNeeds; }
+	public void setUnmetNeeds(List<String> unmetNeeds) { this.unmetNeeds = unmetNeeds; }
+	public boolean isChoiceRequiresAcknowledgement() { return choiceRequiresAcknowledgement; }
+	public void setChoiceRequiresAcknowledgement(boolean v) { this.choiceRequiresAcknowledgement = v; }
 }

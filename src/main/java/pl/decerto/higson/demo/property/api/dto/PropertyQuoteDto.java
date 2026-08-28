@@ -29,7 +29,16 @@ public class PropertyQuoteDto {
 	private List<PropertyVariantDto> variants;
 	private RecommendationDto recommendation;
 	private PropertyOfferDto offer;
+	private PropertyPolicyholderDto policyholder;
 	private String selectedVariant;
+
+	public PropertyPolicyholderDto getPolicyholder() {
+		return policyholder;
+	}
+
+	public void setPolicyholder(PropertyPolicyholderDto policyholder) {
+		this.policyholder = policyholder;
+	}
 
 	public PropertyOfferDto getOffer() {
 		return offer;

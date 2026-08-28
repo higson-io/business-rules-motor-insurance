@@ -35,6 +35,53 @@
 			}
 		</header>
 
+		<!--
+			Ubezpieczający — bez tego dokument nie wygląda na dokument, tylko na wynik kalkulatora.
+			Dane są demonstracyjne i przedstawiają swoje źródło, tak samo jak podpowiedziane
+			odpowiedzi w ankiecie (rek. 8.3).
+		-->
+		@if (policyholder(); as person) {
+			<section class="offer__block" data-testid="offer-policyholder">
+				<h3 class="offer__block__title">Ubezpieczający</h3>
+
+				<dl class="offer__person">
+					<div>
+						<dt>Imię i nazwisko</dt>
+						<dd>{{ person.firstName }} {{ person.lastName }}</dd>
+					</div>
+					<div>
+						<dt>PESEL</dt>
+						<dd>{{ person.pesel }}</dd>
+					</div>
+					<div>
+						<dt>Data urodzenia</dt>
+						<dd>{{ date(person.birthDate) }}</dd>
+					</div>
+					<div>
+						<dt>Dokument tożsamości</dt>
+						<dd>{{ person.idDocument }}</dd>
+					</div>
+					<div class="offer__person__wide">
+						<dt>Adres</dt>
+						<dd>
+							{{ person.street }}<span>&nbsp;m.&nbsp;{{ person.flat }}</span>,
+							{{ person.postcode }} {{ person.city }}
+						</dd>
+					</div>
+					<div>
+						<dt>E-mail</dt>
+						<dd>{{ person.email }}</dd>
+					</div>
+					<div>
+						<dt>Telefon</dt>
+						<dd>{{ person.phone }}</dd>
+					</div>
+				</dl>
+
+				<p class="offer__person__source">Dane pobrane z: {{ person.source }}</p>
+			</section>
+		}
+
 		@if (variant(); as variant) {
 			<section class="offer__block">
 				<h3 class="offer__block__title">Zakres ochrony — wariant {{ variant.name }}</h3>
@@ -68,6 +115,30 @@
 						<p class="offer__premium__note">albo w ratach po {{ premium(instalment) }}</p>
 					}
 				</div>
+			</section>
+		}
+
+		<!--
+			⛔ Rek. 9.3 — odstąpienie klienta od rekomendacji ma być ODNOTOWANE, a nie przemilczane.
+			Notatka jest zawsze, także gdy wybór się zgadza: dokument ma odpowiadać na to pytanie,
+			a nie milczeć, gdy odpowiedź jest korzystna.
+		-->
+		@if (choice(); as choice) {
+			<section
+				class="offer__block offer__choice"
+				[class.offer__choice--departs]="choice.acknowledge"
+				data-testid="offer-choice"
+			>
+				<h3 class="offer__block__title">{{ choice.label }}</h3>
+				<p class="offer__choice__text">{{ choice.text }}</p>
+
+				@if (choice.unmet.length > 0) {
+					<ul class="offer__choice__unmet" data-testid="offer-unmet">
+						@for (need of choice.unmet; track need) {
+							<li>{{ need }}</li>
+						}
+					</ul>
+				}
 			</section>
 		}
 

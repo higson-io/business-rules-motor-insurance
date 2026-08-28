@@ -227,3 +227,71 @@
 	font-weight: 600;
 	color: @color-success;
 }
+
+// ── Ubezpieczający ────────────────────────────────────────────────────────────────────────────
+
+.offer__person {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+	gap: 14px 28px;
+	margin: 0;
+
+	dt {
+		font-size: @font-xs;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: @color-text-muted;
+	}
+
+	dd {
+		margin: 2px 0 0;
+		font-size: @font-md;
+	}
+}
+
+// Adres zajmuje całą szerokość — łamie się inaczej niż reszta i w wąskiej celi wyglądałby
+// jak dwa osobne pola.
+.offer__person__wide {
+	grid-column: 1 / -1;
+}
+
+.offer__person__source {
+	margin: 14px 0 0;
+	font-size: @font-xs;
+	font-style: italic;
+	color: @color-text-muted;
+}
+
+// ── Notatka o wyborze (rek. 9.3) ──────────────────────────────────────────────────────────────
+
+// Neutralnie, gdy wybór zgadza się z rekomendacją — to nie jest ostrzeżenie, tylko odnotowanie.
+.offer__choice {
+	padding: 16px 18px;
+	border-left: 3px solid @color-success;
+	border-radius: 0 @radius-button @radius-button 0;
+	background: @color-ground;
+}
+
+// Odstąpienie od rekomendacji dostaje ton ostrzegawczy — ten sam, którym mówi się o wyłączeniach.
+.offer__choice--departs {
+	border-left-color: @color-warn;
+}
+
+.offer__choice .offer__block__title {
+	margin-bottom: 6px;
+}
+
+.offer__choice__text {
+	margin: 0;
+	font-size: @font-md;
+	line-height: 1.5;
+}
+
+.offer__choice__unmet {
+	margin: 10px 0 0;
+	padding-left: 18px;
+	font-size: @font-sm;
+	line-height: 1.5;
+	color: @color-warn;
+}

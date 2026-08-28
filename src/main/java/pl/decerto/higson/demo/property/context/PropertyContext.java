@@ -36,6 +36,7 @@ public class PropertyContext extends HigsonContext {
 	private String coverCode;
 	private String variantCode;
 	private String reasonCode;
+	private String choiceKind;
 
 	public PropertyContext(PropertyQuote quote) {
 		this.quote = quote;
@@ -63,6 +64,11 @@ public class PropertyContext extends HigsonContext {
 		return this;
 	}
 
+	public PropertyContext withChoice(String kind) {
+		this.choiceKind = kind;
+		return this;
+	}
+
 	public PropertyContext withReason(String code) {
 		this.reasonCode = code;
 		return this;
@@ -86,6 +92,11 @@ public class PropertyContext extends HigsonContext {
 		// więc tabela ofertowa dostaje wersjonowanie za darmo, bez drugiego progu.
 		if ("regime.code".equals(path)) {
 			return quote.getRegime().getCode();
+		}
+
+		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
+		if ("choice.kind".equals(path)) {
+			return choiceKind;
 		}
 
 		if ("reason.code".equals(path)) {

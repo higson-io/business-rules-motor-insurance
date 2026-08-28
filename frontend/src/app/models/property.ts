@@ -91,6 +91,35 @@ export interface PropertyOfferDto {
 	 */
 	readonly variantCode: string | null;
 	readonly premium: number | null;
+
+	/**
+	 * Rek. 9.3 — notatka o tym, czy klient wziął rekomendowany wariant.
+	 *
+	 * ⛔ `unmetNeeds` liczy się względem WYBORU klienta, a nie rekomendacji: gdy klient zejdzie
+	 * niżej, bez pokrycia zostaje więcej niż mówi `recommendation.missingCovers`.
+	 */
+	readonly choiceKind: 'MATCHES' | 'RICHER' | 'POORER' | null;
+	readonly choiceLabel: string | null;
+	readonly choiceText: string | null;
+	readonly choiceRequiresAcknowledgement: boolean;
+	readonly unmetNeeds: readonly string[];
+}
+
+/** Ubezpieczający. Dane demonstracyjne — w prawdziwym wdrożeniu z CRM, nie z reguł. */
+export interface PropertyPolicyholderDto {
+	readonly firstName: string;
+	readonly lastName: string;
+	readonly pesel: string;
+	readonly birthDate: string;
+	readonly idDocument: string;
+	readonly street: string;
+	readonly flat: string;
+	readonly postcode: string;
+	readonly city: string;
+	readonly email: string;
+	readonly phone: string;
+	/** Rek. 8.3 — skąd wzięły się dane, skoro klient ich tu nie wpisywał. */
+	readonly source: string;
 }
 
 /** The APK regime in force for the chosen policy date. Versioned by the region, not by the clock. */
@@ -133,5 +162,6 @@ export interface PropertyQuoteDto {
 	 * być: to jeden dokument, który zmienia stan, a nie dwa byty do zsynchronizowania.
 	 */
 	readonly offer: PropertyOfferDto;
+	readonly policyholder: PropertyPolicyholderDto;
 	readonly selectedVariant: string | null;
 }

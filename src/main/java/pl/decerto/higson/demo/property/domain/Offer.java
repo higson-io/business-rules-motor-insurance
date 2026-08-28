@@ -2,6 +2,8 @@ package pl.decerto.higson.demo.property.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -42,6 +44,28 @@ public class Offer {
 	 */
 	private String variantCode;
 	private BigDecimal premium;
+
+	/**
+	 * Rek. 9.3 — czy klient wziął to, co rekomendowaliśmy.
+	 *
+	 * ⛔ Odstąpienie od rekomendacji ma być ODNOTOWANE, a nie przemilczane. Trzy stany
+	 * (`MATCHES` / `RICHER` / `POORER`), bo wariant szerszy od rekomendowanego niesie inne ryzyko
+	 * niż węższy: przy węższym część zgłoszonych potrzeb zostaje bez pokrycia.
+	 */
+	private String choiceKind;
+	private String choiceLabel;
+	private String choiceText;
+	private boolean choiceRequiresAcknowledgement;
+
+	/**
+	 * Potrzeby, których NIE pokrywa wariant WYBRANY przez klienta.
+	 *
+	 * ⛔ Liczone względem wyboru, a nie względem rekomendacji. `Recommendation.missingCovers` mówi,
+	 * czego brakuje w wariancie PROPONOWANYM — a gdy klient zejdzie niżej, bez pokrycia zostaje
+	 * więcej. Notatka rek. 9.3 twierdzi, że klient „został poinformowany, które potrzeby pozostają
+	 * bez pokrycia"; bez tej listy byłoby to zdanie nieprawdziwe.
+	 */
+	private List<String> unmetNeeds = new ArrayList<>();
 
 	public String getNumber() {
 		return number;
@@ -129,6 +153,25 @@ public class Offer {
 
 	public void setPremium(BigDecimal premium) {
 		this.premium = premium;
+	}
+
+	public String getChoiceKind() { return choiceKind; }
+	public void setChoiceKind(String choiceKind) { this.choiceKind = choiceKind; }
+	public String getChoiceLabel() { return choiceLabel; }
+	public void setChoiceLabel(String choiceLabel) { this.choiceLabel = choiceLabel; }
+	public String getChoiceText() { return choiceText; }
+	public void setChoiceText(String choiceText) { this.choiceText = choiceText; }
+	public boolean isChoiceRequiresAcknowledgement() { return choiceRequiresAcknowledgement; }
+	public void setChoiceRequiresAcknowledgement(boolean value) {
+		this.choiceRequiresAcknowledgement = value;
+	}
+
+	public List<String> getUnmetNeeds() {
+		return unmetNeeds;
+	}
+
+	public void setUnmetNeeds(List<String> unmetNeeds) {
+		this.unmetNeeds = unmetNeeds;
 	}
 
 	public boolean isIssued() {
