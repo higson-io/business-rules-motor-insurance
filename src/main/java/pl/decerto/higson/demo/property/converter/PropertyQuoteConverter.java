@@ -136,9 +136,9 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 			dto.setText(question.getText());
 			dto.setKind(question.getKind());
 			dto.setSection(question.getSection());
-			dto.setHelp(question.getHelp());
 			dto.setPosition(question.getPosition());
 			dto.setVisible(question.isVisible());
+			dto.setRevealed(question.isRevealed());
 			dto.setRequired(question.isRequired());
 			dto.setOptions(question.getOptions());
 			dto.setOptionLabels(question.getOptionLabels());

@@ -25,9 +25,10 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 		text: 'Pytanie',
 		kind: 'TEXT',
 		section: 'SUBJECT',
-		help: null,
 		position: 10,
 		visible: true,
+		// ⚠️ Domyślnie odsłonięte: fixture bada renderowanie, a nie łańcuch odsłaniania.
+		revealed: true,
 		required: true,
 		options: [],
 		optionLabels: [],

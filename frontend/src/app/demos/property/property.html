@@ -25,29 +25,22 @@
 		@switch (step()) {
 			@case ('apk') {
 				<!--
-					⛔ ANKIETA ZALEŻNA: kolejne pytanie pojawia się dopiero po domknięciu poprzedniego.
-					Łańcuch jest kolumną `revealedBy` w katalogu pytań, a nie kolejnością w tym pliku —
-					komponent dostaje gotową listę widocznych pytań i nic nie odsłania sam.
+					⛔ ANKIETA, NIE FORMULARZ: jedno pytanie na ekran, kolejne odsłaniane po domknięciu
+					poprzedniego. Łańcuch jest kolumną `revealedBy` w katalogu pytań, a nie kolejnością
+					w tym pliku.
+
+					⛔ Nawigacja NALEŻY DO ANKIETY, nie do gospodarza — „Dalej" przechodzi między
+					pytaniami, a nie między krokami. Dwa paski nawigacji na jednym ekranie kazałyby
+					zgadywać, który z nich przewija pytanie, a który kończy krok. Gospodarz dowiaduje
+					się o końcu ankiety zdarzeniem.
 				-->
-				<app-property-questionnaire kind="FORM" />
+				<app-property-questionnaire kind="FORM" (completed)="goTo('subject')" />
 
 				@if (blocked()) {
 					<p class="property__blocked" role="status" data-testid="property-blocked">
 						{{ blockMessage() }}
 					</p>
 				}
-
-				<div class="step-nav">
-					<button
-						type="button"
-						class="step-nav__next"
-						data-testid="to-subject"
-						[disabled]="blocked()"
-						(click)="goTo('subject')"
-					>
-						Przejdź do przedmiotu ubezpieczenia →
-					</button>
-				</div>
 			}
 
 			@case ('subject') {
@@ -71,12 +64,15 @@
 
 			@case ('proposal') {
 				<!--
-					⛔ REKOMENDACJA I SKŁADKA NA JEDNYM WIDOKU. Rozdzielone na dwa kroki kazały klientowi
-					pamiętać propozycję przez przejście dalej, żeby zestawić ją z ceną — a rek. 8.2.d
-					mówi o doborze „z uwzględnieniem akceptowalnej wartości składki", czyli o jednej
-					decyzji, a nie o dwóch ekranach. Propozycja stoi nad porównaniem, bo to ona jest
-					odpowiedzią; tabela wariantów jest tym, co pozwala się z nią nie zgodzić.
+					⛔ KOLEJNOŚĆ ZE SPECYFIKACJI, OD GÓRY: proponowane składki (pakiety) → rekomendacja
+					→ uzasadnienie pod spodem. Odwrotna kolejność — propozycja nad tabelą — czytała się
+					logicznie, ale kazała klientowi przyjąć rekomendację, zanim zobaczył, z czego się
+					wybiera. Rekomendowany wariant jest w tabeli ZAZNACZONY, więc widzi ją i propozycję
+					naraz — a to jest warunek z tej samej specyfikacji: nie pokazujemy pakietów do
+					wyboru bez rekomendacji.
 				-->
+				<app-property-comparison />
+
 				<app-apk-recommendation
 					[recommendation]="recommendation()"
 					[copy]="copy"
@@ -86,8 +82,6 @@
 					[alternativeName]="alternative()?.name ?? null"
 					[alternativePremium]="alternative()?.premium ?? null"
 				/>
-
-				<app-property-comparison />
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('subject')">
@@ -101,6 +95,22 @@
 
 			@case ('offer') {
 				<app-property-offer />
+
+				<!--
+					⛔ TEN SAM KOMPONENT W PODSUMOWANIU — wymóg specyfikacji. Klient ma zobaczyć
+					rekomendację i jej uzasadnienie jeszcze raz, obok tego, co faktycznie wybrał;
+					notatkę o zgodności wyboru z rekomendacją niesie już sama oferta i wynika ona
+					automatycznie z wybranego wariantu, więc nie ma tu drugiego pola do wypełnienia.
+				-->
+				<app-apk-recommendation
+					[recommendation]="recommendation()"
+					[copy]="copy"
+					[variantName]="recommendedName()"
+					[missingNames]="missingNames()"
+					[premium]="proposedPremium()"
+					[alternativeName]="alternative()?.name ?? null"
+					[alternativePremium]="alternative()?.premium ?? null"
+				/>
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('proposal')">

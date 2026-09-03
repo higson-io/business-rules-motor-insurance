@@ -54,66 +54,75 @@
 	color: @color-action;
 }
 
-// ⚠️ minmax(0, …), nie minmax(auto, …). Ślad domyślnej ścieżki grid to `auto`, czyli szerokość
-// min-content — a Material renderuje wartość selecta z `white-space: nowrap`, więc jedna długa
-// etykieta ustawiłaby podłogę i wypchnęła kolumnę poza kontener.
+// ═══ UKŁAD PYTAŃ ═══════════════════════════════════════════════════════════════════════════
 //
-// ⛔ `row-gap: 0`, bo odstęp między pytaniami robi margines pod stopką, a NIE odstęp siatki.
-// Powód poniżej: pytania używają `subgrid`, a subgrid dziedziczy odstęp wierszy od rodzica —
-// 18px trafiłoby wtedy między etykietę a kontrolkę każdego pytania, nie między pytania.
-.apk__grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-	column-gap: 20px;
-	row-gap: 0;
+// ⛔ JEDNA KOLUMNA o ograniczonej mierze. Ankieta jest serią pytań zadawanych po kolei, a nie
+// formularzem do wypełnienia naraz — i to jest różnica, którą widać dopiero w układzie. Siatka
+// czterokolumnowa kazała czytać zygzakiem, mieszała pytanie o potrzebę z pytaniem o metraż
+// i przy odsłanianiu kolejnych pytań przestawiała całe wiersze.
+//
+// ⛔ Zniknął przy okazji `subgrid`. Istniał wyłącznie po to, żeby kontrolki w sąsiednich
+// kolumnach zaczynały się na tej samej wysokości — bez kolumn nie ma czego wyrównywać, więc
+// kilkadziesiąt linii reguł wyrównujących ścieżki przestało być potrzebne.
+//
+// Miara ~62ch: dłuższy wiersz męczy przy czytaniu, krótszy łamie treść pytania na trzy linijki.
+.apk__list {
+	max-width: 62ch;
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
 
-// ⛔ **To jest miejsce, w którym kontrolki przestają się rozjeżdżać.** Wcześniej każde pytanie
-// było własnym pudełkiem o wysokości swojej treści, więc pytanie z dwuwierszową etykietą
-// spychało swoje pole 20px niżej niż sąsiad z jednowierszową — i to samo powtarzało się przy
-// pomocy i przy „nie chcę podać". Na ekranie z szesnastoma pytaniami dawało to kilkanaście
-// drobnych uskoków.
-//
-// Każde pytanie zajmuje teraz PIĘĆ ścieżek wiersza rodzica i rozkłada na nich swoje części
-// przez `subgrid`. Ścieżki są wspólne dla całego pasma, więc wysokość każdej wyznacza
-// najwyższa treść w wierszu: etykiety kończą się na tej samej wysokości, kontrolki zaczynają
-// na tej samej, stopki stoją równo.
-//
-// ⚠️ Przypisanie wierszy jest JAWNE, a nie z kolejności. Pomoc i komunikat o odmowie są
-// opcjonalne — przy automatycznym rozmieszczeniu pytanie bez pomocy wsunęłoby stopkę do
-// ścieżki 3 i rozjechało się dokładnie tak, jak przedtem.
+// Numer pytania stoi W MARGINESIE, nie w treści — dzięki temu pytania mają jedną krawędź
+// startową niezależnie od tego, czy numer jest jedno-, czy dwucyfrowy.
 .apk__question {
 	display: grid;
-	grid-row: span 5;
-	grid-template-rows: subgrid;
+	grid-template-columns: 28px minmax(0, 1fr);
+	column-gap: 12px;
+	padding: 18px 0;
+	border-top: 1px solid @color-border-block;
+}
+
+.apk__question:first-child {
+	padding-top: 4px;
+	border-top: 0;
+}
+
+.apk__question:last-child {
+	padding-bottom: 0;
+}
+
+// ⛔ Animacja odsłonięcia. Odsłanianie kolejnych pytań JEST tezą tego ekranu, a bez ruchu
+// wygląda jak przeskok strony. `track question.code` sprawia, że istniejące pytania zachowują
+// swoje węzły — animuje się więc tylko to, które właśnie doszło.
+@keyframes apk-reveal {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+}
+
+.apk__question {
+	animation: apk-reveal 0.28s ease-out;
+}
+
+// ⚠️ Ruch wyłączony, gdy system o to prosi. Reszta układu zostaje bez zmian.
+@media (prefers-reduced-motion: reduce) {
+	.apk__question {
+		animation: none;
+	}
+}
+
+.apk__index {
+	padding-top: 1px;
+	color: @color-text-muted;
+	font-size: 0.8125rem;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.apk__body {
 	min-width: 0;
-}
-
-.apk__label {
-	grid-row: 1;
-}
-
-.apk__field,
-.apk__options,
-.apk__toggle {
-	grid-row: 2;
-}
-
-.apk__help {
-	grid-row: 3;
-}
-
-.apk__foot {
-	grid-row: 4;
-}
-
-.apk__refusal {
-	grid-row: 5;
-}
-
-// Wielokrotny wybór ma tyle opcji, ile ma — nie mieści się w jednej celi siatki.
-.apk__question--wide {
-	grid-column: 1 / -1;
 }
 
 .apk__question--refused .apk__field,
@@ -122,27 +131,25 @@
 	opacity: 0.5;
 }
 
-// Odstęp pod polem daje siatka, nie pole. Globalny `margin-bottom: 14px` z `_forms.less` jest
-// tu zbędny — sumowałby się z gap i rozjeżdżał wiersze, w których jedno pytanie jest polem,
-// a drugie przełącznikiem.
+// Odstęp pod polem daje układ pytania, nie pole. Globalny `margin-bottom: 14px` z `_forms.less`
+// sumowałby się z wyściółką wiersza.
 .apk__field {
-	align-self: start;
 	display: block;
 	width: 100%;
-	margin-bottom: 8px;
+	max-width: 26rem;
+	margin-bottom: 0;
 }
 
 // Treść pytania: zawija się, bo przychodzi z reguł i może mieć dowolną długość.
 //
-// `align-self: start` — w paśmie, w którym któraś etykieta ma dwa wiersze, ścieżka jest wysoka
-// na dwa wiersze; bez tego jednowierszowa etykieta wyśrodkowałaby się w niej i odkleiła od
-// swojego pola.
+// ⛔ O stopień większa i cięższa niż etykieta pola. To jest PYTANIE zadane klientowi, a nie
+// podpis nad inputem — a odkąd zniknęły podpowiedzi, jest też jedyną treścią, którą się tu
+// czyta, więc może wziąć na siebie cały ciężar.
 .apk__label {
-	align-self: start;
-	margin: 0 0 6px;
-	font-size: 0.875rem;
+	margin: 0 0 10px;
+	font-size: 0.9375rem;
 	font-weight: 500;
-	line-height: 1.35;
+	line-height: 1.4;
 }
 
 // ⛔ Gwiazdka NIE dostaje koloru akcji. Portal rezerwuje `--warn-500` dla wszystkiego, co mówi
@@ -154,47 +161,28 @@
 }
 
 .apk__options {
-	align-self: start;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 2px 20px;
-	margin-bottom: 8px;
 }
 
+// ⛔ Przełącznik tak/nie NIE rozciąga się na całą szerokość. W siatce musiał, żeby kolumny
+// były równe; w jednej kolumnie pełna szerokość robiła z dwóch odpowiedzi pasek przez pół
+// ekranu, w którym „Tak" i „Nie" stały metr od siebie.
 .apk__toggle {
-	align-self: start;
 	justify-self: start;
-	width: 100%;
-	margin-bottom: 8px;
+	width: auto;
 }
 
-// Pomoc pochodzi z Higsona i jest tu widoczna zawsze — niezależnie od rodzaju kontrolki.
-.apk__help {
-	align-self: start;
-	margin: 0;
-	font-size: 0.75rem;
-	line-height: 1.35;
-	color: @color-text-muted;
-}
-
-// ⛔ Dolny margines stopki JEST odstępem między pytaniami — siatka ma `row-gap: 0`, bo jej
-// odstęp trafiłby też między części pojedynczego pytania.
-//
-// ⚠️ `flex-start`, nie `space-between`, i BEZ odpychania czegokolwiek do prawej. Przy
-// `space-between` pytanie bez podpowiedzi zostawiało „nie chcę podać" przyklejone do prawej
-// krawędzi, a przy pytaniu wielokrotnego wyboru — zajmującym całą szerokość — guzik lądował metr
-// od pytania, którego dotyczy. Wyrównanie do lewej daje jedną pionową linię przez cały wiersz
-// siatki: tam, gdzie podpowiedź jest, stoi przed guzikiem; tam, gdzie jej nie ma, guzik zaczyna
-// od tej samej krawędzi co sąsiedzi.
+// ⚠️ Wyrównanie do LEWEJ, bez odpychania czegokolwiek do prawej: podpowiedź i „nie chcę podać"
+// należą do pytania powyżej, więc muszą zaczynać się od tej samej krawędzi co ono. Odstęp między
+// pytaniami daje teraz wyściółka wiersza, a nie margines stopki.
 .apk__foot {
-	align-self: end;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	justify-content: flex-start;
 	gap: 4px 12px;
-	margin-top: 4px;
-	margin-bottom: 20px;
+	margin-top: 8px;
 }
 
 .apk__prefill {
@@ -228,4 +216,134 @@
 	background: @color-gray-light;
 	font-size: 0.75rem;
 	line-height: 1.35;
+}
+
+// ═══ TRYB ANKIETY: JEDNO PYTANIE NA EKRAN ═════════════════════════════════════════════════════
+//
+// ⛔ Panel jest wyższy i węższy niż lista, bo ma na ekranie jedną rzecz. Przy pytaniu tak/nie
+// zostaje dużo pustego miejsca i to jest w porządku: pustka wokół jedynego pytania jest tym,
+// co odróżnia ankietę od formularza.
+// ⛔ Karta jest PEŁNEJ SZEROKOŚCI, jak każdy inny panel w tym demie. Zwężona wyglądała jak
+// element, który się nie doładował: pasek kroków nad nią idzie przez całą szerokość, więc każda
+// węższa karta pod nim czyta się jako usterka układu, a nie jako decyzja. Miarę ogranicza się
+// niżej, na samej treści pytania — tam, gdzie to naprawdę służy czytaniu.
+//
+// `min-height` trzyma wysokość między pytaniami: bez tego ekran skakał, bo pytanie tak/nie jest
+// o dwie linijki niższe niż pytanie z polem kwoty.
+.apk__section--single {
+	min-height: 19rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.apk__step {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 22px;
+}
+
+.apk__step__counter {
+	flex: 0 0 auto;
+	color: @color-text-muted;
+	font-size: 0.8125rem;
+	font-variant-numeric: tabular-nums;
+}
+
+// Pasek postępu jest cienki i szary — informuje, ale nie konkuruje z pytaniem o uwagę.
+.apk__step__bar {
+	flex: 1 1 auto;
+	height: 3px;
+	border-radius: 2px;
+	background: @color-border-block;
+	overflow: hidden;
+}
+
+.apk__step__fill {
+	display: block;
+	height: 100%;
+	background: @color-action;
+	transition: width 0.25s ease;
+}
+
+// ⛔ Pytanie rośnie do wielkości nagłówka. W liście musiało być drobne, bo sąsiadowało
+// z dziesięcioma innymi; tutaj jest jedyną treścią na ekranie i drobny druk wyglądałby jak
+// pomyłka składu.
+.apk__question--single {
+	flex: 1 1 auto;
+	display: block;
+	padding: 0;
+	border: 0;
+	animation: apk-reveal 0.28s ease-out;
+
+	// Miara treści, nie karty — długie pytanie łamie się na czytelnej szerokości, a panel
+	// zostaje w rytmie reszty ekranów.
+	.apk__label {
+		max-width: 34ch * 1.6;
+		margin-bottom: 22px;
+		font-size: 1.375rem;
+		font-weight: 600;
+		line-height: 1.3;
+	}
+
+	.apk__field {
+		max-width: 22rem;
+	}
+
+	// ⛔ Przełącznik dostaje szerokość WPROST, bo `_forms.less` daje grupie 100%, a tryb listy
+	// zbija ją do treści. Jako jedyna kontrolka na ekranie „Tak/Nie" wielkości etykiety wygląda
+	// jak niedokończony układ — i jest niewygodne do trafienia z drugiego końca sali.
+	.apk__toggle {
+		width: 18rem;
+	}
+}
+
+.apk__nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 26px;
+	padding-top: 18px;
+	border-top: 1px solid @color-border-block;
+}
+
+.apk__nav__back {
+	padding: 0.7rem 0;
+	border: 0;
+	background: none;
+	font-family: inherit;
+	font-size: @font-md;
+	font-weight: 600;
+	color: @color-text;
+	cursor: pointer;
+}
+
+.apk__nav__back:disabled {
+	color: @color-border-strong;
+	cursor: not-allowed;
+}
+
+.apk__nav__next {
+	padding: 0.7rem 1.5rem;
+	border: 0;
+	border-radius: @radius-button;
+	background: @color-action;
+	font-family: inherit;
+	font-size: @font-md;
+	font-weight: 600;
+	color: @color-white;
+	cursor: pointer;
+}
+
+.apk__nav__next:hover:not(:disabled) {
+	opacity: 0.8;
+}
+
+// ⚠️ Jasne tło i ciemny napis — biel na szarym obrysie daje 1.58:1. Ta sama para co przy
+// wyłączonym przycisku kroku w `_buttons.less`.
+.apk__nav__next:disabled {
+	background: @color-border-block;
+	color: #5a6e83;
+	cursor: not-allowed;
 }

@@ -133,6 +133,15 @@ component under a `kind` input, and step 1 becomes a **dependent questionnaire**
 answer: `Answer.isSettled()` counts a refusal too, or one skipped optional question would stall
 the rest forever. Demo seed answers are gone from the questionnaire and kept only on the subject
 step, where they are genuinely prior-policy data.
+**§19 (2026-09-03)** aligns the demo with the PM's spec `higson_apk_demo_spec_1.7.docx`, which
+**outranks working agreements**. Three gaps closed: step 1 becomes **one question per screen** with
+a counter and its own navigation (the spec asks for a survey, not a form); step 3 is reordered to
+**packages-with-premiums → recommendation → justification**; and the recommendation component
+reappears in the closing summary beside the automatic note on whether the client took it. `HELP`
+leaves the domain type — a question now carries **four attributes**; the deleted Polish texts are
+archived in §19.4. ⚠️ **W-26**: `@if` has no key, so Angular reused the `mat-button-toggle-group`
+node between questions and two consecutive identical answers silently never reached the server —
+`@for … track question.code` over a one-element list is the fix, guarded by a mutation-proven test.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
@@ -372,4 +381,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt and made dependent; four-step flow with recommendation and premium merged; configuration cut to 5 attributes per question; recommendation moved from Java into a decision table)
+**Last regenerated**: 2026-09-03 (aligned with PM spec 1.7: one question per screen, packages before recommendation, recommendation repeated in the summary; question down to four attributes)

@@ -19,9 +19,10 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 		text: 'Pytanie',
 		kind: 'TEXT',
 		section: 'SUBJECT',
-		help: null,
 		position: 10,
 		visible: true,
+		// ⚠️ Domyślnie odsłonięte: fixture bada renderowanie, a nie łańcuch odsłaniania.
+		revealed: true,
 		required: true,
 		options: [],
 		optionLabels: [],
@@ -34,7 +35,7 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 	};
 }
 
-function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
+function quote(questions: readonly PropertyQuestionDto[], kind: 'FORM' | 'KNOWN' = 'KNOWN'): PropertyQuoteDto {
 	return {
 		startDate: '2026-08-21',
 		deductible: 0,
@@ -53,10 +54,7 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
 			code,
 			title: `Sekcja ${code}`,
-			// ⚠️ FORM, nie KNOWN. Sekcja KNOWN ląduje w zwiniętym pasku „dane, które już mamy",
-			// więc fixture z KNOWN sprawiłby, że asercje o wyrenderowanych pytaniach przechodzą
-			// albo nie z powodu, którego test nie bada.
-			kind: 'FORM' as const,
+			kind,
 			position: (index + 1) * 10,
 			visible: true,
 		})),
@@ -136,14 +134,23 @@ describe('Questionnaire', () => {
 		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	async function render(questions: readonly PropertyQuestionDto[]): Promise<HTMLElement> {
+	/**
+	 * ⚠️ Domyślnie KNOWN, czyli układ LISTY. Asercje o kilku pytaniach naraz mają sens tylko tam:
+	 * tryb FORM jest ankietą i renderuje z założenia jedno pytanie na ekran, więc uruchomione
+	 * w nim przechodziłyby albo nie z powodu, którego nie badają. Sam przebieg krokowy ma własny
+	 * test niżej.
+	 *
+	 * ⚠️ `kind` jest wymagane i musi być ustawione PRZED pierwszym `tick()` — komponent czyta je
+	 * w `computed`, więc brak wejścia wybucha przy pierwszym odczycie, a nie przy tworzeniu.
+	 */
+	async function render(
+		questions: readonly PropertyQuestionDto[],
+		kind: 'FORM' | 'KNOWN' = 'KNOWN',
+	): Promise<HTMLElement> {
 		const fixture = TestBed.createComponent(Questionnaire);
-		// ⚠️ `kind` jest wymagane i musi być ustawione PRZED pierwszym `tick()` — komponent
-		// renderuje sekcje w `computed`, więc brak wejścia wybucha przy pierwszym odczycie,
-		// a nie przy tworzeniu. Fixture ustawiony na FORM, bo asercje dotyczą pytań ankiety.
-		fixture.componentRef.setInput('kind', 'FORM');
+		fixture.componentRef.setInput('kind', kind);
 		TestBed.tick();
-		httpTesting.expectOne('property').flush(quote(questions));
+		httpTesting.expectOne('property').flush(quote(questions, kind));
 		await TestBed.inject(ApplicationRef).whenStable();
 		fixture.detectChanges();
 		return fixture.nativeElement as HTMLElement;
@@ -208,5 +215,102 @@ describe('Questionnaire', () => {
 		const messages = element.querySelectorAll('[data-testid="property-refusal"]');
 		expect(messages.length).toBe(1);
 		expect(messages[0].textContent).toContain('najostrożniejsze');
+	});
+
+	/**
+	 * ⛔ To jest teza kroku pierwszego: APK jest ANKIETĄ, nie formularzem. Trzy pytania spełniają
+	 * regułę widoczności, ale łańcuch doszedł dopiero do dwóch — na ekranie ma być JEDNO, a
+	 * licznik ma mówić „z 3", bo mianownik liczy po regule, nie po odsłonięciu.
+	 *
+	 * ⚠️ Test przechodzi też wtedy, gdy komponent renderuje listę i po prostu ukrywa nadmiar
+	 * CSS-em, więc sprawdza LICZBĘ WĘZŁÓW, a nie widoczność.
+	 */
+	it('asks one question at a time and counts by the rule, not by what is revealed', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
+			],
+			'FORM',
+		);
+
+		expect(element.querySelectorAll('[data-question]').length).toBe(1);
+		expect(element.querySelector('[data-question="NEEDS_PROPERTY"]')).not.toBeNull();
+		expect(element.textContent).toContain('Pytanie 1 z 3');
+	});
+
+	/**
+	 * ⛔ Ankieta stoi na pierwszym NIEUDZIELONYM pytaniu, a nie na ostatnim odsłoniętym. Dzięki
+	 * temu odpowiedź sama przenosi ekran na kolejne pytanie — odsłonięcie i przejście to jedno
+	 * zdarzenie, bez osobnego mechanizmu przewijania.
+	 *
+	 * ⛔ „Dalej" jest WYŁĄCZONE, dopóki bieżące pytanie nie jest domknięte: następne nie jest
+	 * jeszcze odsłonięte, więc nie ma dokąd iść. Etykieta mówi mimo to „Następne pytanie", bo
+	 * liczy po regule — „Zakończ" na pytaniu 2 z 3 byłoby kłamstwem.
+	 */
+	it('sits on the first unanswered question and will not advance past it', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', value: 'true' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
+			],
+			'FORM',
+		);
+
+		expect(element.querySelector('[data-question="NEED_THEFT"]')).not.toBeNull();
+		expect(element.querySelectorAll('[data-question]').length).toBe(1);
+		expect(element.textContent).toContain('Pytanie 2 z 3');
+
+		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
+		expect(next.textContent, 'liczy po regule, nie po odsłonięciu').toContain('Następne pytanie');
+		expect(next.disabled, 'bez odpowiedzi nie ma dokąd przejść').toBe(true);
+	});
+
+	it('ends the step from the last question rather than scrolling on', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', value: 'true' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20, value: 'false' }),
+			],
+			'FORM',
+		);
+
+		expect(element.textContent).toContain('Pytanie 2 z 2');
+		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
+		expect(next.disabled).toBe(false);
+		expect(next.textContent).toContain('Zakończ');
+	});
+
+	/**
+	 * ⛔ REGRESJA, która kosztowała pół godziny szukania. `@if` nie ma klucza, więc Angular
+	 * utrzymywał ten sam węzeł `mat-button-toggle-group` przy przejściu do następnego pytania
+	 * i podmieniał mu tylko wartość. Gdy dwa kolejne pytania miały TĘ SAMĄ odpowiedź, Material
+	 * nie widział zmiany, nie emitował `change` i odpowiedź nie leciała na serwer — ankieta
+	 * stawała w miejscu, a wyglądało to na zgubione zdarzenie.
+	 *
+	 * Test pilnuje przyczyny, nie objawu: kontrolka bieżącego pytania ma być INNYM węzłem DOM
+	 * niż kontrolka poprzedniego. Dopóki to zachodzi, Material nie ma czego pamiętać.
+	 */
+	it('rebuilds the control when the question changes, so a repeated answer still registers', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', value: 'false' }),
+				question({ code: 'NEED_PORTABLE', kind: 'BOOLEAN', position: 20 }),
+			],
+			'FORM',
+		);
+
+		const first = element.querySelector('[data-question="NEED_PORTABLE"] mat-button-toggle-group');
+		expect(first, 'kursor stoi na pierwszym nieudzielonym').not.toBeNull();
+
+		// Cofnięcie na pytanie poprzednie musi dać INNY węzeł kontrolki.
+		(element.querySelector('.apk__nav__back') as HTMLButtonElement).click();
+		TestBed.tick();
+
+		const second = element.querySelector('[data-question="NEED_FLOOD"] mat-button-toggle-group');
+		expect(second).not.toBeNull();
+		expect(second, 'ten sam węzeł = Material pamięta poprzednią wartość').not.toBe(first);
 	});
 });

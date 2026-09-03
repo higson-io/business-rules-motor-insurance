@@ -25,6 +25,17 @@ public class Question {
 	 * więc przestawienie jej nie może wymagać wdrożenia.
 	 */
 	private String revealedBy;
+
+	/**
+	 * Czy pytanie zostało już odsłonięte przez łańcuch.
+	 *
+	 * ⛔ OSOBNO od `visible` i to jest nośne. `visible` mówi, czy pytanie DOTYCZY tego klienta
+	 * (piętro nie dotyczy domu) — pytanie odrzucone tą regułą nie istnieje dla niego wcale.
+	 * `revealed` mówi, czy już PORA je zadać. Ekran pyta o pytania spełniające oba warunki, ale
+	 * licznik „pytanie 2 z 7" musi liczyć tylko po pierwszym: gdyby liczył po obu, całkowita
+	 * liczba pytań rosłaby w miarę odpowiadania i pasek postępu nie znaczyłby nic.
+	 */
+	private boolean revealed;
 	private String section;
 	private String help;
 	private String contextPath;
@@ -58,6 +69,14 @@ public class Question {
 
 	public void setKind(String kind) {
 		this.kind = kind;
+	}
+
+	public boolean isRevealed() {
+		return revealed;
+	}
+
+	public void setRevealed(boolean revealed) {
+		this.revealed = revealed;
 	}
 
 	public String getRevealedBy() {

@@ -213,9 +213,13 @@ public class Property {
 		question.setCode(definition.getCode());
 		question.setSection(sectionCode);
 
-		// Pięć rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
+		// Cztery rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
+		//
+		// ⛔ HELP już nie ma. Podpowiedź pod każdym pytaniem dawała drugi akapit tam, gdzie widz
+		// ma przeczytać jedno zdanie, a przy kilkunastu pytaniach robiła z ankiety ścianę tekstu.
+		// Treść pytania musi wystarczyć sama — jeśli nie wystarcza, to jest źle zadane pytanie,
+		// a nie brakujący przypis.
 		question.setText(attrString(definition, "TEXT", ctx));
-		question.setHelp(attrString(definition, "HELP", ctx));
 		// ⛔ NOŚNE. `KIND` niesie i rodzaj kontrolki, i typ wartości — `PropertyContext.convert`
 		// konwertuje po nim. Do 3 września 2026 były to dwa atrybuty; rozdzielone dawały cztery
 		// kombinacje, z których sensowne były dwie, a pomyłka kończyła się tym, że „400" nie
@@ -237,16 +241,16 @@ public class Property {
 		question.setRefusalMessage(row.getString("refusal"));
 		question.setRevealedBy(row.getString("revealedBy"));
 
-		// ⛔ ODSŁANIANIE SKŁADA SIĘ Z WIDOCZNOŚCIĄ, nie zastępuje jej. To dwie różne rzeczy:
-		// reguła `IS_VISIBLE` mówi, czy pytanie w ogóle DOTYCZY tego klienta (piętro nie dotyczy
-		// domu), a łańcuch `revealedBy` — czy już PORA je zadać. Pytanie musi przejść oba testy.
+		// ⛔ DWIE FLAGI, NIE JEDNA — i nie wolno ich tu sklejać. Reguła `IS_VISIBLE` mówi, czy
+		// pytanie DOTYCZY tego klienta (piętro nie dotyczy domu); łańcuch `revealedBy` — czy już
+		// PORA je zadać. Ekran pokazuje pytania spełniające oba warunki, ale licznik „pytanie 2
+		// z 7" liczy tylko po pierwszym. Sklejone w jedno dawałyby licznik, w którym całkowita
+		// liczba pytań rośnie z każdą odpowiedzią.
 		//
 		// ⚠️ Liczy się DOMKNIĘCIE poprzednika, nie odpowiedź: pytanie nieobowiązkowe, które klient
 		// pomija odmową, i tak przepuszcza ankietę dalej. Inaczej jedno „nie chcę podać" przy
 		// oczekiwanej składce zatrzymywałoby resztę ankiety na zawsze.
-		if (question.isVisible()) {
-			question.setVisible(isRevealed(quote, question.getRevealedBy()));
-		}
+		question.setRevealed(isRevealed(quote, question.getRevealedBy()));
 		return question;
 	}
 
@@ -504,7 +508,7 @@ public class Property {
 		quote.setBlockMessage(null);
 		for (Question question : quote.getQuestions()) {
 			Answer answer = quote.getAnswers().get(question.getCode());
-			if (!question.isVisible() || answer == null || !answer.isAnswered()) {
+			if (!question.isVisible() || !question.isRevealed() || answer == null || !answer.isAnswered()) {
 				continue;
 			}
 			ParamValue row = engine.get(PARAM_APK_BLOCKER, new PropertyContext(quote)

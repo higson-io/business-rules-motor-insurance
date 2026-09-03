@@ -1,5 +1,12 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	inject,
+	input,
+	linkedSignal,
+	output,
+} from '@angular/core';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField } from '@angular/material/form-field';
@@ -39,7 +46,6 @@ interface Section {
 @Component({
 	selector: 'app-property-questionnaire',
 	imports: [
-		NgTemplateOutlet,
 		MatButtonToggle,
 		MatButtonToggleGroup,
 		MatCheckbox,
@@ -72,7 +78,10 @@ export class Questionnaire {
 	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 */
 	/**
-	 * Które sekcje renderować: `FORM` — analiza potrzeb, `KNOWN` — przedmiot ubezpieczenia.
+	 * Które sekcje renderować — i, co za tym idzie, JAK.
+	 *
+	 * `FORM` — analiza potrzeb: **jedno pytanie na ekran**, po kolei, z własną nawigacją.
+	 * `KNOWN` — przedmiot ubezpieczenia: lista, bo to dane już zebrane, a nie rozmowa.
 	 *
 	 * ⛔ Rodzaj przychodzi z Higsona (atrybut `KIND` sekcji), a komponent dostaje tylko to, którą
 	 * połowę ma pokazać. Nie ma tu ani jednego kodu sekcji: przeniesienie sekcji z kroku 1 do
@@ -80,15 +89,17 @@ export class Questionnaire {
 	 */
 	readonly kind = input.required<'FORM' | 'KNOWN'>();
 
+	/** Zgłaszane, gdy klient domknął ostatnie pytanie ankiety — gospodarz przechodzi dalej. */
+	readonly completed = output<void>();
+
 	/**
 	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer, a lista sekcji z serwera —
 	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
 	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 *
-	 * ⚠️ Pytania przychodzą już przefiltrowane przez OBIE reguły — czy pytanie dotyczy tego
-	 * klienta i czy pora je zadać. Ankieta zależna odsłania kolejne pytanie po domknięciu
-	 * poprzedniego, ale liczy to serwer; filtrowanie tutaj zamieniłoby kolumnę `revealedBy`
-	 * w martwy wpis.
+	 * ⚠️ `visible` to reguła („czy pytanie dotyczy tego klienta"), `revealed` to łańcuch („czy już
+	 * pora"). Sekcje trzymają pytania przefiltrowane po REGULE — odsłanianie rozstrzyga się niżej,
+	 * przy wyborze pytania bieżącego, bo licznik postępu musi znać całość.
 	 */
 	readonly sections = computed<readonly Section[]>(() => {
 		const quote = this.loaded();
@@ -106,6 +117,112 @@ export class Questionnaire {
 			}))
 			.filter((section) => section.questions.length > 0);
 	});
+
+	/** Wszystkie pytania, o które w tym kroku wolno zapytać — w kolejności zadawania. */
+	private readonly asked = computed<readonly PropertyQuestionDto[]>(() =>
+		this.sections().flatMap((section) => section.questions),
+	);
+
+	/** Te, do których łańcuch już doszedł. Ostatnie z nich jest bieżące. */
+	private readonly reached = computed<readonly PropertyQuestionDto[]>(() =>
+		this.asked().filter((question) => question.revealed),
+	);
+
+	/** Czy klient się tym pytaniem zajął — odpowiedział albo odmówił. Serwerowe `isSettled()`. */
+	private settled(question: PropertyQuestionDto): boolean {
+		return question.refused || question.values.length > 0 || !!question.value;
+	}
+
+	/**
+	 * Numer pytania oglądanego teraz.
+	 *
+	 * ⛔ `linkedSignal`, nie `signal`, i to daje DWIE rzeczy naraz. Po odpowiedzi łańcuch odsłania
+	 * kolejne pytanie, więc `reached` się zmienia, kursor się przelicza i ekran sam przechodzi na
+	 * to nowe pytanie — czyli ankieta zachowuje się jak ankieta, bez osobnego mechanizmu
+	 * przewijania. A gdy klient cofnie się i poprawi odpowiedź, która niczego nie odsłania,
+	 * `reached` nie drgnie i kursor zostaje tam, gdzie klient go postawił.
+	 *
+	 * ⚠️ Pierwsze NIEUDZIELONE, nie ostatnie odsłonięte. Ostatnie odsłonięte przy wejściu na krok
+	 * z częściowo wypełnioną ankietą wrzucałoby klienta na koniec listy zamiast tam, gdzie skończył.
+	 */
+	private readonly cursor = linkedSignal<readonly PropertyQuestionDto[], number>({
+		source: this.reached,
+		computation: (reached, previous) => {
+			const pending = reached.findIndex((question) => !this.settled(question));
+			const fallback = pending >= 0 ? pending : Math.max(reached.length - 1, 0);
+			const kept = previous?.value;
+			return kept !== undefined && kept < reached.length && kept > fallback ? kept : fallback;
+		},
+	});
+
+	readonly current = computed<PropertyQuestionDto | null>(
+		() => this.reached()[this.cursor()] ?? null,
+	);
+
+	/**
+	 * Pytanie bieżące jako JEDNOELEMENTOWA LISTA — po to, żeby szablon mógł je śledzić po kodzie.
+	 *
+	 * ⛔ NOŚNE, nie stylistyka. `@if` nie ma klucza, więc Angular utrzymywał ten sam węzeł
+	 * `mat-button-toggle-group` przy przejściu do następnego pytania i podmieniał mu tylko
+	 * wartość. Gdy dwa kolejne pytania miały TĘ SAMĄ odpowiedź — „Nie" przy powodzi, potem „Nie"
+	 * przy sprzęcie przenośnym — Material nie widział zmiany, nie emitował `change`, odpowiedź
+	 * nie leciała na serwer i ankieta stawała w miejscu z wyłączonym „Dalej".
+	 *
+	 * ⚠️ Objaw był mylący: klikało się i nic się nie działo, więc wyglądało to na zgubione
+	 * zdarzenie albo wyścig z przeładowaniem. `@for` z `track question.code` odtwarza kontrolkę
+	 * przy każdej zmianie pytania i problem znika u źródła.
+	 */
+	readonly currentAsList = computed<readonly PropertyQuestionDto[]>(() => {
+		const question = this.current();
+		return question === null ? [] : [question];
+	});
+
+	/** „Pytanie 3 z 7" — mianownik liczy po REGULE, więc nie rośnie w trakcie odpowiadania. */
+	readonly stepNumber = computed(() => this.cursor() + 1);
+	readonly stepCount = computed(() => this.asked().length);
+
+	readonly hasPrevious = computed(() => this.cursor() > 0);
+
+	/**
+	 * Czy po tym pytaniu jest jeszcze jakieś — liczone po REGULE, nie po odsłonięciu.
+	 *
+	 * ⛔ Po odsłonięciu byłoby źle i to widać od razu: przy pierwszym pytaniu odsłonięte jest
+	 * tylko ono, więc przycisk mówiłby „Zakończ analizę potrzeb" na pytaniu 1 z 5.
+	 */
+	readonly hasNext = computed(() => this.cursor() < this.stepCount() - 1);
+
+	/**
+	 * Czy wolno przejść dalej.
+	 *
+	 * ⛔ Dopóki klient nie domknie pytania, następne nie jest odsłonięte — nie ma dokąd iść.
+	 * Wyszarzony przycisk mówi to wprost, zamiast pozwalać kliknąć i nie zrobić nic.
+	 */
+	readonly canAdvance = computed(() => {
+		const question = this.current();
+		return question !== null && this.settled(question);
+	});
+
+	/**
+	 * ⛔ Nawigacja jest JAWNA, bez samoczynnego przeskoku po kliknięciu odpowiedzi. Na prezentacji
+	 * ekran nie może uciec prowadzącemu w chwili, w której zaczyna mówić o tym, co się właśnie
+	 * przeliczyło — a przy pytaniach z polem tekstowym samoprzewijanie i tak nie miałoby czego
+	 * nasłuchiwać.
+	 */
+	next(): void {
+		if (!this.canAdvance()) {
+			return;
+		}
+		// ⚠️ Nie przeskakuj poza to, co odsłonięte — łańcuch może prowadzić inaczej niż kolejność.
+		if (this.cursor() < this.reached().length - 1) {
+			this.cursor.update((value) => value + 1);
+		} else {
+			this.completed.emit();
+		}
+	}
+
+	previous(): void {
+		this.cursor.update((value) => Math.max(value - 1, 0));
+	}
 
 	label(question: PropertyQuestionDto, option: string): string {
 		const index = question.options.indexOf(option);

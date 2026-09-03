@@ -45,10 +45,18 @@ export interface PropertyQuestionDto {
 	readonly text: string;
 	readonly kind: QuestionKind;
 	readonly section: QuestionSection;
-	readonly help: string | null;
 	readonly position: number;
 	/** ⛔ Computed by the rules, never by this application. */
+	/**
+	 * Czy pytanie DOTYCZY tego klienta — sama reguła `IS_VISIBLE`.
+	 *
+	 * ⛔ To NIE jest „pokaż je teraz". Pytanie odrzucone tą regułą nie istnieje dla tego klienta
+	 * wcale; pytanie z `revealed: false` istnieje, tylko jeszcze nie przyszła jego pora. Licznik
+	 * postępu liczy po `visible`, ekran pokazuje `visible && revealed`.
+	 */
 	readonly visible: boolean;
+	/** Czy łańcuch `revealedBy` już do niego doszedł. */
+	readonly revealed: boolean;
 	readonly required: boolean;
 	readonly options: readonly string[];
 	readonly optionLabels: readonly string[];

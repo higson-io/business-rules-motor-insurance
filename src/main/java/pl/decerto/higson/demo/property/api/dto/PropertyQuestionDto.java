@@ -9,9 +9,9 @@ public class PropertyQuestionDto {
 	private String text;
 	private String kind;
 	private String section;
-	private String help;
 	private int position;
 	private boolean visible;
+	private boolean revealed;
 	private boolean required;
 	private List<String> options;
 	private List<String> optionLabels;
@@ -53,20 +53,20 @@ public class PropertyQuestionDto {
 		this.section = section;
 	}
 
-	public String getHelp() {
-		return help;
-	}
-
-	public void setHelp(String help) {
-		this.help = help;
-	}
-
 	public int getPosition() {
 		return position;
 	}
 
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public boolean isRevealed() {
+		return revealed;
+	}
+
+	public void setRevealed(boolean revealed) {
+		this.revealed = revealed;
 	}
 
 	public boolean isVisible() {

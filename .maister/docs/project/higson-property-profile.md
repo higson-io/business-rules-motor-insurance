@@ -2240,3 +2240,86 @@ pokazuje, co próg dokłada.
 | **Odmowa przy nieobowiązkowej składce** | **`PROPERTY_VALUE` i tak się odsłania** |
 | Krok 2 | dziewięć pytań w dwóch sekcjach, podsumowanie z sumami obok |
 | Krok 3 | propozycja + macierz wariantów + składki na jednym ekranie |
+
+---
+
+## §19 Dostosowanie do specyfikacji PM-a 1.7 (2026-09-03)
+
+Źródło: `higson_apk_demo_spec_1.7.docx` — dokument roboczy przygotowany na podstawie spotkania
+Oktawia Jakubik / Cezary Miernik z 3.09.2026 i potwierdzeń Mateusza Sendala. **Ma priorytet nad
+ustaleniami roboczymi.**
+
+### 19.1 Co już było zgodne
+
+Pytania 1–7 z logiką warunkową, kolejność „najpierw APK, potem charakterystyka przedmiotu",
+charakterystyka wypełniona domyślnie, oczekiwana składka jako wymaganie a nie filtr zakresu oraz
+obsługa „NIE" przy pytaniu 1 (specyfikacja dopuszcza walidację jako wariant alternatywny wobec
+przekierowania — §5.5).
+
+### 19.2 Trzy luki i jak zamknięte
+
+**Jedno pytanie na ekran (§1).** Mieliśmy rosnącą listę odsłanianych pytań; specyfikacja żąda
+ankiety — „jedno pytanie na ekran, nie formularz z wszystkimi polami naraz". Krok 1 renderuje teraz
+pojedyncze pytanie z licznikiem, paskiem postępu i własną nawigacją. Krok 2 zostaje listą, bo tam
+nic się nie odsłania.
+
+⛔ Licznik liczy po REGULE, nie po odsłonięciu — stąd rozdzielenie `visible` i `revealed` na
+drucie. Sklejone dawałyby „Zakończ analizę potrzeb" na pytaniu 1 z 5 i mianownik rosnący z każdą
+odpowiedzią.
+
+**Kolejność w kroku 3 (§3).** Specyfikacja wylicza od góry: proponowane składki → rekomendacja →
+uzasadnienie. Mieliśmy odwrotnie. Warunek „nie pokazujemy pakietów do wyboru, zanim klient nie
+zobaczy rekomendacji" jest spełniony, bo rekomendowany wariant jest w tabeli **zaznaczony** —
+klient widzi jedno i drugie naraz.
+
+**Ten sam komponent w podsumowaniu (§3, §5.4).** Krok oferty dostał komponent rekomendacji obok
+notatki o zgodności wyboru, którą już miał. Zweryfikowane w obie strony: wybór rekomendowanego daje
+„Wybór zgodny z rekomendacją", wybór Podstawowego — „Wybór węższy niż rekomendacja" z listą
+niepokrytych potrzeb.
+
+### 19.3 W-26 — `@if` bez klucza gubi odpowiedź przy powtórzeniu
+
+⚠️ **Najkosztowniejsza pułapka w tej zmianie.** `@if` nie ma klucza, więc Angular utrzymywał ten
+sam węzeł `mat-button-toggle-group` przy przejściu do następnego pytania i podmieniał mu tylko
+wartość. Gdy dwa kolejne pytania miały **tę samą odpowiedź** — „Nie" przy powodzi, potem „Nie"
+przy sprzęcie przenośnym — Material nie widział zmiany, nie emitował `change`, odpowiedź nie
+leciała na serwer i ankieta stawała w miejscu z wyłączonym „Dalej".
+
+Objaw mylił: wyglądało to na zgubione zdarzenie albo wyścig z przeładowaniem. Lekarstwo to
+`@for (question of currentAsList(); track question.code)` — jednoelementowa lista wyłącznie po to,
+żeby kontrolka odtwarzała się przy zmianie pytania. Regresja ma test, który upada pod dokładnie tą
+mutacją (`@for` → `@if`).
+
+### 19.4 Podpowiedzi przy pytaniach usunięte
+
+Atrybut `HELP` zniknął z typu domenowego — pytanie ma teraz **cztery atrybuty**. Podpowiedź pod
+każdym pytaniem dawała drugi akapit tam, gdzie widz ma przeczytać jedno zdanie. Treść pytania musi
+wystarczyć sama; jeśli nie wystarcza, to jest źle zadane pytanie, a nie brakujący przypis.
+
+Usunięte treści (do odtworzenia, gdyby decyzja się zmieniła):
+
+| Pytanie | Treść |
+|---|---|
+| `PROPERTY_KIND` | Dom jednorodzinny albo mieszkanie w budynku wielorodzinnym. |
+| `AREA` | Z tej liczby wyliczymy rekomendowaną sumę ubezpieczenia murów. |
+| `CONSTRUCTION_YEAR` | Wiek budynku wpływa i na składkę, i na sposób wyceny szkody. |
+| `WALL_MATERIAL` | Konstrukcja szkieletowa drewniana jest droższa w ubezpieczeniu niż murowana. |
+| `FLOOR` | Mieszkanie powyżej parteru traktujemy jak położone poza strefą zagrożenia powodziowego. |
+| `RENOVATED` | Budynek starszy niż 50 lat bez remontu wycenia się w wartości rzeczywistej, czyli pomniejszonej o zużycie techniczne. |
+| `FINISH_STANDARD` | Standard decyduje o stawce za metr i o sumach elementów stałych oraz ruchomości. |
+| `POSTCODE` | Z kodu wyznaczamy strefę powodziową i strefę kradzieżową. To dwa różne podziały. |
+| `OCCUPANCY` | Sposób użytkowania zmienia i składkę, i zakres wyłączeń. |
+| `SECURITY` | Zabezpieczenia obniżają składkę, ale muszą działać w chwili szkody. |
+| `CLAIMS_3Y` | Historia szkodowa jest czynnikiem taryfowym u wszystkich towarzystw. |
+| `NEEDS_PROPERTY` | Od tej odpowiedzi zależy, czy w ogóle jest o czym rozmawiać w tej ścieżce. |
+| `NEED_THEFT` | Kradzież z włamaniem i rabunek. Zakres z tą ochroną jest droższy od zakresu bez niej. |
+| `NEED_FLOOD` | Powódź i zalanie. Dostępność tej ochrony zależy od strefy, w której leży miejsce ubezpieczenia. |
+| `NEED_PORTABLE` | Sprzęt noszony poza mieszkanie. Bez tej odpowiedzi nie proponujemy dodatkowego ryzyka. |
+| `RENTED_OUT` | Wynajem otwiera ochronę od szkód wyrządzonych przez osoby trzecie — zakres z nią jest droższy. |
+| `COVER_PERIOD` | Rekomendacja 8.2.b — okres ochrony jest częścią Twoich wymagań, a nie tylko parametrem polisy. |
+| `BUDGET` | Rekomendacja 8.2.d. Składka jest Twoim wymaganiem, a nie filtrem zakresu — jeśli potrzebnego zakresu nie da się w niej zmieścić, i tak go pokażemy, razem z tańszą alternatywą. |
+| `PROPERTY_VALUE` | Rekomendacja 8.2.c. Porównamy Twoje oszacowanie z sumą, którą wyliczają reguły — i powiemy, jeśli te dwie liczby się rozjadą. |
+| `VACANCY` | Rekomendacja 8.2.c — sprawdzamy, czy wyłączenia z warunków nie kolidują z Twoją sytuacją. |
+| `BUSINESS_USE` | Mienie służące działalności ma osobny, niższy limit odpowiedzialności. |
+| `HIGH_VALUE_ITEMS` | Przedmioty powyżej tego progu są chronione dopiero po zgłoszeniu i udokumentowaniu. |
+| `INSPECTIONS` | Brak przeglądów ogranicza odpowiedzialność za szkody, które z tych instalacji wynikną. |
