@@ -16,6 +16,15 @@ public class Question {
 	private String text;
 	private String kind;
 	private String valueType;
+
+	/**
+	 * Kod pytania, którego domknięcie odsłania to pytanie. Puste — widoczne od razu.
+	 *
+	 * ⛔ Łańcuch jest KONFIGURACJĄ (kolumna `revealedBy` w katalogu pytań), nie kolejnością
+	 * w kodzie. Ankieta prowadzona krok po kroku to decyzja o tym, jak rozmawiamy z klientem,
+	 * więc przestawienie jej nie może wymagać wdrożenia.
+	 */
+	private String revealedBy;
 	private String section;
 	private String help;
 	private String contextPath;
@@ -49,6 +58,14 @@ public class Question {
 
 	public void setKind(String kind) {
 		this.kind = kind;
+	}
+
+	public String getRevealedBy() {
+		return revealedBy;
+	}
+
+	public void setRevealedBy(String revealedBy) {
+		this.revealedBy = revealedBy;
 	}
 
 	public String getValueType() {

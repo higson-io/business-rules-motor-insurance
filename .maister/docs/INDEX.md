@@ -125,6 +125,14 @@ become eight. And **`demo.property.apk.answer` now names the package** each answ
 Java walks the answers, the table decides, and the richest indicated package wins — verified live,
 one cell edited in Studio changes the recommendation with no restart. The table is the only
 authority; an under-covering package is reported as a gap, never silently upgraded.
+**§18 (2026-09-03)** reshapes the flow: **needs → subject → recommendation-with-premium → offer**.
+The recommendation and premium steps merge into one view (rec. 8.2.d is one decision, not two
+screens), the object characteristics become their own step 2 rendered by the same questionnaire
+component under a `kind` input, and step 1 becomes a **dependent questionnaire** — a new
+`revealedBy` column chains each question to the one whose *settlement* reveals it. Settlement, not
+answer: `Answer.isSettled()` counts a refusal too, or one skipped optional question would stall
+the rest forever. Demo seed answers are gone from the questionnaire and kept only on the subject
+step, where they are genuinely prior-policy data.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
@@ -364,4 +372,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt to the analyst's notes; configuration cut to 5 attributes per question; recommendation moved from Java into a decision table)
+**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt and made dependent; four-step flow with recommendation and premium merged; configuration cut to 5 attributes per question; recommendation moved from Java into a decision table)

@@ -64,10 +64,17 @@ export class Property {
 	readonly step = signal<string>('apk');
 
 	/**
-	 * ⛔ Kolejność jest argumentem: najpierw pytamy, potem pokazujemy, co z odpowiedzi wynika,
-	 * a cena jest na końcu. Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny
-	 * zawsze, bo prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się
-	 * propozycja.
+	 * ⛔ Kolejność jest argumentem: najpierw POTRZEBY, potem PRZEDMIOT, dopiero na końcu
+	 * propozycja z ceną. To jest odwrotność kolejności, w jakiej robi się to w kalkulatorach —
+	 * te zaczynają od metrażu i kodu pocztowego, czyli od rzeczy, które prowadzą wprost do
+	 * składki, a o potrzebach pytają na końcu albo wcale. O tę odwrotność chodzi w rek. 8 KNF.
+	 *
+	 * ⛔ REKOMENDACJA I SKŁADKA TO JEDEN KROK. Rozdzielone kazały klientowi pamiętać propozycję
+	 * przez przejście dalej, żeby zestawić ją z ceną — a rek. 8.2.d mówi o doborze
+	 * „z uwzględnieniem akceptowalnej wartości składki", czyli o jednej decyzji.
+	 *
+	 * ⛔ Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny zawsze, bo prowadzący
+	 * musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się propozycja.
 	 *
 	 * ⛔ Czwarty krok TYLKO w demie majątkowym. Domyka proces ofertą i polisą, czyli pokazuje, że
 	 * reguły nie kończą się na składce — mówią też, ile oferta jest ważna i co dokument musi
@@ -76,8 +83,8 @@ export class Property {
 	 */
 	readonly steps: readonly Step[] = [
 		{ key: 'apk', label: 'Analiza potrzeb' },
-		{ key: 'reco', label: 'Rekomendacja' },
-		{ key: 'price', label: 'Składka' },
+		{ key: 'subject', label: 'Przedmiot ubezpieczenia' },
+		{ key: 'proposal', label: 'Rekomendacja i składka' },
 		{ key: 'offer', label: 'Oferta' },
 	];
 
@@ -171,6 +178,21 @@ export class Property {
 		}
 		const code = quote.selectedVariant ?? quote.recommendation.variantCode;
 		return quote.variants.find((variant) => variant.code === code) ?? null;
+	});
+
+	/**
+	 * Czy klient odszedł od rekomendacji.
+	 *
+	 * ⛔ Odkąd propozycja i porównanie stoją na JEDNYM ekranie, cena wybranego wariantu pokazana
+	 * bezwarunkowo powtarzała liczbę z nagłówka propozycji — ta sama kwota z tym samym podpisem,
+	 * dwadzieścia centymetrów od siebie, czyta się jak usterka. Podsumowanie odzywa się więc
+	 * dopiero wtedy, gdy ma co powiedzieć: gdy wybór różni się od propozycji.
+	 */
+	readonly choiceDiffers = computed(() => {
+		const quote = this.loaded();
+		return quote !== null
+			&& quote.selectedVariant !== null
+			&& quote.selectedVariant !== quote.recommendation.variantCode;
 	});
 
 	// ── Formatowanie polskie ────────────────────────────────────────────────────────────────

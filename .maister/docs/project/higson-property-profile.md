@@ -2163,3 +2163,80 @@ tego od razu, bo istniejące elementy mają wartości jawne i działają — ale
 dodany w Studio spada na wartość domyślną i wywala 500** z komunikatem o nieznalezionym parametrze
 o nazwie zaczynającej się od `$p`. Podawać **sam kod**, bez prefiksu. To jest ta sama rodzina
 błędu co W-24 z §16.
+
+---
+
+## §18 Cztery kroki i ankieta zależna (2026-09-03)
+
+Trzy zmiany w przebiegu demo, wszystkie w profilu majątkowym.
+
+### 18.1 Nowy układ kroków
+
+| | Przed | Po |
+|---|---|---|
+| 1 | Analiza potrzeb (ankieta + zwinięty pasek danych) | **Analiza potrzeb** — same potrzeby, odsłaniane po kolei |
+| 2 | Rekomendacja | **Przedmiot ubezpieczenia** |
+| 3 | Składka | **Rekomendacja i składka** |
+| 4 | Oferta | Oferta |
+
+Kolejność jest argumentem i teraz mówi go pełniej: najpierw **potrzeby**, potem **przedmiot**,
+dopiero na końcu propozycja z ceną. Kalkulatory robią odwrotnie — zaczynają od metrażu i kodu
+pocztowego, czyli od rzeczy prowadzących wprost do składki, a o potrzebach pytają na końcu albo
+wcale.
+
+### 18.2 Rekomendacja i składka na jednym widoku
+
+Rozdzielone na dwa kroki kazały klientowi **pamiętać propozycję przez przejście dalej**, żeby
+zestawić ją z ceną — a rek. 8.2.d mówi o doborze „z uwzględnieniem akceptowalnej dla klienta
+wartości składki", czyli o jednej decyzji, nie o dwóch ekranach. Propozycja stoi nad porównaniem
+wariantów: ona jest odpowiedzią, tabela jest tym, co pozwala się z nią nie zgodzić.
+
+⚠️ Scalenie odsłoniło powtórzenie: cena wybranego wariantu w podsumowaniu powtarzała kwotę
+z nagłówka propozycji, bo domyślnie wybrany **jest** proponowanym. Podsumowanie odzywa się teraz
+dopiero, gdy `choiceDiffers()` — czyli gdy klient odszedł od rekomendacji i jest co nazwać.
+
+### 18.3 Przedmiot ubezpieczenia jako osobny krok
+
+Zwinięty pasek „dane, które już mamy" z §16 stał się pełnym krokiem. Ten sam komponent ankiety
+renderuje krok 1 i krok 2 — różni je **wyłącznie wejście `kind`** (`FORM` / `KNOWN`), a rodzaj
+sekcji przychodzi z atrybutu `KIND` w Higsonie. Przeniesienie sekcji między krokami to nadal
+zmiana jednego atrybutu w Studio; zniknął za to cały mechanizm zwijania i osobny styl paska.
+
+Podsumowanie z sumami towarzyszy teraz krokowi 2 (a nie tylko 3): tam każda zmiana metrażu czy
+kodu pocztowego ma być widać natychmiast, bo to jest sens tego kroku.
+
+### 18.4 D-14 — ankieta zależna, odsłaniana konfiguracją
+
+Katalog pytań dostał kolumnę **`revealedBy`**: kod pytania, którego domknięcie odsłania to
+pytanie. Puste znaczy „widoczne od razu". Łańcuch jest konfiguracją, więc przestawienie kolejności
+odsłaniania nie wymaga wdrożenia.
+
+⛔ **Odsłanianie SKŁADA SIĘ z widocznością, nie zastępuje jej.** To dwie różne rzeczy: reguła
+`IS_VISIBLE` mówi, czy pytanie w ogóle **dotyczy** tego klienta (piętro nie dotyczy domu), a
+łańcuch — czy już **pora** je zadać. Pytanie musi przejść oba testy.
+
+⛔ **Liczy się DOMKNIĘCIE poprzednika, nie odpowiedź.** `Answer` dostał `isSettled()` —
+odpowiedziane **albo odmówione**. Gdyby liczyła się sama odpowiedź, pytanie nieobowiązkowe, które
+klient pomija (oczekiwana składka, wartość nieruchomości), zatrzymywałoby resztę ankiety na
+zawsze. Odmowa jest wartością (rek. 8.4), więc domyka pytanie tak samo jak odpowiedź.
+
+Konsekwencja: **odpowiedzi demonstracyjne zniknęły z pytań ankiety**. Zostały tylko przy
+przedmiocie ubezpieczenia, gdzie są tym, czym mają być — danymi z poprzedniej polisy i z rejestrów.
+Ankieta zaczyna się pusta, jednym pytaniem, i rośnie w miarę odpowiadania.
+
+Łańcuch: `NEEDS_PROPERTY → NEED_THEFT → NEED_FLOOD → NEED_PORTABLE → RENTED_OUT → COVER_PERIOD →
+BUDGET → PROPERTY_VALUE → VACANCY → BUSINESS_USE → HIGH_VALUE_ITEMS → INSPECTIONS`. Przed progiem
+KNF urywa się po `RENTED_OUT`, bo dalszych pytań nie ma w wersji 1 regionu — i to samo w sobie
+pokazuje, co próg dokłada.
+
+### 18.5 Zweryfikowane na działającej aplikacji
+
+| Scenariusz | Wynik |
+|---|---|
+| Start, reżim ustawowy | **jedno** pytanie, licznik „1 pytań w ankiecie" |
+| Po dwóch odpowiedziach | trzy pytania, licznik „3" |
+| Koniec łańcucha przed progiem KNF | pięć pytań |
+| Przesunięcie daty za próg | łańcuch idzie dalej — `COVER_PERIOD`, potem `BUDGET` |
+| **Odmowa przy nieobowiązkowej składce** | **`PROPERTY_VALUE` i tak się odsłania** |
+| Krok 2 | dziewięć pytań w dwóch sekcjach, podsumowanie z sumami obok |
+| Krok 3 | propozycja + macierz wariantów + składki na jednym ekranie |

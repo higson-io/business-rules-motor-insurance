@@ -9,6 +9,11 @@
 	przerysowuje wszystkie kontrolki i gubi focus dokładnie w chwili, w której widz ma patrzeć na
 	to, że ankieta się zmieniła.
 
+	⛔ Ten sam komponent renderuje KROK 1 i KROK 2 — różni je wyłącznie wejście `kind`. Sekcje
+	oznaczone w Higsonie jako FORM to analiza potrzeb, KNOWN to przedmiot ubezpieczenia. Dwa
+	osobne komponenty rozjechałyby się przy pierwszej zmianie kontrolki, a różnica między nimi
+	nie jest różnicą renderowania — jest różnicą tego, o co pytamy.
+
 	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`, i nie idzie przez `mat-hint`.
 	Etykieta Material nie zawija się — ucina długie zdanie wielokropkiem — a hint jest
 	jednowierszowy i przy dłuższym tekście znika zupełnie. Obie treści pochodzą z Higsona i mogą
@@ -17,48 +22,6 @@
 -->
 @if (ready()) {
 	<div class="apk">
-		<!--
-			⛔ Dane, które JUŻ MAMY, stoją nad ankietą i domyślnie są zwinięte. Charakterystyka
-			przedmiotu ubezpieczenia nie jest analizą potrzeb — zakłady zbierają ją i dziś, poza
-			APK — więc pokazana jako pytania rozmywała to, o co w tym ekranie chodzi. Zwinięta
-			zostaje kontekstem, a rozwinięta pozwala prowadzącemu przestawić metraż albo kod
-			pocztowy i pokazać, jak przesuwa to sumę i strefę.
-
-			⛔ O tym, która sekcja tu trafia, decyduje atrybut KIND w Higsonie. Ani jednego kodu
-			sekcji nie ma w tym pliku.
-		-->
-		@if (known().length > 0) {
-			<section class="known" [class.known--open]="expanded()" data-testid="property-known">
-				<button type="button" class="known__head" (click)="toggleKnown()" [attr.aria-expanded]="expanded()">
-					<span class="known__caret" aria-hidden="true">{{ expanded() ? '▾' : '▸' }}</span>
-					<span class="known__title">Dane, które już mamy</span>
-					<span class="known__count">{{ knownCount() }}</span>
-					@if (!expanded()) {
-						<span class="known__summary">{{ knownSummary() }}</span>
-					}
-					<span class="known__toggle">{{ expanded() ? 'zwiń' : 'rozwiń' }}</span>
-				</button>
-
-				@if (expanded()) {
-					<div class="known__body">
-						@for (section of known(); track section.code) {
-							<h3 class="known__section">{{ section.title }}</h3>
-							<div class="apk__grid">
-								@for (question of section.questions; track question.code) {
-									<ng-container *ngTemplateOutlet="field; context: { $implicit: question }" />
-								}
-							</div>
-						}
-						<p class="known__note">
-							Tych danych nie zbieramy w analizie potrzeb — pochodzą z poprzedniej polisy i z rejestrów.
-							Możesz je tu poprawić; sumy, strefy i składka przeliczą się tak samo jak przy odpowiedzi
-							w ankiecie.
-						</p>
-					</div>
-				}
-			</section>
-		}
-
 		@for (section of sections(); track section.code) {
 			<section class="apk__section" [attr.data-section]="section.code">
 				<header class="apk__section-head">
@@ -77,10 +40,8 @@
 }
 
 <!--
-	⛔ JEDEN blok pytania dla obu miejsc: sekcji, o które pytamy, i zwiniętego paska danych,
-	które już mamy. Dwa osobne bloki rozjechałyby się przy pierwszej zmianie — a pasek musi
-	być w pełni edytowalny, bo prowadzący przestawia w nim metraż i kod pocztowy, żeby pokazać,
-	jak przesuwa to sumę ubezpieczenia i strefę powodziową.
+	⛔ JEDEN blok pytania. Pole ankiety i pole przedmiotu ubezpieczenia wyglądają i zachowują się
+	tak samo, bo są tym samym: pytaniem z Higsona. Różni je tylko to, w której sekcji wisi.
 -->
 <ng-template #field let-question>
 						<div

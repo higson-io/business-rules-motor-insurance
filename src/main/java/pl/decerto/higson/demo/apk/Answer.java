@@ -48,4 +48,16 @@ public class Answer {
 	public boolean isAnswered() {
 		return !refused && (value != null && !value.isEmpty() || !values.isEmpty());
 	}
+
+	/**
+	 * Czy klient się tym pytaniem ZAJĄŁ — odpowiedział albo świadomie odmówił.
+	 *
+	 * ⛔ To NIE jest `isAnswered()` i różnica jest nośna. Ankieta zależna odsłania kolejne pytanie
+	 * po domknięciu poprzedniego; gdyby liczyła się sama odpowiedź, pytanie nieobowiązkowe, które
+	 * klient pomija, zatrzymywałoby całą resztę ankiety na zawsze. Odmowa jest wartością (rek. 8.4),
+	 * więc domyka pytanie tak samo jak odpowiedź.
+	 */
+	public boolean isSettled() {
+		return refused || isAnswered();
+	}
 }

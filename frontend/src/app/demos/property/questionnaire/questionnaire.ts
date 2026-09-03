@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField } from '@angular/material/form-field';
@@ -71,71 +71,41 @@ export class Questionnaire {
 	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
 	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 */
-	private readonly all = computed<readonly (Section & { readonly kind: string })[]>(() => {
+	/**
+	 * Które sekcje renderować: `FORM` — analiza potrzeb, `KNOWN` — przedmiot ubezpieczenia.
+	 *
+	 * ⛔ Rodzaj przychodzi z Higsona (atrybut `KIND` sekcji), a komponent dostaje tylko to, którą
+	 * połowę ma pokazać. Nie ma tu ani jednego kodu sekcji: przeniesienie sekcji z kroku 1 do
+	 * kroku 2 jest zmianą jednego atrybutu w Studio.
+	 */
+	readonly kind = input.required<'FORM' | 'KNOWN'>();
+
+	/**
+	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer, a lista sekcji z serwera —
+	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
+	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
+	 *
+	 * ⚠️ Pytania przychodzą już przefiltrowane przez OBIE reguły — czy pytanie dotyczy tego
+	 * klienta i czy pora je zadać. Ankieta zależna odsłania kolejne pytanie po domknięciu
+	 * poprzedniego, ale liczy to serwer; filtrowanie tutaj zamieniłoby kolumnę `revealedBy`
+	 * w martwy wpis.
+	 */
+	readonly sections = computed<readonly Section[]>(() => {
 		const quote = this.loaded();
 		if (quote === null) {
 			return [];
 		}
 		return quote.sections
-			.filter((section) => section.visible)
+			.filter((section) => section.visible && section.kind === this.kind())
 			.map((section) => ({
 				code: section.code,
 				title: section.title,
-				kind: section.kind,
 				questions: quote.questions.filter(
 					(question) => question.section === section.code && question.visible,
 				),
 			}))
 			.filter((section) => section.questions.length > 0);
 	});
-
-	/** Sekcje, o które PYTAMY. */
-	readonly sections = computed<readonly Section[]>(() =>
-		this.all().filter((section) => section.kind !== 'KNOWN'),
-	);
-
-	/**
-	 * Sekcje, które już ZNAMY — charakterystyka przedmiotu ubezpieczenia i dane oceny ryzyka.
-	 *
-	 * ⛔ Nie ma tu ani jednego kodu sekcji. Podziałem rządzi atrybut `KIND` z Higsona, więc
-	 * przeniesienie sekcji między paskiem a ankietą jest zmianą konfiguracji. To nie jest
-	 * kosmetyka: analiza potrzeb to pytania o POTRZEBY, a metraż i rok budowy potrzebą nie są —
-	 * zakłady zbierają je i dziś, poza APK.
-	 */
-	readonly known = computed<readonly Section[]>(() =>
-		this.all().filter((section) => section.kind === 'KNOWN'),
-	);
-
-	/** Skrót paska: same wartości, w kolejności pytań, żeby dało się je przeczytać jednym rzutem. */
-	readonly knownSummary = computed<string>(() =>
-		this.known()
-			.flatMap((section) => section.questions)
-			.map((question) => this.display(question))
-			.filter((value) => value !== '')
-			.join(' · '),
-	);
-
-	readonly knownCount = computed<number>(() =>
-		this.known().reduce((count, section) => count + section.questions.length, 0),
-	);
-
-	readonly expanded = signal(false);
-
-	toggleKnown(): void {
-		this.expanded.update((open) => !open);
-	}
-
-	/** Wartość odpowiedzi po ludzku: etykieta wyboru zamiast kodu, „—" zamiast pustki. */
-	display(question: PropertyQuestionDto): string {
-		if (question.refused) {
-			return 'nie podano';
-		}
-		if (question.values.length > 0) {
-			return question.values.map((value) => this.label(question, value)).join(', ');
-		}
-		return question.value === null || question.value === '' ? '' : this.label(question, question.value);
-	}
-
 
 	label(question: PropertyQuestionDto, option: string): string {
 		const index = question.options.indexOf(option);

@@ -24,20 +24,13 @@
 	<div class="property__work">
 		@switch (step()) {
 			@case ('apk') {
-				<app-property-questionnaire />
-
 				<!--
-					⛔ Bramka. Odpowiedź „nie potrzebuję ubezpieczenia nieruchomości" zamyka tę
-					ścieżkę: nie ma potrzeby, więc nie ma czego rekomendować, a wycena zrobiona
-					mimo to byłaby ofertą na produkt, którego klient nie chce.
-
-					⛔ Ani pytanie, ani odpowiedź, ani treść komunikatu nie są tutaj — wszystkie
-					trzy przychodzą z tabeli `demo.property.apk.question.blocker`. Bramką może się
-					stać inne pytanie bez zmiany w tym pliku.
-
-					⚠️ Blokujemy PRZEJŚCIE, nie ankietę. Cofnięcie odpowiedzi odblokowuje ekran
-					natychmiast i to jest część demonstracji.
+					⛔ ANKIETA ZALEŻNA: kolejne pytanie pojawia się dopiero po domknięciu poprzedniego.
+					Łańcuch jest kolumną `revealedBy` w katalogu pytań, a nie kolejnością w tym pliku —
+					komponent dostaje gotową listę widocznych pytań i nic nie odsłania sam.
 				-->
+				<app-property-questionnaire kind="FORM" />
+
 				@if (blocked()) {
 					<p class="property__blocked" role="status" data-testid="property-blocked">
 						{{ blockMessage() }}
@@ -48,16 +41,42 @@
 					<button
 						type="button"
 						class="step-nav__next"
-						data-testid="to-recommendation"
+						data-testid="to-subject"
 						[disabled]="blocked()"
-						(click)="goTo('reco')"
+						(click)="goTo('subject')"
 					>
-						Zobacz rekomendację →
+						Przejdź do przedmiotu ubezpieczenia →
 					</button>
 				</div>
 			}
 
-			@case ('reco') {
+			@case ('subject') {
+				<!--
+					⛔ Osobny krok, nie część ankiety. Charakterystyka przedmiotu nie jest analizą
+					potrzeb — zakłady zbierają ją i dziś, poza APK — a wymieszana z pytaniami o potrzeby
+					rozmywała to, o co w kroku pierwszym chodzi. Które sekcje tu trafiają, mówi atrybut
+					`KIND` sekcji w Higsonie.
+				-->
+				<app-property-questionnaire kind="KNOWN" />
+
+				<div class="step-nav">
+					<button type="button" class="step-nav__back" (click)="goTo('apk')">
+						← Wróć do analizy potrzeb
+					</button>
+					<button type="button" class="step-nav__next" data-testid="to-proposal" (click)="goTo('proposal')">
+						Zobacz rekomendację i składkę →
+					</button>
+				</div>
+			}
+
+			@case ('proposal') {
+				<!--
+					⛔ REKOMENDACJA I SKŁADKA NA JEDNYM WIDOKU. Rozdzielone na dwa kroki kazały klientowi
+					pamiętać propozycję przez przejście dalej, żeby zestawić ją z ceną — a rek. 8.2.d
+					mówi o doborze „z uwzględnieniem akceptowalnej wartości składki", czyli o jednej
+					decyzji, a nie o dwóch ekranach. Propozycja stoi nad porównaniem, bo to ona jest
+					odpowiedzią; tabela wariantów jest tym, co pozwala się z nią nie zgodzić.
+				-->
 				<app-apk-recommendation
 					[recommendation]="recommendation()"
 					[copy]="copy"
@@ -68,20 +87,11 @@
 					[alternativePremium]="alternative()?.premium ?? null"
 				/>
 
-				<div class="step-nav">
-					<button type="button" class="step-nav__back" (click)="goTo('apk')">← Wróć do ankiety</button>
-					<button type="button" class="step-nav__next" data-testid="to-price" (click)="goTo('price')">
-						Zobacz składkę →
-					</button>
-				</div>
-			}
-
-			@case ('price') {
 				<app-property-comparison />
 
 				<div class="step-nav">
-					<button type="button" class="step-nav__back" (click)="goTo('reco')">
-						← Wróć do rekomendacji
+					<button type="button" class="step-nav__back" (click)="goTo('subject')">
+						← Wróć do przedmiotu ubezpieczenia
 					</button>
 					<button type="button" class="step-nav__next" data-testid="to-offer" (click)="goTo('offer')">
 						Przejdź do oferty →
@@ -93,8 +103,8 @@
 				<app-property-offer />
 
 				<div class="step-nav">
-					<button type="button" class="step-nav__back" (click)="goTo('price')">
-						← Wróć do składki
+					<button type="button" class="step-nav__back" (click)="goTo('proposal')">
+						← Wróć do rekomendacji
 					</button>
 				</div>
 			}
@@ -102,10 +112,12 @@
 	</div>
 
 	<!--
-		Podsumowanie towarzyszy rekomendacji i składce, ale NIE ankiecie: podczas odpowiadania sumy
-		jeszcze się przeliczają przy każdym kliknięciu i migotanie liczb odciąga od pytań.
+		Podsumowanie towarzyszy przedmiotowi ubezpieczenia i propozycji, ale NIE ankiecie: podczas
+		odpowiadania na pytania o potrzeby sumy jeszcze nic nie znaczą, a migotanie liczb odciąga
+		od pytań. Na kroku przedmiotu jest odwrotnie — tam każda zmiana metrażu czy kodu
+		pocztowego ma być widać natychmiast, bo to jest cały sens tego kroku.
 	-->
-	@if (ready() && step() !== 'apk' && step() !== 'offer') {
+	@if (ready() && (step() === 'subject' || step() === 'proposal')) {
 		<aside class="property__summary" data-testid="property-summary">
 			<h2 class="property__summary-title">Podsumowanie</h2>
 
@@ -130,13 +142,14 @@
 			</dl>
 
 			<!--
-				⛔ Cena TYLKO na kroku składki. Na kroku rekomendacji ta sama kwota stoi już
-				w nagłówku propozycji, gdzie należy do rek. 8.2.d — dwa razy ta sama liczba
-				z tym samym podpisem, kilkanaście centymetrów od siebie, czyta się jak usterka,
-				a nie jak podsumowanie. Podsumowanie zostaje przy swoim: sumach z reguł.
+				⛔ Tylko gdy wybór RÓŻNI SIĘ od propozycji — patrz `choiceDiffers`. Dopóki klient
+				nie odszedł od rekomendacji, ta kwota byłaby powtórzeniem liczby z nagłówka
+				propozycji na tym samym ekranie. Gdy odejdzie, jest jedyną rzeczą, która nazywa
+				różnicę między „proponujemy" a „wybrałeś".
 			-->
-			@if (step() === 'price' && chosen(); as variant) {
+			@if (choiceDiffers() && chosen(); as variant) {
 				<div class="property__price">
+					<p class="property__price-label">Twój wybór</p>
 					<p class="property__price-variant">{{ variant.name }}</p>
 					<p class="property__price-amount" data-testid="property-premium">
 						{{ premium(variant.annualPremium) }} zł

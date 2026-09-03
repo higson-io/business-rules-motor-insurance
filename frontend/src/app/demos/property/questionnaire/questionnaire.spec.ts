@@ -138,6 +138,10 @@ describe('Questionnaire', () => {
 
 	async function render(questions: readonly PropertyQuestionDto[]): Promise<HTMLElement> {
 		const fixture = TestBed.createComponent(Questionnaire);
+		// ⚠️ `kind` jest wymagane i musi być ustawione PRZED pierwszym `tick()` — komponent
+		// renderuje sekcje w `computed`, więc brak wejścia wybucha przy pierwszym odczycie,
+		// a nie przy tworzeniu. Fixture ustawiony na FORM, bo asercje dotyczą pytań ankiety.
+		fixture.componentRef.setInput('kind', 'FORM');
 		TestBed.tick();
 		httpTesting.expectOne('property').flush(quote(questions));
 		await TestBed.inject(ApplicationRef).whenStable();

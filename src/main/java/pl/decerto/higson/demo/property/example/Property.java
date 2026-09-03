@@ -235,7 +235,28 @@ public class Property {
 		question.setOptionLabels(split(row.getString("labels")));
 		question.setPrefillSource(row.getString("prefill"));
 		question.setRefusalMessage(row.getString("refusal"));
+		question.setRevealedBy(row.getString("revealedBy"));
+
+		// ⛔ ODSŁANIANIE SKŁADA SIĘ Z WIDOCZNOŚCIĄ, nie zastępuje jej. To dwie różne rzeczy:
+		// reguła `IS_VISIBLE` mówi, czy pytanie w ogóle DOTYCZY tego klienta (piętro nie dotyczy
+		// domu), a łańcuch `revealedBy` — czy już PORA je zadać. Pytanie musi przejść oba testy.
+		//
+		// ⚠️ Liczy się DOMKNIĘCIE poprzednika, nie odpowiedź: pytanie nieobowiązkowe, które klient
+		// pomija odmową, i tak przepuszcza ankietę dalej. Inaczej jedno „nie chcę podać" przy
+		// oczekiwanej składce zatrzymywałoby resztę ankiety na zawsze.
+		if (question.isVisible()) {
+			question.setVisible(isRevealed(quote, question.getRevealedBy()));
+		}
 		return question;
+	}
+
+	/** Czy pytanie, które odsłania to pytanie, zostało już domknięte. Brak wskazania — od razu. */
+	private boolean isRevealed(PropertyQuote quote, String revealedBy) {
+		if (revealedBy == null || revealedBy.isEmpty()) {
+			return true;
+		}
+		Answer answer = quote.getAnswers().get(revealedBy);
+		return answer != null && answer.isSettled();
 	}
 
 	/**

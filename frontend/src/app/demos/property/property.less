@@ -171,3 +171,13 @@
 	border-radius: @radius-panel;
 	color: @color-text;
 }
+
+// Podpis nad ceną wybranego wariantu. Pojawia się tylko wtedy, gdy wybór różni się od
+// propozycji, więc musi od razu mówić, czyja to kwota — inaczej czyta się jak druga składka.
+.property__price-label {
+	margin: 0 0 2px;
+	color: @color-text-muted;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
