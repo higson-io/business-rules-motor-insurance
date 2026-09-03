@@ -148,6 +148,12 @@ a quiet trigger carrying the date and regime name; the front page gets a **clien
 the `policyholder` the quote already carried, with its CRM source rendered as part of the card
 rather than a footnote. ⛔ The regime-changed marker stays **on the trigger**, because crossing the
 KNF threshold has to be noticeable while the drawer is shut.
+**§21 (2026-09-03)** strips the screen's commentary about itself — the lead under the title, the
+drawer's lead, and the "not typed in" half of the sum note. The claim they made is true and is
+demonstrated by the demo itself; printed beside the title it spoiled the point and read as a tool
+advert inside a sales process. Provenance copy stays (CRM source, "prefilled from the previous
+policy") — that is rec. 8.3, not a boast. ⚠️ The demo picker still narrates the engine in its
+subtitle and in the moto/life tiles; only the property tile was rewritten.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`

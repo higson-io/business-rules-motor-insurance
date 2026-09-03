@@ -43,8 +43,11 @@ export const DEMOS: readonly Demo[] = [
 	{
 		code: 'property',
 		step: '03',
+		// ⚠️ Opis mówi, CO klient tu przechodzi, a nie z czego zbudowane jest demo. Pozostałe dwa
+		// kafelki nadal opowiadają o silniku — do ujednolicenia, jeśli ekran wyboru też ma być
+		// pokazywany klientom.
 		name: 'Ubezpieczenie majątkowe',
 		summary:
-			'Data polisy zmienia nie cenę, tylko to, o co wolno zapytać klienta. Analiza potrzeb jest konfiguracją, nie formularzem.',
+			'Analiza potrzeb klienta, dobór zakresu i oferta dla domu albo mieszkania — krok po kroku, tak jak u agenta.',
 	},
 ];

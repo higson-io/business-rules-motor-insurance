@@ -2368,3 +2368,39 @@ cyfrą każdy.
 | Kliknięcie wyzwalacza | panel z datą, reżimem, podstawą prawną i licznikami |
 | Data przesunięta na 2027-09-01 | reżim KNF, „12 pytań **było 5**", „3 sekcje **było 1**", „tak **było nie**" |
 | Esc | panel zamknięty, **kropka zmiany zostaje na wyzwalaczu** |
+
+---
+
+## §21 Ekran przestaje opowiadać o sobie (2026-09-03)
+
+Pod tytułem stało zdanie: „Analiza potrzeb klienta jest konfiguracją w Higsonie, nie formularzem
+w kodzie. Java nie zna ani jednego pytania i ani jednego progu."
+
+Było prawdziwe i było **skierowane do niewłaściwej osoby**. Ekran ogląda klient kupujący
+ubezpieczenie, a nie architekt oceniający silnik reguł. Tezę o konfiguracji pokazuje samo demo —
+przesunięciem daty polisy i przestawieniem jednego wiersza w tabeli — więc wypisana obok tytułu
+tylko uprzedzała pointę i brzmiała jak reklama narzędzia w środku procesu sprzedaży.
+
+### 21.1 Co zniknęło
+
+| Miejsce | Tekst |
+|---|---|
+| Podpis pod tytułem | „…jest konfiguracją w Higsonie, nie formularzem w kodzie…" — **usunięty w całości** |
+| Panel ustawień | „…Wersje konfiguracji pilnuje region w Higsonie, nie kod aplikacji." — **usunięty w całości** |
+| Podsumowanie, pod sumą murów | „policzona z metrażu i standardu, **nie wpisana**" → „wyliczona z metrażu i standardu wykończenia" |
+| Kafelek na ekranie wyboru | „Analiza potrzeb jest konfiguracją, nie formularzem." → opis tego, co klient przechodzi |
+
+Trzeci wiersz jest przeredagowaniem, nie usunięciem: skąd wzięła się suma ubezpieczenia, to
+informacja **dla klienta** (rek. 8.2.c). Zniknęło z niej tylko przeciwstawienie „nie wpisana",
+czyli uwaga o mechanizmie, a nie o jego wyniku.
+
+### 21.2 Co zostaje i dlaczego
+
+Napisy o **pochodzeniu danych** zostają: „Kartoteka klienta (CRM)" na karcie klienta i
+„Podpowiedziane: Metraż z poprzedniej polisy" przy pytaniach. To nie są uwagi o silniku — to
+rekomendacja 8.3, która każe powiedzieć klientowi, że wartość nie pochodzi od niego.
+
+⚠️ **Ekran wyboru demo nadal opowiada o silniku** — podtytuł („decyzje podejmują reguły biznesowe
+Higsona") i kafelki komunikacyjny oraz życiowy. Zmieniony został wyłącznie kafelek majątkowy, bo
+prace toczą się na tym profilu. Do ujednolicenia, jeśli ekran wyboru też ma być pokazywany
+klientom.

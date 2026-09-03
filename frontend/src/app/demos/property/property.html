@@ -1,17 +1,15 @@
 <!--
-	Układ: tytuł, data ochrony nad wszystkim (bo przełącza reżim, a więc i zawartość każdego
-	z trzech kroków), pasek kroków, a pod nim jeden krok naraz.
+	Układ: tytuł, karta klienta z cichym dostępem do ustawień, pasek kroków, a pod nim jeden krok
+	naraz.
 
-	⛔ Data stoi NAD paskiem, nie w pierwszym kroku. Jest kontekstem całej wyceny, nie odpowiedzią
-	na pytanie — przesunięcie jej przez 1 lipca 2027 zmienia zestaw pytań, reżim i treść
-	rekomendacji naraz, więc musi być widoczna, w którym kroku by się nie stało.
+	⛔ BEZ PODPISU POD TYTUŁEM. Stało tu zdanie o tym, że analiza potrzeb jest konfiguracją
+	w Higsonie, a nie formularzem w kodzie. Było prawdziwe i było skierowane do niewłaściwej osoby:
+	ekran ogląda klient kupujący ubezpieczenie, a nie architekt oceniający silnik reguł. Tezę
+	o konfiguracji pokazuje samo demo — przestawieniem daty i wiersza w tabeli — więc wypisana
+	obok tytułu tylko uprzedzała pointę i brzmiała jak reklama narzędzia.
 -->
 <header class="property__head">
 	<h1 class="property__title">Ubezpieczenie domu i mieszkania</h1>
-	<p class="property__lead">
-		Analiza potrzeb klienta jest konfiguracją w Higsonie, nie formularzem w kodzie. Java nie zna
-		ani jednego pytania i ani jednego progu.
-	</p>
 </header>
 
 <app-error-banner [loadError]="loadError()" testId="property-error-banner" />
@@ -141,13 +139,15 @@
 			<h2 class="property__summary-title">Podsumowanie</h2>
 
 			<!--
-				Suma murów wybita, bo to ona jest liczona przez reguły z odpowiedzi klienta, a nie
-				wpisywana. Reszta to jej rozbicie i wejścia, które ją wyznaczyły — dlatego niżej i
-				drobniej.
+				Suma murów wybita, bo to ona jest liczona z odpowiedzi klienta, a nie wpisywana.
+				Reszta to jej rozbicie — dlatego niżej i drobniej.
+
+				⚠️ Podpis mówi, SKĄD wzięła się liczba, i to jest informacja dla klienta (rek. 8.2.c).
+				Nie mówi już „nie wpisana" — to była uwaga o mechanizmie, nie o jego wyniku.
 			-->
 			<p class="property__headline-label">Suma ubezpieczenia murów</p>
 			<p class="property__headline" data-testid="property-sum-building">{{ sumBuilding() }} zł</p>
-			<p class="property__headline-note">policzona z metrażu i standardu, nie wpisana</p>
+			<p class="property__headline-note">wyliczona z metrażu i standardu wykończenia</p>
 
 			<dl class="property__rows">
 				<dt>Elementy stałe</dt>
