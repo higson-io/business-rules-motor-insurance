@@ -59,7 +59,7 @@ public class Property {
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
 
 	private static final String PARAM_REGIME = "demo.property.apk.regime";
-	private static final String PARAM_DEFAULT_ANSWER = "demo.property.apk.question.defaultAnswer";
+	private static final String PARAM_QUESTION = "demo.property.apk.question";
 	private static final String PARAM_COVER_AVAILABILITY = "demo.property.cover.availability";
 
 	private static final String FUNCTION_BUILDING_AGE = "demo.property.util.buildingAge";
@@ -69,9 +69,8 @@ public class Property {
 	private static final String FUNCTION_LIMIT = "demo.property.limit.effective";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
-	private static final String PARAM_APK_NEED = "demo.property.apk.need.derive";
-	private static final String PARAM_APK_EXCLUSION = "demo.property.apk.exclusion.conflict";
-	private static final String PARAM_APK_NEED_CONFLICT = "demo.property.apk.need.conflict";
+	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
+	private static final String PARAM_APK_WARNING = "demo.property.apk.warning";
 	private static final String PARAM_APK_BLOCKER = "demo.property.apk.question.blocker";
 	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
@@ -213,22 +212,29 @@ public class Property {
 		Question question = new Question();
 		question.setCode(definition.getCode());
 		question.setSection(sectionCode);
+
+		// Pięć rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
 		question.setText(attrString(definition, "TEXT", ctx));
-		question.setKind(attrString(definition, "KIND", ctx));
 		question.setHelp(attrString(definition, "HELP", ctx));
+		// ⛔ NOŚNE. `KIND` niesie i rodzaj kontrolki, i typ wartości — `PropertyContext.convert`
+		// konwertuje po nim. Do 3 września 2026 były to dwa atrybuty; rozdzielone dawały cztery
+		// kombinacje, z których sensowne były dwie, a pomyłka kończyła się tym, że „400" nie
+		// stawało się `BigDecimal` i budżet klienta znikał w drodze do rekomendacji.
+		// `NUMBER` rozpadł się na `INTEGER` i `DECIMAL` i to wystarczyło, żeby drugi atrybut
+		// przestał być potrzebny.
+		question.setKind(attrString(definition, "KIND", ctx));
 		question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
-		// ⛔ NOŚNE. Bez `VALUE_TYPE` odpowiedź wchodzi do kontekstu jako łańcuch, a
-		// `PropertyContext.convert` konwertuje PO TYPIE WARTOŚCI — więc „400" nie stawało się
-		// `BigDecimal`, `decimalAt` zwracało null i budżet klienta znikał w drodze do
-		// rekomendacji. Cała gałąź BUDGET_EXCEEDED (D-7) była nieosiągalna.
-		question.setValueType(attrString(definition, "VALUE_TYPE", ctx));
-		question.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
 		question.setVisible(Boolean.TRUE.equals(definition.getAttrBoolean("IS_VISIBLE", ctx)));
-		question.setRequired(Boolean.TRUE.equals(definition.getAttrBoolean("IS_REQUIRED", ctx)));
-		question.setOptions(split(attrString(definition, "OPTIONS", ctx)));
-		question.setOptionLabels(split(attrString(definition, "OPTION_LABELS", ctx)));
-		question.setPrefillSource(attrString(definition, "PREFILL_SOURCE", ctx));
-		question.setRefusalMessage(attrString(definition, "REFUSAL_MESSAGE", ctx));
+
+		// Reszta z KATALOGU — te, które na elemencie były identycznym wskaźnikiem `$p` i tylko
+		// zasłaniały pięć powyższych. Jeden odczyt zamiast sześciu atrybutów i pięciu tabel.
+		ParamValue row = engine.get(PARAM_QUESTION, ctx);
+		question.setPosition(intOrZero(row.getInteger("position")));
+		question.setRequired(Boolean.TRUE.equals(row.getBoolean("required")));
+		question.setOptions(split(row.getString("options")));
+		question.setOptionLabels(split(row.getString("labels")));
+		question.setPrefillSource(row.getString("prefill"));
+		question.setRefusalMessage(row.getString("refusal"));
 		return question;
 	}
 
@@ -245,7 +251,7 @@ public class Property {
 				continue;
 			}
 			PropertyContext ctx = new PropertyContext(quote).withQuestion(question.getCode());
-			String value = engine.get(PARAM_DEFAULT_ANSWER, ctx).getString("value");
+			String value = engine.get(PARAM_QUESTION, ctx).getString("demoAnswer");
 			if (value == null || value.isEmpty()) {
 				continue;
 			}
@@ -377,25 +383,25 @@ public class Property {
 	 * dla klienta nie ma w tym pliku — wszystkie siedzą w `demo.property.apk.*`.
 	 */
 	private void recommend(PropertyQuote quote) {
-		List<Need> needs = ApkAnalysis.deriveNeeds(engine, PARAM_APK_NEED,
+		List<Need> needs = ApkAnalysis.deriveNeeds(engine, PARAM_APK_ANSWER,
 			quote.getQuestions(), quote.getAnswers(),
 			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value));
 		quote.setNeeds(needs);
 
-		// Dwie tabele, jeden przebieg i jedna lista. Pierwsza konfrontuje sytuację klienta
-		// z wyłączeniami OWU (rek. 8.2.c), druga — z tym, czego klient sam SOBIE ODMÓWIŁ, choć
-		// jego sytuacja tego wymaga: mieszkanie w strefie zalewowej i „nie" przy powodzi.
-		// Obie mają ten sam kształt wyjścia, więc chodzą tym samym kodem i sortują się razem
-		// po wadze — inaczej ostrzeżenie cięższe stanęłoby pod lżejszym.
-		List<Warning> warnings = new ArrayList<>();
-		if (quote.getRegime().isRequiresExclusionCheck()) {
-			warnings.addAll(ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION,
+		// Jedna tabela, jeden przebieg, jedna lista. Wyłączenia OWU stykające się z sytuacją
+		// klienta (rek. 8.2.c) i ochrona, której klient sam sobie odmówił, choć jego sytuacja
+		// tego wymaga (rek. 8.2.b), miały do 3 września 2026 dwie osobne tabele o identycznym
+		// kształcie wyjścia. Jedna tabela z dwoma kolumnami stref robi obie rzeczy i czyta się
+		// jak lista tego, co trzeba klientowi powiedzieć — bo tym właśnie jest.
+		// ⛔ Gałąź reżimu zostaje. Wszystkie wiersze tej tabeli są konfrontacją sytuacji klienta —
+		// z wyłączeniami OWU albo ze strefą — więc jeden przełącznik `requiresExclusionCheck`
+		// rządzi całą listą. Przed progiem KNF ostrzeżeń nie ma i to jest widoczna różnica
+		// między reżimami, a nie brak danych.
+		List<Warning> warnings = quote.getRegime().isRequiresExclusionCheck()
+			? new ArrayList<>(ApkAnalysis.checkExclusions(engine, PARAM_APK_WARNING,
 				quote.getQuestions(), quote.getAnswers(),
-				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)));
-		}
-		warnings.addAll(ApkAnalysis.checkExclusions(engine, PARAM_APK_NEED_CONFLICT,
-			quote.getQuestions(), quote.getAnswers(),
-			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)));
+				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)))
+			: new ArrayList<>();
 		Warning valueGap = checkValueGap(quote);
 		if (valueGap != null) {
 			warnings.add(valueGap);
@@ -412,6 +418,16 @@ public class Property {
 		if (!quote.isVariantChosen()) {
 			quote.setSelectedVariant(quote.getRecommendation().getVariantCode());
 		}
+	}
+
+	/** Miejsce pakietu w drabince, albo `null`, gdy w tej strefie nie ma go wcale. */
+	private Integer rankOf(List<Variant> ladder, String code) {
+		for (Variant variant : ladder) {
+			if (variant.getCode().equals(code)) {
+				return variant.getPosition();
+			}
+		}
+		return null;
 	}
 
 	private Variant variantByCode(PropertyQuote quote, String code) {
@@ -508,14 +524,22 @@ public class Property {
 		}
 		ladder.sort(Comparator.comparingInt(Variant::getPosition));
 
-		Variant best = ladder.get(0);
-		ApkAnalysis.Score bestScore = ApkAnalysis.score(needs, best.getCovers()::contains);
-		for (Variant variant : ladder) {
-			ApkAnalysis.Score score = ApkAnalysis.score(needs, variant.getCovers()::contains);
-			if (score.getCovered() > bestScore.getCovered()) {
-				best = variant;
-				bestScore = score;
-			}
+		// ⛔ PAKIET WSKAZUJE TABELA. Java pyta `demo.property.apk.answer`, co oznacza każda
+		// udzielona odpowiedź, i zostawia najbogatszy wskazany pakiet — patrz `ApkAnalysis.pickPackage`.
+		// Wcześniej stał tu algorytm maksymalizujący pokrycie potrzeb; działał, ale rozmowa
+		// o rekomendacji toczyła się wtedy nad tą klasą, a nie nad tabelą.
+		//
+		// ⚠️ Wskazany pakiet może nie pokrywać wszystkich potrzeb i NIE PODNOSIMY go z tego
+		// powodu. Luka jest nazwana niżej, w `NEEDS_PARTIAL` — tak samo jak luka budżetowa.
+		Variant best = variantByCode(quote, ApkAnalysis.pickPackage(engine, PARAM_APK_ANSWER,
+			quote.getQuestions(), quote.getAnswers(),
+			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value),
+			code -> rankOf(ladder, code)));
+
+		// Tabela nie wskazała nic albo wskazała wariant niedostępny w tej strefie — wtedy
+		// najuboższy dostępny, bo milczenie nie jest propozycją.
+		if (best == null || !ladder.contains(best)) {
+			best = ladder.get(0);
 		}
 
 		// Propozycją zostaje `best` BEZ WZGLĘDU NA CENĘ — patrz komentarz nad metodą.

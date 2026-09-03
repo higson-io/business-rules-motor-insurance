@@ -116,10 +116,19 @@ have" strip driven by a new `SECTION.KIND` attribute; and — the load-bearing c
 proposal to the richest variant inside budget, making the scope depend on price; now the best-fit
 variant is always proposed and the cheaper one rides alongside as an alternative.
 Three new tables: `apk.need.conflict`, `sum.valueGap`, `apk.question.blocker`.
+**§17 (2026-09-03)** cuts the configuration down to what a client can take in at a glance, and
+finishes moving the recommendation out of Java. The `QUESTION` type goes from **12 attributes to
+5** — the seven that were an identical `$p` pointer on every question become one row of a new
+catalogue table, and `KIND` absorbs `VALUE_TYPE` (`NUMBER` splits into `INTEGER`/`DECIMAL`);
+`COVER` goes 7→3 and `VARIANT` 4→2 by dropping attributes Java never read. Thirteen APK tables
+become eight. And **`demo.property.apk.answer` now names the package** each answer calls for:
+Java walks the answers, the table decides, and the richest indicated package wins — verified live,
+one cell edited in Studio changes the recommendation with no restart. The table is the only
+authority; an under-covering package is reported as a gap, never silently upgraded.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
-depends on the region version — a question added without `CONTEXT_PATH` and `VALUE_TYPE` will not
-reach the engine, and a question added under `SECTIONS[NEEDS]` silently inherits region version 2
-(**W-24**).
+depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
+version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
+prefix, which only breaks the *next* element someone adds (**W-25**).
 
 ### Vision (`project/vision.md`)
 *Not created.* Add it to capture project mission, goals, target users, and long-term direction.
@@ -355,4 +364,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt to the analyst's notes; expected premium no longer filters the recommendation)
+**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt to the analyst's notes; configuration cut to 5 attributes per question; recommendation moved from Java into a decision table)

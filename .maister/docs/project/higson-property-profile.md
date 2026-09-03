@@ -2074,3 +2074,92 @@ zainteresowany?" z przekierowaniem do dema komunikacyjnego albo życiowego — *
 zbudowana**; wybrano wersję szybszą (walidację). Aplikacja ma oba pozostałe dema, więc
 przekierowanie byłoby prawdziwe, a nie udawane; to jest najtańsza rzecz do dołożenia, gdyby
 prezentacja tego potrzebowała.
+
+---
+
+## §17 Uproszczenie konfiguracji pod demo dla klienta (2026-09-03)
+
+Punkt wyjścia: klienci oglądający demo nie znają wcześniej konfiguracji, a pytanie APK miało
+**dwanaście atrybutów**, z których siedem było identycznym wskaźnikiem `$p` na każdym pytaniu.
+Widz przewijał dwanaście wierszy, żeby dowiedzieć się dwóch rzeczy.
+
+### 17.1 Co zniknęło i dokąd
+
+| Typ domenowy | Przed | Po | Co się stało z resztą |
+|---|---|---|---|
+| `QUESTION` | 12 | **5** | sześć ustawień → jeden wiersz tabeli, `VALUE_TYPE` wchłonięty przez `KIND` |
+| `COVER` | 7 | **3** | cztery atrybuty, których Java **nigdy nie czytała** |
+| `VARIANT` | 4 | **2** | dwa atrybuty, których Java nigdy nie czytała — dostępność bierze flow wprost z tabeli |
+| `SECTION` | 4 | 4 | bez zmian, wszystkie są używane |
+
+Pytanie niesie teraz pięć rzeczy, i każda jest przy każdym pytaniu **inna**: `TEXT` (o co pytamy),
+`HELP` (jak to wyjaśniamy), `KIND` (jakiego rodzaju jest odpowiedź), `CONTEXT_PATH` (gdzie ona
+ląduje) i `IS_VISIBLE` (kiedy pytanie jest widoczne — jedyna reguła na elemencie). Nazwy atrybutów
+skrócono do dwóch–czterech słów; opis mechanizmu przeniesiono do opisu typu, gdzie nie zasłania
+listy.
+
+### 17.2 D-12 — `KIND` wchłania `VALUE_TYPE`
+
+Dwa atrybuty opisywały tę samą rzecz z dwóch stron: `KIND` mówił, jak narysować kontrolkę,
+`VALUE_TYPE` — czym jest wpisana w nią wartość. Dawały cztery kombinacje, z których sensowne były
+dwie, a pomyłka **nie wybuchała** — dawała złą liczbę (to jest ten sam mechanizm, który w §13
+zabrał całą gałąź `BUDGET_EXCEEDED`).
+
+Rozbicie `NUMBER` na `INTEGER` i `DECIMAL` sprawiło, że rodzaj wyznacza typ jednoznacznie:
+`TEXT`/`CHOICE`/`MULTI` → łańcuch, `INTEGER` → `Integer`, `DECIMAL`/`MONEY` → `BigDecimal`,
+`BOOLEAN` → `Boolean`. Drugi atrybut przestał być potrzebny — zniknął też z DTO i z modelu frontu.
+
+### 17.3 Trzynaście tabel APK → osiem
+
+| Nowa tabela | Zastąpiła |
+|---|---|
+| `demo.property.apk.question` — katalog pytań | `question.position`, `question.required`, `question.options`, `question.prefill`, `question.defaultAnswer` |
+| `demo.property.apk.answer` — co wynika z odpowiedzi | `apk.need.derive` (+ nowa kolumna `package`) |
+| `demo.property.apk.warning` — ostrzeżenia | `apk.exclusion.conflict`, `apk.need.conflict` |
+
+Katalog czyta się jak arkusz z ankietą: jeden wiersz = jedno pytanie. Osiem starych tabel zostało
+**usuniętych**, nie osieroconych.
+
+⚠️ Scalenie ostrzeżeń wymusiło **jedną skalę wag 0–100** — wcześniej wyłączenia OWU chodziły po
+1–2, a konfrontacje ze strefą po 50–90, więc wspólna lista sortowałaby się po dwóch różnych
+miarach. Próg wyróżnienia na froncie przeszedł z `>= 2` na `>= 50`.
+
+### 17.4 D-13 — rekomendację wskazuje tabela, nie algorytm
+
+Druga połowa zmiany. Wybór pakietu robił **algorytm w Javie**: policz, ile potrzeb pokrywa każdy
+wariant, weź najlepszy, przy remisie tańszy. Działał, ale nie był widoczny nigdzie w Studio —
+rozmowa o rekomendacji toczyła się nad klasą, a nie nad tabelą.
+
+Teraz `demo.property.apk.answer` ma kolumnę **pakiet**: z każdej odpowiedzi wynika, od którego
+wariantu ta ochrona jest dostępna. Java przechodzi po udzielonych odpowiedziach, pyta tabelę
+i zostawia **najbogatszy wskazany pakiet** — ten sam wzorzec co `deriveNeeds` (pętla w kodzie,
+decyzja w tabeli), wyniesiony do `ApkAnalysis.pickPackage`.
+
+⛔ **Tabela jest jedynym autorytetem.** Wskazany pakiet może nie pokrywać wszystkich potrzeb i kod
+go z tego powodu **nie podnosi** — luka zostaje nazwana przez `NEEDS_PARTIAL`, tak samo jak luka
+budżetowa. Kod, który po cichu podnosiłby wariant, przywróciłby ukryty algorytm i unieważnił
+tabelę. Jedyny wyjątek: gdy tabela nie wskaże nic albo wskaże wariant niedostępny w tej strefie,
+propozycją zostaje najuboższy dostępny — milczenie nie jest propozycją.
+
+**Zweryfikowane na działającej aplikacji**, łącznie z tezą demo:
+
+| Scenariusz | Rekomendacja |
+|---|---|
+| mieszkanie, kradzież TAK | Pełny (3/3) |
+| mieszkanie, kradzież NIE | Standardowy (2/2) |
+| mieszkanie, kradzież NIE, powódź TAK | Pełny (3/3) |
+| dom, wszystko NIE | Podstawowy (1/1) |
+| **`NEED_THEFT` → `STANDARD` w tabeli, publikacja** | **Standardowy (2/3), „poza zakresem zostaje: Kradzież"** |
+
+Ostatni wiersz to cała demonstracja: przestawienie **jednej komórki** w Studio zmieniło
+rekomendację **bez restartu aplikacji** — silnik podchwycił zmianę przy pierwszym odświeżeniu.
+Wartość przywrócono po teście.
+
+### 17.5 W-25 — `$p` w wartości domyślnej dubluje się przez API
+
+⚠️ `update_domain_type` **sam dokłada prefiks** `$p` do `defaultValue` typu PARAMETER. Podanie
+`"$p demo.property.cover.position"` daje w bazie `$p $p demo.property.cover.position`. Nie widać
+tego od razu, bo istniejące elementy mają wartości jawne i działają — ale **pierwszy nowy element
+dodany w Studio spada na wartość domyślną i wywala 500** z komunikatem o nieznalezionym parametrze
+o nazwie zaczynającej się od `$p`. Podawać **sam kod**, bez prefiksu. To jest ta sama rodzina
+błędu co W-24 z §16.

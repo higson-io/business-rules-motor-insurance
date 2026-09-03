@@ -21,8 +21,8 @@ import pl.decerto.higson.demo.apk.Question;
  * dołożenie pytania w Studio wymagałoby wtedy zmiany w Javie. Wartości wyliczone (wiek budynku,
  * strefy, sumy, czynnik ryzyka) idą osobno, bo nie pochodzą z żadnej odpowiedzi.
  *
- * Typ wartości bierze się z atrybutu VALUE_TYPE pytania, nie z jego kodu — Java zna rodzaje
- * wartości, a nie katalog pytań.
+ * Typ wartości bierze się z atrybutu KIND pytania, nie z jego kodu — Java zna rodzaje odpowiedzi,
+ * a nie katalog pytań.
  */
 public class PropertyContext extends HigsonContext {
 
@@ -142,7 +142,7 @@ public class PropertyContext extends HigsonContext {
 			if (answer == null || !answer.isAnswered()) {
 				continue;
 			}
-			values.put(path, convert(question.getValueType(), answer.getValue()));
+			values.put(path, convert(question.getKind(), answer.getValue()));
 		}
 	}
 
@@ -180,28 +180,32 @@ public class PropertyContext extends HigsonContext {
 	}
 
 	/**
-	 * Konwersja po TYPIE WARTOŚCI z konfiguracji, nie po kodzie pytania i nie po rodzaju kontrolki.
+	 * Konwersja po RODZAJU ODPOWIEDZI z konfiguracji, nie po kodzie pytania.
 	 *
 	 * ⚠️ Silnik NIE konwertuje typów przy dopasowaniu poziomu wejściowego — BigDecimal podany pod
-	 * poziom integer kończy się „conversion not supported". Dlatego VALUE_TYPE jest osobnym
-	 * atrybutem pytania: KIND mówi, jak narysować kontrolkę, VALUE_TYPE — czym jest wpisana w nią
-	 * wartość. Rozdzielenie tych dwóch rzeczy kosztuje jeden atrybut i usuwa całą klasę cichych
-	 * pudeł, w których tabela spada na wiersz domyślny zamiast wybuchnąć.
+	 * poziom integer kończy się „conversion not supported", a łańcuch pod poziom decimal cicho
+	 * spada na wiersz domyślny. Dlatego rodzaj musi rozstrzygać jednoznacznie.
+	 *
+	 * ⛔ JEDEN atrybut, nie dwa. Do 3 września 2026 stały tu obok siebie KIND (jak narysować
+	 * kontrolkę) i VALUE_TYPE (czym jest wartość) — para, w której sensowne były dwie kombinacje
+	 * na cztery możliwe, a pomyłka nie wybuchała, tylko dawała złą liczbę. Wystarczyło rozbić
+	 * `NUMBER` na `INTEGER` i `DECIMAL`, żeby rodzaj wyznaczał typ jednoznacznie i drugi atrybut
+	 * stał się zbędny.
 	 */
-	private Object convert(String valueType, String value) {
+	private Object convert(String kind, String value) {
 		if (value == null || value.isEmpty()) {
 			return null;
 		}
-		if ("DECIMAL".equals(valueType)) {
+		if ("DECIMAL".equals(kind) || "MONEY".equals(kind)) {
 			return new BigDecimal(value);
 		}
-		if ("INTEGER".equals(valueType)) {
+		if ("INTEGER".equals(kind)) {
 			return Integer.valueOf(value);
 		}
-		if ("BOOLEAN".equals(valueType)) {
+		if ("BOOLEAN".equals(kind)) {
 			return Boolean.valueOf(value);
 		}
-		if ("DATE".equals(valueType)) {
+		if ("DATE".equals(kind)) {
 			return LocalDate.parse(value);
 		}
 		return value;

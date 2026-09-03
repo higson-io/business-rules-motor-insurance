@@ -24,7 +24,6 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 		code: 'Q',
 		text: 'Pytanie',
 		kind: 'TEXT',
-		valueType: 'STRING',
 		section: 'SUBJECT',
 		help: null,
 		position: 10,

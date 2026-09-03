@@ -10,20 +10,40 @@
 
 import { ApkRecommendationDto } from './apk';
 
-/** How to render the control. Comes from the question's KIND attribute. */
-export type QuestionKind = 'CHOICE' | 'MULTI' | 'NUMBER' | 'MONEY' | 'BOOLEAN' | 'TEXT';
+/**
+ * What the answer IS — and, from that, how the control is drawn. One attribute, not two.
+ *
+ * ⛔ There used to be a separate `valueType`. Splitting "how to draw it" from "what it is" gave
+ * four combinations where two made sense, and a mismatch did not fail — it quietly produced the
+ * wrong number. Splitting `NUMBER` into `INTEGER` and `DECIMAL` made the second attribute
+ * redundant, so it is gone from the wire as well.
+ */
+export type QuestionKind =
+	| 'CHOICE'
+	| 'MULTI'
+	| 'INTEGER'
+	| 'DECIMAL'
+	| 'MONEY'
+	| 'BOOLEAN'
+	| 'TEXT';
 
-/** What the answer IS, separately from how it is drawn — see the VALUE_TYPE attribute. */
-export type QuestionValueType = 'STRING' | 'INTEGER' | 'DECIMAL' | 'BOOLEAN' | 'DATE';
-
-/** Sections of the questionnaire. NEEDS and EXCLUSIONS exist only under the 2026 recommendations. */
-export type QuestionSection = 'SUBJECT' | 'SITUATION' | 'NEEDS' | 'EXCLUSIONS';
+/**
+ * Sections of the questionnaire.
+ *
+ * ⚠️ This is documentation, not a gate — the component never matches on a section code. NEEDS
+ * and EXCLUSIONS exist only under the 2026 recommendations; NEEDS_BASE exists in both regimes.
+ */
+export type QuestionSection =
+	| 'SUBJECT'
+	| 'SITUATION'
+	| 'NEEDS_BASE'
+	| 'NEEDS'
+	| 'EXCLUSIONS';
 
 export interface PropertyQuestionDto {
 	readonly code: string;
 	readonly text: string;
 	readonly kind: QuestionKind;
-	readonly valueType: QuestionValueType;
 	readonly section: QuestionSection;
 	readonly help: string | null;
 	readonly position: number;

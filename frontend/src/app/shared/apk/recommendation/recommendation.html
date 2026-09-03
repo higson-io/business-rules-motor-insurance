@@ -10,9 +10,15 @@
 			<section class="reco__warnings" data-testid="apk-warnings">
 				<h3 class="reco__section-title">{{ copy().warningsTitle }}</h3>
 				@for (warning of warnings(); track warning.code) {
+					<!--
+						⚠️ Próg 50, nie 2. Skala wag przeszła na 0–100, kiedy dwie tabele ostrzeżeń
+						scaliły się w jedną: wcześniej wyłączenia OWU chodziły po 1–2, a
+						konfrontacje ze strefą po 50–90, więc jedna lista sortowała się po dwóch
+						różnych miarach. Zostawiony próg 2 wyróżniałby wszystko, czyli nic.
+					-->
 					<div
 						class="reco__warning"
-						[class.reco__warning--severe]="warning.severity >= 2"
+						[class.reco__warning--severe]="warning.severity >= 50"
 						[attr.data-warning]="warning.code"
 					>
 						<p class="reco__warning-text">{{ warning.text }}</p>

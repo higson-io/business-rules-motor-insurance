@@ -8,7 +8,6 @@ public class PropertyQuestionDto {
 	private String code;
 	private String text;
 	private String kind;
-	private String valueType;
 	private String section;
 	private String help;
 	private int position;
@@ -44,14 +43,6 @@ public class PropertyQuestionDto {
 
 	public void setKind(String kind) {
 		this.kind = kind;
-	}
-
-	public String getValueType() {
-		return valueType;
-	}
-
-	public void setValueType(String valueType) {
-		this.valueType = valueType;
 	}
 
 	public String getSection() {
