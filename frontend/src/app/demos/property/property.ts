@@ -6,6 +6,7 @@ import { ApkRecommendation } from '../../shared/apk/recommendation/recommendatio
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { Step, StepBar } from '../../shared/step-bar/step-bar';
 import { Comparison } from './comparison/comparison';
+import { Client } from './client/client';
 import { EffectiveDate } from './effective-date/effective-date';
 import { Offer } from './offer/offer';
 import { Questionnaire } from './questionnaire/questionnaire';
@@ -45,6 +46,7 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	selector: 'app-property',
 	imports: [
 		ApkRecommendation,
+		Client,
 		Comparison,
 		EffectiveDate,
 		ErrorBanner,

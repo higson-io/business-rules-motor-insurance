@@ -1,0 +1,32 @@
+<!--
+	⛔ Nagłówek mówi, KTO jest po drugiej stronie, a nie jak skonfigurowany jest silnik. Pasek
+	techniczny, który tu stał, zszedł do wysuwanego panelu obok.
+
+	⛔ Źródło danych jest częścią karty, nie przypisem. Bez niego zestaw personaliów na ekranie
+	demo wygląda jak dane prawdziwej osoby.
+-->
+@if (client(); as client) {
+	<div class="client" data-testid="property-client">
+		<span class="client__avatar" aria-hidden="true">{{ initials() }}</span>
+
+		<div class="client__who">
+			<p class="client__name">{{ name() }}</p>
+			<p class="client__source">{{ client.source }}</p>
+		</div>
+
+		<dl class="client__facts">
+			<div class="client__fact">
+				<dt>PESEL</dt>
+				<dd>{{ client.pesel }}</dd>
+			</div>
+			<div class="client__fact">
+				<dt>Adres</dt>
+				<dd>{{ address() }}</dd>
+			</div>
+			<div class="client__fact client__fact--wide">
+				<dt>Kontakt</dt>
+				<dd>{{ client.email }} · {{ client.phone }}</dd>
+			</div>
+		</dl>
+	</div>
+}

@@ -142,6 +142,12 @@ leaves the domain type — a question now carries **four attributes**; the delet
 archived in §19.4. ⚠️ **W-26**: `@if` has no key, so Angular reused the `mat-button-toggle-group`
 node between questions and two consecutive identical answers silently never reached the server —
 `@for … track question.code` over a one-element list is the fix, guarded by a mutation-proven test.
+**§20 (2026-09-03)** takes the technical band off the front page. Policy date, regime, legal basis
+and the counters move into a right-hand **drawer** (closed by default, Esc/scrim/✕ to close) behind
+a quiet trigger carrying the date and regime name; the front page gets a **client card** built from
+the `policyholder` the quote already carried, with its CRM source rendered as part of the card
+rather than a footnote. ⛔ The regime-changed marker stays **on the trigger**, because crossing the
+KNF threshold has to be noticeable while the drawer is shut.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
@@ -381,4 +387,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-03 (aligned with PM spec 1.7: one question per screen, packages before recommendation, recommendation repeated in the summary; question down to four attributes)
+**Last regenerated**: 2026-09-03 (aligned with PM spec 1.7; technical band moved into a drawer, client card on the front page)

@@ -16,7 +16,16 @@
 
 <app-error-banner [loadError]="loadError()" testId="property-error-banner" />
 
-<app-property-effective-date />
+<!--
+	⛔ Pierwszy plan należy do KLIENTA, nie do konfiguracji. Pasek techniczny — data polisy, nazwa
+	reżimu, liczniki pytań — stał tu jako najgłośniejszy element ekranu i kazał patrzeć na silnik
+	zamiast na rozmowę. Zszedł do wysuwanego panelu po prawej, gdzie jest o jedno kliknięcie;
+	wyzwalacz niesie datę i reżim, czyli to, na co warto rzucić okiem bez otwierania.
+-->
+<div class="property__identity">
+	<app-property-client />
+	<app-property-effective-date />
+</div>
 
 <app-step-bar [steps]="steps" [current]="step()" (selected)="goTo($event)" />
 

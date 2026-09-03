@@ -156,7 +156,7 @@ describe('Property EffectiveDate', () => {
 		httpTesting = TestBed.inject(HttpTestingController);
 	});
 
-	async function render(first: PropertyQuoteDto): Promise<{
+	async function render(first: PropertyQuoteDto, openDrawer = true): Promise<{
 		element: HTMLElement;
 		reload: (next: PropertyQuoteDto) => Promise<void>;
 	}> {
@@ -167,6 +167,11 @@ describe('Property EffectiveDate', () => {
 		fixture.detectChanges();
 
 		const component = fixture.componentInstance;
+		// ⚠️ Panel jest domyślnie ZAMKNIĘTY — od 3 września 2026 pasek reżimu zszedł z pierwszego
+		// planu do wysuwanego panelu. Te testy badają ODCZYT, nie sposób jego wywołania, więc
+		// otwierają panel raz i pracują na jego zawartości. Sam wyzwalacz ma osobny test niżej.
+		component.open.set(openDrawer);
+		fixture.detectChanges();
 		return {
 			element: fixture.nativeElement as HTMLElement,
 			reload: async (next) => {
@@ -277,5 +282,29 @@ describe('Property EffectiveDate', () => {
 			readout?.textContent,
 			'przeliczenie w tym samym reżimie nie jest zdarzeniem, które pasek ma zgłaszać',
 		).not.toContain('było');
+	});
+
+	/**
+	 * ⛔ Panel jest ZAMKNIĘTY na starcie i to jest cała zmiana: demo pokazuje proces sprzedaży,
+	 * a nie panel konfiguracji. Na pierwszym planie zostaje wyzwalacz z datą i nazwą reżimu —
+	 * tyle, ile trzeba, żeby wiedzieć, w jakim stanie jest demonstracja.
+	 */
+	it('trzyma ustawienia w zamkniętym panelu, a na wierzchu zostawia sam reżim', async () => {
+		const { element } = await render(quote(STATUTORY, [question({ code: 'AREA' })]), false);
+
+		expect(element.querySelector('[data-testid="property-regime-drawer"]')).toBeNull();
+		expect(element.querySelector('[data-testid="property-start-date"]')).toBeNull();
+
+		const trigger = element.querySelector(
+			'[data-testid="property-regime-trigger"]',
+		) as HTMLButtonElement;
+		expect(trigger).not.toBeNull();
+		expect(trigger.textContent).toContain('minimum ustawowe');
+
+		trigger.click();
+		TestBed.tick();
+
+		expect(element.querySelector('[data-testid="property-regime-drawer"]')).not.toBeNull();
+		expect(element.querySelector('[data-testid="property-start-date"]')).not.toBeNull();
 	});
 });

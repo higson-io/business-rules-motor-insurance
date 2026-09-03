@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	inject,
+	linkedSignal,
+	signal,
+} from '@angular/core';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -28,7 +35,12 @@ interface Reading {
 		MatSuffix,
 	],
 	templateUrl: './effective-date.html',
+	styleUrl: './effective-date.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	// ⚠️ Escape zamyka panel. Nasłuch na hoście, a nie na `document`: komponent nie ma prawa
+	// przechwytywać klawisza wtedy, gdy panel jest zamknięty — `close()` i tak nic nie zrobi,
+	// ale nasłuch globalny zostałby po komponencie w każdym innym demie.
+	host: { '(document:keydown.escape)': 'close()' },
 })
 export class EffectiveDate {
 	private readonly store = inject(PropertyStore);
@@ -91,6 +103,36 @@ export class EffectiveDate {
 
 	readonly now = computed(() => this.readings()?.now ?? null);
 	readonly before = computed(() => this.readings()?.before ?? null);
+
+	/**
+	 * Czy panel ustawień jest otwarty.
+	 *
+	 * ⛔ Domyślnie ZAMKNIĘTY. Demo pokazuje proces sprzedaży; konfiguracja silnika jest o jedno
+	 * kliknięcie, a nie rozpięta nad ekranem.
+	 */
+	readonly open = signal(false);
+
+	toggle(): void {
+		this.open.update((value) => !value);
+	}
+
+	close(): void {
+		this.open.set(false);
+	}
+
+	/** Data na wyzwalaczu — bez godziny, bo to jest data polisy, a nie znacznik czasu. */
+	readonly label = computed(() => {
+		const value = this.startDate();
+		return value === null ? '' : value.toISOString().slice(0, 10);
+	});
+
+	/**
+	 * Czy reżim właśnie się przestawił.
+	 *
+	 * ⛔ Steruje kropką na wyzwalaczu. `before()` jest niepuste WYŁĄCZNIE wtedy, gdy poprzedni
+	 * odczyt miał inną nazwę reżimu — czyli dokładnie w chwili, którą widz ma zauważyć.
+	 */
+	readonly changed = computed(() => this.before() !== null);
 
 	/**
 	 * ⛔ Sends a `Date` OBJECT. `PropertyApi.setStartDate` is `@RequestBody Date`; a string would

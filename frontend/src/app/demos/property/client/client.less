@@ -1,0 +1,93 @@
+@import '_variables';
+
+:host {
+	display: block;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+// ⛔ Karta klienta jest CICHA. Stoi w miejscu, w którym wcześniej krzyczał pasek techniczny,
+// i gdyby krzyczała tak samo, zamieniłaby jeden hałas na drugi. Jedyny mocny element to nazwisko;
+// reszta ma się dać przeczytać wtedy, gdy ktoś o nią zapyta.
+.client {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	min-width: 0;
+}
+
+// Inicjały zamiast zdjęcia — awatar z fotografią udawałby, że to prawdziwa osoba.
+.client__avatar {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: @color-gray-light;
+	color: @color-panel-title;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.client__who {
+	flex: 0 0 auto;
+	min-width: 0;
+}
+
+.client__name {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.client__source {
+	margin: 2px 0 0;
+	color: @color-text-muted;
+	font-size: 0.75rem;
+	font-style: italic;
+}
+
+// Fakty rozkładają się w wiersz, a przy ciasnocie zawijają — nie chowamy ich za wielokropkiem,
+// bo adres ucięty w połowie jest gorszy niż adres w drugiej linijce.
+.client__facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 28px;
+	margin: 0;
+	min-width: 0;
+}
+
+.client__fact {
+	min-width: 0;
+}
+
+.client__fact dt {
+	margin: 0;
+	color: @color-text-muted;
+	font-size: 0.6875rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.client__fact dd {
+	margin: 1px 0 0;
+	font-size: 0.8125rem;
+	line-height: 1.3;
+}
+
+// Kontakt schodzi jako pierwszy, bo jest najmniej potrzebny do rozmowy o ubezpieczeniu.
+@media (max-width: 1200px) {
+	.client__fact--wide {
+		display: none;
+	}
+}
+
+@media (max-width: 900px) {
+	.client__facts {
+		display: none;
+	}
+}

@@ -2323,3 +2323,48 @@ Usunięte treści (do odtworzenia, gdyby decyzja się zmieniła):
 | `BUSINESS_USE` | Mienie służące działalności ma osobny, niższy limit odpowiedzialności. |
 | `HIGH_VALUE_ITEMS` | Przedmioty powyżej tego progu są chronione dopiero po zgłoszeniu i udokumentowaniu. |
 | `INSPECTIONS` | Brak przeglądów ogranicza odpowiedzialność za szkody, które z tych instalacji wynikną. |
+
+---
+
+## §20 Pasek techniczny schodzi z pierwszego planu (2026-09-03)
+
+Nad ekranem stała belka z datą polisy, nazwą reżimu, podstawą prawną i trzema licznikami. Mówiła
+prawdę o mechanizmie, ale mówiła ją **najgłośniejszym elementem ekranu** — a demo pokazuje proces
+sprzedaży, nie panel konfiguracji.
+
+### 20.1 Co zajęło jej miejsce
+
+**Karta klienta.** To, co w prawdziwej aplikacji jest w tym miejscu: kto siedzi po drugiej stronie.
+Inicjały zamiast zdjęcia, nazwisko, PESEL, adres, kontakt — i **źródło danych jako część karty, nie
+przypis**. Bez podanego źródła zestaw personaliów na ekranie pokazywanym obcym ludziom wygląda jak
+dane prawdziwej osoby.
+
+Dane pochodzą z `policyholder`, który wniosek już niósł — nie trzeba było niczego dokładać po
+stronie serwera.
+
+### 20.2 Wysuwany panel „Ustawienia analizy"
+
+Belka przeniosła się w całości do panelu wysuwanego z prawej: data początku ochrony, nazwa reżimu,
+podstawa prawna i liczniki ze znacznikami „było N". Zamknięty domyślnie, otwierany cichym
+wyzwalaczem, zamykany klawiszem Esc, kliknięciem w tło albo krzyżykiem.
+
+⛔ **Wyzwalacz niesie datę i nazwę reżimu.** To dwie rzeczy, na które warto rzucić okiem bez
+otwierania czegokolwiek — reszta jest w panelu.
+
+⛔ **Znacznik zmiany zostaje NA WYZWALACZU.** Przesunięcie daty przez próg KNF jest momentem,
+który widz ma zauważyć **także wtedy, gdy panel jest zamknięty**; kropka schowana do środka byłaby
+zmianą, o której nikt się nie dowiaduje. Sterują nią te same dane co znacznikami „było N" —
+`before()` jest niepuste wyłącznie wtedy, gdy poprzedni odczyt miał inną nazwę reżimu.
+
+⚠️ Pasek w panelu układa się **pionowo**, a liczniki w wiersz. Poziomy układ z `_date-band.less`
+był projektowany na pełną szerokość ekranu; w kolumnie 26 rem dawał trzy wysokie słupki z jedną
+cyfrą każdy.
+
+### 20.3 Zweryfikowane
+
+| Scenariusz | Wynik |
+|---|---|
+| Wejście na demo | panel zamknięty, na wierzchu karta klienta i cichy wyzwalacz |
+| Kliknięcie wyzwalacza | panel z datą, reżimem, podstawą prawną i licznikami |
+| Data przesunięta na 2027-09-01 | reżim KNF, „12 pytań **było 5**", „3 sekcje **było 1**", „tak **było nie**" |
+| Esc | panel zamknięty, **kropka zmiany zostaje na wyzwalaczu** |
