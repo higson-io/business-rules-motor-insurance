@@ -12,11 +12,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * ⚠️ `visible` (reguła) i nieobecność w wersji regionu to dwie różne rzeczy. Sekcja niewidoczna
  * istnieje i może się pokazać po zmianie odpowiedzi; sekcji spoza wersji nie ma w drzewie wcale.
+ *
+ * ⛔ `kind` rozstrzyga, czy sekcja jest ANKIETĄ, czy DANYMI, KTÓRE JUŻ MAMY. Charakterystyka
+ * przedmiotu ubezpieczenia nie jest analizą potrzeb — zakłady zbierają ją i dziś, poza APK —
+ * więc ekran pokazuje ją zwinięcie, jako kontekst, a nie jako pytania do zadania. Rodzaj jest
+ * atrybutem sekcji w Higsonie, bo przeniesienie sekcji z jednej roli do drugiej to decyzja
+ * o kształcie ankiety, a nie o kodzie ekranu.
  */
 public class Section {
 
 	private String code;
 	private String title;
+	private String kind;
 	private int position;
 	private boolean visible;
 
@@ -34,6 +41,14 @@ public class Section {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 
 	public int getPosition() {

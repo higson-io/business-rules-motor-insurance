@@ -99,7 +99,7 @@ domeny**, a nie formularz; 32 tabele decyzyjne pod prefiksem `demo.property.*` (
 mapowanie odpowiedzi na potrzeby, konfrontacja wyłączeń z sytuacją klienta, wyliczenie sumy
 ubezpieczenia, taryfa, strefy, limity); 18 funkcji Groovy i dwa flow; oraz **region `PROPERTY`
 z dwoma wersjami — `2026-01-01` i `2027-07-01`**, czyli terminem dostosowania z §2 uchwały KNF
-nr 190/2026. Przesunięcie daty polisy przez ten próg zmienia **zestaw pytań** (9 → 16 widocznych),
+nr 190/2026. Przesunięcie daty polisy przez ten próg zmienia **zestaw pytań** (5 → 12 widocznych po §16; przed nim 9 → 16),
 **reżim APK** i **treść rekomendacji** — bez wdrożenia. Osiem decyzji **D-1…D-8**: granica
 mury/elementy stałe jako **trzy niezależne parametry** (a nie jedna decyzja), suma liczona
 z metrażu i stawki zł/m², strefa powodziowa jako **przełącznik dostępności** obok strefy
@@ -107,9 +107,19 @@ kradzieżowej jako czynnika, pytanie jako element domeny, wersjonowanie obejmuj�
 naraz, odmowa odpowiedzi jako trzeci stan, przekroczony budżet z **nazwaną luką**, franszyza
 w dwóch rolach. §13 dokumentuje odstępstwa wymuszone przez API i przez pierwsze uruchomienie, **§14 — zdjęcie analizy potrzeb z Groovy'ego (2026-08-27)**: siedem funkcji i flow `apk.recommend` usunięte, wszystkie tabele nietknięte, a **§15 — domknięcie procesu ofertą i polisą (2026-08-28)**: czwarty krok tylko w tym profilu, nowa tabela `demo.property.offer.terms` **kluczowana kodem reżimu**, dzięki czemu wersjonuje się bez własnego progu — po 1 lipca 2027 oferta niesie załącznik z analizą potrzeb (rek. 8.7). Numer dokumentu celowo NIE jest regułą; wystawienie polisy zamraża wariant i składkę.
 ⚠️ Wszystkie stawki są **demonstracyjne** (W-2); jedyne liczby przepisane z OWU to limity z PZU §46.
+**§16 (2026-09-03)** rebuilds the APK questionnaire to the analyst's notes: the multi-select
+`CIRCUMSTANCES` becomes five yes/no need questions in a **new, unversioned section `NEEDS_BASE`**
+(what insurers ask today), `NEEDS` keeps only what the KNF threshold adds; the object
+characteristics move out of the questionnaire into a collapsed, still-editable "data we already
+have" strip driven by a new `SECTION.KIND` attribute; and — the load-bearing correction —
+**the client's expected premium stops filtering the recommendation**. It used to downgrade the
+proposal to the richest variant inside budget, making the scope depend on price; now the best-fit
+variant is always proposed and the cheaper one rides alongside as an alternative.
+Three new tables: `apk.need.conflict`, `sum.valueGap`, `apk.question.blocker`.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added without `CONTEXT_PATH` and `VALUE_TYPE` will not
-reach the engine.
+reach the engine, and a question added under `SECTIONS[NEEDS]` silently inherits region version 2
+(**W-24**).
 
 ### Vision (`project/vision.md`)
 *Not created.* Add it to capture project mission, goals, target users, and long-term direction.
@@ -345,4 +355,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-08-27 (needs analysis moved out of Groovy; three-step demo flow)
+**Last regenerated**: 2026-09-03 (APK questionnaire rebuilt to the analyst's notes; expected premium no longer filters the recommendation)

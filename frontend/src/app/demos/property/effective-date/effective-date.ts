@@ -49,7 +49,15 @@ export class EffectiveDate {
 		if (quote === null) {
 			return null;
 		}
-		const visible = quote.questions.filter((question) => question.visible);
+		// ⛔ Liczy się ANKIETA, nie katalog. Sekcje oznaczone w Higsonie jako KNOWN to dane,
+		// które już mamy — pokazywanie ich w liczniku „pytań w ankiecie" cofałoby dokładnie tę
+		// różnicę, którą ekran ma pokazać: analiza potrzeb pyta o pięć rzeczy, a nie o czternaście.
+		const asked = new Set(
+			quote.sections.filter((section) => section.kind !== 'KNOWN').map((section) => section.code),
+		);
+		const visible = quote.questions.filter(
+			(question) => question.visible && asked.has(question.section),
+		);
 		return {
 			regime: quote.regime.name,
 			legalBasis: quote.regime.legalBasis,

@@ -51,6 +51,18 @@ export class ApkRecommendation {
 	 */
 	readonly premium = input<string | null>(null);
 
+	/**
+	 * Tańsza alternatywa mieszcząca się w oczekiwanej przez klienta składce — nazwa i już
+	 * sformatowana składka.
+	 *
+	 * ⛔ ALTERNATYWA, nie podmiana. Propozycja powyżej zostaje ta sama, bo oczekiwana składka
+	 * jest wymaganiem klienta, a nie filtrem zakresu (rek. 8.2.d). Ekran, który pokazywałby
+	 * wyłącznie tańszy wariant, cofnąłby tę różnicę i nikt by tego nie zauważył — bo wyglądałby
+	 * poprawnie.
+	 */
+	readonly alternativeName = input<string | null>(null);
+	readonly alternativePremium = input<string | null>(null);
+
 	readonly needs = computed<readonly ApkNeedDto[]>(() => this.recommendation()?.needs ?? []);
 
 	/** Ostrzeżenia przychodzą już posortowane wagą malejąco — sortowania po stronie klienta brak. */

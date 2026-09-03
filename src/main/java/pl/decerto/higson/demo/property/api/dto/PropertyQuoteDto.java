@@ -33,6 +33,10 @@ public class PropertyQuoteDto {
 	private PropertyPolicyholderDto policyholder;
 	private String selectedVariant;
 
+	/** Odpowiedź, po której nie ma czego dalej analizować — treść komunikatu podaje reguła. */
+	private boolean blocked;
+	private String blockMessage;
+
 	public PropertyPolicyholderDto getPolicyholder() {
 		return policyholder;
 	}
@@ -186,5 +190,21 @@ public class PropertyQuoteDto {
 
 	public void setSelectedVariant(String selectedVariant) {
 		this.selectedVariant = selectedVariant;
+	}
+
+	public boolean isBlocked() {
+		return blocked;
+	}
+
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
+	}
+
+	public String getBlockMessage() {
+		return blockMessage;
+	}
+
+	public void setBlockMessage(String blockMessage) {
+		this.blockMessage = blockMessage;
 	}
 }

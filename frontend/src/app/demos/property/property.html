@@ -26,8 +26,32 @@
 			@case ('apk') {
 				<app-property-questionnaire />
 
+				<!--
+					⛔ Bramka. Odpowiedź „nie potrzebuję ubezpieczenia nieruchomości" zamyka tę
+					ścieżkę: nie ma potrzeby, więc nie ma czego rekomendować, a wycena zrobiona
+					mimo to byłaby ofertą na produkt, którego klient nie chce.
+
+					⛔ Ani pytanie, ani odpowiedź, ani treść komunikatu nie są tutaj — wszystkie
+					trzy przychodzą z tabeli `demo.property.apk.question.blocker`. Bramką może się
+					stać inne pytanie bez zmiany w tym pliku.
+
+					⚠️ Blokujemy PRZEJŚCIE, nie ankietę. Cofnięcie odpowiedzi odblokowuje ekran
+					natychmiast i to jest część demonstracji.
+				-->
+				@if (blocked()) {
+					<p class="property__blocked" role="status" data-testid="property-blocked">
+						{{ blockMessage() }}
+					</p>
+				}
+
 				<div class="step-nav">
-					<button type="button" class="step-nav__next" data-testid="to-recommendation" (click)="goTo('reco')">
+					<button
+						type="button"
+						class="step-nav__next"
+						data-testid="to-recommendation"
+						[disabled]="blocked()"
+						(click)="goTo('reco')"
+					>
 						Zobacz rekomendację →
 					</button>
 				</div>
@@ -40,6 +64,8 @@
 					[variantName]="recommendedName()"
 					[missingNames]="missingNames()"
 					[premium]="proposedPremium()"
+					[alternativeName]="alternative()?.name ?? null"
+					[alternativePremium]="alternative()?.premium ?? null"
 				/>
 
 				<div class="step-nav">

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField } from '@angular/material/form-field';
@@ -22,6 +23,7 @@ interface Section {
 	readonly questions: readonly PropertyQuestionDto[];
 }
 
+
 /**
  * The APK questionnaire — and the component that proves the demo's claim.
  *
@@ -37,6 +39,7 @@ interface Section {
 @Component({
 	selector: 'app-property-questionnaire',
 	imports: [
+		NgTemplateOutlet,
 		MatButtonToggle,
 		MatButtonToggleGroup,
 		MatCheckbox,
@@ -68,7 +71,7 @@ export class Questionnaire {
 	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
 	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 */
-	readonly sections = computed<readonly Section[]>(() => {
+	private readonly all = computed<readonly (Section & { readonly kind: string })[]>(() => {
 		const quote = this.loaded();
 		if (quote === null) {
 			return [];
@@ -78,12 +81,61 @@ export class Questionnaire {
 			.map((section) => ({
 				code: section.code,
 				title: section.title,
+				kind: section.kind,
 				questions: quote.questions.filter(
 					(question) => question.section === section.code && question.visible,
 				),
 			}))
 			.filter((section) => section.questions.length > 0);
 	});
+
+	/** Sekcje, o które PYTAMY. */
+	readonly sections = computed<readonly Section[]>(() =>
+		this.all().filter((section) => section.kind !== 'KNOWN'),
+	);
+
+	/**
+	 * Sekcje, które już ZNAMY — charakterystyka przedmiotu ubezpieczenia i dane oceny ryzyka.
+	 *
+	 * ⛔ Nie ma tu ani jednego kodu sekcji. Podziałem rządzi atrybut `KIND` z Higsona, więc
+	 * przeniesienie sekcji między paskiem a ankietą jest zmianą konfiguracji. To nie jest
+	 * kosmetyka: analiza potrzeb to pytania o POTRZEBY, a metraż i rok budowy potrzebą nie są —
+	 * zakłady zbierają je i dziś, poza APK.
+	 */
+	readonly known = computed<readonly Section[]>(() =>
+		this.all().filter((section) => section.kind === 'KNOWN'),
+	);
+
+	/** Skrót paska: same wartości, w kolejności pytań, żeby dało się je przeczytać jednym rzutem. */
+	readonly knownSummary = computed<string>(() =>
+		this.known()
+			.flatMap((section) => section.questions)
+			.map((question) => this.display(question))
+			.filter((value) => value !== '')
+			.join(' · '),
+	);
+
+	readonly knownCount = computed<number>(() =>
+		this.known().reduce((count, section) => count + section.questions.length, 0),
+	);
+
+	readonly expanded = signal(false);
+
+	toggleKnown(): void {
+		this.expanded.update((open) => !open);
+	}
+
+	/** Wartość odpowiedzi po ludzku: etykieta wyboru zamiast kodu, „—" zamiast pustki. */
+	display(question: PropertyQuestionDto): string {
+		if (question.refused) {
+			return 'nie podano';
+		}
+		if (question.values.length > 0) {
+			return question.values.map((value) => this.label(question, value)).join(', ');
+		}
+		return question.value === null || question.value === '' ? '' : this.label(question, question.value);
+	}
+
 
 	label(question: PropertyQuestionDto, option: string): string {
 		const index = question.options.indexOf(option);

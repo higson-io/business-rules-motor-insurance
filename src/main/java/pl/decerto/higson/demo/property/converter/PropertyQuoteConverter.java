@@ -58,6 +58,8 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setOffer(convertOffer(quote.getOffer()));
 		dto.setPolicyholder(convertPolicyholder(quote.getPolicyholder()));
 		dto.setSelectedVariant(quote.getSelectedVariant());
+		dto.setBlocked(quote.isBlocked());
+		dto.setBlockMessage(quote.getBlockMessage());
 
 		return dto;
 	}
@@ -106,6 +108,7 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 			PropertySectionDto dto = new PropertySectionDto();
 			dto.setCode(section.getCode());
 			dto.setTitle(section.getTitle());
+			dto.setKind(section.getKind());
 			dto.setPosition(section.getPosition());
 			dto.setVisible(section.isVisible());
 			dtos.add(dto);

@@ -36,6 +36,8 @@ const QUOTE: PropertyQuoteDto = {
 		totalNeeds: 0,
 		missingCovers: [],
 		budgetOutcome: null,
+		alternativeVariantCode: null,
+		alternativePremium: null,
 		justification: [],
 		needs: [],
 		warnings: [],
@@ -73,6 +75,8 @@ const QUOTE: PropertyQuoteDto = {
 			unmetNeeds: [],
 	},
 	selectedVariant: null,
+	blocked: false,
+	blockMessage: null,
 };
 
 describe('PropertyStore', () => {

@@ -48,6 +48,22 @@
 	&:hover {
 		opacity: 0.8;
 	}
+
+	// ⛔ Wyłączony przycisk MUSI to pokazywać. Sam atrybut `disabled` blokuje klik, ale przycisk
+	// zostaje pełnokolorowy i z łapką — a wtedy widz widzi tylko, że kliknięcie nic nie robi,
+	// i czyta to jako awarię zamiast jako regułę. Powód stoi obok, w komunikacie z tabeli.
+	// ⚠️ Jasne tło i ciemny napis, nie szare tło i biały napis: biel na #caced3 daje 1.58:1.
+	// Napis o krok ciemniejszy niż `@color-text-muted`, bo ten daje na tym tle 4.49:1 — czyli
+	// mija próg o setną. #5a6e83 to najmniejszy krok, który przechodzi (4.56:1).
+	&:disabled {
+		background: @color-border-block;
+		color: #5a6e83;
+		cursor: not-allowed;
+	}
+
+	&:disabled:hover {
+		opacity: 1;
+	}
 }
 
 // Wstecz jest cichy: bez tła i bez obrysu, jak `.back-button` w portalu. Krok wstecz nie

@@ -1964,3 +1964,113 @@ Pozostałe dwa dema zatrzymują się na składce świadomie. To samo domknięcie
 nie dodałoby ani jednej nowej rzeczy do pokazania, a kosztowałoby trzy komplety ekranów do
 utrzymania. Majątek jest właściwym miejscem, bo to jego osią jest APK — a rek. 8.7 mówi
 o **dokumencie wydawanym klientowi**, więc to tutaj widać, po co ta analiza w ogóle powstaje.
+
+---
+
+## §16 Ankieta APK wg uwag analityka (2026-09-03)
+
+Uwagi Mateusza Sendala z 31 sierpnia 2026 do kształtu ankiety APK. Punkt wyjścia był taki, że
+ankieta pytała o osiemnaście rzeczy naraz, mieszając potrzeby klienta z charakterystyką przedmiotu
+ubezpieczenia — a zakłady zbierają jedno i drugie osobno i tak jest dzisiaj.
+
+### 16.1 Co się zmieniło
+
+| Uwaga | Stan przed | Stan po |
+|---|---|---|
+| Pytania 1–5 to osobne TAK/NIE per ryzyko | jedno `CIRCUMSTANCES` (wielokrotny wybór) | `NEEDS_PROPERTY`, `NEED_THEFT`, `NEED_FLOOD`, `NEED_PORTABLE`, `RENTED_OUT` |
+| „Czy potrzebujesz ubezpieczyć nieruchomość" jako bramka | nie istniało | `NEEDS_PROPERTY` + tabela `apk.question.blocker` |
+| Pytanie 6 — oczekiwana składka | `BUDGET` (już było) | przeredagowane, treść mówi wprost, że to nie filtr |
+| Szacowana przez klienta wartość nieruchomości (rek. 8.2.c) | nie istniało | `PROPERTY_VALUE` + tabela `sum.valueGap` |
+| Charakterystyka przedmiotu w ankiecie | osiem pytań w sekcji `SUBJECT` | sekcje `SUBJECT` i `SITUATION` mają `KIND = KNOWN` |
+| Budżet jako filtr zakresu | **obniżał rekomendację** do tańszego wariantu | rekomendacja zostaje przy najlepiej dopasowanym |
+
+### 16.2 D-9 — sekcja ma rodzaj, a nie tylko tytuł
+
+Typ domenowy `SECTION` dostał atrybut `KIND` o dwóch wartościach: `FORM` (o to pytamy klienta)
+i `KNOWN` (to już wiemy). Ekran renderuje sekcje `KNOWN` jako zwinięty pasek „Dane, które już
+mamy", nad ankietą.
+
+⛔ **Pasek jest w pełni edytowalny.** Read-only wersja byłaby ładniejsza i bezużyteczna: prowadzący
+przestawia w nim metraż i kod pocztowy, żeby pokazać, jak przesuwa się suma ubezpieczenia i strefa
+powodziowa. Szablon używa jednego bloku pytania (`ng-template #field`) dla obu miejsc — dwa osobne
+rozjechałyby się przy pierwszej zmianie.
+
+⛔ **Front nie zna ani jednego kodu sekcji.** Podziałem rządzi wyłącznie `KIND`, więc przeniesienie
+sekcji między paskiem a ankietą jest zmianą jednego atrybutu w Studio.
+
+Licznik „pytań w ankiecie" w nagłówku liczy **tylko sekcje `FORM`**. Liczenie wszystkiego cofałoby
+dokładnie tę różnicę, którą ekran ma pokazać: 5 pytań zamiast 14.
+
+### 16.3 D-10 — oczekiwana składka NIE jest filtrem zakresu
+
+Najważniejsza poprawka merytoryczna. Poprzednia wersja, przy przekroczeniu budżetu, podmieniała
+rekomendację na najbogatszy wariant mieszczący się w kwocie — czyli zakres wychodzący z analizy
+potrzeb zależał od ceny. Rek. 8.2.d wymaga odwrotnie: priorytetem jest zaspokojenie potrzeb, a
+oczekiwana składka jest **wymaganiem klienta, o którego niespełnieniu trzeba go poinformować**.
+
+Teraz `recommendation.variantCode` niesie wariant najlepiej dopasowany zawsze, a tańszy jedzie obok
+jako `alternativeVariantCode` — z listą tego, czego w nim brakuje. Ekran pokazuje alternatywę
+**pod** propozycją, drobniej i bez wyróżnionej kwoty: równa waga wizualna sugerowałaby, że to ona
+jest właściwym wyborem, i filtr wróciłby, tyle że narysowany zamiast policzonego.
+
+Trzy nowe powody w `apk.recommendation.reason`: `BUDGET_EXCEEDED` (przeredagowany),
+`BUDGET_ALTERNATIVE`, `BUDGET_NO_ALTERNATIVE`.
+
+### 16.4 D-11 — dwie nowe konfrontacje
+
+**`demo.property.apk.need.conflict`** — klient odmawia ochrony, której jego sytuacja wymaga.
+Cztery poziomy wejściowe: pytanie, odpowiedź, strefa powodziowa, strefa kradzieżowa. Ten sam
+kształt wyjścia co `apk.exclusion.conflict`, więc chodzi tym samym kodem (`ApkAnalysis.checkExclusions`)
+i sortuje się z nim razem po wadze. Scenariusz z uwag: nieruchomość w strefie zalewowej, a klient
+mówi, że powodzi nie chce.
+
+**`demo.property.sum.valueGap`** — oszacowanie klienta zderzone z sumą liczoną z metrażu i stawki
+(rek. 8.2.c). Java liczy iloraz, próg jest w tabeli: poniżej 0,85 → `UNDERSTATED`, powyżej 1,15 →
+`OVERSTATED`. Zdanie pada także przy zgodności, bo „sprawdziliśmy i się zgadza" jest częścią
+wykazania zgodności.
+
+**`demo.property.apk.question.blocker`** — odpowiedź, po której nie ma czego dalej analizować.
+Wersja „szybsza" z uwag (walidacja), nie przekierowanie. Bramka blokuje **przejście dalej**, nie
+ankietę: wycena leci mimo blokady, żeby cofnięcie odpowiedzi odblokowywało ekran natychmiast.
+
+### 16.5 W-24 — sekcja `NEEDS` jest przypięta do regionu, więc dziedziczą to jej pytania
+
+⚠️ Pułapka, na którą wpadliśmy przy pierwszym podejściu. Pytania utworzone w `SECTIONS[NEEDS]`
+odziedziczyły przypięcie do **wersji 2** regionu i nie pokazywałyby się przed 1 lipca 2027 — a
+analityk mówi wprost, że pytania 1–5 zakłady mają już dziś. `attach_to_region` odpowiada wtedy
+`DOMAIN_CONFIGURATION_ELEMENTS_ALREADY_ASSIGNED_TO_REGION`, co jest jedynym sygnałem.
+
+Rozwiązaniem jest **druga sekcja**: `NEEDS_BASE` („Czego potrzebujesz", pozycja 30), niewersjonowana,
+z pytaniami 1–5. `NEEDS` zostaje wersjonowana, przemianowana na „Twoje wymagania wobec oferty"
+(pozycja 35) i trzyma okres ochrony, oczekiwaną składkę i wartość nieruchomości. Zestawienie tych
+dwóch sekcji jest teraz samo w sobie demonstracją: widać, co rekomendacja KNF faktycznie dokłada.
+
+⚠️ Drugi trap: element domeny utworzony bez **jawnego** `IS_VISIBLE` spada na wartość domyślną
+razem z prefiksem `$p `, a silnik szuka wtedy parametru o nazwie `$p demo.property.apk.section.visibility`
+i wywala 500. Atrybuty parametrowe na nowym elemencie trzeba ustawić wprost.
+
+### 16.6 Zweryfikowane na działającej aplikacji
+
+| Scenariusz | Wynik |
+|---|---|
+| Reżim ustawowy | 5 pytań w 1 sekcji, 9 pozycji w pasku „dane, które już mamy" |
+| Reżim KNF | 12 pytań w 3 sekcjach (+ oczekiwana składka, wartość nieruchomości, wyłączenia) |
+| Budżet 400 zł | rekomendacja **zostaje** Pełny 2912,65 zł, `BUDGET_NO_ALTERNATIVE` |
+| Budżet 1200 zł | rekomendacja Pełny, alternatywa Standardowy 993,07 zł z nazwaną luką |
+| Wartość 400 000 vs suma 528 000 | ostrzeżenie `UNDERSTATED`, waga 75 |
+| Kod 50-001, parter, „nie chcę powodzi" | `FLOOD_DECLINED` waga 80 |
+| Strefa kradzieżowa T2, „nie chcę kradzieży" | `THEFT_DECLINED` waga 50 |
+| „Nie potrzebuję ubezpieczenia nieruchomości" | przejście dalej zablokowane, komunikat z tabeli; cofnięcie odblokowuje |
+
+### 16.7 Co zostało nierozstrzygnięte
+
+`CIRCUMSTANCES` **nie zostało usunięte**, tylko wygaszone wierszem w `apk.question.visibility`
+(`CIRCUMSTANCES;*;* - *;false`) i wyczyszczone z `apk.need.derive` oraz z domyślnych odpowiedzi.
+Element nadal jest w drzewie, w sekcji `NEEDS`, na pozycji 290. Do usunięcia ręcznie w Studio, jeśli
+uznamy, że nie jest potrzebny jako materiał porównawczy „jak było wcześniej".
+
+Wersja „bardziej dopasowana" bramki z uwag analityka — pytanie „Jakim ubezpieczeniem jesteś
+zainteresowany?" z przekierowaniem do dema komunikacyjnego albo życiowego — **nie została
+zbudowana**; wybrano wersję szybszą (walidację). Aplikacja ma oba pozostałe dema, więc
+przekierowanie byłoby prawdziwe, a nie udawane; to jest najtańsza rzecz do dołożenia, gdyby
+prezentacja tego potrzebowała.

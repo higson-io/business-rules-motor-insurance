@@ -118,6 +118,14 @@ export interface PropertyOfferDto {
 export interface PropertySectionDto {
 	readonly code: string;
 	readonly title: string;
+	/**
+	 * `FORM` — o to pytamy klienta. `KNOWN` — to już wiemy i tylko pokazujemy.
+	 *
+	 * ⛔ Charakterystyka przedmiotu ubezpieczenia nie jest analizą potrzeb: zakłady zbierają ją
+	 * i dziś, poza APK. Ekran pokazuje ją zwiniętą, jako kontekst — a o tym, która sekcja jest
+	 * którą, decyduje atrybut w Higsonie, nie lista kodów w komponencie.
+	 */
+	readonly kind: 'FORM' | 'KNOWN';
 	readonly position: number;
 	readonly visible: boolean;
 }
@@ -181,4 +189,14 @@ export interface PropertyQuoteDto {
 	readonly offer: PropertyOfferDto;
 	readonly policyholder: PropertyPolicyholderDto;
 	readonly selectedVariant: string | null;
+
+	/**
+	 * Odpowiedź, po której nie ma czego dalej analizować — dziś brak potrzeby ubezpieczenia
+	 * nieruchomości.
+	 *
+	 * ⛔ Decyduje o tym tabela `demo.property.apk.question.blocker`, a treść komunikatu też
+	 * przychodzi z niej. Front nie zna ani pytania, ani odpowiedzi, która zamyka ścieżkę.
+	 */
+	readonly blocked: boolean;
+	readonly blockMessage: string | null;
 }

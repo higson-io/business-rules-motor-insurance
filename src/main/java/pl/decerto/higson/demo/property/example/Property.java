@@ -1,6 +1,7 @@
 package pl.decerto.higson.demo.property.example;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -70,6 +71,9 @@ public class Property {
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
 	private static final String PARAM_APK_NEED = "demo.property.apk.need.derive";
 	private static final String PARAM_APK_EXCLUSION = "demo.property.apk.exclusion.conflict";
+	private static final String PARAM_APK_NEED_CONFLICT = "demo.property.apk.need.conflict";
+	private static final String PARAM_APK_BLOCKER = "demo.property.apk.question.blocker";
+	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
 	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
 	private static final String PARAM_FLOOD_AVAILABILITY = "demo.property.flood.availability";
@@ -83,8 +87,12 @@ public class Property {
 	private static final String OUTCOME_ABSENT = "BUDGET_ABSENT";
 	private static final String OUTCOME_FIT = "BUDGET_FIT";
 	private static final String OUTCOME_EXCEEDED = "BUDGET_EXCEEDED";
+	private static final String REASON_ALTERNATIVE = "BUDGET_ALTERNATIVE";
+	private static final String REASON_NO_ALTERNATIVE = "BUDGET_NO_ALTERNATIVE";
 
 	private static final String PATH_BUDGET = "quote.needs.budget";
+	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
+	private static final String PATH_VALUE_RATIO = "quote.sums.valueRatio";
 	private static final String PATH_AREA = "quote.property.area";
 	private static final String PATH_SUM_BUILDING = "quote.sums.building";
 	private static final String PATH_SUM_SUGGESTED = "quote.sums.suggestedBuilding";
@@ -177,6 +185,10 @@ public class Property {
 			Section section = new Section();
 			section.setCode(branch.getCode());
 			section.setTitle(attrString(branch, "TITLE", sectionCtx));
+			// FORM albo KNOWN — o to pytamy klienta, albo to już wiemy. Rodzaj jest atrybutem
+			// sekcji, więc przeniesienie charakterystyki przedmiotu poza ankietę było zmianą
+			// konfiguracji, nie wdrożeniem.
+			section.setKind(attrString(branch, "KIND", sectionCtx));
 			section.setPosition(intOrZero(branch.getAttrInteger("POSITION", sectionCtx)));
 			section.setVisible(Boolean.TRUE.equals(branch.getAttrBoolean("IS_VISIBLE", sectionCtx)));
 			sections.add(section);
@@ -370,11 +382,28 @@ public class Property {
 			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value));
 		quote.setNeeds(needs);
 
-		quote.setWarnings(quote.getRegime().isRequiresExclusionCheck()
-			? ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION,
+		// Dwie tabele, jeden przebieg i jedna lista. Pierwsza konfrontuje sytuację klienta
+		// z wyłączeniami OWU (rek. 8.2.c), druga — z tym, czego klient sam SOBIE ODMÓWIŁ, choć
+		// jego sytuacja tego wymaga: mieszkanie w strefie zalewowej i „nie" przy powodzi.
+		// Obie mają ten sam kształt wyjścia, więc chodzą tym samym kodem i sortują się razem
+		// po wadze — inaczej ostrzeżenie cięższe stanęłoby pod lżejszym.
+		List<Warning> warnings = new ArrayList<>();
+		if (quote.getRegime().isRequiresExclusionCheck()) {
+			warnings.addAll(ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION,
 				quote.getQuestions(), quote.getAnswers(),
-				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value))
-			: new ArrayList<>());
+				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)));
+		}
+		warnings.addAll(ApkAnalysis.checkExclusions(engine, PARAM_APK_NEED_CONFLICT,
+			quote.getQuestions(), quote.getAnswers(),
+			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)));
+		Warning valueGap = checkValueGap(quote);
+		if (valueGap != null) {
+			warnings.add(valueGap);
+		}
+		warnings.sort(Comparator.comparingInt(Warning::getSeverity).reversed());
+		quote.setWarnings(warnings);
+
+		applyBlocker(quote);
 
 		quote.setRecommendation(propose(quote, needs));
 
@@ -385,12 +414,86 @@ public class Property {
 		}
 	}
 
+	private Variant variantByCode(PropertyQuote quote, String code) {
+		if (code == null) {
+			return null;
+		}
+		for (Variant variant : quote.getVariants()) {
+			if (code.equals(variant.getCode())) {
+				return variant;
+			}
+		}
+		return null;
+	}
+
 	/**
-	 * Rek. 8.2.d — dobór do potrzeb i możliwości finansowych.
+	 * Rek. 8.2.c — oszacowanie klienta zderzone z sumą, którą liczą reguły.
 	 *
-	 * ⛔ Przy remisie wygrywa NIŻSZY szczebel drabinki, czyli tańszy. A gdy nic nie mieści się
-	 * w budżecie, propozycją zostaje najtańszy wariant Z KOMUNIKATEM — milczenie nie jest
-	 * propozycją.
+	 * ⛔ Próg jest w tabeli, nie tutaj. Java liczy iloraz i pyta `demo.property.sum.valueGap`,
+	 * od którego rozjazdu warto klienta ostrzec — bo to jest decyzja produktowa, a nie liczenie.
+	 * Bez odpowiedzi klienta nie ma czego porównywać i nie ma ostrzeżenia; brak pytania jest
+	 * stanem normalnym przed progiem KNF, gdzie PROPERTY_VALUE nie istnieje w drzewie.
+	 */
+	private Warning checkValueGap(PropertyQuote quote) {
+		BigDecimal declared = decimalAt(quote, PATH_PROPERTY_VALUE);
+		BigDecimal computed = decimalAt(quote, PATH_SUM_SUGGESTED);
+		if (declared == null || declared.signum() <= 0 || computed == null || computed.signum() <= 0) {
+			return null;
+		}
+		BigDecimal ratio = declared.divide(computed, 4, RoundingMode.HALF_UP);
+		ParamValue row = engine.get(PARAM_VALUE_GAP,
+			new PropertyContext(quote).withComputed(PATH_VALUE_RATIO, ratio));
+		String warning = row.getString("warning");
+		if (warning == null || warning.isEmpty()) {
+			return null;
+		}
+		return new Warning(row.getString("outcome"), intOrZero(row.getInteger("severity")),
+			warning, row.getString("remedy"));
+	}
+
+	/**
+	 * Odpowiedź, po której nie ma czego dalej analizować.
+	 *
+	 * ⛔ Które to odpowiedzi, mówi tabela `demo.property.apk.question.blocker` — dziś jedna:
+	 * brak potrzeby ubezpieczenia nieruchomości. Warunek w Javie związałby bramkę z jednym
+	 * konkretnym pytaniem, a wtedy przeniesienie jej gdzie indziej wymagałoby wdrożenia.
+	 *
+	 * ⚠️ Bramka NIE przerywa wyceny. Ekran ma pokazać komunikat i zablokować przejście dalej,
+	 * ale prowadzący musi móc cofnąć odpowiedź i zobaczyć, że wszystko wraca — a to działa
+	 * tylko wtedy, gdy reszta wyniku i tak jest policzona.
+	 */
+	private void applyBlocker(PropertyQuote quote) {
+		quote.setBlocked(false);
+		quote.setBlockMessage(null);
+		for (Question question : quote.getQuestions()) {
+			Answer answer = quote.getAnswers().get(question.getCode());
+			if (!question.isVisible() || answer == null || !answer.isAnswered()) {
+				continue;
+			}
+			ParamValue row = engine.get(PARAM_APK_BLOCKER, new PropertyContext(quote)
+				.withQuestion(question.getCode()).withAnswer(answer.getValue()));
+			if (Boolean.TRUE.equals(row.getBoolean("blocks"))) {
+				quote.setBlocked(true);
+				quote.setBlockMessage(row.getString("message"));
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Rek. 8.2.d — dobór do potrzeb i do oczekiwanej składki, w tej kolejności.
+	 *
+	 * ⛔ OCZEKIWANA SKŁADKA NIE JEST FILTREM ZAKRESU. Propozycją zostaje wariant najlepiej
+	 * odpowiadający potrzebom, także wtedy, gdy kosztuje więcej, niż klient podał — a to, że
+	 * kosztuje więcej, mówimy wprost. Poprzednia wersja obniżała propozycję do najbogatszego
+	 * wariantu mieszczącego się w budżecie, przez co zakres wychodzący z analizy potrzeb zależał
+	 * od ceny. Rekomendacja wymaga odwrotnie: priorytetem jest zaspokojenie potrzeb, a oczekiwana
+	 * składka jest wymaganiem klienta, o którego niespełnieniu trzeba go poinformować.
+	 *
+	 * ⛔ Tańszy wariant nie znika — jedzie obok jako ALTERNATYWA, razem z listą tego, czego
+	 * w nim brakuje. Propozycja i alternatywa, nie podmiana jednej na drugą.
+	 *
+	 * ⛔ Przy remisie w liczbie pokrytych potrzeb wygrywa NIŻSZY szczebel drabinki, czyli tańszy.
 	 */
 	private Recommendation propose(PropertyQuote quote, List<Need> needs) {
 		Recommendation recommendation = new Recommendation();
@@ -415,6 +518,7 @@ public class Property {
 			}
 		}
 
+		// Propozycją zostaje `best` BEZ WZGLĘDU NA CENĘ — patrz komentarz nad metodą.
 		Variant proposed = best;
 		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
 		if (!quote.getRegime().isRequiresBudget() || budget == null || budget.signum() <= 0) {
@@ -423,14 +527,23 @@ public class Property {
 			recommendation.setBudgetOutcome(OUTCOME_FIT);
 		} else {
 			recommendation.setBudgetOutcome(OUTCOME_EXCEEDED);
-			proposed = ladder.get(0);
-			int covered = ApkAnalysis.score(needs, proposed.getCovers()::contains).getCovered();
+			// Najlepiej dopasowany spośród tych, które mieszczą się w oczekiwanej składce.
+			// Może nie być żadnego i to też jest odpowiedź — mówimy o tym osobnym zdaniem.
+			Variant alternative = null;
+			int covered = -1;
 			for (Variant variant : ladder) {
+				if (variant.getAnnualPremium().compareTo(budget) > 0) {
+					continue;
+				}
 				int score = ApkAnalysis.score(needs, variant.getCovers()::contains).getCovered();
-				if (variant.getAnnualPremium().compareTo(budget) <= 0 && score >= covered) {
-					proposed = variant;
+				if (score > covered) {
+					alternative = variant;
 					covered = score;
 				}
+			}
+			if (alternative != null) {
+				recommendation.setAlternativeVariantCode(alternative.getCode());
+				recommendation.setAlternativePremium(alternative.getAnnualPremium());
 			}
 		}
 
@@ -442,7 +555,7 @@ public class Property {
 
 		if (quote.getRegime().isRequiresJustification()) {
 			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
-				reasons(quote, proposed, best, score, recommendation.getBudgetOutcome()),
+				reasons(quote, proposed, score, recommendation),
 				reason -> new PropertyContext(quote).withReason(reason)));
 		}
 		return recommendation;
@@ -452,8 +565,8 @@ public class Property {
 	 * Powody uzasadnienia: kody i liczby. Ani jednego zdania — te są w
 	 * `demo.property.apk.recommendation.reason`, razem z pozycją, która je sortuje.
 	 */
-	private List<ApkAnalysis.Reason> reasons(PropertyQuote quote, Variant proposed, Variant best,
-			ApkAnalysis.Score score, String outcome) {
+	private List<ApkAnalysis.Reason> reasons(PropertyQuote quote, Variant proposed,
+			ApkAnalysis.Score score, Recommendation recommendation) {
 
 		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
 		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
@@ -485,15 +598,41 @@ public class Property {
 		}
 
 		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
+		String outcome = recommendation.getBudgetOutcome();
 		if (OUTCOME_FIT.equals(outcome)) {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_FIT", money(proposed.getAnnualPremium()), money(budget)));
 		} else if (OUTCOME_EXCEEDED.equals(outcome)) {
-			// Cena wariantu NAJLEPIEJ dopasowanego, nie proponowanego — to jego przekroczenie
-			// budżetu jest powodem, dla którego propozycja zeszła niżej.
-			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED", money(best.getAnnualPremium()), money(budget),
-				nameOf(product, COLLECTION_VARIANTS, proposed.getCode())));
+			// Cena PROPONOWANEGO wariantu — a proponowany jest ten najlepiej dopasowany, bo
+			// oczekiwana składka nie obniża zakresu. Zdanie mówi, o ile jesteśmy powyżej.
+			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED",
+				money(proposed.getAnnualPremium()), money(budget)));
+			Variant alternative = variantByCode(quote, recommendation.getAlternativeVariantCode());
+			if (alternative == null) {
+				reasons.add(new ApkAnalysis.Reason(REASON_NO_ALTERNATIVE, money(budget)));
+			} else {
+				List<String> gaps = new ArrayList<>();
+				for (String cover : ApkAnalysis.score(quote.getNeeds(),
+						alternative.getCovers()::contains).getMissing()) {
+					gaps.add(nameOf(product, COLLECTION_COVERS, cover));
+				}
+				reasons.add(new ApkAnalysis.Reason(REASON_ALTERNATIVE,
+					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
+					money(alternative.getAnnualPremium()),
+					gaps.isEmpty() ? "nic — pokrywa te same potrzeby" : String.join(", ", gaps)));
+			}
 		} else {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_ABSENT"));
+		}
+
+		// Rek. 8.2.c — oszacowanie klienta obok sumy z reguł. Zdanie pada także wtedy, gdy obie
+		// liczby się zgadzają: „sprawdziliśmy i się zgadza" jest częścią wykazania zgodności.
+		BigDecimal declared = decimalAt(quote, PATH_PROPERTY_VALUE);
+		BigDecimal computed = decimalAt(quote, PATH_SUM_SUGGESTED);
+		if (declared != null && declared.signum() > 0 && computed != null && computed.signum() > 0) {
+			String gap = engine.get(PARAM_VALUE_GAP, new PropertyContext(quote)
+				.withComputed(PATH_VALUE_RATIO, declared.divide(computed, 4, RoundingMode.HALF_UP)))
+				.getString("outcome");
+			reasons.add(new ApkAnalysis.Reason("VALUE_" + gap, money(declared), money(computed)));
 		}
 
 		ParamValue flood = engine.get(PARAM_FLOOD_AVAILABILITY, new PropertyContext(quote));

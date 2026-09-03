@@ -75,6 +75,7 @@ function quote(
 		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
 			code,
 			title: `Sekcja ${code}`,
+			kind: 'FORM' as const,
 			position: (index + 1) * 10,
 			visible: true,
 		})),
@@ -95,6 +96,8 @@ function quote(
 			totalNeeds: 0,
 			missingCovers: [],
 			budgetOutcome: null,
+			alternativeVariantCode: null,
+			alternativePremium: null,
 			justification,
 			needs: [],
 			warnings: [],
@@ -132,6 +135,8 @@ function quote(
 			unmetNeeds: [],
 		},
 		selectedVariant: null,
+		blocked: false,
+		blockMessage: null,
 	};
 }
 

@@ -75,6 +75,18 @@ public class PropertyContext extends HigsonContext {
 		return this;
 	}
 
+	/**
+	 * Wartość policzona na potrzeby JEDNEGO odczytu, pod ścieżką, której nie ma w modelu wniosku.
+	 *
+	 * Dziś jedna taka jest: stosunek wartości oszacowanej przez klienta do sumy wyliczonej
+	 * z metrażu. Nie jest polem wniosku, bo nie jest niczyją odpowiedzią ani niczyim wynikiem —
+	 * istnieje wyłącznie po to, żeby próg z tabeli miał na czym się dopasować.
+	 */
+	public PropertyContext withComputed(String path, Object value) {
+		values.put(path, value);
+		return this;
+	}
+
 	public PropertyContext withReason(String code) {
 		this.reasonCode = code;
 		return this;

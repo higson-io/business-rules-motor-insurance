@@ -115,6 +115,35 @@ export class Property {
 
 	readonly recommendation = computed(() => this.loaded()?.recommendation ?? null);
 
+	/**
+	 * Bramka ankiety — odpowiedź, po której nie ma czego dalej analizować.
+	 *
+	 * ⛔ Front nie wie, KTÓRE to pytanie ani KTÓRA odpowiedź. Pyta serwer o dwie rzeczy:
+	 * czy zablokowane i co powiedzieć — jedno i drugie pochodzi z tabeli
+	 * `demo.property.apk.question.blocker`.
+	 *
+	 * ⚠️ Blokada dotyczy PRZEJŚCIA DALEJ, nie ankiety. Cofnięcie odpowiedzi ma natychmiast
+	 * odblokować ekran, więc pytania zostają aktywne, a pasek kroków — klikalny wstecz.
+	 */
+	readonly blocked = computed(() => this.loaded()?.blocked ?? false);
+	readonly blockMessage = computed(() => this.loaded()?.blockMessage ?? null);
+
+	/** Nazwa i składka tańszej alternatywy, gdy propozycja nie mieści się w oczekiwanej składce. */
+	readonly alternative = computed(() => {
+		const quote = this.loaded();
+		const code = quote?.recommendation.alternativeVariantCode;
+		if (!quote || !code) {
+			return null;
+		}
+		const variant = quote.variants.find((item) => item.code === code);
+		return {
+			name: variant?.name ?? code,
+			premium: variant?.annualPremium == null
+				? null
+				: this.plnFormat.format(variant.annualPremium) + ' zł',
+		};
+	});
+
 	/** Nazwa wariantu, nie kod — komponent rekomendacji nie wie, gdzie w tym modelu leżą nazwy. */
 	readonly recommendedName = computed(() => {
 		const quote = this.loaded();

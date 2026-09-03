@@ -54,6 +54,10 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
 			code,
 			title: `Sekcja ${code}`,
+			// ⚠️ FORM, nie KNOWN. Sekcja KNOWN ląduje w zwiniętym pasku „dane, które już mamy",
+			// więc fixture z KNOWN sprawiłby, że asercje o wyrenderowanych pytaniach przechodzą
+			// albo nie z powodu, którego test nie bada.
+			kind: 'FORM' as const,
 			position: (index + 1) * 10,
 			visible: true,
 		})),
@@ -74,6 +78,8 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 			totalNeeds: 0,
 			missingCovers: [],
 			budgetOutcome: null,
+			alternativeVariantCode: null,
+			alternativePremium: null,
 			justification: [],
 			needs: [],
 			warnings: [],
@@ -111,6 +117,8 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 			unmetNeeds: [],
 		},
 		selectedVariant: null,
+		blocked: false,
+		blockMessage: null,
 	};
 }
 

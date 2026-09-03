@@ -1,11 +1,20 @@
 package pl.decerto.higson.demo.apk;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Wynik analizy potrzeb: wariant plus powody. Lista braków jest częścią odpowiedzi, a nie
- * przypisem — przekroczony budżet obniża propozycję, ale luka zostaje nazwana (decyzja D-7).
+ * przypisem.
+ *
+ * ⛔ OCZEKIWANA SKŁADKA NIE OBNIŻA PROPOZYCJI. Do 2 września 2026 obniżała: przy przekroczeniu
+ * budżetu rekomendacją zostawał najbogatszy wariant, który się w nim mieścił. To czyniło ze
+ * składki filtr zakresu, a rek. 8.2.d wymaga czegoś innego — zakres ma odpowiadać potrzebom,
+ * a oczekiwana składka jest wymaganiem klienta, o którego niespełnieniu trzeba go poinformować.
+ * Dlatego `variantCode` niesie wariant najlepiej dopasowany do potrzeb ZAWSZE, a tańszy wariant
+ * mieszczący się w budżecie jedzie obok, jako `alternative*` — propozycja i alternatywa, nie
+ * podmiana jednej na drugą.
  */
 public class Recommendation {
 
@@ -14,6 +23,11 @@ public class Recommendation {
 	private int totalNeeds;
 	private List<String> missingCovers = new ArrayList<>();
 	private String budgetOutcome;
+
+	/** Tańszy wariant mieszczący się w oczekiwanej składce. `null`, gdy nie ma takiego. */
+	private String alternativeVariantCode;
+	private BigDecimal alternativePremium;
+
 	private List<String> justification = new ArrayList<>();
 
 	public String getVariantCode() {
@@ -54,6 +68,22 @@ public class Recommendation {
 
 	public void setBudgetOutcome(String budgetOutcome) {
 		this.budgetOutcome = budgetOutcome;
+	}
+
+	public String getAlternativeVariantCode() {
+		return alternativeVariantCode;
+	}
+
+	public void setAlternativeVariantCode(String alternativeVariantCode) {
+		this.alternativeVariantCode = alternativeVariantCode;
+	}
+
+	public BigDecimal getAlternativePremium() {
+		return alternativePremium;
+	}
+
+	public void setAlternativePremium(BigDecimal alternativePremium) {
+		this.alternativePremium = alternativePremium;
 	}
 
 	public List<String> getJustification() {

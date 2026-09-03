@@ -47,6 +47,19 @@
 					}
 				</div>
 
+				<!--
+					⛔ Alternatywa STOI POD propozycją, drobniej i bez wyróżnienia ceny. Wystarczy
+					dać jej równą wagę, żeby ekran zaczął sugerować, że to ona jest właściwym
+					wyborem — a wtedy oczekiwana składka z powrotem staje się filtrem zakresu,
+					tyle że narysowanym zamiast policzonym.
+				-->
+				@if (alternativeName(); as alternative) {
+					<p class="reco__alternative" data-testid="apk-alternative">
+						<span class="reco__alternative__label">Alternatywa w Twojej składce:</span>
+						{{ alternative }}@if (alternativePremium(); as cost) { — {{ cost }}}
+					</p>
+				}
+
 				<div class="reco__body">
 					@if (needs().length > 0) {
 						<div class="reco__col">

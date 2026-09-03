@@ -74,6 +74,17 @@ public class PropertyQuote {
 	 */
 	private boolean buildingSumOverridden;
 
+	/**
+	 * Czy któraś odpowiedź zamknęła tę ścieżkę.
+	 *
+	 * ⛔ Rozstrzyga o tym TABELA `demo.property.apk.question.blocker`, a nie warunek w kodzie.
+	 * Dzięki temu bramką może się stać dowolne pytanie bez wdrożenia — a dziś jest nią brak
+	 * potrzeby ubezpieczenia nieruchomości. Wycena leci dalej mimo bramki: prowadzący ma móc
+	 * cofnąć jedną odpowiedź i pokazać, że ekran wraca do życia.
+	 */
+	private boolean blocked;
+	private String blockMessage;
+
 
 	public Policy getPolicy() {
 		return policy;
@@ -201,6 +212,22 @@ public class PropertyQuote {
 
 	public void setVariantChosen(boolean variantChosen) {
 		this.variantChosen = variantChosen;
+	}
+
+	public boolean isBlocked() {
+		return blocked;
+	}
+
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
+	}
+
+	public String getBlockMessage() {
+		return blockMessage;
+	}
+
+	public void setBlockMessage(String blockMessage) {
+		this.blockMessage = blockMessage;
 	}
 
 	public boolean isBuildingSumOverridden() {

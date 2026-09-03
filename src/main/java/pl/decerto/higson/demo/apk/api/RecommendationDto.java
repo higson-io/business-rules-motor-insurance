@@ -1,5 +1,6 @@
 package pl.decerto.higson.demo.apk.api;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,12 @@ public class RecommendationDto {
 	private List<String> missingCovers = new ArrayList<>();
 	/** BUDGET_FIT / BUDGET_EXCEEDED / BUDGET_ABSENT — albo `null`, gdy reżim budżetu nie wymaga. */
 	private String budgetOutcome;
+	/**
+	 * Tańszy wariant mieszczący się w oczekiwanej składce — ALTERNATYWA, nie podmiana.
+	 * `variantCode` powyżej niesie wariant najlepiej dopasowany do potrzeb bez względu na cenę.
+	 */
+	private String alternativeVariantCode;
+	private BigDecimal alternativePremium;
 	/** Rek. 8.7. Puste, dopóki reżim nie wymaga uzasadnienia — i to też jest informacja. */
 	private List<String> justification = new ArrayList<>();
 
@@ -39,6 +46,10 @@ public class RecommendationDto {
 	public void setMissingCovers(List<String> missingCovers) { this.missingCovers = missingCovers; }
 	public String getBudgetOutcome() { return budgetOutcome; }
 	public void setBudgetOutcome(String budgetOutcome) { this.budgetOutcome = budgetOutcome; }
+	public String getAlternativeVariantCode() { return alternativeVariantCode; }
+	public void setAlternativeVariantCode(String code) { this.alternativeVariantCode = code; }
+	public BigDecimal getAlternativePremium() { return alternativePremium; }
+	public void setAlternativePremium(BigDecimal premium) { this.alternativePremium = premium; }
 	public List<String> getJustification() { return justification; }
 	public void setJustification(List<String> justification) { this.justification = justification; }
 	public List<NeedDto> getNeeds() { return needs; }
@@ -53,6 +64,8 @@ public class RecommendationDto {
 		dto.setTotalNeeds(source.getTotalNeeds());
 		dto.setMissingCovers(source.getMissingCovers());
 		dto.setBudgetOutcome(source.getBudgetOutcome());
+		dto.setAlternativeVariantCode(source.getAlternativeVariantCode());
+		dto.setAlternativePremium(source.getAlternativePremium());
 		dto.setJustification(source.getJustification());
 		for (Need need : needs) {
 			dto.getNeeds().add(NeedDto.of(need));

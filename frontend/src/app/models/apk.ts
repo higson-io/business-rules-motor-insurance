@@ -107,6 +107,16 @@ export interface ApkRecommendationDto {
 	readonly missingCovers: readonly string[];
 	/** `null`, gdy reżim nie wymaga pytania o budżet — wtedy nie ma czego z czym porównywać. */
 	readonly budgetOutcome: string | null;
+	/**
+	 * Tańszy wariant mieszczący się w oczekiwanej składce — ALTERNATYWA obok propozycji, nie
+	 * zamiast niej.
+	 *
+	 * ⛔ `variantCode` powyżej niesie wariant najlepiej dopasowany do potrzeb, także wtedy, gdy
+	 * kosztuje więcej, niż klient podał. Oczekiwana składka jest wymaganiem klienta, a nie filtrem
+	 * zakresu — ekran, który podmieniałby propozycję na tańszą, robiłby z niej filtr z powrotem.
+	 */
+	readonly alternativeVariantCode: string | null;
+	readonly alternativePremium: number | null;
 	readonly justification: readonly string[];
 	readonly needs: readonly ApkNeedDto[];
 	readonly warnings: readonly ApkWarningDto[];
