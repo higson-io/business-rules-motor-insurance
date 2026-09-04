@@ -2677,3 +2677,28 @@ i jedna linia w `reasons()`.
 
 Przy okazji znika drobna wada składu: tekst wzorca kończył się kropką, a wstawiana podstawa prawna
 też („…z 26.06.2026 r."), więc zdanie miało dwie kropki na końcu.
+
+---
+
+## §28 `index.html` przestaje być cache'owany (2026-09-04)
+
+⛔ **Trzy razy w jednej sesji zmiana wyglądała na niewdrożoną, a była wdrożona.** Przyczyna nie
+była po stronie przeglądarki użytkownika, tylko aplikacji: `index.html` szedł z samym
+`Last-Modified`, **bez `Cache-Control`**. Przeglądarka stosuje wtedy **cache heurystyczny** —
+przyjmuje własny czas ważności i przez ten czas serwuje kopię z dysku, nie pytając serwera o nic.
+
+Skutek składał się z dwóch rzeczy naraz:
+
+1. stara strona ładowała **stary, zahaszowany bundle**,
+2. ten bundle **nadal był w artefakcie**, bo `target/motor-insurance/` nigdy nie jest czyszczony
+   (W-28) — więc zamiast 404 i przeładowania dostawała poprawną odpowiedź z kodem sprzed zmian.
+
+`IndexNoCacheFilter` ustawia `Cache-Control: no-cache, must-revalidate` **tylko na dokumencie
+HTML**. Zahaszowane zasoby zostają cache'owalne i tak ma być: nowa treść to nowa nazwa pliku.
+`no-cache` nie znaczy „nie zapisuj", tylko „zapytaj przed użyciem" — koszt to jedno warunkowe
+żądanie na wejście.
+
+⚠️ **Filtr rejestrowany jest JAWNIE w `ApplicationConfig`.** `@ComponentScan` tej aplikacji
+obejmuje wyłącznie trzy pakiety dem i nie sięga `pl.decerto` — pierwsza wersja z `@Component`
+skompilowała się, wstała i nie zrobiła nic, bo bean nigdy nie powstał. To ta sama pułapka, przed
+którą ostrzega komentarz przy skanie, tylko od strony filtra zamiast kontrolera.

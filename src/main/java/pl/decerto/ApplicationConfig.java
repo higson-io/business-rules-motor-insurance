@@ -1,6 +1,7 @@
 package pl.decerto;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -19,5 +20,15 @@ public class ApplicationConfig implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("forward:/index.html");
+	}
+
+	/**
+	 * ⛔ Rejestracja jawna, bo `@ComponentScan` powyżej NIE obejmuje `pl.decerto` — filtr
+	 * oznaczony `@Component` nigdy by nie powstał. Ta sama pułapka, przed którą ostrzega komentarz
+	 * przy skanie, tylko z drugiej strony: tam chodziło o kontroler, tu o filtr.
+	 */
+	@Bean
+	public IndexNoCacheFilter indexNoCacheFilter() {
+		return new IndexNoCacheFilter();
 	}
 }
