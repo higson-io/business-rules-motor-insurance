@@ -95,27 +95,20 @@
 						}
 					}
 
-					<footer class="apk__foot">
-						<!--
-							Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba
-							o tym powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
-						-->
-						@if (question.prefillSource) {
+					<!--
+						Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
+						powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
+					
+						⛔ Nie ma tu już „nie chcę podać". Odmowa była trzecim stanem odpowiedzi i to
+						ona przepuszczała ankietę przez pytania nieobowiązkowe; jej rolę przejęła sama
+						obowiązkowość — pytanie nieobowiązkowe wolno po prostu pominąć.
+					-->
+					@if (question.prefillSource) {
+						<footer class="apk__foot">
 							<span class="apk__prefill" data-testid="property-prefill">
 								Podpowiedziane: {{ question.prefillSource }}
 							</span>
-						}
-
-						<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
-						<button type="button" class="apk__refuse" (click)="refuse(question)">
-							{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
-						</button>
-					</footer>
-
-					@if (question.refused && question.refusalMessage) {
-						<p class="apk__refusal" data-testid="property-refusal">
-							{{ question.refusalMessage }}
-						</p>
+						</footer>
 					}
 					</div>
 				</div>
@@ -152,12 +145,17 @@
 
 					<ol class="apk__list">
 						@for (question of section.questions; track question.code) {
+							<!--
+								⛔ Bez numeru porządkowego. Numerowanie miało sens, gdy była to jedna
+								rosnąca lista pytań ankiety; przedmiot ubezpieczenia to dane już
+								zebrane, a nie kolejne kroki rozmowy — a na wyśrodkowanej kolumnie
+								cyfra w lewym marginesie i tak stałaby krzywo względem treści.
+							-->
 							<li
 								class="apk__question"
 								[class.apk__question--refused]="question.refused"
 								[attr.data-question]="question.code"
 							>
-								<span class="apk__index" aria-hidden="true">{{ $index + 1 }}</span>
 								<div class="apk__body">
 									<!--
 										⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
@@ -224,27 +222,20 @@
 										}
 									}
 
-									<footer class="apk__foot">
-										<!--
-											Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba
-											o tym powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
-										-->
-										@if (question.prefillSource) {
+									<!--
+										Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
+										powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
+									
+										⛔ Nie ma tu już „nie chcę podać". Odmowa była trzecim stanem odpowiedzi i to
+										ona przepuszczała ankietę przez pytania nieobowiązkowe; jej rolę przejęła sama
+										obowiązkowość — pytanie nieobowiązkowe wolno po prostu pominąć.
+									-->
+									@if (question.prefillSource) {
+										<footer class="apk__foot">
 											<span class="apk__prefill" data-testid="property-prefill">
 												Podpowiedziane: {{ question.prefillSource }}
 											</span>
-										}
-
-										<!-- Rek. 8.4 — odmowa jest wartością, nie brakiem. -->
-										<button type="button" class="apk__refuse" (click)="refuse(question)">
-											{{ question.refused ? 'Jednak podam' : 'Nie chcę podać' }}
-										</button>
-									</footer>
-
-									@if (question.refused && question.refusalMessage) {
-										<p class="apk__refusal" data-testid="property-refusal">
-											{{ question.refusalMessage }}
-										</p>
+										</footer>
 									}
 								</div>
 							</li>

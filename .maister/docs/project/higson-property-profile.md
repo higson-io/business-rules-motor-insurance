@@ -2404,3 +2404,65 @@ rekomendacja 8.3, która każe powiedzieć klientowi, że wartość nie pochodzi
 Higsona") i kafelki komunikacyjny oraz życiowy. Zmieniony został wyłącznie kafelek majątkowy, bo
 prace toczą się na tym profilu. Do ujednolicenia, jeśli ekran wyboru też ma być pokazywany
 klientom.
+
+---
+
+## §22 Koniec z odmową, pytanie na środku ekranu (2026-09-04)
+
+### 22.1 „Nie chcę podać" usunięte
+
+Odmowa była **trzecim stanem odpowiedzi** (decyzja D-6, rek. 8.4) i pełniła w ankiecie zależnej
+funkcję, o której łatwo zapomnieć: **domykała pytanie bez odpowiadania na nie**, więc pytanie
+nieobowiązkowe — oczekiwana składka, szacowana wartość nieruchomości — nie zatrzymywało łańcucha.
+
+⛔ Usunięcie samego przycisku zrobiłoby z tych dwóch pytań **ślepy zaułek**. Jego rolę przejęła
+**sama obowiązkowość**: pytanie nieobowiązkowe wolno pominąć i to ono odsłania następne.
+
+- Serwer: `applyReveal` — osobny przebieg po całej liście pytań, bo odsłonięcie zależy od cudzej
+  odpowiedzi **i od cudzej obowiązkowości**. Liczone przy czytaniu pojedynczego pytania musiałoby
+  zgadywać, czy pytanie wskazane w `revealedBy` zostało już wczytane.
+- Front: `canAdvance` = odpowiedziane **albo** nieobowiązkowe.
+
+⚠️ `Answer.refused`, endpoint `PUT /answer/{code}/refused` i wspólny komponent ankiety **zostają** —
+korzystają z nich dema komunikacyjne i życiowe. Zniknęło wyłącznie renderowanie w profilu
+majątkowym. Kolumna `refusal` w katalogu pytań jest odtąd **nieużywana** — do usunięcia przy
+najbliższej okazji, gdy tabela i tak będzie przebudowywana.
+
+### 22.2 Pytanie wyśrodkowane
+
+Jedno pytanie na ekranie wyrównane do lewej zostawiało po prawej pas pustki szerszy od samego
+pytania. Wyśrodkowana kolumna czyta się jak decyzja: ekran ma jedną rzecz i ta rzecz stoi
+pośrodku. Nawigacja **nie** jest środkowana — „wstecz" i „dalej" zostają na krawędziach, bo to
+sterowniki ekranu, a nie część pytania.
+
+### 22.3 W-27 — nieaktualny identyfikator wiersza po przebudowie kolumn
+
+⚠️ `update_decision_table` (zmiana kolumn) **przenumerowuje wiersze**. Aktualizacja wykonana
+później ze starym identyfikatorem nie zgłasza błędu — **tworzy drugi wiersz o tym samym kluczu**.
+Tak powstał duplikat `INSPECTIONS`: jeden z pustą odpowiedzią startową, drugi z „true", a silnik
+zwracał pierwszy z brzegu. Objawiło się to pojedynczym pytaniem ankiety wypełnionym na starcie,
+mimo że katalog wyglądał poprawnie.
+
+**Po każdej zmianie kolumn odczytać macierz na nowo** i dopiero z niej brać identyfikatory.
+
+### 22.4 Przedmiot ubezpieczenia też wyśrodkowany
+
+Krok 2 dostał ten sam rytm co ankieta: wyśrodkowana kolumna, wyśrodkowane etykiety i kontrolki.
+Przy okazji zniknął numer porządkowy przy polach — numerowanie miało sens, gdy była to rosnąca
+lista pytań ankiety, a przedmiot ubezpieczenia to dane już zebrane, nie kolejne kroki rozmowy.
+
+### 22.5 D-15 — rekomendacja NAD pakietami
+
+Specyfikacja PM-a wylicza w §3 kolejność „od góry: proponowane składki → rekomendacja →
+uzasadnienie", ale **ten sam paragraf** kończy się zdaniem: „Priorytet: nie pomijać rekomendacji
+ani nie pokazywać klientowi pakietu do wyboru, zanim nie zobaczy rekomendacji i jej uzasadnienia."
+
+Te dwa zdania są ze sobą w napięciu. Tabela nad propozycją spełniała warunek priorytetu tylko
+pośrednio — dlatego, że rekomendowany wariant jest w niej **zaznaczony**. Propozycja nad tabelą
+spełnia go wprost, a porządek czytania staje się porządkiem rozmowy: **co proponujemy, dlaczego,
+i dopiero potem z czego klient może wybrać inaczej**. Rozstrzygnięcie należy do prowadzącego demo
+i zapadło na jego korzyść.
+
+⚠️ To jest **świadome odstępstwo od litery §3 specyfikacji** na rzecz jej własnego zdania
+o priorytecie. Gdyby PM chciał wrócić do wyliczenia, wystarczy zamienić miejscami dwa znaczniki
+w `property.html`.

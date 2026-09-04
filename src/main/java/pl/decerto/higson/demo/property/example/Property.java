@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -199,6 +200,7 @@ public class Property {
 
 		sections.sort(Comparator.comparingInt(Section::getPosition));
 		questions.sort(Comparator.comparingInt(Question::getPosition));
+		applyReveal(quote, questions);
 		quote.setSections(sections);
 		quote.setQuestions(questions);
 	}
@@ -247,20 +249,38 @@ public class Property {
 		// z 7" liczy tylko po pierwszym. Sklejone w jedno dawałyby licznik, w którym całkowita
 		// liczba pytań rośnie z każdą odpowiedzią.
 		//
-		// ⚠️ Liczy się DOMKNIĘCIE poprzednika, nie odpowiedź: pytanie nieobowiązkowe, które klient
-		// pomija odmową, i tak przepuszcza ankietę dalej. Inaczej jedno „nie chcę podać" przy
-		// oczekiwanej składce zatrzymywałoby resztę ankiety na zawsze.
-		question.setRevealed(isRevealed(quote, question.getRevealedBy()));
+		// Samo odsłonięcie liczy `applyReveal`, po zbudowaniu całej listy — patrz tam.
 		return question;
 	}
 
-	/** Czy pytanie, które odsłania to pytanie, zostało już domknięte. Brak wskazania — od razu. */
-	private boolean isRevealed(PropertyQuote quote, String revealedBy) {
-		if (revealedBy == null || revealedBy.isEmpty()) {
-			return true;
+	/**
+	 * Które pytania są już odsłonięte przez łańcuch.
+	 *
+	 * ⛔ Osobny przebieg po CAŁEJ liście, a nie przy czytaniu pojedynczego pytania. Odsłonięcie
+	 * zależy od cudzej odpowiedzi i od cudzej obowiązkowości, więc liczone po jednym elemencie
+	 * musiałoby zgadywać, czy pytanie wskazane w `revealedBy` zostało już wczytane.
+	 *
+	 * ⚠️ Pytanie NIEOBOWIĄZKOWE przepuszcza ankietę dalej także wtedy, gdy klient go pominął.
+	 * Do 4 września 2026 rolę tę pełniła odmowa („nie chcę podać"), która domykała pytanie bez
+	 * odpowiadania na nie; po jej usunięciu z ekranu bez tej gałęzi jedno pominięte pytanie
+	 * o oczekiwaną składkę zatrzymywałoby resztę ankiety na zawsze.
+	 */
+	private void applyReveal(PropertyQuote quote, List<Question> questions) {
+		Map<String, Question> byCode = new LinkedHashMap<>();
+		for (Question question : questions) {
+			byCode.put(question.getCode(), question);
 		}
-		Answer answer = quote.getAnswers().get(revealedBy);
-		return answer != null && answer.isSettled();
+		for (Question question : questions) {
+			String revealedBy = question.getRevealedBy();
+			if (revealedBy == null || revealedBy.isEmpty()) {
+				question.setRevealed(true);
+				continue;
+			}
+			Question source = byCode.get(revealedBy);
+			Answer answer = quote.getAnswers().get(revealedBy);
+			boolean settled = answer != null && answer.isSettled();
+			question.setRevealed(settled || source == null || !source.isRequired());
+		}
 	}
 
 	/**

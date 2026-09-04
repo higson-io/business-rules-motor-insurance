@@ -128,7 +128,7 @@ export class Questionnaire {
 		this.asked().filter((question) => question.revealed),
 	);
 
-	/** Czy klient się tym pytaniem zajął — odpowiedział albo odmówił. Serwerowe `isSettled()`. */
+	/** Czy klient na to pytanie odpowiedział. Odpowiednik serwerowego `isSettled()`. */
 	private settled(question: PropertyQuestionDto): boolean {
 		return question.refused || question.values.length > 0 || !!question.value;
 	}
@@ -194,12 +194,16 @@ export class Questionnaire {
 	/**
 	 * Czy wolno przejść dalej.
 	 *
-	 * ⛔ Dopóki klient nie domknie pytania, następne nie jest odsłonięte — nie ma dokąd iść.
-	 * Wyszarzony przycisk mówi to wprost, zamiast pozwalać kliknąć i nie zrobić nic.
+	 * ⛔ Dopóki klient nie odpowie na pytanie OBOWIĄZKOWE, następne nie jest odsłonięte — nie ma
+	 * dokąd iść. Wyszarzony przycisk mówi to wprost, zamiast pozwalać kliknąć i nie zrobić nic.
+	 *
+	 * ⚠️ Pytanie nieobowiązkowe wolno pominąć. Do 4 września 2026 rolę tę pełniła odmowa („nie
+	 * chcę podać"), która domykała pytanie bez odpowiadania; po jej usunięciu bez tej gałęzi
+	 * oczekiwana składka byłaby ślepym zaułkiem.
 	 */
 	readonly canAdvance = computed(() => {
 		const question = this.current();
-		return question !== null && this.settled(question);
+		return question !== null && (this.settled(question) || !question.required);
 	});
 
 	/**
@@ -248,13 +252,4 @@ export class Questionnaire {
 		);
 	}
 
-	/**
-	 * „Nie chcę podać" — trzeci stan odpowiedzi (decyzja D-6). Nie blokuje wyceny; pokazuje
-	 * konsekwencję, którą podaje reguła.
-	 */
-	refuse(question: PropertyQuestionDto): void {
-		void this.store.commit(
-			firstValueFrom(this.propertyService.updateRefused(question.code, !question.refused)),
-		);
-	}
 }

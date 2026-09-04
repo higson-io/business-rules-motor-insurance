@@ -154,6 +154,17 @@ demonstrated by the demo itself; printed beside the title it spoiled the point a
 advert inside a sales process. Provenance copy stays (CRM source, "prefilled from the previous
 policy") — that is rec. 8.3, not a boast. ⚠️ The demo picker still narrates the engine in its
 subtitle and in the moto/life tiles; only the property tile was rewritten.
+**§22 (2026-09-04)** drops the "prefer not to say" control and centres the single question.
+Refusal was load-bearing in a way that is easy to miss — it *settled* a question without answering
+it, which is what let an optional one (expected premium, property value) pass the reveal chain;
+its role moves to **optionality itself**, so removing the button does not dead-end those two.
+`Answer.refused` and its endpoint stay — the motor and life demos still use them. ⚠️ **W-27**:
+changing a table's columns renumbers its rows, and a later update with a stale id silently creates
+a **duplicate row** rather than failing — that is how one questionnaire question ended up
+pre-answered. Re-read the matrix after any column change. Step 2 is centred like the questionnaire, and
+**D-15** puts the recommendation ABOVE the packages — a deliberate departure from the letter of
+spec §3's ordering in favour of the priority sentence in the same paragraph ("do not show the
+client packages to choose from before they have seen the recommendation and its justification").
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`

@@ -202,19 +202,35 @@ describe('Questionnaire', () => {
 		expect(notes[0].textContent).toContain('Metraż z poprzedniej polisy');
 	});
 
-	it('shows the consequence of declining, and only after declining (recommendation 8.4)', async () => {
-		const element = await render([
-			question({
-				code: 'CLAIMS_3Y',
-				refused: true,
-				refusalMessage: 'Przyjmiemy najostrożniejsze założenie.',
-			}),
-			question({ code: 'AREA', position: 20, refusalMessage: 'Nie wyliczymy sumy.' }),
-		]);
+	/**
+	 * ⛔ Zastąpił test odmowy („nie chcę podać"), usuniętej z ekranu 4 września 2026. Odmowa
+	 * domykała pytanie bez odpowiadania na nie i to ona przepuszczała ankietę przez pytania
+	 * nieobowiązkowe; jej rolę przejęła sama obowiązkowość.
+	 *
+	 * ⚠️ Gdyby tej gałęzi zabrakło, oczekiwana składka byłaby ślepym zaułkiem: pytanie
+	 * nieobowiązkowe, na które klient nie chce odpowiedzieć, zatrzymywałoby resztę ankiety.
+	 */
+	it('lets an optional question be skipped, so it cannot dead-end the questionnaire', async () => {
+		const element = await render(
+			[
+				question({ code: 'BUDGET', kind: 'MONEY', required: false }),
+				question({ code: 'PROPERTY_VALUE', kind: 'MONEY', position: 20, required: false }),
+			],
+			'FORM',
+		);
 
-		const messages = element.querySelectorAll('[data-testid="property-refusal"]');
-		expect(messages.length).toBe(1);
-		expect(messages[0].textContent).toContain('najostrożniejsze');
+		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
+		expect(next.disabled, 'nieobowiązkowe wolno pominąć').toBe(false);
+	});
+
+	it('still blocks a required question until it is answered', async () => {
+		const element = await render(
+			[question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', required: true })],
+			'FORM',
+		);
+
+		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
+		expect(next.disabled).toBe(true);
 	});
 
 	/**

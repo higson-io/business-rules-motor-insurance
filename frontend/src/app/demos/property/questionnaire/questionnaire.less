@@ -66,21 +66,34 @@
 // kilkadziesiąt linii reguł wyrównujących ścieżki przestało być potrzebne.
 //
 // Miara ~62ch: dłuższy wiersz męczy przy czytaniu, krótszy łamie treść pytania na trzy linijki.
+// ⛔ WYŚRODKOWANA KOLUMNA, tak samo jak pojedyncze pytanie w ankiecie. Oba kroki mają wtedy jeden
+// rytm: treść pośrodku, sterowniki na krawędziach. Wyrównana do lewej zostawiała po prawej pas
+// pustki szerszy od samych pól.
 .apk__list {
-	max-width: 62ch;
-	margin: 0;
+	max-width: 34rem;
+	margin: 0 auto;
 	padding: 0;
 	list-style: none;
 }
 
-// Numer pytania stoi W MARGINESIE, nie w treści — dzięki temu pytania mają jedną krawędź
-// startową niezależnie od tego, czy numer jest jedno-, czy dwucyfrowy.
 .apk__question {
-	display: grid;
-	grid-template-columns: 28px minmax(0, 1fr);
-	column-gap: 12px;
+	display: block;
 	padding: 18px 0;
 	border-top: 1px solid @color-border-block;
+	text-align: center;
+}
+
+// Kontrolki na środek: `mat-form-field` i grupa przełącznika są blokowe, więc bez automatycznych
+// marginesów zostałyby przy lewej krawędzi wyśrodkowanej kolumny.
+.apk__question .apk__field,
+.apk__question .apk__toggle {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.apk__question .apk__options,
+.apk__question .apk__foot {
+	justify-content: center;
 }
 
 .apk__question:first-child {
@@ -111,14 +124,6 @@
 	.apk__question {
 		animation: none;
 	}
-}
-
-.apk__index {
-	padding-top: 1px;
-	color: @color-text-muted;
-	font-size: 0.8125rem;
-	font-variant-numeric: tabular-nums;
-	text-align: right;
 }
 
 .apk__body {
@@ -269,18 +274,46 @@
 // ⛔ Pytanie rośnie do wielkości nagłówka. W liście musiało być drobne, bo sąsiadowało
 // z dziesięcioma innymi; tutaj jest jedyną treścią na ekranie i drobny druk wyglądałby jak
 // pomyłka składu.
+// ⛔ WYŚRODKOWANE. Jedno pytanie na ekranie wyrównane do lewej zostawiało po prawej pas pustki
+// szerszy od samego pytania i wyglądało jak treść, która nie doładowała reszty. Wyśrodkowana
+// kolumna czyta się jak decyzja: ekran ma jedną rzecz i ta rzecz stoi pośrodku.
+//
+// ⚠️ Środkuje się KOLUMNA i jej treść, ale NIE nawigacja — „wstecz" i „dalej" zostają rozepchnięte
+// na krawędzie, bo to są sterowniki ekranu, a nie część pytania.
 .apk__question--single {
 	flex: 1 1 auto;
-	display: block;
-	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 8px 0 0;
 	border: 0;
 	animation: apk-reveal 0.28s ease-out;
+
+	.apk__body {
+		max-width: 46rem;
+		text-align: center;
+	}
+
+	// Kontrolki wracają na środek: `mat-form-field` i grupa przełącznika są blokowe, więc bez
+	// automatycznych marginesów zostałyby przy lewej krawędzi wyśrodkowanej kolumny.
+	.apk__field,
+	.apk__toggle {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.apk__options {
+		justify-content: center;
+	}
+
+	.apk__foot {
+		justify-content: center;
+	}
 
 	// Miara treści, nie karty — długie pytanie łamie się na czytelnej szerokości, a panel
 	// zostaje w rytmie reszty ekranów.
 	.apk__label {
-		max-width: 34ch * 1.6;
-		margin-bottom: 22px;
+		margin-bottom: 24px;
 		font-size: 1.375rem;
 		font-weight: 600;
 		line-height: 1.3;
