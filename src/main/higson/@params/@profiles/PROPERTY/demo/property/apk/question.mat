@@ -1,22 +1,22 @@
 #matrix for parameter demo.property.apk.question
-question;position;required;options;labels;prefill;refusal;demoAnswer;revealedBy
-*;999;true;;;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;;
-AREA;20;true;;;Metraż z poprzedniej polisy;Bez metrażu nie wyliczymy rekomendowanej sumy ubezpieczenia.;60;
-BUDGET;260;false;;;;Bez informacji o oczekiwanej składce zaproponujemy wariant najpełniej odpowiadający potrzebom, bez względu na cenę.;;RENTED_OUT
-CLAIMS_3Y;110;true;;;Historia szkód w bazie UFG;Bez historii szkód przyjmiemy najostrożniejsze założenie, co podniesie składkę.;0;
-CONSTRUCTION_YEAR;30;true;;;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;2005;
-COVER_PERIOD;120;true;12,24,36;Rok,Dwa lata,Trzy lata;;Bez tej informacji przyjmiemy roczny okres ochrony.;12;
-FINISH_STANDARD;70;true;BASIC,STANDARD,PREMIUM;Podstawowy,Podwyższony,Wysoki;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;STANDARD;
-FLOOR;50;false;;;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;3;
-NEEDS_PROPERTY;200;true;;;;Bez tej odpowiedzi nie wiemy, czy ta ścieżka w ogóle Cię dotyczy.;;
-NEED_FLOOD;220;true;;;;Bez tej odpowiedzi nie zaproponujemy ochrony od powodzi ani jej nie pominiemy świadomie.;;NEED_THEFT
-NEED_PORTABLE;230;true;;;;Bez tej odpowiedzi nie proponujemy dodatkowego ryzyka dla sprzętu przenośnego.;;NEED_FLOOD
-NEED_THEFT;210;true;;;;Bez tej odpowiedzi nie zaproponujemy ochrony od kradzieży ani jej nie pominiemy świadomie.;;NEEDS_PROPERTY
-OCCUPANCY;90;true;PERMANENT,SEASONAL,RENTED;Mieszkam na stałe,Korzystam sezonowo,Wynajmuję;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;PERMANENT;
-POSTCODE;80;true;;;Adres z poprzedniej polisy;Bez kodu pocztowego nie ustalimy strefy powodziowej — ochrona od powodzi nie będzie dostępna.;00-950;
-PROPERTY_KIND;10;true;HOUSE,FLAT;Dom jednorodzinny,Mieszkanie;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;FLAT;
-PROPERTY_VALUE;270;false;;;;Bez Twojego oszacowania nie porównamy go z sumą wyliczoną z metrażu — sumę przyjmiemy z wyliczenia.;;BUDGET
-RENOVATED;60;false;;;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;true;
-RENTED_OUT;240;true;;;;Bez tej odpowiedzi nie wiemy, czy potrzebujesz ochrony od szkód wyrządzonych przez najemców.;;NEED_PORTABLE
-SECURITY;100;true;NONE,DOOR,ALARM,MONITORED;Brak,Drzwi antywłamaniowe,Alarm,Alarm z monitoringiem;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;DOOR;
-WALL_MATERIAL;40;true;BRICK,WOOD_FRAME;Murowane,Szkieletowe drewniane;;Bez tej informacji nie możemy ocenić Twoich potrzeb i przedstawimy ofertę wyłącznie orientacyjną.;BRICK;
+question;position;required;options;labels;prefill;demoAnswer;revealedBy
+*;999;true;;;;;
+AREA;20;true;;;Metraż z poprzedniej polisy;60;
+BUDGET;260;false;;;;;RENTED_OUT
+CLAIMS_3Y;110;true;;;Historia szkód w bazie UFG;0;
+CONSTRUCTION_YEAR;30;true;;;;2005;
+COVER_PERIOD;120;true;12,24,36;Rok,Dwa lata,Trzy lata;;12;
+FINISH_STANDARD;70;true;BASIC,STANDARD,PREMIUM;Podstawowy,Podwyższony,Wysoki;;STANDARD;
+FLOOR;50;false;;;;3;
+NEEDS_PROPERTY;200;true;;;;;
+NEED_FLOOD;220;true;;;;;NEED_THEFT
+NEED_PORTABLE;230;true;;;;;NEED_FLOOD
+NEED_THEFT;210;true;;;;;NEEDS_PROPERTY
+OCCUPANCY;90;true;PERMANENT,SEASONAL,RENTED;Mieszkam na stałe,Korzystam sezonowo,Wynajmuję;;PERMANENT;
+POSTCODE;80;true;;;Adres z poprzedniej polisy;00-950;
+PROPERTY_KIND;10;true;HOUSE,FLAT;Dom jednorodzinny,Mieszkanie;;FLAT;
+PROPERTY_VALUE;270;false;;;;;BUDGET
+RENOVATED;60;false;;;;true;
+RENTED_OUT;240;true;;;;;NEED_PORTABLE
+SECURITY;100;true;NONE,DOOR,ALARM,MONITORED;Brak,Drzwi antywłamaniowe,Alarm,Alarm z monitoringiem;;DOOR;
+WALL_MATERIAL;40;true;BRICK,WOOD_FRAME;Murowane,Szkieletowe drewniane;;BRICK;

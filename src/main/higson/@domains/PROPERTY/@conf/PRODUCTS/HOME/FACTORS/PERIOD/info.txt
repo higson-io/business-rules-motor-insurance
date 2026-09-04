@@ -1,0 +1,3 @@
+name = "Czynnik i liczba rat za okres ochrony"
+description = "Czyta go ANNUAL_PREMIUM (czynnik) i INSTALMENT (liczba rat)."
+tags = []

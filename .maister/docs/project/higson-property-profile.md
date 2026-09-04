@@ -2767,3 +2767,74 @@ Suma murów 528 000 zł. Testy frontu: 60 przechodzi.
 
 ⚠️ Test „sekcja renderuje się tylko, gdy ma widoczne pytanie" zastąpiony testem „renderuje się
 tylko gałąź, o którą poproszono" — stara asercja badała `data-section`, którego nie ma.
+
+---
+
+## §30 Ergonomia konfiguracji: puste gałęzie, kolumna, która kłamie, martwe reguły (2026-09-04)
+
+Przegląd całej konfiguracji pod jednym kątem: **co utrudnia pracę komuś, kto ją widzi
+pierwszy raz**. Cztery klasy defektów, wszystkie usunięte.
+
+### 30.1 ⛔ `USES` odwrócone — pusta gałąź pod każdym liściem
+
+§29 dał typowi `RULE` kolekcję `USES`, żeby drzewo szło po grafie wywołań. Efekt uboczny:
+Higson renderuje kolekcję **także wtedy, gdy jest pusta**, więc pod każdą regułą bez zależności
+wisiała gałąź „Korzysta z regul" z zerem elementów. Przy 29 regułach to 22 puste węzły — szum,
+w którym ginie ta garść miejsc, gdzie zagnieżdżenie coś znaczyło.
+
+Reguły wracają na płasko, w sześć gałęzi tematycznych. Kto co woła, stoi w **opisie elementu**
+(„Woła RATE_PER_SQM i DERIVED_RATIO", „Czyta go ANNUAL_PREMIUM i INSTALMENT"). Opis czyta się
+w tym samym panelu co atrybut, więc nitka jest, a pustych węzłów nie ma.
+
+```
+/PRODUCTS[HOME]
+  COVERS (7) · VARIANTS (3) · QUESTIONS (7) · SUBJECT (12)
+  APK      QUESTION_CATALOGUE, BLOCKER, ANSWER_MAP, JUSTIFICATION
+  SUMS     SUGGEST, RATE_PER_SQM, DERIVED_RATIO, VALUE_GAP
+  ZONES    ZONE_RESOLVE, FLOOD_ZONE, THEFT_ZONE, FLOOD_AVAILABILITY, FLOOD_WAITING
+  FACTORS  8 czynnikow taryfowych
+  PRICING  QUOTE, RISK_FACTOR, COVER_PREMIUMS, SUM_PREMIUMS, ANNUAL_PREMIUM, INSTALMENT
+  OFFER    TERMS, CHOICE
+```
+
+### 30.2 D-19 — pakiet wynika ze składu pakietów, nie z kolumny w tabeli
+
+`demo.property.apk.answer` niosła czwartą kolumnę **„pakiet, od którego dostępne"**. To był duplikat
+składu pakietów: D-18 przeniósł skład pod pakiet w drzewie, więc każda przebudowa pakietu — a już
+na pewno dołożenie czwartego — wymagała ręcznego poprawienia kilkunastu wierszy, **żeby
+konfiguracja przestała kłamać**. Klasyczny defekt ergonomii: dwa źródła prawdy o tym samym.
+
+Kolumna usunięta. Tabela mówi teraz tylko, jakiego **pokrycia** wymaga odpowiedź; który pakiet
+wystarczy, wynika z `VARIANTS[..]/COVERS`. Propozycją zostaje **najtańszy pakiet pokrywający
+wszystkie potrzeby**, a gdy żaden nie pokrywa — ten z największym pokryciem, przy remisie tańszy.
+
+⛔ To **nie** jest powrót do algorytmu sprzed §17. Tamten liczył potrzeby w Javie z listy pokryć,
+której nigdzie nie było widać. Teraz obie połowy decyzji są konfiguracją: czego wymaga odpowiedź —
+tabela, co zawiera pakiet — drzewo. Java robi tylko `min` i `max`.
+⚠️ Reguła z §17 zostaje: pakiet pokrywający nie wszystko **nie jest po cichu podnoszony**, luka
+nazywa się w `NEEDS_PARTIAL`. Zweryfikowane na żywo: kradzież + powódź → `COMPLETE`, 4/4.
+
+### 30.3 Martwa konfiguracja usunięta
+
+Trzy artefakty wyglądały na żywe, a nie czytał ich nikt — ani Java, ani Groovy, ani flow:
+
+| Usunięte | Dlaczego było martwe |
+|---|---|
+| `demo.property.cover.sumBasis` + atrybuty `SUM_BASIS`, `SUM_REFERENCE` | sumy liczą się raz w `SUMS[SUGGEST]`; `coverPremiums` czyta `quote.sums.<kod>`, nie tę tabelę |
+| `demo.property.fixtures.model` | nie czytał jej nikt od czasu, gdy model elementów stałych zeszedł do `sum.derivedRatio` |
+| flow `demo.property.flood.decision` | Java woła `flood.availability` i `flood.waitingPeriod` wprost; flow powtarzał tę logikę i nigdy się nie uruchamiał |
+
+⚠️ Martwy flow był najgorszy z tej trójki: **wyglądał jak diagram decyzji, którą podejmuje system**,
+a można go było zmienić i nic by się nie stało.
+
+### 30.4 Kolumna `refusal` zdjęta z katalogu pytań
+
+§22 usunął przycisk „nie chcę podać" z ekranu majątku, ale kolumna „skutek odmowy" została —
+19 wierszy długiego polskiego zdania każdy, w tabeli, którą się na demie pokazuje. Kolumna
+usunięta; `Question.refusalMessage` i wspólny komponent ankiety zostają, bo moto i życie nadal
+z odmowy korzystają.
+
+### 30.5 Otwarte
+
+⚠️ Typ domenowy `SECTION` nadal jest w schemacie — bez elementów i bez odwołań, od §29. Usunięcie
+zostało zablokowane w tej sesji na poziomie uprawnień; do skasowania w Studio jednym kliknięciem.

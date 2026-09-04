@@ -1,3 +1,0 @@
-name = "Strefa kradzieżowa dla kodu pocztowego"
-description = "Czynnik ceny. Używa jej także PRICING/QUOTE/RISK_FACTOR."
-tags = []

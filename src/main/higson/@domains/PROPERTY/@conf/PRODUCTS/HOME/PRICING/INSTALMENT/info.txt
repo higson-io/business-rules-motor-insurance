@@ -1,0 +1,3 @@
+name = "Rata miesięczna"
+description = "Dzieli składkę przez liczbę rat z FACTORS[PERIOD]."
+tags = []

@@ -1,0 +1,3 @@
+name = "Udział sum pochodnych w sumie murów"
+description = "Elementy stałe i ruchomości jako ułamek sumy murów."
+tags = []

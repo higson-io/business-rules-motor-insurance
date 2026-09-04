@@ -1,3 +1,3 @@
 name = "Wycena wariantu"
-description = "Ten sam flow, który wisi na pakiecie jako VARIANT/PREMIUM. Tutaj widać, z czego się składa."
+description = "Flow spinający całość. Ten sam, który wisi na pakiecie jako VARIANT/PREMIUM. Woła po kolei RISK_FACTOR, COVER_PREMIUMS, SUM_PREMIUMS, ANNUAL_PREMIUM, INSTALMENT."
 tags = []

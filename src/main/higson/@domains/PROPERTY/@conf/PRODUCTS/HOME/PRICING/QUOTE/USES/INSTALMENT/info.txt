@@ -1,3 +1,0 @@
-name = "Rata miesięczna"
-description = "Dzieli składkę przez liczbę rat z ANNUAL_PREMIUM/PERIOD."
-tags = []

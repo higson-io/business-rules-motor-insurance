@@ -1,2 +1,0 @@
-name = "Składka za okres ochrony"
-tags = []

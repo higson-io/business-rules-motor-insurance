@@ -238,7 +238,6 @@ public class Property {
 		question.setOptions(split(row.getString("options")));
 		question.setOptionLabels(split(row.getString("labels")));
 		question.setPrefillSource(row.getString("prefill"));
-		question.setRefusalMessage(row.getString("refusal"));
 		question.setRevealedBy(row.getString("revealedBy"));
 
 		// ⛔ DWIE FLAGI, NIE JEDNA — i nie wolno ich tu sklejać. Reguła `IS_VISIBLE` mówi, czy
@@ -451,15 +450,6 @@ public class Property {
 		}
 	}
 
-	/** Miejsce pakietu w drabince, albo `null`, gdy w tej strefie nie ma go wcale. */
-	private Integer rankOf(List<Variant> ladder, String code) {
-		for (Variant variant : ladder) {
-			if (variant.getCode().equals(code)) {
-				return variant.getPosition();
-			}
-		}
-		return null;
-	}
 
 	private Variant variantByCode(PropertyQuote quote, String code) {
 		if (code == null) {
@@ -530,22 +520,30 @@ public class Property {
 		}
 		ladder.sort(Comparator.comparingInt(Variant::getPosition));
 
-		// ⛔ PAKIET WSKAZUJE TABELA. Java pyta `demo.property.apk.answer`, co oznacza każda
-		// udzielona odpowiedź, i zostawia najbogatszy wskazany pakiet — patrz `ApkAnalysis.pickPackage`.
-		// Wcześniej stał tu algorytm maksymalizujący pokrycie potrzeb; działał, ale rozmowa
-		// o rekomendacji toczyła się wtedy nad tą klasą, a nie nad tabelą.
+		// ⛔ PAKIET WYNIKA ZE SKŁADU PAKIETÓW, NIE Z KOLUMNY W TABELI. `demo.property.apk.answer`
+		// mówi, jakiego POKRYCIA wymaga odpowiedź; co zawiera pakiet, stoi pod pakietem w drzewie
+		// (VARIANTS[..]/COVERS). Propozycją zostaje NAJTAŃSZY pakiet pokrywający wszystkie potrzeby.
 		//
-		// ⚠️ Wskazany pakiet może nie pokrywać wszystkich potrzeb i NIE PODNOSIMY go z tego
-		// powodu. Luka jest nazwana niżej, w `NEEDS_PARTIAL` — tak samo jak luka budżetowa.
-		Variant best = variantByCode(quote, ApkAnalysis.pickPackage(engine, PARAM_APK_ANSWER,
-			quote.getQuestions(), quote.getAnswers(),
-			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value),
-			code -> rankOf(ladder, code)));
-
-		// Tabela nie wskazała nic albo wskazała wariant niedostępny w tej strefie — wtedy
-		// najuboższy dostępny, bo milczenie nie jest propozycją.
-		if (best == null || !ladder.contains(best)) {
-			best = ladder.get(0);
+		// Wcześniej tabela niosła czwartą kolumnę „pakiet, od którego dostępne". Działało, ale ta
+		// kolumna powtarzała skład pakietów: dołożenie albo przebudowa pakietu wymagały ręcznego
+		// poprawienia kilkunastu wierszy, żeby konfiguracja przestała kłamać. Teraz nie wymagają
+		// niczego — jedyne miejsce, w którym stoi skład pakietu, to drzewo.
+		//
+		// ⚠️ Gdy żaden pakiet nie pokrywa wszystkiego, wygrywa ten z NAJWIĘKSZYM pokryciem, a przy
+		// remisie tańszy. Luka zostaje nazwana na ekranie w `NEEDS_PARTIAL` — tak samo jak luka
+		// budżetowa. Nie podnosimy pakietu po cichu i nie milczymy o brakach.
+		Variant best = null;
+		int bestCovered = -1;
+		for (Variant variant : ladder) {
+			int covered = ApkAnalysis.score(needs, variant.getCovers()::contains).getCovered();
+			if (covered > bestCovered) {
+				best = variant;
+				bestCovered = covered;
+				if (covered == needs.size()) {
+					// Drabinka jest posortowana rosnąco, więc pierwszy pełny pokrywacz jest najtańszy.
+					break;
+				}
+			}
 		}
 
 		// Propozycją zostaje `best` BEZ WZGLĘDU NA CENĘ — patrz komentarz nad metodą.

@@ -1,3 +1,2 @@
 name = "Wiek budynku na dzień początku ochrony"
-description = "Liczy wiek, którym kluczuje się czynnik."
 tags = []

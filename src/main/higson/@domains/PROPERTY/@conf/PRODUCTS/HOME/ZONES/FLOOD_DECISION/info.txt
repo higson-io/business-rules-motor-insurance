@@ -1,3 +1,0 @@
-name = "Decyzja o ochronie powodziowej"
-description = "Flow składający strefę, dostępność i franszyzę w jedno rozstrzygnięcie."
-tags = []

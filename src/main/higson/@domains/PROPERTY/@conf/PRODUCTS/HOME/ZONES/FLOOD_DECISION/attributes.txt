@@ -1,5 +1,0 @@
-[[attr]]
-attributeCode = "RULE"
-attributeName = "Tabela, funkcja albo flow rozstrzygajace"
-refType = "FLOW"
-refName = "demo.property.flood.decision"

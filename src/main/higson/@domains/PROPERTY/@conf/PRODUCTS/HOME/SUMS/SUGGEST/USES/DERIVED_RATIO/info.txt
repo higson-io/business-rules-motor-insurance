@@ -1,2 +1,0 @@
-name = "Udział sum pochodnych w sumie murów"
-tags = []

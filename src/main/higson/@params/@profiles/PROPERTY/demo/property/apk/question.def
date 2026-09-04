@@ -1,5 +1,5 @@
 code = "demo.property.apk.question"
-description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \"odslania je\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo odpowiedziane. Pusta wartosc znaczy \"widoczne od razu\". Lancuch jest konfiguracja, wiec przestawienie kolejnosci odslaniania nie wymaga wdrozenia."
+description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \\\"odslania je\\\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo rozstrzygniete. Pusta wartosc znaczy \\\"widoczne od razu\\\". Lancuch jest konfiguracja, wiec przestawienie kolejnosci odslaniania nie wymaga wdrozenia."
 nullable = false
 dictionary = false
 cacheable = true
@@ -51,13 +51,6 @@ array = false
 [[outputLevel]]
 code = "prefill"
 label = "zrodlo podpowiedzi"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "refusal"
-label = "skutek odmowy"
 type = "string"
 external = false
 array = false

@@ -33,15 +33,3 @@ attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
 refType = "PARAMETER"
 refName = "demo.property.tariff.baseRate [basis]"
-
-[[attr]]
-attributeCode = "SUM_BASIS"
-attributeName = "Skad bierze sie suma"
-refType = "PARAMETER"
-refName = "demo.property.cover.sumBasis [basis]"
-
-[[attr]]
-attributeCode = "SUM_REFERENCE"
-attributeName = "Pokrycie odniesienia dla sumy pochodnej"
-refType = "PARAMETER"
-refName = "demo.property.cover.sumBasis [reference]"

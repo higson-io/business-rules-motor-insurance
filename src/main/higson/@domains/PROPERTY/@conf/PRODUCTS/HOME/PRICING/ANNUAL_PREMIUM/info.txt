@@ -1,0 +1,3 @@
+name = "Składka za okres ochrony"
+description = "Mnoży sumę składek przez czynnik okresu z FACTORS[PERIOD]."
+tags = []

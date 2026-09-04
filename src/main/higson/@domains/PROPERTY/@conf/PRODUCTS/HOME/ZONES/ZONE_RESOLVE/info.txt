@@ -1,3 +1,3 @@
 name = "Strefy z kodu pocztowego"
-description = "Ustala obie strefy naraz — powodziową i kradzieżową. Ten sam adres, dwie różne role."
+description = "Ustala obie strefy naraz. Woła FLOOD_ZONE i THEFT_ZONE."
 tags = []

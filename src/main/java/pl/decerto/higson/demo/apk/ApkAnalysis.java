@@ -39,7 +39,6 @@ public final class ApkAnalysis {
 	private static final String OUT_WEIGHT = "weight";
 	private static final String OUT_TEXT = "text";
 	private static final String OUT_POSITION = "position";
-	private static final String OUT_PACKAGE = "package";
 
 	private ApkAnalysis() {
 	}
@@ -71,43 +70,6 @@ public final class ApkAnalysis {
 		return new ArrayList<>(byCover.values());
 	}
 
-	/**
-	 * Rek. 8.2.d — pakiet wskazany przez konfigurację, a nie policzony przez algorytm.
-	 *
-	 * ⛔ TO JEST CAŁY DOBÓR WARIANTU. Java przechodzi po udzielonych odpowiedziach, pyta tabelę,
-	 * co każda z nich oznacza, i zostawia ten pakiet, który stoi najwyżej w drabince. Nie ma tu
-	 * maksymalizacji pokrycia, remisów ani progów — te siedziały tu wcześniej i były niewidoczne
-	 * dla kogokolwiek poza czytającym kod. Teraz przestawienie jednej komórki w tabeli zmienia
-	 * rekomendację, a rozmowa o niej toczy się nad tabelą, a nie nad klasą.
-	 *
-	 * ⚠️ Wskazany pakiet może NIE POKRYWAĆ wszystkich potrzeb — to nie jest błąd do naprawienia
-	 * w tym miejscu. Tabela jest jedynym autorytetem; luka zostaje nazwana na ekranie, tak samo
-	 * jak przy przekroczonej składce. Kod, który po cichu podnosiłby wariant, przywróciłby ukryty
-	 * algorytm i unieważnił tabelę.
-	 *
-	 * `rank` odpowiada na jedno pytanie: który z dwóch pakietów jest bogatszy. Zadaje je
-	 * wywołujący, bo drabinka jest jego, a nie tej klasy.
-	 */
-	public static String pickPackage(HigsonEngine engine, String answerTable,
-			List<Question> questions, Map<String, Answer> answers,
-			BiFunction<String, String, HigsonContext> contextFor, Function<String, Integer> rank) {
-
-		String best = null;
-		int bestRank = Integer.MIN_VALUE;
-		for (AnswerRef ref : flatten(questions, answers)) {
-			String candidate = engine.get(answerTable, contextFor.apply(ref.questionCode, ref.value))
-				.getString(OUT_PACKAGE);
-			if (candidate == null || candidate.isEmpty()) {
-				continue;
-			}
-			Integer position = rank.apply(candidate);
-			if (position != null && position > bestRank) {
-				best = candidate;
-				bestRank = position;
-			}
-		}
-		return best;
-	}
 
 	/**
 	 * Ile z potrzeb pokrywa dany zestaw — i czego w nim brakuje.

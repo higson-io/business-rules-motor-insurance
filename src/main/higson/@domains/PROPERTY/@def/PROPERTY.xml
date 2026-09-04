@@ -6,7 +6,7 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa spisem tresci: skad bierze sie suma, jaka jest stawka i jaki limit. To, W KTORYM PAKIECIE pokrycie sie znajduje, NIE jest juz jego cecha - sklad pakietu wisi pod pakietem (VARIANTS[..]/COVERS), bo to relacja pakietu, a nie wlasciwosc pokrycia.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa spisem tresci: kolejnosc na ekranie, stawka i limit. To, W KTORYM PAKIECIE pokrycie sie znajduje, NIE jest jego cecha - sklad pakietu wisi pod pakietem (VARIANTS[..]/COVERS). Skad bierze sie suma, tez nie: sumy licza sie raz dla calej wyceny w SUMS[SUGGEST].</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeAttributes>
@@ -21,28 +21,10 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>SUM_BASIS</code>
-                    <name>Skad bierze sie suma</name>
-                    <order>1</order>
-                    <groupOrder>2</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.sumBasis [basis]</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>SUM_REFERENCE</code>
-                    <name>Pokrycie odniesienia dla sumy pochodnej</name>
-                    <order>2</order>
-                    <groupOrder>2</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.sumBasis [reference]</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
                     <code>RATE</code>
                     <name>Stawka taryfowa</name>
                     <order>1</order>
-                    <groupOrder>3</groupOrder>
+                    <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.tariff.baseRate [rate]</defaultRefName>
                 </typeAttribute>
@@ -51,7 +33,7 @@
                     <code>RATE_BASIS</code>
                     <name>Podstawa stawki - promile sumy albo kwota</name>
                     <order>2</order>
-                    <groupOrder>3</groupOrder>
+                    <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.tariff.baseRate [basis]</defaultRefName>
                 </typeAttribute>
@@ -60,7 +42,7 @@
                     <code>CAP_KIND</code>
                     <name>Rodzaj limitu</name>
                     <order>1</order>
-                    <groupOrder>4</groupOrder>
+                    <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.cover.limitRule [capKind]</defaultRefName>
                 </typeAttribute>
@@ -69,7 +51,7 @@
                     <code>CAP_LABEL</code>
                     <name>Opis limitu dla klienta</name>
                     <order>2</order>
-                    <groupOrder>4</groupOrder>
+                    <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.cover.limitRule [label]</defaultRefName>
                 </typeAttribute>
@@ -78,7 +60,7 @@
                     <code>EFFECTIVE_LIMIT</code>
                     <name>Efektywny limit - nizszy z ulamka sumy i kwoty</name>
                     <order>3</order>
-                    <groupOrder>4</groupOrder>
+                    <groupOrder>3</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.limit.effective</defaultRefName>
                 </typeAttribute>
@@ -96,7 +78,7 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu calej konfiguracji. Rozwiniecie tego wezla daje wszystko: co sprzedajemy (COVERS, VARIANTS), o co pytamy (QUESTIONS, SUBJECT) i reguly, ktore to licza (APK, SUMS, ZONES, PRICING, OFFER). Kazda regula ma pod soba USES z regulami, ktorych uzywa, wiec od produktu da sie zejsc po nitce do kazdej tabeli i funkcji. Zadna nie lezy poza tym drzewem.</description>
+            <description>Punkt startu calej konfiguracji. Rozwiniecie tego wezla daje wszystko: co sprzedajemy (COVERS, VARIANTS), o co pytamy (QUESTIONS, SUBJECT) i reguly, ktore to licza (APK, SUMS, ZONES, FACTORS, PRICING, OFFER). Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeCollections>
@@ -115,6 +97,14 @@
                     <visible>true</visible>
                     <order>0</order>
                     <collectionTypeCode>COVER</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>FACTORS</code>
+                    <name>Czynniki taryfowe</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
                     <code>OFFER</code>
@@ -166,7 +156,7 @@
                 </typeCollection>
                 <typeCollection>
                     <code>ZONES</code>
-                    <name>Strefy i powodz</name>
+                    <name>Strefy z kodu pocztowego</name>
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
@@ -251,19 +241,9 @@
             <profile>PROPERTY</profile>
             <code>RULE</code>
             <name>Regula</name>
-            <description>Jedna regula silnika widoczna w drzewie. Nazwa elementu mowi, CO ta regula rozstrzyga, atrybut RULE prowadzi do tabeli, funkcji albo flow, ktory to robi, a kolekcja USES pokazuje reguly, z ktorych ta korzysta - i tak schodzi sie w dol az do tabeli z liczbami. Regula uzywana w dwoch miejscach wisi pod tym, kto jest jej glownym odbiorca; drugie uzycie opisane jest slowami.</description>
+            <description>Jedna regula silnika widoczna w drzewie. Nazwa elementu mowi, CO ta regula rozstrzyga, a jedyny atrybut RULE prowadzi do tabeli, funkcji albo flow, ktory to robi. To, ktora regula wola ktora, stoi w opisach - regula nie ma wlasnych podgalezi, bo pusta galaz pod kazdym lisciem to szum, a nie struktura.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
-            <typeCollections>
-                <typeCollection>
-                    <code>USES</code>
-                    <name>Korzysta z regul</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-            </typeCollections>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>

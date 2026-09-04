@@ -202,6 +202,17 @@ is gone: the seven APK questions and the twelve subject fields now hang directly
 sections of one form — which reverses §23.1's section name and segmented progress bar. And
 **D-18**: a package's covers are now child references under `VARIANTS[...]/COVERS` in the tree
 rather than rows of a decision table, so what a package contains is visible by expanding a branch.
+**§30 (2026-09-04)** is an ergonomics pass over the whole configuration. §29's `USES` collection
+is **reversed** — Higson renders a collection even when empty, so 22 of 29 rules carried an empty
+"uses" branch; the rules go flat into six thematic branches and what-calls-what moves into element
+descriptions. **D-19**: `demo.property.apk.answer` loses its "package" column — it duplicated the
+package composition D-18 had put in the tree, so rebuilding a package meant hand-editing a dozen
+rows to stop the configuration lying. The answer now names only the **cover** it needs, and the
+proposal is the cheapest package covering every need (largest coverage, cheapest on a tie, when
+none covers all). Three artifacts nobody read are deleted — `cover.sumBasis`, `fixtures.model` and
+the flow `flood.decision`, which looked like a live decision diagram and had never run — and the
+`refusal` column leaves the question catalogue (§22 took the control off the screen). ⚠️ The unused
+`SECTION` type is still in the schema.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
