@@ -147,7 +147,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 			dto.setName(cover.getName());
 			dto.setDescription(cover.getDescription());
 			dto.setPosition(cover.getPosition());
-			dto.setSumBasis(cover.getSumBasis());
 			dto.setCapLabel(cover.getCapLabel());
 			dto.setEffectiveLimit(cover.getEffectiveLimit());
 			dto.setSum(cover.getSum());

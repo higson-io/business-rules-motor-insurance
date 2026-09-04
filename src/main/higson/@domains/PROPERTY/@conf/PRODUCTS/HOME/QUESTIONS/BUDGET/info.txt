@@ -1,3 +1,0 @@
-name = "Jaka jest oczekiwana przez Ciebie składka?"
-description = "Pytanie 6 ze specyfikacji, rek. 8.2.d. Nieobowiazkowe - wymuszona kwota bylaby kwota zmyslona."
-tags = []

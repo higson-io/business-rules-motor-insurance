@@ -9,7 +9,6 @@ public class Cover {
 	private String name;
 	private String description;
 	private int position;
-	private String sumBasis;
 	private String capLabel;
 	private BigDecimal effectiveLimit;
 	private BigDecimal sum;
@@ -44,14 +43,6 @@ public class Cover {
 
 	public void setPosition(int position) {
 		this.position = position;
-	}
-
-	public String getSumBasis() {
-		return sumBasis;
-	}
-
-	public void setSumBasis(String sumBasis) {
-		this.sumBasis = sumBasis;
 	}
 
 	public String getCapLabel() {

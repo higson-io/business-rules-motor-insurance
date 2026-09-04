@@ -52,8 +52,10 @@ public class Property {
 	private static final String PROFILE = "PROPERTY";
 	private static final String PRODUCT_PATH = "/PRODUCTS[HOME]";
 
-	private static final String COLLECTION_SUBJECT = "SUBJECT";
+	private static final String COLLECTION_STEPS = "STEPS";
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
+	private static final String STEP_NEEDS = "NEEDS";
+	private static final String STEP_SUBJECT = "SUBJECT";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
 
@@ -163,8 +165,8 @@ public class Property {
 	 *    znikało siedem pojedynczych pytań, a sekcje trzeba było wygaszać domyślaniem się z
 	 *    pustej listy.
 	 *
-	 * ⚠️ Widoczność sekcji i nieistnienie sekcji to DWA RÓŻNE mechanizmy. Pierwszy to reguła
-	 * (`demo.property.apk.section.visibility`), drugi to wersja regionu. Zlanie ich w jedno
+	 * ⚠️ Widoczność pytania i nieistnienie pytania to DWA RÓŻNE mechanizmy. Pierwszy to reguła
+	 * (`demo.property.apk.question.visibility`), drugi to wersja regionu. Zlanie ich w jedno
 	 * odebrałoby demonstracji połowę sensu.
 	 */
 	private void loadQuestions(PropertyQuote quote) {
@@ -173,8 +175,8 @@ public class Property {
 			return;
 		}
 		List<Question> questions = new ArrayList<>();
-		readInto(quote, product, COLLECTION_QUESTIONS, questions);
-		readInto(quote, product, COLLECTION_SUBJECT, questions);
+		readInto(quote, product, STEP_NEEDS, questions);
+		readInto(quote, product, STEP_SUBJECT, questions);
 
 		questions.sort(Comparator.comparingInt(Question::getPosition));
 		applyReveal(quote, questions);
@@ -182,28 +184,33 @@ public class Property {
 	}
 
 	/**
-	 * Pytania z jednej kolekcji produktu. Kod kolekcji jedzie z pytaniem i mówi, DOKĄD ono należy.
+	 * Pytania jednego KROKU rozmowy. Kod kroku jedzie z pytaniem i mówi, DOKĄD ono należy.
 	 *
-	 * ⛔ Sekcji już nie ma. Do 4 września 2026 pytania wisiały pod elementami `SECTIONS[...]`,
-	 * a sekcja miała własny tytuł, kolejność, regułę widoczności i rodzaj. Był to poziom pośredni,
-	 * który przy siedmiu pytaniach nie rozstrzygał niczego, czego nie rozstrzyga sama gałąź —
-	 * a konfigurując go, konfigurowało się rzecz istniejącą wyłącznie po to, żeby grupować.
+	 * ⛔ DWA KROKI, bo to dwie różne rzeczy pod dwoma różnymi reżimami. `NEEDS` to analiza
+	 * potrzeb w rozumieniu rek. 8: pytamy klienta, czego potrzebuje. `SUBJECT` to przedmiot
+	 * ubezpieczenia i sytuacja — dane, które zakłady zbierają POZA APK i mają je już zebrane.
+	 * Rozdział przebiega w drzewie, więc przeniesienie pytania z jednej strony na drugą jest
+	 * przeniesieniem elementu, a nie zmianą atrybutu.
 	 *
-	 * ⛔ DWIE GAŁĘZIE, bo to dwie różne rzeczy. `QUESTIONS` to analiza potrzeb: pytamy klienta,
-	 * czego potrzebuje. `SUBJECT` to przedmiot ubezpieczenia i sytuacja — dane, które zakłady
-	 * zbierają POZA APK i mają je już zebrane. Rozdział przebiega w drzewie, więc przeniesienie
-	 * pytania z jednej strony na drugą jest przeniesieniem elementu, a nie zmianą atrybutu.
+	 * ⛔ Krok trzyma pytania RAZEM z regułami, które te odpowiedzi rozstrzygają. Do 4 września
+	 * 2026 były to dwie niezwiązane gałęzie na tym samym poziomie — `QUESTIONS` obok `APK`,
+	 * `SUBJECT` obok `ZONES` i `SUMS` — i trzeba było wiedzieć, że mają ze sobą cokolwiek
+	 * wspólnego. Java czyta stąd tylko pytania; reguły są dla czytającego drzewo.
 	 */
-	private void readInto(PropertyQuote quote, DomainObject product, String collection,
+	private void readInto(PropertyQuote quote, DomainObject product, String stepCode,
 			List<Question> questions) {
 
-		for (DomainObject definition : product.getChildren(collection)) {
-			questions.add(readQuestion(quote, definition, collection));
+		DomainObject step = product.getChild(COLLECTION_STEPS, stepCode);
+		if (step == null) {
+			return;
+		}
+		for (DomainObject definition : step.getChildren(COLLECTION_QUESTIONS)) {
+			questions.add(readQuestion(quote, definition, stepCode));
 		}
 	}
 
-	/** Jedno pytanie. Sekcję niesie GAŁĄŹ, w której pytanie wisi — nie jego własny atrybut. */
-	private Question readQuestion(PropertyQuote quote, DomainObject definition, String collection) {
+	/** Jedno pytanie. Krok niesie GAŁĄŹ, w której pytanie wisi — nie jego własny atrybut. */
+	private Question readQuestion(PropertyQuote quote, DomainObject definition, String stepCode) {
 		// W-22: nawigacja po domenie nie wstrzykuje kodu elementu do kontekstu, więc atrybut
 		// kluczowany question.code nie miałby się z czego rozwiązać. Kontekst budujemy sami.
 		PropertyContext ctx = new PropertyContext(quote).withQuestion(definition.getCode());
@@ -211,7 +218,7 @@ public class Property {
 		Question question = new Question();
 		question.setCode(definition.getCode());
 		// Kod kolekcji: QUESTIONS albo SUBJECT. Ekran po nim rozdziela krok pierwszy od drugiego.
-		question.setSection(collection);
+		question.setSection(stepCode);
 
 		// Cztery rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
 		//
@@ -219,7 +226,11 @@ public class Property {
 		// ma przeczytać jedno zdanie, a przy kilkunastu pytaniach robiła z ankiety ścianę tekstu.
 		// Treść pytania musi wystarczyć sama — jeśli nie wystarcza, to jest źle zadane pytanie,
 		// a nie brakujący przypis.
-		question.setText(attrString(definition, "TEXT", ctx));
+		// ⛔ TREŚĆ PYTANIA TO NAZWA ELEMENTU, nie osobny atrybut. Do 4 września 2026 stała
+		// w atrybucie `TEXT`, przez co każde pytanie miało dwie wersje siebie — nazwę widoczną
+		// w drzewie i tekst widoczny na ekranie. Cztery z dziewiętnastu zdążyły się rozjechać,
+		// a rozjazd nie objawiał się niczym: konfigurator poprawiał nazwę i ekran się nie zmieniał.
+		question.setText(definition.getName());
 		// ⛔ NOŚNE. `KIND` niesie i rodzaj kontrolki, i typ wartości — `PropertyContext.convert`
 		// konwertuje po nim. Do 3 września 2026 były to dwa atrybuty; rozdzielone dawały cztery
 		// kombinacje, z których sensowne były dwie, a pomyłka kończyła się tym, że „400" nie
@@ -323,7 +334,10 @@ public class Property {
 		quote.getSums().setFixtures(asDecimal(sums.get(0, "fixtures")));
 		quote.getSums().setContents(asDecimal(sums.get(0, "contents")));
 		// Kradzież i powódź nie mają własnej sumy — ubezpieczają to samo mienie, więc dziedziczą
-		// sumę ruchomości i murów. To jest reguła cover.sumBasis, tu tylko jej wykonanie.
+		// sumę ruchomości i murów. ⚠️ To jest reguła, a stoi w kodzie: tabela `cover.sumBasis`
+		// miała ją nieść, ale nikt jej nigdy nie czytał poza jedną komórką (OC), więc została
+		// usunięta razem z martwymi wierszami. Jeśli dziedziczenie sum ma być konfiguracją,
+		// wraca jako kolumny katalogu pokryć, a nie jako osobna tabela.
 		quote.getSums().setTheft(quote.getSums().getContents());
 		quote.getSums().setFlood(quote.getSums().getBuilding());
 		quote.getSums().setAssistance(BigDecimal.ZERO);
@@ -345,7 +359,6 @@ public class Property {
 			cover.setName(definition.getName());
 			cover.setDescription(definition.getDescription());
 			cover.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
-			cover.setSumBasis(attrString(definition, "SUM_BASIS", ctx));
 			cover.setCapLabel(attrString(definition, "CAP_LABEL", ctx));
 			cover.setEffectiveLimit(asDecimal(engine.call(FUNCTION_LIMIT, ctx)));
 			cover.setSum(sumFor(quote, definition.getCode()));
@@ -447,6 +460,19 @@ public class Property {
 		// rekomendacja się zmieniła, bo zmieniła się data polisy albo odpowiedź w ankiecie.
 		if (!quote.isVariantChosen()) {
 			quote.setSelectedVariant(quote.getRecommendation().getVariantCode());
+		}
+
+		// ⛔ SUMA GWARANCYJNA OC JEST CECHĄ PAKIETU, nie wyceny — znamy ją dopiero tutaj, bo
+		// dopiero tutaj wiadomo, który pakiet jest pokazywany. Do 4 września 2026 tę zależność
+		// niósł atrybut `SUM_BASIS` pokrycia z wartością `CATALOGUE`, a front wybierał po nim
+		// między sumą pokrycia a sumą gwarancyjną wariantu. Atrybut wskazywał tabelę, która nie
+		// mówiła nic ponadto (pozostałe wiersze były martwe — wykonanie siedziało na sztywno
+		// w `computeDerived`), więc znikła razem z nią. Suma ląduje teraz w polu, które od
+		// zawsze na nią czekało, i pokrycie OC ma po prostu swoją sumę jak każde inne.
+		Variant shown = variantByCode(quote, quote.getSelectedVariant());
+		quote.getSums().setLiability(shown == null ? null : shown.getLiabilitySum());
+		for (Cover cover : quote.getCovers()) {
+			cover.setSum(sumFor(quote, cover.getCode()));
 		}
 	}
 

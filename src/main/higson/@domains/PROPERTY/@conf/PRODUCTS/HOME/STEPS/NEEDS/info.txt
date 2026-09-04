@@ -1,0 +1,3 @@
+name = "Krok 1 — Analiza potrzeb klienta"
+description = "Pytania rekomendowane przez KNF i reguly, ktore z odpowiedzi robia potrzeby, rekomendacje i jej uzasadnienie."
+tags = []

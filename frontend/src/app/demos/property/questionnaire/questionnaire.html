@@ -16,7 +16,7 @@
 	a treść przychodzi z reguł i może mieć dowolną długość.
 -->
 @if (ready()) {
-	@if (group() === 'QUESTIONS') {
+	@if (group() === 'NEEDS') {
 		@for (question of currentAsList(); track question.code) {
 			<section class="apk__section apk__section--single">
 				<header class="apk__step">

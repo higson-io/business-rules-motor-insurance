@@ -1,3 +1,0 @@
-name = "Czy chcesz ubezpieczyć smartfon lub inne urządzenia przenośne?"
-description = "Pytanie 4 ze specyfikacji."
-tags = []

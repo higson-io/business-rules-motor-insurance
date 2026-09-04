@@ -40,7 +40,7 @@ export type QuestionKind =
  * pytania wiszą teraz płasko w dwóch kolekcjach pod produktem. `QUESTIONS` to analiza potrzeb,
  * `SUBJECT` to przedmiot ubezpieczenia i sytuacja — dane zbierane poza APK.
  */
-export type QuestionSection = 'QUESTIONS' | 'SUBJECT';
+export type QuestionSection = 'NEEDS' | 'SUBJECT';
 
 export interface PropertyQuestionDto {
 	readonly code: string;
@@ -76,7 +76,6 @@ export interface PropertyCoverDto {
 	readonly name: string;
 	readonly description: string | null;
 	readonly position: number;
-	readonly sumBasis: string | null;
 	readonly capLabel: string | null;
 	readonly effectiveLimit: number | null;
 	readonly sum: number | null;

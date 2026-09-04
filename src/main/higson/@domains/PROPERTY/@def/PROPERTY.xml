@@ -78,18 +78,10 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu calej konfiguracji. Rozwiniecie tego wezla daje wszystko: co sprzedajemy (COVERS, VARIANTS), o co pytamy (QUESTIONS, SUBJECT) i reguly, ktore to licza (APK, SUMS, ZONES, FACTORS, PRICING, OFFER). Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
+            <description>Punkt startu calej konfiguracji. STEPS to rozmowa z klientem - w kazdym kroku pytania i reguly, ktore te odpowiedzi rozstrzygaja, stoja obok siebie. COVERS i VARIANTS to co sprzedajemy. FACTORS, PRICING i OFFER to co dzieje sie potem, gdy o nic juz nie pytamy. Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeCollections>
-                <typeCollection>
-                    <code>APK</code>
-                    <name>Reguly analizy potrzeb</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
                 <typeCollection>
                     <code>COVERS</code>
                     <name>Pokrycia</name>
@@ -123,28 +115,12 @@
                     <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
-                    <code>QUESTIONS</code>
-                    <name>Pytania analizy potrzeb (APK)</name>
+                    <code>STEPS</code>
+                    <name>Kroki rozmowy z klientem</name>
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
-                    <collectionTypeCode>QUESTION</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>SUBJECT</code>
-                    <name>Przedmiot ubezpieczenia i sytuacja (poza APK)</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>QUESTION</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>SUMS</code>
-                    <name>Sumy ubezpieczenia</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
+                    <collectionTypeCode>STEP</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
                     <code>VARIANTS</code>
@@ -153,14 +129,6 @@
                     <visible>true</visible>
                     <order>0</order>
                     <collectionTypeCode>VARIANT</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>ZONES</code>
-                    <name>Strefy z kodu pocztowego</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
             </typeCollections>
             <typeAttributes>
@@ -178,42 +146,33 @@
         <domainType>
             <profile>PROPERTY</profile>
             <code>QUESTION</code>
-            <name>Pytanie APK</name>
-            <description>Pytanie analizy potrzeb jako element domeny, a nie wiersz tabeli: wiersz zawsze istnieje, a element moze NIE ISTNIEC w danej wersji regionu - i na tej roznicy stoi cala demonstracja wersjonowania. Element niesie cztery rzeczy: o co pytamy, jakiego rodzaju jest odpowiedz, gdzie ona laduje i kiedy pytanie jest widoczne. Reszta ustawien siedzi w jednym wierszu tabeli demo.property.apk.question.</description>
+            <name>Pytanie</name>
+            <description>Pytanie zadawane klientowi. NAZWA ELEMENTU JEST TRESCIA PYTANIA - do 4 wrzesnia 2026 tresc stala osobno w atrybucie TEXT, wiec kazde pytanie mialo dwie wersje siebie i cztery z dziewietnastu zdazyly sie rozjechac: drzewo mowilo co innego niz ekran. Zostaja trzy atrybuty: jakiego rodzaju jest odpowiedz, gdzie ona laduje i kiedy pytanie w ogole dotyczy tego klienta. Reszta ustawien to jeden wiersz demo.property.apk.question.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>TEXT</code>
-                    <name>Tresc pytania</name>
+                    <code>KIND</code>
+                    <name>Rodzaj odpowiedzi</name>
                     <order>1</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>LITERAL</defaultRefType>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>KIND</code>
-                    <name>Rodzaj odpowiedzi</name>
-                    <order>2</order>
-                    <groupOrder>1</groupOrder>
-                    <defaultRefType>LITERAL</defaultRefType>
-                    <defaultRefName>TEXT</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
                     <code>CONTEXT_PATH</code>
                     <name>Gdzie laduje odpowiedz</name>
-                    <order>3</order>
+                    <order>2</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>LITERAL</defaultRefType>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>IS_VISIBLE</code>
-                    <name>Kiedy pokazac</name>
-                    <order>1</order>
-                    <groupOrder>2</groupOrder>
+                    <name>Czy pytanie dotyczy tego klienta</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.apk.question.visibility</defaultRefName>
                 </typeAttribute>
@@ -309,6 +268,32 @@
                     <defaultRefName>demo.property.apk.section.visibility</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>STEP</code>
+            <name>Krok rozmowy z klientem</name>
+            <description>Krok, w ktorym o cos pytamy klienta. Trzyma RAZEM pytania i reguly, ktore te odpowiedzi rozstrzygaja - wczesniej byly to dwie niezwiazane galezie na tym samym poziomie (QUESTIONS obok APK, SUBJECT obok ZONES i SUMS) i trzeba bylo wiedziec, ze maja ze soba cokolwiek wspolnego. Kroki, w ktorych o nic nie pytamy (wycena, oferta), nie sa tu - ich reguly wisza wprost pod produktem.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>QUESTIONS</code>
+                    <name>O co pytamy</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>RULES</code>
+                    <name>Co rozstrzyga odpowiedzi</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RULE</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
         </domainType>
         <domainType>
             <profile>PROPERTY</profile>

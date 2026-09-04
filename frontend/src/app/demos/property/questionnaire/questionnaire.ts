@@ -75,7 +75,7 @@ export class Questionnaire {
 	 * i kolejnością; przy siedmiu pytaniach był to poziom pośredni, który niczego nie rozstrzygał.
 	 * Podział przebiega teraz po gałęzi drzewa i tylko po niej.
 	 */
-	readonly group = input.required<'QUESTIONS' | 'SUBJECT'>();
+	readonly group = input.required<'NEEDS' | 'SUBJECT'>();
 
 	/** Zgłaszane, gdy klient domknął ostatnie pytanie ankiety — gospodarz przechodzi dalej. */
 	readonly completed = output<void>();

@@ -213,6 +213,19 @@ none covers all). Three artifacts nobody read are deleted — `cover.sumBasis`, 
 the flow `flood.decision`, which looked like a live decision diagram and had never run — and the
 `refusal` column leaves the question catalogue (§22 took the control off the screen). ⚠️ The unused
 `SECTION` type is still in the schema.
+**§31 (2026-09-04)** merges each step's questions with the rules that settle them. A new `STEP`
+type holds `QUESTIONS` and `RULES` side by side, so `NEEDS` (7 APK questions + 4 APK rules) and
+`SUBJECT` (12 fields + zones and sums) each read as one thing instead of two unrelated branches at
+the same level; the product drops from ten branches to six with no empty collection. **D-20**: a
+question's text is now the **element name** — it used to sit in a `TEXT` attribute as well, and 4
+of 19 had already diverged, invisibly. §31.3 records a regression this pass caused and fixed: the
+`cover.sumBasis` table deleted in §30.3 was **not** dead — Java reached it through the `SUM_BASIS`
+domain attribute, and the offer lost the liability guarantee sum; the fix fills `sums.liability`
+from the chosen variant instead of restoring the table. ⚠️ **W-29**: `update_domain_type` defaults
+to `action: SET_TO_ALL`, which overwrites every element's value with the type default — editing
+one attribute wiped `KIND` and `CONTEXT_PATH` on all 19 questions and returned HTTP 500.
+§31.5 lists what the analysis found and this pass did not do — chief among it that Higson's real
+element references (`reference.txt`) are unused, so a package's covers are hand-copied stubs.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is

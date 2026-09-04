@@ -2838,3 +2838,87 @@ z odmowy korzystają.
 
 ⚠️ Typ domenowy `SECTION` nadal jest w schemacie — bez elementów i bez odwołań, od §29. Usunięcie
 zostało zablokowane w tej sesji na poziomie uprawnień; do skasowania w Studio jednym kliknięciem.
+
+---
+
+## §31 Krok trzyma pytania razem z regułami, które je rozstrzygają (2026-09-04)
+
+Trzy równoległe analizy całej konfiguracji (duplikaty / możliwości modelu / nawigacja) i jedna
+skarga, od której się zaczęło: **„w drzewie są dwie sekcje związane z APK — jedna z pytaniami,
+druga z regułami"**. To samo dotyczyło przedmiotu ubezpieczenia: `SUBJECT` stał osobno,
+a `ZONES` i `SUMS` osobno, i trzeba było wiedzieć, że mają ze sobą cokolwiek wspólnego.
+
+### 31.1 Nowy typ `STEP`
+
+```
+/PRODUCTS[HOME]
+  STEPS
+    NEEDS     Krok 1 — Analiza potrzeb klienta
+              QUESTIONS  7 pytań APK
+              RULES      katalog pytań, blokady, mapa odpowiedzi, uzasadnienie
+    SUBJECT   Krok 2 — Przedmiot ubezpieczenia
+              QUESTIONS  12 pól
+              RULES      strefy (5) i sumy (4)
+  COVERS      7 · VARIANTS 3 · FACTORS 8 · PRICING 6 · OFFER 2
+```
+
+Sześć gałęzi zamiast dziesięciu, **żadnej pustej kolekcji**, i pytanie stoi obok reguły, która
+z jego odpowiedzi coś robi. Kroki 3 i 4 z ekranu (rekomendacja, oferta) nie są krokami rozmowy —
+o nic w nich nie pytamy — więc ich reguły wiszą wprost pod produktem, jako `PRICING` i `OFFER`.
+
+⛔ Nie da się tego zrobić jedną kolekcją: **jedna kolekcja = jeden typ**, a pytanie i reguła to
+dwa różne typy. Stąd krok jako element z dwiema kolekcjami.
+
+### 31.2 D-20 — treść pytania to NAZWA elementu
+
+Pytanie miało dwie wersje siebie: nazwę widoczną w drzewie i atrybut `TEXT` widoczny na ekranie.
+**Cztery z dziewiętnastu zdążyły się rozjechać** (`BUDGET`, `NEED_PORTABLE`, `AREA`, `CLAIMS_3Y`),
+a rozjazd nie objawiał się niczym — konfigurator poprawiał nazwę w drzewie i ekran się nie zmieniał.
+`TEXT` usunięty, `Property.readQuestion` czyta `definition.getName()`. Typ `QUESTION` ma teraz
+**trzy** atrybuty: rodzaj odpowiedzi, gdzie odpowiedź ląduje, kiedy pytanie dotyczy tego klienta.
+
+### 31.3 Regresja z §30.3 — suma gwarancyjna OC
+
+⛔ **`demo.property.cover.sumBasis` NIE była martwa.** Audyt szukał kodu tabeli w Javie i Groovym
+i nie znalazł go, bo Java sięgała po nią **przez atrybut domeny** `SUM_BASIS` — czyli dokładnie tą
+drogą, dla której atrybuty istnieją. Jedna komórka była żywa: `LIABILITY = CATALOGUE`, po której
+front wybierał sumę gwarancyjną wariantu zamiast sumy pokrycia. Po usunięciu tabeli w §30.3
+dokument oferty pokazywał przy OC w życiu prywatnym **kreskę zamiast 200 000 / 2 000 000 zł**.
+
+Naprawione nie przez przywrócenie tabeli, tylko przez usunięcie potrzeby rozstrzygania: suma
+gwarancyjna jest cechą PAKIETU, więc Java wypełnia `quote.sums.liability` z wybranego wariantu,
+gdy tylko wiadomo, który to wariant. Pokrycie OC ma po prostu swoją sumę jak każde inne, a front
+przestaje wiedzieć, że OC jest inne.
+
+⚠️ **Wniosek na przyszłość: „nikt nie czyta tej tabeli" wymaga sprawdzenia OBU dróg** — kodu tabeli
+w Javie/Groovym ORAZ atrybutu domeny, który na nią wskazuje. Pierwsze bez drugiego daje fałszywy
+wynik dokładnie dla tabel podpiętych pod drzewo, czyli tych najlepiej zorganizowanych.
+
+### 31.4 ⚠️ W-29 — `update_domain_type` domyślnie KASUJE wartości na elementach
+
+`higson_update_domain_type` przyjmuje na atrybucie `action` z domyślną wartością **`SET_TO_ALL`**,
+która ustawia `defaultValue` typu **na wszystkich istniejących elementach**. Zdjęcie jednego
+atrybutu z typu `QUESTION` wyczyściło przy okazji `KIND` i `CONTEXT_PATH` na wszystkich 19
+pytaniach — aplikacja odpowiedziała HTTP 500 („Brak powierzchni użytkowej"), bo `AREA` przestało
+mieć ścieżkę kontekstu. To samo wyjaśnia zagadkowe „Deleted: 45" przy imporcie w §29.
+
+Przy każdej zmianie listy atrybutów typu: **`action: "NO_CHANGES"` na atrybutach, które mają
+zachować wartości**, albo odtworzenie wartości importem z wcześniejszego eksportu.
+
+⚠️ Odtwarzając wartości importem, dopasowuj po **kodzie ORAZ typie kolekcji** — `FACTORS` ma
+elementy `SECURITY`, `OCCUPANCY`, `WALL_MATERIAL` o tych samych kodach co pytania w `SUBJECT`,
+więc dopasowanie po samym kodzie wstawia atrybuty pytania do reguły i import się wykłada
+(„attribute CONTEXT_PATH was not defined in type").
+
+### 31.5 Co z tej analizy zostało do zrobienia
+
+Trzy niezależne analizy wskazały więcej niż zmieściło się w tej rundzie. Otwarte, w kolejności wagi:
+
+| # | Rzecz | Na czym polega |
+|---|---|---|
+| 1 | **Prawdziwe referencje** (`reference.txt`) | `VARIANTS[x]/COVERS[...]` to dziś **atrapy** typu `PACKAGE_COVER` z zerem atrybutów i ręcznie przepisaną nazwą (12 kopii). Higson ma wbudowany mechanizm referencji — `<references>` w XSD, `reference.txt` w snapshocie, `addReference`/`getNotRefChildren` w runtimie — i **w całym repo nie ma ani jednego użycia**. Po przetypowaniu kolekcji na `COVER` skład pakietu zostaje widoczny, a klikając pokrycie pod pakietem widzi się prawdziwe pokrycie z jego atrybutami |
+| 2 | **Katalog pokryć jedną tabelą** | `cover.position`, `cover.limitRule`, `tariff.baseRate` — trzy tabele po 8 wierszy o identycznym kluczu. Nowe pokrycie to dziś trzy wiersze w trzech plikach; pominięcie `baseRate` daje cichą stawkę 0 |
+| 3 | **Region `PROPERTY` do skasowania** | D-17 zdjął wersje, ale sam region z harmonogramem został i **mówi co innego niż `apk.regime`**: harmonogram obiecuje „minimum ustawowe" przed 1 lipca 2027, tabela zwraca KNF zawsze |
+| 4 | **Drugi poziom wejściowy w tabelach pokryć** | MOTO kluczuje limity parą `coverage × option`, LIFE parą `benefit × variant`. Majątek nie — dlatego `THEFT` ma ten sam limit w STANDARD i COMPLETE. `PropertyContext` **już niesie oba pola** |
+| 5 | **`variant.position`, `variant.availability[COMPLETE×ZX]`, `variant.liabilitySum[BASIC=0]`** | wszystkie trzy wyprowadzalne ze składu pakietu w drzewie |
+| 6 | **Martwe resztki** | `QuestionCatalogue.java` czyta 8 atrybutów, których typ `QUESTION` nie ma; osierocony wiersz `CIRCUMSTANCES` w `question.visibility`; martwe typy kontekstu (`Situation`, `Apk`); `quote.property.priorFloodCover`, którego nikt nie ustawia, więc karencja zawsze trafia w wiersz `*`; nieczytane kolumny w `sum.valueGap` i `flood.availability` powtarzające zdania z `reason.mat`; typ `SECTION` |

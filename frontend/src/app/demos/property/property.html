@@ -37,7 +37,7 @@
 					zgadywać, który z nich przewija pytanie, a który kończy krok. Gospodarz dowiaduje
 					się o końcu ankiety zdarzeniem.
 				-->
-				<app-property-questionnaire group="QUESTIONS" (completed)="goTo('subject')" />
+				<app-property-questionnaire group="NEEDS" (completed)="goTo('subject')" />
 
 				@if (blocked()) {
 					<p class="property__blocked" role="status" data-testid="property-blocked">

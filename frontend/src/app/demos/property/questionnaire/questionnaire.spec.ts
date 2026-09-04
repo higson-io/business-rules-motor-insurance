@@ -135,7 +135,7 @@ describe('Questionnaire', () => {
 	 */
 	async function render(
 		questions: readonly PropertyQuestionDto[],
-		group: 'QUESTIONS' | 'SUBJECT' = 'SUBJECT',
+		group: 'NEEDS' | 'SUBJECT' = 'SUBJECT',
 	): Promise<HTMLElement> {
 		const fixture = TestBed.createComponent(Questionnaire);
 		fixture.componentRef.setInput('group', group);
@@ -185,7 +185,7 @@ describe('Questionnaire', () => {
 		const element = await render(
 			[
 				question({ code: 'AREA', section: 'SUBJECT' }),
-				question({ code: 'BUDGET', section: 'QUESTIONS' }),
+				question({ code: 'BUDGET', section: 'NEEDS' }),
 			],
 			'SUBJECT',
 		);
@@ -222,7 +222,7 @@ describe('Questionnaire', () => {
 				question({ code: 'BUDGET', kind: 'MONEY', required: false }),
 				question({ code: 'PROPERTY_VALUE', kind: 'MONEY', position: 20, required: false }),
 			],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
@@ -232,7 +232,7 @@ describe('Questionnaire', () => {
 	it('still blocks a required question until it is answered', async () => {
 		const element = await render(
 			[question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', required: true })],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
@@ -254,7 +254,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
 			],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		expect(element.querySelectorAll('[data-question]').length).toBe(1);
@@ -278,7 +278,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
 			],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		expect(element.querySelector('[data-question="NEED_THEFT"]')).not.toBeNull();
@@ -296,7 +296,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', value: 'true' }),
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20, value: 'false' }),
 			],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		expect(element.textContent).toContain('Pytanie 2 z 2');
@@ -321,7 +321,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', value: 'false' }),
 				question({ code: 'NEED_PORTABLE', kind: 'BOOLEAN', position: 20 }),
 			],
-			'QUESTIONS',
+			'NEEDS',
 		);
 
 		const first = element.querySelector('[data-question="NEED_PORTABLE"] mat-button-toggle-group');

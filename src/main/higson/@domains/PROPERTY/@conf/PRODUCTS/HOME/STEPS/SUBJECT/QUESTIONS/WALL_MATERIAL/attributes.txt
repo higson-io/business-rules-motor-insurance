@@ -1,0 +1,17 @@
+[[attr]]
+attributeCode = "CONTEXT_PATH"
+attributeName = "Gdzie laduje odpowiedz"
+refType = "LITERAL"
+refName = "quote.property.wallMaterial"
+
+[[attr]]
+attributeCode = "IS_VISIBLE"
+attributeName = "Czy pytanie dotyczy tego klienta"
+refType = "PARAMETER"
+refName = "demo.property.apk.question.visibility"
+
+[[attr]]
+attributeCode = "KIND"
+attributeName = "Rodzaj odpowiedzi"
+refType = "LITERAL"
+refName = "CHOICE"

@@ -59,18 +59,17 @@ export class Offer {
 	/**
 	 * Pokrycia wchodzące w wybrany wariant, z SUMĄ UBEZPIECZENIA — to jest treść ochrony.
 	 *
-	 * ⛔ Kwota wybiera się po `sumBasis`, a nie przez „pierwsza niepusta wartość". Dwa przypadki
-	 * wywracają to drugie podejście:
+	 * ⛔ `effectiveLimit` jest DRUGIM wyborem, nigdy pierwszym — to PODLIMIT, a nie suma:
+	 * 34 848 zł na elementy stałe w pomieszczeniach przynależnych przy sumie 116 160 zł. Pokazany
+	 * jako kwota ochrony zaniżał ją trzykrotnie. Podlimit jedzie osobno, jako `capLabel` pod nazwą
+	 * pokrycia — tak samo jak w tabeli porównawczej. Sięgamy po niego tylko wtedy, gdy sumy nie ma
+	 * wcale (assistance) i limit JEST całą kwotą ochrony.
 	 *
-	 * `CATALOGUE` (OC w życiu prywatnym) — jedyna suma, która nie jest wyliczana z metrażu, tylko
-	 * bierze się z katalogu i wisi na WARIANCIE jako `liabilitySum`. Na samym pokryciu jest pusta,
-	 * więc dokument pokazywał kreskę zamiast dwóch milionów.
-	 *
-	 * `effectiveLimit` to PODLIMIT, a nie suma — 34 848 zł na elementy stałe w pomieszczeniach
-	 * przynależnych przy sumie 116 160 zł. Pokazany jako kwota ochrony zaniżał ją trzykrotnie.
-	 * Podlimit jedzie osobno, jako `capLabel` pod nazwą pokrycia — tak samo jak w tabeli
-	 * porównawczej. Wyjątkiem jest `NONE` (assistance), które sumy nie ma wcale i wtedy limit
-	 * JEST całą kwotą.
+	 * ⚠️ OC w życiu prywatnym było tu kiedyś trzecim przypadkiem: jego suma nie bierze się
+	 * z metrażu, tylko z wariantu (`liabilitySum`), więc na pokryciu była pusta i dokument
+	 * pokazywał kreskę zamiast dwóch milionów. Rozstrzygał o tym atrybut `sumBasis` z wartością
+	 * `CATALOGUE`. Teraz backend wypełnia `sum` także dla OC — gdy tylko wiadomo, który wariant
+	 * jest pokazywany — więc front nie musi wiedzieć, że OC jest inne.
 	 */
 	readonly covers = computed(() => {
 		const quote = this.loaded();
@@ -83,10 +82,7 @@ export class Offer {
 			.map((cover) => ({
 				code: cover.code,
 				name: cover.name,
-				amount:
-					cover.sumBasis === 'CATALOGUE'
-						? chosen.liabilitySum
-						: (cover.sum ?? cover.effectiveLimit),
+				amount: cover.sum ?? cover.effectiveLimit,
 				capLabel: cover.capLabel,
 			}));
 	});

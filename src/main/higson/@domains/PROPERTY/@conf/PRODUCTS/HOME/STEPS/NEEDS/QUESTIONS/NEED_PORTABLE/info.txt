@@ -1,0 +1,3 @@
+name = "Czy chcesz ubezpieczyć smartfon lub inne urządzenia przenośne, np. na wypadek stłuczenia?"
+description = "Pytanie 4 ze specyfikacji."
+tags = []
