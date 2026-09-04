@@ -1,0 +1,3 @@
+name = "Zgodność wyboru z rekomendacją"
+description = "Notatka w podsumowaniu wynika z wybranego wariantu, agent jej nie wpisuje."
+tags = []

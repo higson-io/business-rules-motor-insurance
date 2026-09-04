@@ -1,0 +1,3 @@
+name = "Oszacowanie klienta a suma z wyliczenia"
+description = "Rozstrzyga, czy oszacowanie jest zgodne, zawyżone czy zaniżone. Wynik jest zdaniem w uzasadnieniu (rek. 8.2.b)."
+tags = []

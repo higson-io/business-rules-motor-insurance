@@ -1,0 +1,5 @@
+[[attr]]
+attributeCode = "RULE"
+attributeName = "Tabela, funkcja albo flow rozstrzygajace"
+refType = "FUNCTION"
+refName = "demo.property.sum.suggest"

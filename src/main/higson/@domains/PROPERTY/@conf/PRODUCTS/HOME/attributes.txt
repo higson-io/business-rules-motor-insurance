@@ -3,27 +3,3 @@ attributeCode = "APK_REGIME"
 attributeName = "Rezim analizy potrzeb"
 refType = "PARAMETER"
 refName = "demo.property.apk.regime [name]"
-
-[[attr]]
-attributeCode = "BUILDING_AGE"
-attributeName = "Wiek budynku na dzien poczatku ochrony"
-refType = "FUNCTION"
-refName = "demo.property.util.buildingAge"
-
-[[attr]]
-attributeCode = "RISK_FACTOR"
-attributeName = "Czynnik ryzyka - iloczyn szesciu czynnikow taryfowych"
-refType = "FUNCTION"
-refName = "demo.property.risk.factor"
-
-[[attr]]
-attributeCode = "SUMS"
-attributeName = "Sumy ubezpieczenia - metraz x stawka i sumy pochodne"
-refType = "FUNCTION"
-refName = "demo.property.sum.suggest"
-
-[[attr]]
-attributeCode = "ZONES"
-attributeName = "Strefy z kodu pocztowego - powodziowa i kradziezowa"
-refType = "FUNCTION"
-refName = "demo.property.zone.resolve"

@@ -1,0 +1,3 @@
+name = "Co odpowiedź oznacza"
+description = "Jedna odpowiedź to potrzeba, pokrycie, waga i pakiet, który tę potrzebę zaspokaja. Ta tabela wybiera rekomendowany pakiet — Java tylko chodzi po odpowiedziach."
+tags = []

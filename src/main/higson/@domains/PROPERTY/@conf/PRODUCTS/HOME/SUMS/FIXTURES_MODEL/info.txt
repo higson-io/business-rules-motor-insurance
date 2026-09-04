@@ -1,0 +1,3 @@
+name = "Model elementów stałych"
+description = "Granica mury / elementy stałe — trzy niezależne parametry, nie jedna decyzja (D-1)."
+tags = []

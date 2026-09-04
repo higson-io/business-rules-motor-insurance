@@ -1,0 +1,3 @@
+name = "Czynnik ryzyka"
+description = "Iloczyn czynników taryfowych. Mnoży też przez czynnik strefy kradzieżowej z gałęzi ZONES."
+tags = []

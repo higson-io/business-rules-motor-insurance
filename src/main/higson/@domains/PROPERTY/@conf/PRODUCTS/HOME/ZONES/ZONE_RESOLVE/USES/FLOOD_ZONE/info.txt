@@ -1,0 +1,3 @@
+name = "Strefa powodziowa dla kodu pocztowego"
+description = "Przełącznik dostępności ochrony, nie czynnik ceny."
+tags = []

@@ -1,0 +1,3 @@
+name = "Suma ubezpieczenia murów"
+description = "Metraż × stawka odtworzeniowa, a z niej sumy pochodne dla elementów stałych i ruchomości."
+tags = []

@@ -1,0 +1,2 @@
+name = "Karencja ochrony powodziowej"
+tags = []

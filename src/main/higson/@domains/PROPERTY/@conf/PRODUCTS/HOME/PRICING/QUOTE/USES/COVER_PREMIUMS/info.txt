@@ -1,0 +1,3 @@
+name = "Składki poszczególnych pokryć"
+description = "Chodzi po pokryciach pakietu w drzewie (VARIANTS[..]/COVERS) i czyta ich atrybuty: stawkę, podstawę i limit."
+tags = []

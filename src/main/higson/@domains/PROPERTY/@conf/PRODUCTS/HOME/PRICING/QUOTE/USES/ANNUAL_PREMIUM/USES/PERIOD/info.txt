@@ -1,0 +1,3 @@
+name = "Czynnik i liczba rat za okres ochrony"
+description = "Używa jej także INSTALMENT — stąd bierze liczbę rat."
+tags = []

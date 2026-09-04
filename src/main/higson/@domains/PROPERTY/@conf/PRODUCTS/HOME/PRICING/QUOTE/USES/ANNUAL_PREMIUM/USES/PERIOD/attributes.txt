@@ -1,0 +1,5 @@
+[[attr]]
+attributeCode = "RULE"
+attributeName = "Tabela, funkcja albo flow rozstrzygajace"
+refType = "PARAMETER"
+refName = "demo.property.factor.period"

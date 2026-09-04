@@ -1,0 +1,3 @@
+name = "Czy powódź jest dostępna"
+description = "Dostępność, wymagana franszyza i jej minimum."
+tags = []

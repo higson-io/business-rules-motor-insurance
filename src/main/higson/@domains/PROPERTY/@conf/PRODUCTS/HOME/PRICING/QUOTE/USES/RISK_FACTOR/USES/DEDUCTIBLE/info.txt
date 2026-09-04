@@ -1,0 +1,2 @@
+name = "Zniżka za franszyzę redukcyjną"
+tags = []

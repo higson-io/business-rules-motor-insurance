@@ -1,0 +1,3 @@
+name = "Zdania uzasadnienia rekomendacji"
+description = "Treść każdego zdania i jego pozycja na liście. Java podaje wyłącznie kod powodu i liczby do wstawienia."
+tags = []
