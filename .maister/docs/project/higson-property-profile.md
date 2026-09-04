@@ -2523,3 +2523,64 @@ nie rusza runtime'u: wyceny wariantów bez zmian (489,52 / 891,50 / 2334,17 zł)
 
 ⚠️ Kryterium przy kolejnych porządkach brzmi więc: **usuwamy atrybuty, które nie wskazują żadnej
 reguły**, a nie te, których nie czyta Java.
+
+---
+
+## §24 Siedem pytań i jeden reżim (2026-09-04)
+
+Dwie decyzje prowadzącego demo, obie zwężające.
+
+### 24.1 Ankieta to dokładnie siedem pytań ze specyfikacji
+
+Usunięte pytania 6 i 9–12, czyli **okres ochrony** oraz **cała sekcja wyłączeń** (`VACANCY`,
+`BUSINESS_USE`, `HIGH_VALUE_ITEMS`, `INSPECTIONS`). Zostało dokładnie to, co wylicza §2
+specyfikacji PM-a: pięć pytań o potrzeby plus oczekiwana składka i szacowana wartość nieruchomości.
+
+⚠️ **Okres ochrony nie zniknął — przeniósł się do kroku 2.** Karmi `demo.property.factor.period`
+(czynnik i liczba rat), więc skasowany zostawiłby wycenę bez podstawy. Jako dana polisy jest
+wypełniony domyślnie i nadal edytowalny, więc rabat za dłuższy okres da się pokazać.
+
+Konsekwencja, o której warto wiedzieć: **rek. 8.2.c traci połowę materiału.** Konfrontacja
+z wyłączeniami OWU opierała się na tych czterech pytaniach. Zostają ostrzeżenia mocniejsze
+demonstracyjnie — konflikt zadeklarowanej potrzeby ze strefą (powódź, kradzież) i rozjazd
+oszacowania wartości — ale sam blok „Zanim zdecydujesz" jest teraz chudszy.
+
+Posprzątane razem z pytaniami: wiersze w `apk.question`, `apk.answer` i `apk.warning` oraz sama
+sekcja `EXCLUSIONS`.
+
+### 24.2 D-17 — jeden reżim, koniec wersjonowania datą
+
+⛔ **To usuwa oś, na której stał ten profil.** Cały §12 — region `PROPERTY` z dwiema wersjami,
+próg 1 lipca 2027, „przesunięcie daty zmienia zestaw pytań i reżim bez wdrożenia" — przestaje być
+demonstrowalny. Razem z nim znikają znaczniki „było N" i przyrost segmentów na pasku postępu
+z §23.1. Decyzja prowadzącego: demo ma pokazywać jedną, prostą ścieżkę sprzedaży.
+
+⚠️ **Nie ma narzędzia MCP do skasowania wersji regionu.** „Usunięcie wersji 1" zrealizowano przez
+`detach_from_region` na wszystkim, co było przypięte — trzech tabelach (`apk.regime`,
+`sum.ratePerSqm`, `tariff.baseRate`) i sekcji `NEEDS`. Region istnieje dalej, ale nic nie trzyma.
+
+⚠️ **Odpięcie zachowuje wartości wersji AKTYWNEJ i trzeba to sprawdzić, a nie założyć.** Wersja 1
+miała `systemActive: true` (obowiązywała w dniu dzisiejszym), wersja 2 `userActive: true`.
+Zachowała się **wersja 2**, czyli ta pożądana — potwierdzone po fakcie na działającej aplikacji:
+reżim `KNF_190_2026` przy dzisiejszej dacie, suma murów 528 000 zł (stawka KNF 8800, nie ustawowa
+7900) i taryfa 545,29 / 993,07 / 2912,65 zł. Gdyby wyszło odwrotnie, treść wersji 2 była zapisana
+przed odpięciem i wystarczyłoby ją przepisać.
+
+### 24.3 Panel ustawień usunięty
+
+Skoro reżim jest jeden, nie ma czym przełączać ani co porównywać — wysuwany panel z §20 zniknął
+razem z komponentem `effective-date` profilu majątkowego. Nagłówek to teraz sama karta klienta.
+Data polisy pozostaje w modelu i jest datą dzisiejszą; nie ma jej kto zmienić z ekranu.
+
+Komponenty `effective-date` dem komunikacyjnego i życiowego **zostają** — tam wersjonowanie nadal
+działa i nadal jest tezą tamtych ekranów. Selektor w `styles/_date-band.less` stracił tylko
+gospodarza majątkowego.
+
+### 24.4 Stan końcowy
+
+| | |
+|---|---|
+| Ankieta (krok 1) | 7 pytań w 2 sekcjach |
+| Przedmiot (krok 2) | 10 pól, wszystkie wypełnione domyślnie |
+| Reżim | `KNF_190_2026`, zawsze |
+| Taryfa | 545,29 / 993,07 / 2912,65 zł |

@@ -16,27 +16,6 @@
 }
 
 // Mobile-first: jedna kolumna, podsumowanie NAD pracą, bo nie ma obok czego go postawić.
-// ⛔ Nagłówek tożsamości: kto jest po drugiej stronie, a obok — cichy dostęp do ustawień
-// demonstracji. Jedna karta, nie dwie: klient i przełącznik reżimu stoją w tym samym wierszu,
-// więc dwie osobne karty jedna przy drugiej rozbijałyby go na dwa niezależne bloki.
-.property__identity {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 20px;
-	margin-bottom: @space-gap;
-	padding: 14px @space-panel;
-	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
-}
-
-@media (max-width: 700px) {
-	.property__identity {
-		flex-wrap: wrap;
-	}
-}
-
 .property {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);

@@ -172,6 +172,15 @@ domain attribute pointing at a rule is the tree's *table of contents*, not dead 
 attributes removed there for "Java does not read them" come back and more join them — most
 importantly `VARIANT.PREMIUM` → the pricing flow, and a `PRODUCT` node that had **no attributes at
 all**. The criterion is now "remove attributes that point at no rule", not "that Java does not read".
+**§24 (2026-09-04)** narrows the demo twice. The questionnaire becomes exactly spec §2's seven
+questions: the cover period moves to step 2 (it feeds the period factor, so deleting it would
+leave the pricing without a basis) and the whole EXCLUSIONS section goes — which costs rec. 8.2.c
+half its material. And **D-17 removes region version 1**: one regime, always KNF, so the settings
+drawer and the property `effective-date` component are gone. ⛔ That retires §12 — the date
+threshold that changed the questionnaire without a deployment is no longer demonstrable here
+(motor and life still version by date). ⚠️ There is no MCP call to delete a region version;
+"removing version 1" is `detach_from_region` on everything attached, and detaching keeps the
+ACTIVE version's content — **verify which one survived** rather than assuming.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
@@ -411,4 +420,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-03 (aligned with PM spec 1.7; technical band moved into a drawer, client card on the front page)
+**Last regenerated**: 2026-09-04 (questionnaire cut to spec §2's seven questions; region versioning and the settings drawer removed)

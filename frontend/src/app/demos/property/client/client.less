@@ -1,9 +1,14 @@
 @import '_variables';
 
+// ⛔ Karta klienta niesie teraz WŁASNĄ obudowę. Do 4 września 2026 dzieliła wiersz z wyzwalaczem
+// ustawień i panel rysował gospodarz; po usunięciu wersjonowania nie ma z czym jej dzielić.
 :host {
 	display: block;
-	flex: 1 1 auto;
-	min-width: 0;
+	margin-bottom: @space-gap;
+	padding: 14px @space-panel;
+	background: @color-paper;
+	border-radius: @radius-panel;
+	box-shadow: @shadow-panel;
 }
 
 // ⛔ Karta klienta jest CICHA. Stoi w miejscu, w którym wcześniej krzyczał pasek techniczny,
