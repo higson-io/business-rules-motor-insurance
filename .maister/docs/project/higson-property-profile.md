@@ -2660,3 +2660,20 @@ sprzedażowego**, co dla oferty jest właściwsze.
 ⚠️ Weryfikacja tej zmiany wymagała **wymuszenia świeżego `index.html`** — przeglądarka trzymała
 poprzedni i ładowała bundle sprzed zmiany, mimo że serwer miał już nowy (patrz W-28). Pierwszy
 zrzut po przebudowie pokazywał usunięty blok jako nadal obecny.
+
+---
+
+## §27 Podstawa prawna znika z notatki (2026-09-04)
+
+Uzasadnienie rekomendacji kończyło się zdaniem „Analizę przeprowadziliśmy zgodnie z: Rekomendacje
+8 i 9 — uchwała KNF nr 190/2026 z 26.06.2026 r.." — powołaniem się na przepis w dokumencie, który
+czyta klient. Usunięte: powód `LEGAL_BASIS` z `Property.reasons()` i jego wiersz
+z `demo.property.apk.recommendation.reason`.
+
+⚠️ **Reżim i jego podstawa prawna zostają w modelu** (`quote.regime.legalBasis`) i nadal
+rozstrzygają, o co wolno zapytać i czego wymaga oferta. Przestały być zdaniem w notatce, a nie
+przestały istnieć — gdyby wróciła potrzeba pokazania podstawy, wystarczy jeden wiersz w tabeli
+i jedna linia w `reasons()`.
+
+Przy okazji znika drobna wada składu: tekst wzorca kończył się kropką, a wstawiana podstawa prawna
+też („…z 26.06.2026 r."), więc zdanie miało dwie kropki na końcu.

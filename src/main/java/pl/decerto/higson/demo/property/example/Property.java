@@ -670,7 +670,10 @@ public class Property {
 		reasons.add(new ApkAnalysis.Reason("FLOOD_WAITING",
 			engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
 
-		reasons.add(new ApkAnalysis.Reason("LEGAL_BASIS", quote.getRegime().getLegalBasis()));
+		// ⛔ Bez podstawy prawnej. Uzasadnienie kończyło się zdaniem „Analizę przeprowadziliśmy
+		// zgodnie z: Rekomendacje 8 i 9 — uchwała KNF nr 190/2026" — powołaniem się na przepis
+		// w notatce, którą czyta klient. Reżim i jego podstawa prawna nadal są w modelu i nadal
+		// sterują tym, co wolno zapytać; przestały być zdaniem w dokumencie.
 		return reasons;
 	}
 
