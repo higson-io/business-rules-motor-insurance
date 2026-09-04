@@ -2463,9 +2463,14 @@ spełnia go wprost, a porządek czytania staje się porządkiem rozmowy: **co pr
 i dopiero potem z czego klient może wybrać inaczej**. Rozstrzygnięcie należy do prowadzącego demo
 i zapadło na jego korzyść.
 
-⚠️ To jest **świadome odstępstwo od litery §3 specyfikacji** na rzecz jej własnego zdania
-o priorytecie. Gdyby PM chciał wrócić do wyliczenia, wystarczy zamienić miejscami dwa znaczniki
-w `property.html`.
+⚠️ To było **świadome odstępstwo od litery §3 specyfikacji** na rzecz jej własnego zdania
+o priorytecie.
+
+⛔ **COFNIĘTE 4 września 2026.** Ekran wrócił do kolejności z §3: pakiety ze składkami, potem
+rekomendacja, potem uzasadnienie. Warunek priorytetu jest spełniony przez to, że rekomendowany
+wariant jest w tabeli **zaznaczony** — klient widzi propozycję i wybór naraz, a nie wybór przed
+propozycją. Decyzja prowadzącego demo; zmiana to zamiana miejscami dwóch znaczników
+w `property.html`, więc obie kolejności są tanie do wypróbowania na żywo.
 
 ---
 

@@ -67,15 +67,14 @@
 
 			@case ('proposal') {
 				<!--
-					⛔ KOLEJNOŚĆ: rekomendacja z uzasadnieniem NAD pakietami. Specyfikacja PM-a wylicza
-					w §3 odwrotnie — najpierw składki — ale ten sam paragraf kończy się zdaniem
-					„nie pokazywać klientowi pakietu do wyboru, zanim nie zobaczy rekomendacji i jej
-					uzasadnienia". Tabela nad propozycją spełniała to tylko dlatego, że rekomendowany
-					wariant jest w niej zaznaczony; propozycja nad tabelą spełnia to wprost.
-
-					Porządek czytania jest wtedy porządkiem rozmowy: co proponujemy, dlaczego, i dopiero
-					potem z czego klient może wybrać inaczej.
+					⛔ KOLEJNOŚĆ ZE SPECYFIKACJI, OD GÓRY: proponowane składki (pakiety) → rekomendacja
+					→ uzasadnienie pod spodem (§3). Warunek z tego samego paragrafu — „nie pokazywać
+					klientowi pakietu do wyboru, zanim nie zobaczy rekomendacji i jej uzasadnienia" —
+					jest spełniony przez to, że rekomendowany wariant jest w tabeli ZAZNACZONY: klient
+					widzi propozycję i wybór naraz, nie jedno przed drugim.
 				-->
+				<app-property-comparison />
+
 				<app-apk-recommendation
 					[recommendation]="recommendation()"
 					[copy]="copy"
@@ -85,8 +84,6 @@
 					[alternativeName]="alternative()?.name ?? null"
 					[alternativePremium]="alternative()?.premium ?? null"
 				/>
-
-				<app-property-comparison />
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('subject')">
