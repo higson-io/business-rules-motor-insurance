@@ -1,0 +1,8 @@
+#matrix for parameter dictionary.product.version.details.inputLevel
+PRODUCT_CODE;VERSION_CODE;COMMERCIAL_NAME;DESCRIPTION
+ACCOUNT;CURRENT;Account "My Comfort";Current account
+ACCOUNT;SAVING;Account "For great future";Saving account with increased interest rate for new deposits
+CARD;CREDIT;Credit card "Gold";Credit card for customers from affluent segment
+DEPOSIT;HELLO;Deposit "On Great Start";4-month deposit with interest rate 4% p.a. for new customers
+DEPOSIT;RENEWABLE;Deposit "Perpetuum mobile";Monthly-renewable deposit with non-guaranteed renewal rates
+PLUMBER_ASSISTANCE;MONTHLY;Plumber's assistance "Safe pipes";Monthly renewable plumber's assistance services product payable automatically from current account

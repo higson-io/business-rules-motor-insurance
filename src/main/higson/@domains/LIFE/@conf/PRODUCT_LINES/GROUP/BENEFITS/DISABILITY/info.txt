@@ -1,0 +1,2 @@
+name = "Niezdolność do pracy"
+tags = []

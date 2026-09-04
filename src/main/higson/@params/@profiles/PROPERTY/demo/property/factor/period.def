@@ -1,0 +1,35 @@
+code = "demo.property.factor.period"
+description = "Czynnik mniejszy niz wielokrotnosc okresu - znizka za dluzsze zobowiazanie."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Cover period factor"
+
+[[inputLevel]]
+code = "months"
+label = "period months"
+type = "integer"
+reverseMatcher = false
+property = "quote.policy.periodMonths"
+source = "quote.policy.periodMonths"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "installments"
+label = "installments"
+type = "integer"
+external = false
+array = false

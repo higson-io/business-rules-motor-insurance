@@ -12,9 +12,13 @@ frontend/.angular/
 *.iml
 higson-cli*.log
 
-# The Higson rules snapshot. Studio is the system of record, never git
-# (standards/higson/snapshot.md). A fresh clone populates it with `mvn higson-cli:pull`.
-src/main/higson/
+# ⛔ Snapshot reguł Higsona JEST od 4 września 2026 w repozytorium — patrz
+# standards/higson/snapshot.md. Do tej pory systemem zapisu było wyłącznie Studio, a katalog
+# stał tutaj. Zmiana jest świadoma: cała konfiguracja trzech dem żyje w lokalnym kontenerze
+# Studio i bez kopii w repo ginie razem z nim.
+#
+# ⚠️ Studio pozostaje miejscem, w którym się konfigurację ZMIENIA. Ta kopia jest zrzutem, więc
+# rozjeżdża się przy każdej zmianie w Studio, której nikt nie zeksportował.
 
 # Artefakty przeglądarki sterowanej przez Playwright MCP — zrzuty drzewa dostępności
 # i screenshoty weryfikacyjne. Powstają w katalogu roboczym przy każdym uruchomieniu i nie są

@@ -1,0 +1,7 @@
+#matrix for parameter demo.life.apk.question.prefill
+code;source;refusal
+BUDGET;;Bez budżetu rekomendacja nie sprawdzi, czy składka mieści się w Twoich możliwościach (rek. 8.5).
+HEALTH_CHANGES;;§ 9 ust. 2 OWU: zatajenie informacji zdrowotnych zwalnia ubezpieczyciela z odpowiedzialności. To jedyne pytanie, przy którym odmowa może kosztować całe świadczenie.
+MONTHLY_OBLIGATIONS;;Bez wysokości zobowiązań rekomendacja nie policzy sumy, która faktycznie je pokryje — zostanie zaproponowana suma domyślna.
+OCCUPATION;;§ 9 ust. 2 OWU: zatajenie lub podanie nieprawdziwych informacji przy zawieraniu umowy ZWALNIA ubezpieczyciela z odpowiedzialności na zasadach kodeksu cywilnego. Odmowa odpowiedzi nie chroni — przeciwnie.
+SPORTS_PROFESSIONAL;;§ 9 ust. 1 pkt 4 OWU wymienia sportowca zawodowego wśród zawodów wyłączonych z ochrony. Nieudzielenie odpowiedzi tego nie zmienia.

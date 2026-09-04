@@ -1,0 +1,6 @@
+#matrix for parameter demo.property.factor.occupancy
+occupancy;factor
+*;1.00
+PERMANENT;1.00
+RENTED;1.20
+SEASONAL;1.30

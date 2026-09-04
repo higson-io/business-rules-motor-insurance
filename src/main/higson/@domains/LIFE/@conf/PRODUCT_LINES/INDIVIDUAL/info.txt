@@ -1,0 +1,3 @@
+name = "Indywidualne ochronne"
+description = "Umowa glowna plus siedem umow dodatkowych, z indywidualna ocena ryzyka"
+tags = []

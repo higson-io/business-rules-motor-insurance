@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.sum.valueGap
+ratio;outcome;severity;warning;remedy
+* - 0.85;UNDERSTATED;75;Wartość, na którą szacujesz nieruchomość, jest wyraźnie niższa od wyliczonej wartości odtworzeniowej. Suma ubezpieczenia oparta na Twoim oszacowaniu nie wystarczyłaby na odbudowę.;Zostawiamy sumę wyliczoną z metrażu i stawki<#s#> możesz ją obniżyć świadomie na kroku składki.
+0.85 - 1.15;CONSISTENT;0;;
+1.15 - *;OVERSTATED;40;Wartość, na którą szacujesz nieruchomość, jest wyższa od wyliczonej wartości odtworzeniowej. Ubezpieczenie odbudowy ponad tę wartość podnosi składkę, a nie odszkodowanie.;Różnica bierze się zwykle stąd, że cena rynkowa zawiera grunt, który nie podlega odbudowie.

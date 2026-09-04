@@ -1,0 +1,47 @@
+code = "demo.property.apk.question.visibility"
+description = "Rek. 8.1.b - widocznosc pytania zalezna od wczesniejszych odpowiedzi. Domyslna odpowiedz to POKAZ."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK question visibility"
+
+[[inputLevel]]
+code = "question"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "kind"
+label = "property kind"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[inputLevel]]
+code = "age"
+label = "building age"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.property.age"
+source = "quote.property.age"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "visible"
+type = "boolean"
+external = false
+array = false

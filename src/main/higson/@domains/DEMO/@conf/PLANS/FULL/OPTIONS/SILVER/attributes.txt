@@ -1,0 +1,6 @@
+[[attr]]
+attributeCode = "ORDER"
+attributeName = "Display order"
+attributeDescription = ""
+refType = "LITERAL"
+refName = "2"

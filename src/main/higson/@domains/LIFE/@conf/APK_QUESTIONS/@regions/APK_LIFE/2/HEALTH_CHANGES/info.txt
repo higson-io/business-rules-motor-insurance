@@ -1,0 +1,3 @@
+name = "Leczenie przewlekle w ostatnim roku"
+description = "WERSJA 2 REGIONU APK_LIFE. Par. 9 ust. 2 OWU Warta: zatajenie zwalnia ubezpieczyciela z odpowiedzialnosci - to jedyne pytanie, przy ktorym odmowa moze kosztowac cale swiadczenie."
+tags = []

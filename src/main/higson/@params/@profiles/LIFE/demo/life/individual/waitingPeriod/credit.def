@@ -1,0 +1,48 @@
+code = "demo.life.individual.waitingPeriod.credit"
+description = "Zaliczenie poprzedniej ochrony. Przerwa powyzej 30 dni nie zalicza nic. CRITICAL_ILLNESS i DISABILITY zatrzymuja polowe."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Waiting period credit for prior cover"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[inputLevel]]
+code = "priorMonths"
+label = "prior cover months"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.insured.priorCoverMonths"
+source = "quote.insured.priorCoverMonths"
+union = false
+
+[[inputLevel]]
+code = "gapDays"
+label = "gap in days"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.insured.priorCoverGapDays"
+source = "quote.insured.priorCoverGapDays"
+union = false
+
+[[outputLevel]]
+code = "creditRatio"
+label = "credit ratio"
+type = "number"
+external = false
+array = false

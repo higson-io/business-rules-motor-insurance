@@ -1,0 +1,35 @@
+code = "demo.life.individual.rider.rate"
+description = "Stawka umowy dodatkowej i informacja, czy skaluje sie wiekiem. Wersjonowana regionem LIFE."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rider rate"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[outputLevel]]
+code = "rate"
+label = "rate"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "ageRated"
+label = "scales with age"
+type = "boolean"
+external = false
+array = false

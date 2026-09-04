@@ -1,0 +1,3 @@
+name = "Twoja sytuacja"
+description = "Jak klient korzysta z nieruchomosci i jaka ma historie szkodowa."
+tags = []

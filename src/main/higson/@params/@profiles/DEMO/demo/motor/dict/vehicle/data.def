@@ -1,0 +1,102 @@
+code = "demo.motor.dict.vehicle.data"
+description = "Full vehicle dictionary"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+slave = false
+label = "<no label>"
+
+[[outputLevel]]
+code = "production_year"
+label = "year of production"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "make"
+label = "vehicle's make"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "make_id"
+label = "make identifier"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "type"
+label = "vehicle's type"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "type_id"
+label = "type identifier"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "model"
+label = "model name"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "model_id"
+label = "model identifier"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "seats"
+label = "number of seats"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "doors"
+label = "number of doors"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capacity"
+label = "engine capacity (cm3)"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "power"
+label = "engine power (HP)"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "body_type"
+label = "body type code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "model_label"
+label = "model label"
+type = "string"
+external = false
+array = false

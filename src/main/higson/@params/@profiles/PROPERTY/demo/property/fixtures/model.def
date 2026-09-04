@@ -1,0 +1,42 @@
+code = "demo.property.fixtures.model"
+description = "D-1 - granica mury/elementy stale jako trzy niezalezne parametry. Przelaczenie na model Warty, Link4 albo ERGO to zmiana trzech komorek."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Fixtures boundary model"
+
+[[inputLevel]]
+code = "kind"
+label = "property kind"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[outputLevel]]
+code = "mode"
+label = "mode"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "sublimitRatio"
+label = "sublimit ratio"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "externalJoinery"
+label = "external joinery side"
+type = "string"
+external = false
+array = false

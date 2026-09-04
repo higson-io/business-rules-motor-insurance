@@ -1,0 +1,3 @@
+name = "Trwały uszczerbek za 1 procent"
+description = "Liczba w polu suma to kwota za KAZDY procent uszczerbku, nie cale swiadczenie"
+tags = []

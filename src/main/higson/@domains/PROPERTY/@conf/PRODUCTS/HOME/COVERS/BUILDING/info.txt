@@ -1,0 +1,3 @@
+name = "Mury i konstrukcja"
+description = "Konstrukcja budynku albo lokalu: mury, fundamenty, dach, stropy."
+tags = []

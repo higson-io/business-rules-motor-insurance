@@ -1,0 +1,28 @@
+code = "demo.property.zone.flood"
+description = "STREFY DEMONSTRACYJNE (W-3) - Generali wyznacza je ze statystyki szkod i mapy nie publikuje."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Flood zone by postcode area"
+
+[[inputLevel]]
+code = "area"
+label = "postcode area"
+type = "string"
+reverseMatcher = false
+property = "quote.property.postcodeArea"
+source = "quote.property.postcodeArea"
+union = false
+
+[[outputLevel]]
+code = "zone"
+label = "flood zone"
+type = "string"
+external = false
+array = false

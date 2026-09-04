@@ -1,0 +1,4 @@
+#matrix for parameter demo.property.variant.availability
+variant;zone;available;reason
+*;*;true;
+COMPLETE;ZX;false;Wariant pełny zawiera ochronę od powodzi, która w tej lokalizacji nie jest dostępna.

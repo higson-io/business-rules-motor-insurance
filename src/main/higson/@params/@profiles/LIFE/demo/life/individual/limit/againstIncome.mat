@@ -1,0 +1,5 @@
+#matrix for parameter demo.life.individual.limit.againstIncome
+rider;basis;ratio
+*;NONE;0
+DISABILITY;ANNUAL_INCOME;3.00
+HOSPITAL_STAY;DAILY_INCOME;0.60

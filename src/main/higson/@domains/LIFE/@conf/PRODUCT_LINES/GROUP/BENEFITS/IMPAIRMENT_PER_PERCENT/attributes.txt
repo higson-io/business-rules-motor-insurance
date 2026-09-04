@@ -1,0 +1,23 @@
+[[attr]]
+attributeCode = "BENEFIT_KIND"
+attributeName = "Rodzaj swiadczenia - SUM_ASSURED, DAILY_AMOUNT, PER_PERCENT albo SERVICE_PACKAGE"
+refType = "PARAMETER"
+refName = "demo.life.group.benefit.benefitKind"
+
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy wchodzi w sklad danego wariantu"
+refType = "PARAMETER"
+refName = "demo.life.group.benefit.availability"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc w tabeli porownawczej"
+refType = "PARAMETER"
+refName = "demo.life.group.benefit.position"
+
+[[attr]]
+attributeCode = "SUM_ASSURED"
+attributeName = "Suma w danym wariancie - znaczenie zalezy od BENEFIT_KIND"
+refType = "PARAMETER"
+refName = "demo.life.group.benefit.sumAssured"

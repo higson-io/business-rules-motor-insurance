@@ -1,0 +1,5 @@
+#matrix for parameter demo.life.individual.factor.smoker
+smoker;factor
+*;1.00
+false;1.00
+true;1.75

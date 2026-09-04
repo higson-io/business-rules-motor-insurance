@@ -1,0 +1,29 @@
+code = "demo.life.underwriting.medicalExamThreshold"
+description = "Suma, powyzej ktorej wymagane sa badania lekarskie. Wersjonowana regionem LIFE."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Medical exam threshold"
+
+[[inputLevel]]
+code = "age"
+label = "entry age"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.insured.entryAge"
+source = "quote.insured.entryAge"
+union = false
+
+[[outputLevel]]
+code = "maxNoExam"
+label = "max sum without exam"
+type = "number"
+external = false
+array = false

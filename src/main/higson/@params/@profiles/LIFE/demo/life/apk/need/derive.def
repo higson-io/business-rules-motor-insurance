@@ -1,0 +1,51 @@
+code = "demo.life.apk.need.derive"
+description = "Rek. 8.2.b - mapowanie odpowiedzi na potrzebe klienta i umowe, ktora ja zaspokaja."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Odpowiedz na potrzebe APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "value"
+label = "odpowiedz"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "need"
+label = "potrzeba"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "cover"
+label = "umowa, ktora ja zaspokaja"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "weight"
+label = "waga"
+type = "integer"
+external = false
+array = false

@@ -1,0 +1,3 @@
+name = "Kradzież z włamaniem i rabunek"
+description = "Zabór mienia z włamaniem oraz rabunek w miejscu ubezpieczenia."
+tags = []

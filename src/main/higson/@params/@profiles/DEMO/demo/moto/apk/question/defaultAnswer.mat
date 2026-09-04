@@ -1,0 +1,13 @@
+#matrix for parameter demo.moto.apk.question.defaultAnswer
+code;value
+ABROAD;false
+ANNUAL_MILEAGE;15000
+FINANCING;false
+PARKING;STREET
+REPLACEMENT_CAR;false
+ROADWORTHY;true
+SECURITY;IMMOBILISER
+SHARED_DRIVERS;false
+SMALL_DAMAGE;false
+USAGE;PRIVATE
+VEHICLE_VALUE;45000

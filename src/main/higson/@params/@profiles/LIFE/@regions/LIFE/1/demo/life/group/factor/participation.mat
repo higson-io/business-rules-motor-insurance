@@ -1,0 +1,5 @@
+#matrix for parameter demo.life.group.factor.participation
+participation;factor
+* - 50;1.12
+50 - 75;1.00
+75 - *;0.93

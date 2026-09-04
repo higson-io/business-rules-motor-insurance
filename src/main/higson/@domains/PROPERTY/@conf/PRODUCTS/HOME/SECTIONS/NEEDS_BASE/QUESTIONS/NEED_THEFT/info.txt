@@ -1,0 +1,3 @@
+name = "Czy potrzebujesz ubezpieczyć swój majątek od kradzieży?"
+description = "Pytanie 2 z listy analityka. TAK kieruje do zakresu obejmujacego kradziez, NIE - do tanszego bez niej."
+tags = []

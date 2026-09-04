@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.tariff.basePremium
+variant;base
+*;0
+BASIC;42.00
+COMPLETE;94.00
+EXTENDED;63.00

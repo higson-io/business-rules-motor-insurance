@@ -1,0 +1,3 @@
+name = "Pomoc w domu"
+description = "Interwencja fachowca po szkodzie: hydraulik, elektryk, ślusarz."
+tags = []

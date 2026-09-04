@@ -1,0 +1,5 @@
+#matrix for parameter demo.moto.apk.question.visibility
+code;usage;parking;visible
+*;*;*;true
+SECURITY;*;GARAGE;false
+SHARED_DRIVERS;HIRE;*;false

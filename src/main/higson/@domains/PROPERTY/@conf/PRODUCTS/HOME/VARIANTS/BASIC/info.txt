@@ -1,0 +1,3 @@
+name = "Podstawowy"
+description = "Same mury. Najtańsza ochrona przed zdarzeniami losowymi."
+tags = []

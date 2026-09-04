@@ -1,0 +1,3 @@
+name = "Wczesniejsze ubezpieczenie na zycie"
+description = "Par. 9 ust. 3 OWU Warta: okres oplacania skladek z poprzedniej umowy zalicza sie do dwoch lat klauzuli samobojczej."
+tags = []

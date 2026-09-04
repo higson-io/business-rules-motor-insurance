@@ -1,0 +1,4 @@
+#matrix for parameter demo.life.apk.question.options
+code;options;labels
+COVER_PURPOSE;OBLIGATIONS,INCOME,FUNERAL;Spłata zobowiązań, żeby nie obciążyły rodziny,Zastąpienie mojego dochodu na kilka lat,Pokrycie kosztów pogrzebu i formalności
+OCCUPATION;OFFICE,TRADE,DRIVER,HAZARDOUS;Praca biurowa lub zdalna,Handel, usługi, edukacja,Kierowca zawodowy,Górnik, strażak, policjant, pirotechnik, praca pod ziemią lub na wysokości

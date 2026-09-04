@@ -1,0 +1,3 @@
+name = "Powódź"
+description = "Zalanie wskutek wystąpienia wody z koryta. Dostępność zależy od strefy."
+tags = []

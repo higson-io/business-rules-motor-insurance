@@ -1,0 +1,28 @@
+code = "demo.property.variant.position"
+description = "Kolejnosc wariantu w drabince."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Variant position"
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

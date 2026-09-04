@@ -1,0 +1,11 @@
+#matrix for parameter demo.life.apk.need.derive
+code;value;need;cover;weight
+COVER_PURPOSE;FUNERAL;Pokrycie kosztów pogrzebu i formalności;MAIN_COVER;1
+COVER_PURPOSE;INCOME;Zastąpienie dochodu na kilka lat;MAIN_COVER;3
+COVER_PURPOSE;OBLIGATIONS;Spłata zobowiązań po śmierci — żeby nie przeszły na rodzinę;MAIN_COVER;3
+CRITICAL_ILLNESS_CONCERN;true;Wypłata przy poważnym zachorowaniu, zanim wróci zdolność zarobkowa;CRITICAL_ILLNESS;3
+DISABILITY_CONCERN;true;Ochrona na wypadek trwałej niezdolności do pracy;DISABILITY;3
+HOSPITAL_CONCERN;true;Świadczenie za każdy dzień pobytu w szpitalu;HOSPITAL_STAY;2
+OCCUPATION;DRIVER;Ochrona przy pracy w drodze;ACCIDENTAL_DEATH;2
+OCCUPATION;HAZARDOUS;Ochrona przy pracy podwyższonego ryzyka;ACCIDENTAL_DEATH;3
+SPORTS_PROFESSIONAL;true;Ochrona przy uszczerbku na zdrowiu;PERMANENT_IMPAIRMENT;2

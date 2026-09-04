@@ -1,0 +1,42 @@
+code = "demo.life.apk.sum.multiplier"
+description = "Rek. 8.2.d - suma dopasowana do potrzeb, nie do cennika. Cel swiadczenia rozstrzyga, ILE miesiecy zobowiazan trzeba pokryc i ile dolozyc na osobe na utrzymaniu. WSZYSTKIE liczby demonstracyjne."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Mnozniki sumy z potrzeb (zycie)"
+
+[[inputLevel]]
+code = "purpose"
+label = "cel swiadczenia"
+type = "string"
+reverseMatcher = false
+property = "quote.apk.coverPurpose"
+source = "quote.apk.coverPurpose"
+union = false
+
+[[outputLevel]]
+code = "base"
+label = "kwota bazowa"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "months"
+label = "ile miesiecy zobowiazan"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "perDependant"
+label = "na osobe na utrzymaniu"
+type = "number"
+external = false
+array = false

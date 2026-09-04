@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.factor.wallMaterial
+material;factor
+*;1.00
+BRICK;1.00
+WOOD_FRAME;1.45

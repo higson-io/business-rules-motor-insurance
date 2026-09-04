@@ -1,0 +1,14 @@
+#matrix for parameter demo.property.apk.answer
+question;answer;need;cover;weight;package
+*;*;;;0;
+FINISH_STANDARD;PREMIUM;Ochrona wysokiego standardu wykończenia;FIXTURES;2;STANDARD
+NEEDS_PROPERTY;true;Ochrona murów i mienia przed pożarem oraz innymi zdarzeniami losowymi;BUILDING;3;BASIC
+NEED_FLOOD;true;Ochrona przed powodzią i zalaniem;FLOOD;3;COMPLETE
+NEED_PORTABLE;true;Ochrona sprzętu przenośnego, także poza mieszkaniem;CONTENTS;3;STANDARD
+NEED_THEFT;true;Ochrona przed kradzieżą z włamaniem i rabunkiem;THEFT;3;COMPLETE
+OCCUPANCY;RENTED;Ochrona przy wynajmie lokalu;LIABILITY;2;STANDARD
+OCCUPANCY;SEASONAL;Ochrona nieruchomości okresowo pustej;THEFT;2;COMPLETE
+PROPERTY_KIND;FLAT;Ochrona lokalu i elementów stałych;FIXTURES;3;STANDARD
+PROPERTY_KIND;HOUSE;Ochrona konstrukcji budynku;BUILDING;3;BASIC
+RENTED_OUT;true;Odpowiedzialność za szkody wyrządzone osobom trzecim przy wynajmie;LIABILITY;3;STANDARD
+SECURITY;NONE;Pilna potrzeba ochrony przed kradzieżą — brak zabezpieczeń;THEFT;2;COMPLETE

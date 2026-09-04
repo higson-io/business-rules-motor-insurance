@@ -1,0 +1,46 @@
+code = "demo.property.sum.ratePerSqm"
+description = "Stawka odtworzeniowa zl/m2. Wersjonowana regionem PROPERTY. LICZBY DEMONSTRACYJNE (W-2)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Reconstruction rate per square metre"
+
+[[inputLevel]]
+code = "area"
+label = "postcode area"
+type = "string"
+reverseMatcher = false
+property = "quote.property.postcodeArea"
+source = "quote.property.postcodeArea"
+union = false
+
+[[inputLevel]]
+code = "kind"
+label = "property kind"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[inputLevel]]
+code = "standard"
+label = "finish standard"
+type = "string"
+reverseMatcher = false
+property = "quote.property.finishStandard"
+source = "quote.property.finishStandard"
+union = false
+
+[[outputLevel]]
+code = "rate"
+label = "rate per sqm"
+type = "number"
+external = false
+array = false

@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.factor.variantMix
+topVariantShare;factor
+* - 40;1.00
+40 - 60;1.06
+60 - 80;1.13
+80 - *;1.22

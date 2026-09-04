@@ -1,0 +1,36 @@
+code = "demo.life.apk.cover.equivalent"
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Odpowiednik umowy w slowniku linii"
+
+[[inputLevel]]
+code = "line"
+label = "linia produktowa"
+type = "string"
+reverseMatcher = false
+property = "quote.lineCode"
+source = "quote.lineCode"
+union = false
+
+[[inputLevel]]
+code = "cover"
+label = "umowa wg slownika indywidualnego"
+type = "string"
+reverseMatcher = false
+property = "benefit.code"
+source = "benefit.code"
+union = false
+
+[[outputLevel]]
+code = "code"
+label = "kod w slowniku tej linii"
+type = "string"
+external = false
+array = false

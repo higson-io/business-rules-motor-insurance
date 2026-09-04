@@ -1,0 +1,29 @@
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy dostepny w tej strefie"
+refType = "PARAMETER"
+refName = "demo.property.variant.availability [available]"
+
+[[attr]]
+attributeCode = "LIABILITY_SUM"
+attributeName = "Suma gwarancyjna OC"
+refType = "PARAMETER"
+refName = "demo.property.variant.liabilitySum"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Miejsce w drabince"
+refType = "PARAMETER"
+refName = "demo.property.variant.position"
+
+[[attr]]
+attributeCode = "PREMIUM"
+attributeName = "Skladka - flow wyceny wariantu"
+refType = "FLOW"
+refName = "demo.property.calculateQuote"
+
+[[attr]]
+attributeCode = "UNAVAILABLE_REASON"
+attributeName = "Powod niedostepnosci"
+refType = "PARAMETER"
+refName = "demo.property.variant.availability [reason]"

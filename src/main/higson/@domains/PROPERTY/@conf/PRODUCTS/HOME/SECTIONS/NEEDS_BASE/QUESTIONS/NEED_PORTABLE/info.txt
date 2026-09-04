@@ -1,0 +1,3 @@
+name = "Czy chcesz ubezpieczyć smartfon lub inne urządzenia przenośne?"
+description = "Pytanie 4 z listy analityka. TAK doklada ryzyko w zakresie ubezpieczenia ruchomosci, NIE nie proponuje niczego dodatkowego."
+tags = []

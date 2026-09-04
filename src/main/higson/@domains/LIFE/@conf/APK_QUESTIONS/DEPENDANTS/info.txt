@@ -1,0 +1,3 @@
+name = "Osoby na utrzymaniu"
+description = "Wyznacza sume ubezpieczenia. Steruje tez widocznoscia pytania o oszczednosci."
+tags = []

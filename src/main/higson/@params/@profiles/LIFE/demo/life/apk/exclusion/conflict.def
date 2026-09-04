@@ -1,0 +1,58 @@
+code = "demo.life.apk.exclusion.conflict"
+description = "Rek. 8.2.c - konfrontacja sytuacji klienta z wylaczeniami. Kazdy wiersz ma pokrycie w OWU Warta Dla Ciebie i Rodziny (uchwala nr 22/2024) par. 9."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Konfrontacja z wylaczeniami APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "value"
+label = "odpowiedz"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "exclusion"
+label = "kod wylaczenia"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "severity"
+label = "waga 1-3"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "warning"
+label = "ostrzezenie"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "remedy"
+label = "co klient moze zrobic"
+type = "string"
+external = false
+array = false

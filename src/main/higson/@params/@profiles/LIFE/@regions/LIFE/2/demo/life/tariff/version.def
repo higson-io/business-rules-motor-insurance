@@ -1,0 +1,42 @@
+code = "demo.life.tariff.version"
+description = "Nazwa obowiazujacej wersji taryfy. Istnieje po to, zeby ekran nie musial znac daty progu - wersje wybiera region po effective date, a nazwe podaje ta tabela. Wzorzec przeniesiony z demo.property.apk.regime."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Tariff version"
+
+[[inputLevel]]
+code = "lineCode"
+label = "product line"
+type = "string"
+reverseMatcher = false
+property = "quote.lineCode"
+source = "quote.lineCode"
+union = false
+
+[[outputLevel]]
+code = "code"
+label = "version code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "name"
+label = "version name"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "validFrom"
+label = "valid from"
+type = "string"
+external = false
+array = false

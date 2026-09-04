@@ -1,0 +1,3 @@
+name = "Zabezpieczenia przeciwkradziezowe"
+description = "Uruchamia wylaczenie THEFT_NO_SECURITY (OWU PZU Auto par. 12 pkt 11 lit. c)."
+tags = []

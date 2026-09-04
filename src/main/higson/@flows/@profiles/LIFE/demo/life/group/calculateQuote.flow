@@ -1,0 +1,14 @@
+/*
+#Full code: demo.life.group.calculateQuote
+
+# DO NOT REMOVE, MOVE OR MODIFY THIS COMMENT
+# unless you know what you're doing. Incorrect content will cause error during import.
+# IMPORTANT: these escape sequences MUST be used inside this comment: '/' -> '\/', '\' -> '\\'
+
+arguments = []
+categories = []
+logLevel = "INFO"
+description = "Wycena grupowa. Jeden flow obsluguje obie fazy - roznice robi obecnosc listy przystapien, a nie przelacznik trybu. programCost wychodzi jako null w fazie oferty, bo bez rozkladu wyborow ta liczba nie istnieje (D-2)."
+*/
+
+{"arguments":[],"variables":[{"name":"eligible","type":"boolean","value":null,"returned":true},{"name":"variants","type":"object","value":null,"returned":true},{"name":"insuredCount","type":"number","value":null,"returned":true},{"name":"programCost","type":"number","value":null,"returned":true}],"nodes":[{"id":"n1","actions":[{"type":"FUNCTION","value":"demo.life.group.eligible","outputVariable":"eligible","arguments":[],"label":"Czy program kwalifikuje sie do oferty"}],"links":[],"defaultNextNode":"n2","position":{"x":0.0,"y":0.0}},{"id":"n2","actions":[],"links":[{"conditionString":"eligible == false","condition":[],"target":"n4","label":"poza zakresem oferty"}],"defaultNextNode":"n3","position":{"x":300.0,"y":0.0}},{"id":"n3","actions":[{"type":"FUNCTION","value":"demo.life.group.premiums","outputVariable":"variants","arguments":[],"label":"Skladka na pracownika w kazdym dostepnym wariancie"}],"links":[],"defaultNextNode":"n5","position":{"x":600.0,"y":100.0}},{"id":"n5","actions":[{"type":"FUNCTION","value":"demo.life.group.insured","outputVariable":"insuredCount","arguments":[],"label":"Ilu ludzi jest ubezpieczonych - z przystapien albo z deklaracji"}],"links":[],"defaultNextNode":"n6","position":{"x":900.0,"y":100.0}},{"id":"n6","actions":[{"type":"FUNCTION","value":"demo.life.group.programCost","outputVariable":"programCost","arguments":[{"value":"variants","source":"VARIABLE","name":"variants"}],"label":"Rzeczywisty koszt programu - null bez rozkladu wyborow"}],"links":[],"defaultNextNode":null,"position":{"x":1200.0,"y":100.0}},{"id":"n4","actions":[{"type":"FUNCTION","value":"util.echo","outputVariable":"variants","arguments":[{"value":"","source":"LITERAL","name":"text"}],"label":"Odmowa - bez wariantow"}],"links":[],"defaultNextNode":null,"position":{"x":600.0,"y":-150.0}}],"startNodeId":"n1","version":"V1"}

@@ -1,0 +1,14 @@
+#matrix for parameter demo.life.apk.question.visibility
+code;lineCode;dependants;visible
+*;*;*;true
+BENEFICIARY_KNOWN;GROUP;*;false
+CONFLICT_ZONES;GROUP;*;false
+COVER_PURPOSE;GROUP;*;false
+DEPENDANTS;GROUP;*;false
+HEALTH_CHANGES;GROUP;*;false
+MONTHLY_OBLIGATIONS;GROUP;*;false
+OCCUPATION;GROUP;*;false
+PRIOR_COVER;GROUP;*;false
+SAVINGS_MONTHS;*;0 - 0;false
+SAVINGS_MONTHS;GROUP;*;false
+SPORTS_PROFESSIONAL;GROUP;*;false

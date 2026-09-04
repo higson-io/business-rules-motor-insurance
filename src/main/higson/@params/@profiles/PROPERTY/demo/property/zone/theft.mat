@@ -1,0 +1,13 @@
+#matrix for parameter demo.property.zone.theft
+area;zone;factor
+*;T1;1.00
+00;T3;1.35
+01;T3;1.35
+02;T3;1.30
+03;T2;1.18
+30;T3;1.28
+31;T2;1.18
+40;T2;1.15
+50;T2;1.18
+60;T2;1.15
+80;T2;1.20

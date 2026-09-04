@@ -1,0 +1,28 @@
+code = "demo.life.underwriting.sumLimit"
+description = "Maksymalna suma glowna bez skierowania do oceny recznej, zalezna od klasy zawodu."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Max sum without manual referral"
+
+[[inputLevel]]
+code = "occupationClass"
+label = "occupation class"
+type = "integer"
+reverseMatcher = false
+property = "quote.insured.occupationClass"
+source = "quote.insured.occupationClass"
+union = false
+
+[[outputLevel]]
+code = "maxSum"
+label = "max sum"
+type = "number"
+external = false
+array = false

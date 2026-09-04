@@ -1,0 +1,35 @@
+code = "demo.property.zone.theft"
+description = "Druga strefa z tego samego adresu - czynnik skladki, nie dostepnosc (D-3)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Theft zone by postcode area"
+
+[[inputLevel]]
+code = "area"
+label = "postcode area"
+type = "string"
+reverseMatcher = false
+property = "quote.property.postcodeArea"
+source = "quote.property.postcodeArea"
+union = false
+
+[[outputLevel]]
+code = "zone"
+label = "theft zone"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

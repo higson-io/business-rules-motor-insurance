@@ -1,0 +1,98 @@
+@transient
+def /ROOT
+  answer Answer               @desc Wartosc odpowiedzi, element iteracji
+  cover Cover                 @desc Pokrycie, element iteracji po COVERS
+  question Question           @desc Pytanie APK, element iteracji po QUESTIONS
+  quote PropertyQuote         @desc Wniosek majatkowy
+  reason Reason               @desc Powod rekomendacji, element iteracji
+  variant Variant             @desc Wariant, element iteracji po VARIANTS
+
+@transient
+def Answer                @desc Wartosc odpowiedzi jako tekst - element iteracji
+  value string                @desc Wartosc odpowiedzi
+
+@transient
+def Apk                   @desc Material wejsciowy analizy potrzeb, skladany przez Jave z udzielonych odpowiedzi
+  answers string              @desc Udzielone odpowiedzi jako KOD=WARTOSC rozdzielone srednikiem
+  premiums string             @desc Wycenione warianty jako KOD=SKLADKA rozdzielone srednikiem
+
+@transient
+def Cover                 @desc Pokrycie - element iteracji po COVERS
+  code string                 @desc Kod pokrycia
+
+@transient
+def Needs                 @desc Potrzeby klienta ustalone w APK
+  budget number               @desc Akceptowalna skladka roczna, null gdy klient nie podal
+
+@transient
+def Policy                @desc Parametry polisy
+  deductible number           @desc Franszyza redukcyjna
+  periodMonths integer        @desc Okres ochrony w miesiacach
+  startDate date              @desc Data poczatku ochrony, klucz do wersji regionu
+
+@transient
+def Property              @desc Nieruchomosc podlegajaca ubezpieczeniu
+  age integer                 @desc Wiek budynku na date polisy, wyliczany
+  area number                 @desc Powierzchnia uzytkowa w m2
+  claims3y integer            @desc Liczba szkod w ostatnich trzech latach
+  constructionYear integer    @desc Rok budowy
+  finishStandard string       @desc BASIC STANDARD albo PREMIUM
+  floor integer               @desc Pietro, tylko dla mieszkania
+  kind string                 @desc HOUSE albo FLAT
+  occupancy string            @desc PERMANENT SEASONAL albo RENTED
+  postcode string             @desc Kod pocztowy miejsca ubezpieczenia
+  postcodeArea string         @desc Dwie pierwsze cyfry kodu, klucz obu stref
+  priorFloodCover boolean     @desc Ciaglosc ochrony od powodzi, znosi karencje
+  renovated boolean           @desc Czy budynek przeszedl remont
+  security string             @desc NONE DOOR ALARM albo MONITORED
+  wallMaterial string         @desc BRICK albo WOOD_FRAME
+
+@transient
+def PropertyQuote         @desc Wniosek majatkowy - korzen modelu kanonicznego
+  apk Apk
+  needs Needs
+  policy Policy
+  property Property
+  risk Risk
+  situation Situation
+  sums Sums
+  zone Zone
+
+@transient
+def Question              @desc Pytanie APK - element iteracji po katalogu
+  code string                 @desc Kod pytania
+
+@transient
+def Reason                @desc Powod rekomendacji - element iteracji
+  code string                 @desc Kod powodu
+
+@transient
+def Risk                  @desc Zlozony czynnik ryzyka
+  factor number               @desc Iloczyn czynnikow taryfowych
+
+@transient
+def Situation             @desc Cechy i sytuacja klienta - podstawa konfrontacji z wylaczeniami
+  businessUse boolean         @desc Czy prowadzona jest tam dzialalnosc gospodarcza
+  highValueItems boolean      @desc Czy sa rzeczy o wartosci jednostkowej powyzej 30000 zl
+  inspections boolean         @desc Czy przeglady instalacji sa aktualne
+  vacancy boolean             @desc Czy nieruchomosc bywa pusta dluzej niz 60 dni
+
+@transient
+def Sums                  @desc Sumy ubezpieczenia - wyliczone i wybrane
+  assistance number           @desc Suma assistance, ryczalt
+  building number             @desc Suma murow
+  contents number             @desc Suma ruchomosci
+  fixtures number             @desc Suma elementow stalych
+  flood number                @desc Suma dla ryzyka powodzi
+  liability number            @desc Suma gwarancyjna OC
+  suggestedBuilding number    @desc Wyliczona suma murow, wartosc odniesienia dla ostrzezenia
+  theft number                @desc Suma dla ryzyka kradziezy
+
+@transient
+def Variant               @desc Wariant - element iteracji po VARIANTS
+  code string                 @desc Kod wariantu
+
+@transient
+def Zone                  @desc Dwie strefy wyliczone z jednego adresu
+  flood string                @desc Z0 Z1 Z2 albo ZX, steruje dostepnoscia powodzi
+  theft string                @desc T1 T2 albo T3, czynnik skladki

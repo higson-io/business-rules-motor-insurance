@@ -1,0 +1,49 @@
+code = "demo.property.flood.availability"
+description = "Odwzorowanie OWU Generali par. 21 ust. 1 - strefa jest przelacznikiem dostepnosci, nie mnoznikiem."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Flood cover availability by zone"
+
+[[inputLevel]]
+code = "zone"
+label = "flood zone"
+type = "string"
+reverseMatcher = false
+property = "quote.zone.flood"
+source = "quote.zone.flood"
+union = false
+
+[[outputLevel]]
+code = "available"
+label = "available"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresDeductible"
+label = "requires deductible"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "minDeductible"
+label = "minimum deductible"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "message"
+label = "message"
+type = "string"
+external = false
+array = false

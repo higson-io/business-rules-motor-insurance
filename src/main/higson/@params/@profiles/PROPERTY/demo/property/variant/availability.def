@@ -1,0 +1,44 @@
+code = "demo.property.variant.availability"
+description = "Strefa ZX wycina caly wariant COMPLETE z podanym powodem, zamiast po cichu usuwac z niego powodz."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Variant availability"
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[inputLevel]]
+code = "zone"
+label = "flood zone"
+type = "string"
+reverseMatcher = false
+property = "quote.zone.flood"
+source = "quote.zone.flood"
+union = false
+
+[[outputLevel]]
+code = "available"
+label = "available"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reason"
+label = "reason"
+type = "string"
+external = false
+array = false

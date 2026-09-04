@@ -1,0 +1,3 @@
+name = "Assistance medyczny"
+description = "Pakiet uslug bez sumy - interfejs pokazuje w pakiecie zamiast kwoty"
+tags = []

@@ -1,0 +1,3 @@
+name = "Czy potrzebujesz ubezpieczyć nieruchomość?"
+description = "Pytanie 1 z listy analityka. Bramka calej sciezki: odpowiedz NIE zatrzymuje analize, bo ten produkt nie zaspokoi zadnej potrzeby, ktora klient zglasza."
+tags = []

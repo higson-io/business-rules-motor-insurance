@@ -1,0 +1,28 @@
+code = "demo.life.individual.factor.occupation"
+description = "Czynnik za klase ryzyka zawodowego, 1 najbezpieczniejsza, 4 najbardziej narazona."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Occupation class factor"
+
+[[inputLevel]]
+code = "occupationClass"
+label = "occupation class"
+type = "integer"
+reverseMatcher = false
+property = "quote.insured.occupationClass"
+source = "quote.insured.occupationClass"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

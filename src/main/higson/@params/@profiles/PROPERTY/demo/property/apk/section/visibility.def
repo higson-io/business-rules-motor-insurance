@@ -1,0 +1,36 @@
+code = "demo.property.apk.section.visibility"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Widocznosc sekcji ankiety"
+
+[[inputLevel]]
+code = "code"
+label = "kod sekcji"
+type = "string"
+reverseMatcher = false
+property = "section.code"
+source = "section.code"
+union = false
+
+[[inputLevel]]
+code = "kind"
+label = "rodzaj nieruchomosci"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "czy sekcja jest widoczna"
+type = "boolean"
+external = false
+array = false

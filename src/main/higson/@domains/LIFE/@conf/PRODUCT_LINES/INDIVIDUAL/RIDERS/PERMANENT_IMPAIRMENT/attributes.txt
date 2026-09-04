@@ -1,0 +1,53 @@
+[[attr]]
+attributeCode = "AGE_RATED"
+attributeName = "Czy stawka skaluje sie wiekiem"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.rate [ageRated]"
+
+[[attr]]
+attributeCode = "BENEFIT_KIND"
+attributeName = "Rodzaj swiadczenia - decyduje, czym jest liczba w polu suma"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.benefitKind"
+
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy dostepna w wieku wnioskodawcy"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.availability"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc na ekranie"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.position"
+
+[[attr]]
+attributeCode = "RATE"
+attributeName = "Stawka jednostkowa"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.rate [rate]"
+
+[[attr]]
+attributeCode = "SUMS"
+attributeName = "Katalog sum do wyboru"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.sumsOffered [sums]"
+
+[[attr]]
+attributeCode = "SUM_DEFAULT"
+attributeName = "Suma domyslna"
+refType = "PARAMETER"
+refName = "demo.life.individual.rider.sumsOffered [defaultSum]"
+
+[[attr]]
+attributeCode = "SUM_MAX"
+attributeName = "Efektywny pulap sumy, nizszy z produktowego i dochodowego"
+refType = "FUNCTION"
+refName = "demo.life.individual.maxSumAssured"
+
+[[attr]]
+attributeCode = "WAITING_PERIOD_DAYS"
+attributeName = "Karencja po zaliczeniu poprzedniej ochrony"
+refType = "FUNCTION"
+refName = "demo.life.individual.effectiveWaitingPeriod"

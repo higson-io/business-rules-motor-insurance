@@ -1,0 +1,28 @@
+code = "demo.property.factor.security"
+description = "Znizka za zabezpieczenia. CELOWO NIE WERSJONOWANA - to jest dowod selektywnosci wersjonowania."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Security factor"
+
+[[inputLevel]]
+code = "security"
+label = "security level"
+type = "string"
+reverseMatcher = false
+property = "quote.property.security"
+source = "quote.property.security"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

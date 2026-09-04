@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.underwriting.customerMessage
+decision;message;binding
+*;Skontaktuj się z doradcą, żeby dokończyć wniosek.;false
+ACCEPT;;true
+DECLINE;Tego wniosku nie możemy obsłużyć online — skontaktuj się z doradcą.;false
+REFER;Składka wstępna. Warunki ostateczne ustalimy po ocenie medycznej.;false

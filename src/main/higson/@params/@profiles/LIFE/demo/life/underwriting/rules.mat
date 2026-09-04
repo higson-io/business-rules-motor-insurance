@@ -1,0 +1,12 @@
+#matrix for parameter demo.life.underwriting.rules
+age;bmi;smoker;occupationClass;decision;severity;reasonInternal
+* - *;* - *;*;*;ACCEPT;0;
+* - *;* - *;*;4;REFER;1;IV klasa ryzyka zawodowego
+* - *;* - 16;*;*;DECLINE;2;BMI ponizej 16
+* - *;0 - 16;*;*;DECLINE;2;BMI ponizej 16
+* - *;32 - 40;*;*;REFER;1;Podwyzszone BMI
+* - *;40 - *;*;*;DECLINE;2;BMI powyzej 40
+* - *;40 - 99;*;*;DECLINE;2;BMI powyzej 40
+56 - 70;* - *;true;*;REFER;1;Wiek i palenie
+61 - 70;32 - *;true;*;DECLINE;2;Wiek, BMI i palenie lacznie
+61 - 70;32 - 99;true;*;DECLINE;2;Wiek, BMI i palenie lacznie

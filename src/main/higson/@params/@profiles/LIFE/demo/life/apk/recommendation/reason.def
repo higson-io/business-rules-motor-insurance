@@ -1,0 +1,35 @@
+code = "demo.life.apk.recommendation.reason"
+description = "Rek. 8.7 - dokumentacja ma wykazac zgodnosc, wiec jej tresc jest regula. Placeholdery {0}, {1} wypelnia funkcja."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Uzasadnienia rekomendacji APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod uzasadnienia"
+type = "string"
+reverseMatcher = false
+property = "reason.code"
+source = "reason.code"
+union = false
+
+[[outputLevel]]
+code = "text"
+label = "tresc"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "position"
+label = "pozycja"
+type = "integer"
+external = false
+array = false

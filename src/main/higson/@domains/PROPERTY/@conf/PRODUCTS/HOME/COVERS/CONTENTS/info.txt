@@ -1,0 +1,3 @@
+name = "Ruchomości domowe"
+description = "Meble, sprzęt, odzież i rzeczy osobiste domowników."
+tags = []

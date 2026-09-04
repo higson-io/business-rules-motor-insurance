@@ -1,0 +1,11 @@
+#matrix for parameter demo.motor.coverage.description
+code;name;description
+BI;Bodily Injury;Bodily Injury Liability pays damages for people injured or killed in an accident for which you are legally responsible. It also covers your legal defense if you are sued as a result of an accident.
+COLL;Collision;Collision Coverage pays for damages to your auto caused by collision with another object or when it overturns.
+COMP;Comprehensive;Comprehensive coverage pays for damages to your auto not caused by collision such as theft, animal damage, hail, etc.
+ERS;Emergency Road Service;Emergency Road Service coverage is GEICO's alternative to auto-club towing and road services (such as AAA). It covers problems not typically covered by car insurance such as towing, mechanical labor,  etc.
+MED;Medical Payments;Medical Payments coverage pays the reasonable and necessary medical, dental, hospital and funeral expenses for the insured, covered passengers and family members, who are injured in a covered auto accident, regardless of who was at fault
+PD;Property Damage;Property Damage Liability pays for damage to other people's property resulting from an accident caused by your auto for which you are legally responsible. It also covers your legal defense if you are sued as a result of an accident.
+PIP;Personal Injury Protection;Personal Injury Protection covers you, your family, and your passengers, regardless of fault, if they are injured in an accident.
+UMBI;Uninsured Motorist Bodily Injury;Uninsured Motorist Bodily Injury coverage pays a covered person any monetary damages the covered person is legally entitled to recover as a result of bodily injury or death caused by an uninsured or hit-and-run motorist, subject to the limit of liability you select. Underinsured Motorist Bodily Injury protection is included in this coverage
+UMPD;Uninsured Motorist Property Damage;Uninsured Motorist Property Damage pays for damage to your vehicle caused by an uninsured driver or in many cases, a hit-and-run driver

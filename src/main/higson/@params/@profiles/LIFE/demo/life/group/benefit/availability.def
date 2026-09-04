@@ -1,0 +1,37 @@
+code = "demo.life.group.benefit.availability"
+description = "Ktore swiadczenie w ktorym wariancie. Relacja, dlatego tabela, a nie struktura drzewa."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group benefit availability by variant"
+
+[[inputLevel]]
+code = "benefit"
+label = "benefit code"
+type = "string"
+reverseMatcher = false
+property = "benefit.code"
+source = "benefit.code"
+union = false
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "available"
+label = "available"
+type = "boolean"
+external = false
+array = false

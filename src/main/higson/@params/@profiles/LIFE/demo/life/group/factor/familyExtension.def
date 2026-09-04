@@ -1,0 +1,37 @@
+code = "demo.life.group.factor.familyExtension"
+description = "Czynnik za rozszerzenie ochrony o wspolmalzonka i pelnoletnie dziecko."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group family extension factor"
+
+[[inputLevel]]
+code = "spouse"
+label = "include spouse"
+type = "boolean"
+reverseMatcher = false
+property = "quote.group.includeSpouse"
+source = "quote.group.includeSpouse"
+union = false
+
+[[inputLevel]]
+code = "child"
+label = "include adult child"
+type = "boolean"
+reverseMatcher = false
+property = "quote.group.includeAdultChild"
+source = "quote.group.includeAdultChild"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

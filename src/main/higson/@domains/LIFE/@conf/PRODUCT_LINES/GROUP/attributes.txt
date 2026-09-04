@@ -1,0 +1,11 @@
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy linia jest w ogole oferowana"
+refType = "PARAMETER"
+refName = "demo.life.productLine.availability"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc na ekranie wyboru"
+refType = "PARAMETER"
+refName = "demo.life.productLine.position"

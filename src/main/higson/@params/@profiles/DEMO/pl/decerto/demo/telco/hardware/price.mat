@@ -1,0 +1,7 @@
+#matrix for parameter pl.decerto.demo.telco.hardware.price
+packageCode;hardwareCode;activationPrice;monthlyPrice
+*;*;0;0
+COMFORT;CAM_CI;4,9;0
+COMFORT;ULTRABOX;49;15
+COMFORT_WITH_HBO;CAM_CI;9,9;0
+COMFORT_WITH_HBO;MEDIABOX;9,9;5

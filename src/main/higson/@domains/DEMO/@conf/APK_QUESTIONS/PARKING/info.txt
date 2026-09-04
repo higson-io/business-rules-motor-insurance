@@ -1,0 +1,3 @@
+name = "Miejsce postoju w nocy"
+description = "Wyznacza potrzebe ochrony przed kradzieza i steruje widocznoscia pytania o zabezpieczenia."
+tags = []

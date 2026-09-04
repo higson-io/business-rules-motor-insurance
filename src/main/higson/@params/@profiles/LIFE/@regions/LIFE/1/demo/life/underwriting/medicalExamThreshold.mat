@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.underwriting.medicalExamThreshold
+age;maxNoExam
+18 - 35;600000
+36 - 45;400000
+46 - 55;250000
+56 - 70;100000

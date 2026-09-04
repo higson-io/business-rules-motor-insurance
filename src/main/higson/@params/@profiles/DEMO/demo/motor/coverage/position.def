@@ -1,0 +1,26 @@
+code = "demo.motor.coverage.position"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "code"
+label = "coverage code"
+type = "string"
+reverseMatcher = false
+property = "coverage.code"
+source = "coverage.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

@@ -1,0 +1,35 @@
+code = "demo.life.underwriting.customerMessage"
+description = "Tresc dla klienta, jedna na decyzje, niezalezna od przeslanki. Nigdy nie pokazuje reasonInternal. Czytana przez resolveDecision, bo flow nie zapisuje kontekstu."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Customer facing underwriting message"
+
+[[inputLevel]]
+code = "decision"
+label = "underwriting decision"
+type = "string"
+reverseMatcher = false
+property = "underwriting.decision"
+source = "underwriting.decision"
+union = false
+
+[[outputLevel]]
+code = "message"
+label = "customer message"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "binding"
+label = "price is binding"
+type = "boolean"
+external = false
+array = false

@@ -1,0 +1,50 @@
+code = "demo.property.sum.valueGap"
+description = "Rek. 8.2.c - suma ubezpieczenia ma odpowiadac potrzebom klienta, wiec zderzamy jego wlasne oszacowanie wartosci nieruchomosci z suma wyliczona z metrazu i stawki. Prog jest TUTAJ, a nie w Javie - to on decyduje, od ktorego rozjazdu warto klienta ostrzec."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Client value estimate vs computed sum"
+
+[[inputLevel]]
+code = "ratio"
+label = "declared value to computed sum"
+type = "number"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.sums.valueRatio"
+source = "quote.sums.valueRatio"
+union = false
+
+[[outputLevel]]
+code = "outcome"
+label = "outcome code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "severity"
+label = "severity"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "warning"
+label = "warning"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "remedy"
+label = "remedy"
+type = "string"
+external = false
+array = false

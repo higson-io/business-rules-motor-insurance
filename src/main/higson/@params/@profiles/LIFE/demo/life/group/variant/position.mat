@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.variant.position
+variant;position
+*;0
+BASIC;1
+COMPLETE;3
+EXTENDED;2

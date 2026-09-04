@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.flood.waitingPeriod
+priorCover;days
+*;30
+false;30
+true;0

@@ -1,0 +1,77 @@
+code = "demo.property.apk.question"
+description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \"odslania je\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo odpowiedziane. Pusta wartosc znaczy \"widoczne od razu\". Lancuch jest konfiguracja, wiec przestawienie kolejnosci odslaniania nie wymaga wdrozenia."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Katalog pytań ankiety APK"
+
+[[inputLevel]]
+code = "question"
+label = "pytanie"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "kolejnosc"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "required"
+label = "obowiazkowe"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "options"
+label = "kody odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "labels"
+label = "etykiety odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "prefill"
+label = "zrodlo podpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "refusal"
+label = "skutek odmowy"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "demoAnswer"
+label = "odpowiedz na starcie demo"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "revealedBy"
+label = "odslania je"
+type = "string"
+external = false
+array = false

@@ -1,0 +1,4 @@
+#matrix for parameter demo.property.apk.question.blocker
+question;answer;blocks;message
+*;*;false;
+NEEDS_PROPERTY;false;true;Nie zgłaszasz potrzeby ubezpieczenia nieruchomości, więc nie prowadzimy dalej tej analizy — ubezpieczenie domu i mieszkania nie zaspokoiłoby żadnej Twojej potrzeby. Jeśli interesuje Cię inny rodzaj ochrony, przekażemy Cię do właściwej ścieżki sprzedaży.

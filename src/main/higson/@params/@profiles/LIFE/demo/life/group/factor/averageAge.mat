@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.factor.averageAge
+averageAge;factor
+* - 30;0.85
+30 - 40;1.00
+40 - 50;1.25
+50 - *;1.60

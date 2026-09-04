@@ -1,0 +1,3 @@
+name = "Roczny budzet na ubezpieczenie"
+description = "WERSJA 2 REGIONU APK_MOTOR. Rek. 8.5 - mozliwosci finansowe klienta. Celowo nieobowiazkowe."
+tags = []

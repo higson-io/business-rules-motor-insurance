@@ -1,0 +1,3 @@
+name = "Wyjazdy do stref konfliktu"
+description = "WERSJA 2 REGIONU APK_LIFE. Par. 9 ust. 1 pkt 2 OWU Warta wylacza CZYNNY UDZIAL, nie sam pobyt."
+tags = []

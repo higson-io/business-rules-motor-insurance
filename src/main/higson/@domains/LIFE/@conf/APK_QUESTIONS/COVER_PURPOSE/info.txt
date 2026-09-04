@@ -1,0 +1,3 @@
+name = "Czemu ma sluzyc swiadczenie"
+description = "Rek. 8.2.b - cel wyznacza i sume, i to, ktore umowy dodatkowe maja sens."
+tags = []

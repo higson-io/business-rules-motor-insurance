@@ -1,0 +1,6 @@
+#matrix for parameter demo.motor.discount.drivingExperience
+experienceYears;available;percentValue;amountValue
+*;no;;
+10 - 19;yes;;20
+20 - *;yes;;30
+5 - 9;yes;;8

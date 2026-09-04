@@ -1,0 +1,36 @@
+code = "demo.motor.dict.vehicle.availableMakes"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = true
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = "make"
+masterName = "demo.motor.dict.vehicle.data"
+slave = true
+label = "<no label>"
+
+[[inputLevel]]
+code = "production_year"
+label = "year of production"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.vehicle.productionYear"
+source = "quote.vehicle.productionYear"
+union = true
+
+[[outputLevel]]
+code = "make"
+label = "vehicle's make"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "make_id"
+label = "make identifier"
+type = "integer"
+external = false
+array = false

@@ -1,0 +1,3 @@
+name = "Dom i mieszkanie"
+description = "Ubezpieczenie domu jednorodzinnego albo mieszkania w detalu."
+tags = []

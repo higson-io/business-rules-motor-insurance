@@ -1,0 +1,37 @@
+code = "demo.life.group.benefit.sumAssured"
+description = "Uwaga: liczba znaczy co innego zaleznie od benefitKind. Dla IMPAIRMENT_PER_PERCENT to kwota za 1 procent uszczerbku, dla HOSPITAL_STAY kwota za dzien."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group benefit sum by variant"
+
+[[inputLevel]]
+code = "benefit"
+label = "benefit code"
+type = "string"
+reverseMatcher = false
+property = "benefit.code"
+source = "benefit.code"
+union = false
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "sum"
+label = "sum assured"
+type = "number"
+external = false
+array = false

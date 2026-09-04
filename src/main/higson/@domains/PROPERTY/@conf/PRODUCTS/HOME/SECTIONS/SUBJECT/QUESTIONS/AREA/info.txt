@@ -1,0 +1,3 @@
+name = "Powierzchnia użytkowa w metrach kwadratowych"
+description = "Z tej liczby wyliczymy rekomendowaną sumę ubezpieczenia murów."
+tags = []

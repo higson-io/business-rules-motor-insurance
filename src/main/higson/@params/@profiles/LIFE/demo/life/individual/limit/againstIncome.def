@@ -1,0 +1,35 @@
+code = "demo.life.individual.limit.againstIncome"
+description = "Pulap dochodowy dla swiadczen zastepujacych dochod. Obowiazuje lacznie z produktowym, przez min."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rider sum cap against income"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[outputLevel]]
+code = "basis"
+label = "income basis"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "ratio"
+label = "ratio"
+type = "number"
+external = false
+array = false

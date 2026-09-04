@@ -1,0 +1,3 @@
+name = "Miesieczne zobowiazania"
+description = "Podstawa sumy przy celu OBLIGATIONS."
+tags = []

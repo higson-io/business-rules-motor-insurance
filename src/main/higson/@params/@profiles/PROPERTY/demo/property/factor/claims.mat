@@ -1,0 +1,6 @@
+#matrix for parameter demo.property.factor.claims
+claims;factor
+* - 0;0.90
+1 - 1;1.15
+2 - 2;1.45
+3 - *;1.90

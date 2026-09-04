@@ -1,0 +1,28 @@
+code = "demo.moto.apk.question.defaultAnswer"
+description = "Odpowiedzi, ktorymi demo wypelnia ankiete na starcie. Sa TUTAJ, a nie w Javie, bo inaczej kod musialby znac kody pytan."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK demo default answer (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "value"
+label = "default value"
+type = "string"
+external = false
+array = false

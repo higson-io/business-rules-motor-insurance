@@ -1,0 +1,3 @@
+name = "Roczny przebieg"
+description = "Wyznacza potrzebe assistance. Wartosc demonstracyjna."
+tags = []

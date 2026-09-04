@@ -1,0 +1,53 @@
+[[attr]]
+attributeCode = "CAP_KIND"
+attributeName = "Rodzaj limitu"
+refType = "PARAMETER"
+refName = "demo.property.cover.limitRule [capKind]"
+
+[[attr]]
+attributeCode = "CAP_LABEL"
+attributeName = "Opis limitu dla klienta"
+refType = "PARAMETER"
+refName = "demo.property.cover.limitRule [label]"
+
+[[attr]]
+attributeCode = "EFFECTIVE_LIMIT"
+attributeName = "Efektywny limit - nizszy z ulamka sumy i kwoty"
+refType = "FUNCTION"
+refName = "demo.property.limit.effective"
+
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy wchodzi w sklad wariantu"
+refType = "PARAMETER"
+refName = "demo.property.cover.availability"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc na ekranie"
+refType = "PARAMETER"
+refName = "demo.property.cover.position"
+
+[[attr]]
+attributeCode = "RATE"
+attributeName = "Stawka taryfowa"
+refType = "PARAMETER"
+refName = "demo.property.tariff.baseRate [rate]"
+
+[[attr]]
+attributeCode = "RATE_BASIS"
+attributeName = "Podstawa stawki - promile sumy albo kwota"
+refType = "PARAMETER"
+refName = "demo.property.tariff.baseRate [basis]"
+
+[[attr]]
+attributeCode = "SUM_BASIS"
+attributeName = "Skad bierze sie suma"
+refType = "PARAMETER"
+refName = "demo.property.cover.sumBasis [basis]"
+
+[[attr]]
+attributeCode = "SUM_REFERENCE"
+attributeName = "Pokrycie odniesienia dla sumy pochodnej"
+refType = "PARAMETER"
+refName = "demo.property.cover.sumBasis [reference]"

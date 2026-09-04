@@ -1,0 +1,4 @@
+#matrix for parameter pl.decerto.demo.telco.package.invoice.prices
+InvoiceEntryNumber;OverallPrice;OverallPriceAfterDiscounts
+1-1;$f pl.decerto.demo.telco.invoice.first.entry.price.calculator;$f pl.decerto.demo.telco.invoice.first.entry.discount.price.calculator
+2-12;$f pl.decerto.demo.telco.invoice.standard.entry.price.calculator;$f pl.decerto.demo.telco.invoice.discount.price.calculator

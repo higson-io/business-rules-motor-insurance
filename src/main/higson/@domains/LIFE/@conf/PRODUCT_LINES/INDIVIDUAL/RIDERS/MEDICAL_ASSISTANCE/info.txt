@@ -1,0 +1,3 @@
+name = "Assistance medyczny"
+description = "Pakiet usług bez sumy — dlatego wycena omija czynniki ryzyka"
+tags = []

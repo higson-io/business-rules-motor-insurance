@@ -1,0 +1,28 @@
+code = "demo.life.apk.question.position"
+description = "Kolejnosc pytania w ankiecie. Dane, nie regula - jeden wiersz na pytanie."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Kolejnosc pytania APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "pozycja"
+type = "integer"
+external = false
+array = false

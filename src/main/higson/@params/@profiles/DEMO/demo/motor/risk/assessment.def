@@ -1,0 +1,64 @@
+code = "demo.motor.risk.assessment"
+description = ""
+nullable = true
+dictionary = false
+cacheable = false
+distinct = false
+aiModelSource = true
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Description"
+
+[[inputLevel]]
+code = "gender"
+label = "Gender"
+type = "number"
+reverseMatcher = false
+levelCreator = "$f demo.motor.risk.gender.mapper"
+source = "$f demo.motor.risk.gender.mapper"
+union = false
+
+[[inputLevel]]
+code = "age"
+label = "Age"
+type = "number"
+reverseMatcher = false
+property = "quote.driver.age"
+source = "quote.driver.age"
+union = false
+
+[[inputLevel]]
+code = "licenceObtainedAtAge"
+label = "Licence obtained at age"
+type = "number"
+reverseMatcher = false
+property = "quote.driver.licenceObtainedAtAge"
+source = "quote.driver.licenceObtainedAtAge"
+union = false
+
+[[inputLevel]]
+code = "numberOfAccidents"
+label = "Number of accidents"
+type = "number"
+reverseMatcher = false
+property = "quote.driver.numberOfAccidents"
+source = "quote.driver.numberOfAccidents"
+union = false
+
+[[inputLevel]]
+code = "numberOfTickets"
+label = "Number of tickets"
+type = "number"
+reverseMatcher = false
+property = "quote.driver.numberOfTickets"
+source = "quote.driver.numberOfTickets"
+union = false
+
+[[outputLevel]]
+code = "risk"
+label = "Risk"
+type = "number"
+external = false
+array = false

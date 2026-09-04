@@ -1,0 +1,70 @@
+code = "demo.life.apk.regime"
+description = "Rezim APK dla linii zyciowej, wersjonowany regionem APK_LIFE. Ten sam ksztalt co w pozostalych dwoch liniach - art. 8 ustawy o dystrybucji nie rozroznia produktow."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rezim APK (zycie)"
+
+[[inputLevel]]
+code = "lineCode"
+label = "linia produktowa"
+type = "string"
+reverseMatcher = false
+property = "quote.lineCode"
+source = "quote.lineCode"
+union = false
+
+[[outputLevel]]
+code = "code"
+label = "kod rezimu"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "name"
+label = "nazwa rezimu"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "legalBasis"
+label = "podstawa prawna"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresBudget"
+label = "wymaga budzetu"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresExclusionCheck"
+label = "wymaga konfrontacji z wylaczeniami"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresJustification"
+label = "wymaga uzasadnienia"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresVariantDifferences"
+label = "wymaga roznic miedzy wariantami"
+type = "boolean"
+external = false
+array = false

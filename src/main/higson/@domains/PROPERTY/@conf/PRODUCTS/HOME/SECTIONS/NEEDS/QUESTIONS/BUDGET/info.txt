@@ -1,0 +1,3 @@
+name = "Jaka roczna składka jest dla Ciebie akceptowalna?"
+description = "Rekomendacja 8.2.d. Pytanie nie jest obowiązkowe — wymuszony budżet byłby budżetem zmyślonym."
+tags = []

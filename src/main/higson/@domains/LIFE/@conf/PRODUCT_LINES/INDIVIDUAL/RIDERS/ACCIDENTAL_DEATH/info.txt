@@ -1,0 +1,2 @@
+name = "Śmierć wskutek nieszczęśliwego wypadku"
+tags = []

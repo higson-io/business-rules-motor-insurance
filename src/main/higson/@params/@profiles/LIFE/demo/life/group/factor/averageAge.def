@@ -1,0 +1,29 @@
+code = "demo.life.group.factor.averageAge"
+description = "Czynnik za sredni wiek grupy."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group average age factor"
+
+[[inputLevel]]
+code = "averageAge"
+label = "average age"
+type = "integer"
+matcher = "between/ie"
+reverseMatcher = false
+property = "quote.group.averageAge"
+source = "quote.group.averageAge"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

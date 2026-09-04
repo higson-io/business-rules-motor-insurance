@@ -1,0 +1,28 @@
+code = "demo.property.factor.wallMaterial"
+description = "Palnosc konstrukcji - czynnik wymieniany wprost przez Allianz (pkt 134)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Wall material factor"
+
+[[inputLevel]]
+code = "material"
+label = "wall material"
+type = "string"
+reverseMatcher = false
+property = "quote.property.wallMaterial"
+source = "quote.property.wallMaterial"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

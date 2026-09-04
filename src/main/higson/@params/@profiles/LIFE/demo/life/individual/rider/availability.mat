@@ -1,0 +1,10 @@
+#matrix for parameter demo.life.individual.rider.availability
+rider;age;available
+*;* - *;false
+ACCIDENTAL_DEATH;18 - 70;true
+CRITICAL_ILLNESS;18 - 60;true
+DISABILITY;18 - 55;true
+HOSPITAL_STAY;18 - 65;true
+MEDICAL_ASSISTANCE;18 - 70;true
+PERMANENT_IMPAIRMENT;18 - 65;true
+SURGERY;18 - 65;true

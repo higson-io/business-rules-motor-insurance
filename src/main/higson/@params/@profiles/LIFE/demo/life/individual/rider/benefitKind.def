@@ -1,0 +1,28 @@
+code = "demo.life.individual.rider.benefitKind"
+description = "Jedyny atrybut mowiacy, czym jest liczba w polu suma. Steruje wzorem na skladke i znaczeniem pulapu."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rider benefit kind"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[outputLevel]]
+code = "kind"
+label = "benefit kind"
+type = "string"
+external = false
+array = false

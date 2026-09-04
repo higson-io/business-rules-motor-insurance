@@ -1,0 +1,3 @@
+name = "Potrzeba ochrony przy niezdolnosci do pracy"
+description = "WERSJA 2 REGIONU APK_LIFE. Rek. 8.2.b - potrzeba nazwana wprost, nie domniemana z wariantu."
+tags = []

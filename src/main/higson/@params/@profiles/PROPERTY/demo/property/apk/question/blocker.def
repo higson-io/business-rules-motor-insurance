@@ -1,0 +1,44 @@
+code = "demo.property.apk.question.blocker"
+description = "Odpowiedz, po ktorej nie ma czego dalej analizowac. Regula, a nie warunek w kodzie - dowolne pytanie moze sie stac bramka bez wdrozenia. Dzis jeden wiersz: brak potrzeby ubezpieczenia nieruchomosci zamyka ta sciezke."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK answer that stops the path"
+
+[[inputLevel]]
+code = "question"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "answer"
+label = "answer value"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "blocks"
+label = "stops the path"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "message"
+label = "message shown to the client"
+type = "string"
+external = false
+array = false

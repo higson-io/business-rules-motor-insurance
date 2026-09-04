@@ -1,0 +1,3 @@
+name = "Pojazd prowadza tez inne osoby"
+description = "WERSJA 2 REGIONU APK_MOTOR. Rek. 8.2.c - konfrontacja z wylaczeniem NO_LICENCE (OWU par. 12 pkt 4 lit. b)."
+tags = []

@@ -1,0 +1,17 @@
+[[attr]]
+attributeCode = "BASE_PREMIUM"
+attributeName = "Skladka bazowa miesieczna na pracownika"
+refType = "PARAMETER"
+refName = "demo.life.group.tariff.basePremium"
+
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy dostepny przy tej liczebnosci grupy"
+refType = "PARAMETER"
+refName = "demo.life.group.variant.availability"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc, zarazem miara bogactwa wariantu"
+refType = "PARAMETER"
+refName = "demo.life.group.variant.position"

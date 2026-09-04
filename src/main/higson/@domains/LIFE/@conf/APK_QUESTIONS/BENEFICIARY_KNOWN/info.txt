@@ -1,0 +1,3 @@
+name = "Wskazanie uposazonego"
+description = "Bez wskazania swiadczenie idzie do spadkobiercow ustawowych - to rzadko jest tym, czego klient chce."
+tags = []

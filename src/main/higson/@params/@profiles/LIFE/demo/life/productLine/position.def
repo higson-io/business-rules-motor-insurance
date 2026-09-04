@@ -1,0 +1,28 @@
+code = "demo.life.productLine.position"
+description = "Kolejnosc linii produktu na ekranie wyboru."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Product line position"
+
+[[inputLevel]]
+code = "line"
+label = "product line code"
+type = "string"
+reverseMatcher = false
+property = "quote.lineCode"
+source = "quote.lineCode"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

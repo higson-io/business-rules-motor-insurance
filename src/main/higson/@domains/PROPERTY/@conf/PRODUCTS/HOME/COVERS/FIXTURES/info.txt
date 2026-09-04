@@ -1,0 +1,3 @@
+name = "Elementy stałe"
+description = "To, co zamontowane na trwałe: podłogi, glazura, armatura, zabudowa, stolarka."
+tags = []

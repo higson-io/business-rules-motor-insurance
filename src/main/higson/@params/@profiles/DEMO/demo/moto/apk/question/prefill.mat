@@ -1,0 +1,7 @@
+#matrix for parameter demo.moto.apk.question.prefill
+code;source;refusal
+ANNUAL_MILEAGE;average mileage for this vehicle class;Without the mileage, the assessment of your assistance needs rests on your declaration alone.
+BUDGET;;Without a budget the recommendation cannot check whether a tier is within your means (recommendation 8.5).
+ROADWORTHY;;Declining to answer does not remove the exclusion in § 12(5) of the policy wording — an invalid roadworthiness certificate can void cover, if the condition of the vehicle contributed to the loss.
+SHARED_DRIVERS;;Withholding this does not protect you from the exclusion in § 12(4)(b) of the policy wording.
+VEHICLE_VALUE;catalogue value for this make and year;Without the vehicle value there is no basis for a comprehensive sum insured — only third-party cover can be offered.

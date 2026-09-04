@@ -1,0 +1,10 @@
+#matrix for parameter demo.life.apk.recommendation.reason
+code;text;position
+BUDGET_EXCEEDED;Składka {0} zł miesięcznie przekracza podany budżet {1} zł. Propozycja schodzi do zakresu {2} — najbliższego dopasowania, które się w nim mieści.;30
+BUDGET_EXCEEDED_SET;Składka {0} zł miesięcznie przekracza podany budżet {1} zł. W ochronie indywidualnej nie ma tańszego wariantu do wybrania — składkę obniża rezygnacja z części umów dodatkowych albo niższa suma.;30
+BUDGET_OK;Składka {0} zł miesięcznie mieści się w podanym budżecie {1} zł.;30
+COVERS_NEEDS;Zaproponowany zakres pokrywa {0} z {1} zgłoszonych przez Ciebie potrzeb.;10
+EXCLUSION_WARNING;Twoja sytuacja styka się z {0} wyłączeniem lub wyłączeniami z OWU — opisane są powyżej.;40
+MISSING_COVER;Poza zakresem zostaje: {0}.;20
+REGIME;Analiza przeprowadzona w reżimie: {0}.;50
+SUM_FROM_OBLIGATIONS;Suma {0} zł odpowiada Twoim zobowiązaniom ({1} zł miesięcznie) i liczbie osób na utrzymaniu ({2}).;25

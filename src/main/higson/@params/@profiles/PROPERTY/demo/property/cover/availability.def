@@ -1,0 +1,37 @@
+code = "demo.property.cover.availability"
+description = "Drabinka jest scisla: kazdy wariant zawiera wszystko, co poprzedni. Test variant.ladder tego pilnuje."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Cover availability by variant"
+
+[[inputLevel]]
+code = "cover"
+label = "cover code"
+type = "string"
+reverseMatcher = false
+property = "cover.code"
+source = "cover.code"
+union = false
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "available"
+label = "available"
+type = "boolean"
+external = false
+array = false

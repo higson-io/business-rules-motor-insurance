@@ -1,0 +1,3 @@
+name = "Ile szkód zgłaszałeś w ostatnich trzech latach?"
+description = "Historia szkodowa jest czynnikiem taryfowym u wszystkich towarzystw."
+tags = []

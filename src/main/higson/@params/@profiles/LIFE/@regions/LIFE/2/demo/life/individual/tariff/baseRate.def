@@ -1,0 +1,29 @@
+code = "demo.life.individual.tariff.baseRate"
+description = "Stawka miesieczna za 1000 zl sumy umowy glownej. Wersjonowana regionem LIFE."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Individual base rate per 1000"
+
+[[inputLevel]]
+code = "age"
+label = "entry age"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.insured.entryAge"
+source = "quote.insured.entryAge"
+union = false
+
+[[outputLevel]]
+code = "rate"
+label = "rate per 1000"
+type = "number"
+external = false
+array = false

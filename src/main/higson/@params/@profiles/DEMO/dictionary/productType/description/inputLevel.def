@@ -1,0 +1,29 @@
+code = "dictionary.productType.description.inputLevel"
+description = "Description of product's type"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+masterName = "dictionary.productType.description"
+slave = true
+label = "<no label>"
+
+[[inputLevel]]
+code = "PRODUCT_TYPE"
+label = "Type of product"
+type = "string"
+reverseMatcher = false
+property = "PRODUCT_TYPE"
+source = "PRODUCT_TYPE"
+union = false
+
+[[outputLevel]]
+code = "DESCRIPTION"
+label = "Description of product type"
+type = "string"
+external = false
+array = false

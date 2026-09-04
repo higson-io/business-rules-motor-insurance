@@ -1,0 +1,8 @@
+#matrix for parameter demo.moto.apk.recommendation.reason
+code;text;position
+BUDGET_EXCEEDED;The best-matching tier costs {0} zł, above the {1} zł budget you gave. The proposal drops to {2} — the closest fit that stays within it.;30
+BUDGET_OK;A premium of {0} zł is within the budget of {1} zł you gave.;30
+COVERS_NEEDS;{0} meets {1} of the {2} needs you told us about.;10
+EXCLUSION_WARNING;Your situation touches {0} exclusion(s) in the policy wording — they are described above.;40
+MISSING_COVER;Left outside the cover: {0}.;20
+REGIME;Analysis carried out under: {0}.;50

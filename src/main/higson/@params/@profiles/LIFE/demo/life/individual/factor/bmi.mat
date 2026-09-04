@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.individual.factor.bmi
+bmi;factor
+* - 18.5;1.15
+18.5 - 27;1.00
+27 - 32;1.25
+32 - *;1.60

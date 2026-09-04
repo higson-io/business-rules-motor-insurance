@@ -1,0 +1,3 @@
+name = "Miesieczny budzet na ochrone"
+description = "WERSJA 2 REGIONU APK_LIFE. Rek. 8.5 - mozliwosci finansowe klienta. Celowo nieobowiazkowe."
+tags = []

@@ -1,0 +1,106 @@
+@transient
+def /ROOT
+  answer Answer                     @desc Odpowiedz APK pod iteracja
+  claim Claim                       @desc Zdarzenie, uzywane wylacznie przy sprawdzaniu karencji
+  question Question                 @desc Pytanie APK pod iteracja
+  quote Quote                       @desc Wniosek wraz z osoba, polisa i programem grupowym
+  reason Reason                     @desc Uzasadnienie rekomendacji pod iteracja
+
+@transient
+def Answer                      @desc Odpowiedz APK pod iteracja
+  value string                      @desc Surowa odpowiedz, tak jak podal ja klient
+
+@transient
+def Apk                         @desc Odpowiedzi ankiety APK dla linii zyciowej
+  answers string                    @desc wszystkie odpowiedzi jako kod=wartosc;kod=wartosc
+  beneficiaryKnown boolean          @desc Czy klient wie, kogo wskaze jako uposazonego
+  budget number                     @desc Miesieczny budzet na ochrone
+  conflictZones boolean             @desc Wyjazdy do stref konfliktu zbrojnego
+  coverPurpose string               @desc Czemu ma sluzyc swiadczenie
+  criticalIllnessConcern boolean    @desc Potrzeba ochrony na wypadek powaznego zachorowania
+  dependants integer                @desc Liczba osob na utrzymaniu
+  disabilityConcern boolean         @desc Potrzeba ochrony na wypadek niezdolnosci do pracy
+  healthChanges boolean             @desc Leczenie przewlekle w ostatnich 12 miesiacach
+  hospitalConcern boolean           @desc Potrzeba swiadczenia za pobyt w szpitalu
+  monthlyObligations number         @desc Miesieczne zobowiazania
+  occupation string                 @desc Zawod klienta
+  premiums string                   @desc skladki jako kod=kwota;kod=kwota
+  priorCover boolean                @desc Wczesniejsze ubezpieczenie na zycie
+  savingsMonths integer             @desc Na ile miesiecy wystarcza oszczednosci
+  sportsProfessional boolean        @desc Czy klient uprawia sport zawodowo
+
+@transient
+def Benefit                     @desc Swiadczenie w programie grupowym
+  code string                       @desc Kod swiadczenia
+  sum number                        @desc Suma swiadczenia w danym wariancie
+
+@transient
+def Claim                       @desc Zdarzenie ubezpieczeniowe, uzywane przy sprawdzaniu karencji
+  cause string                      @desc ILLNESS albo ACCIDENT
+
+@transient
+def Enrolment                   @desc Liczba pracownikow, ktorzy wybrali dany wariant
+  count integer                     @desc Liczba pracownikow w tym wariancie
+  variantCode string                @desc Kod wybranego wariantu
+
+@transient
+def GroupScheme                 @desc Program grupowy pracowniczy, bez indywidualnej oceny ryzyka
+  averageAge integer                @desc Sredni wiek grupy
+  benefits Benefit*                 @desc Swiadczenia w programie
+  enrolment Enrolment*              @desc Rozklad wyborow pracownikow
+  headcount integer                 @desc Liczba pracownikow
+  includeAdultChild boolean         @desc Rozszerzenie o pelnoletnie dziecko
+  includeSpouse boolean             @desc Rozszerzenie o wspolmalzonka
+  industryClass integer             @desc Klasa branzy 1-4
+  participation number              @desc Partycypacja w procentach
+  topVariantShare number            @desc Udzial najbogatszego wariantu, wyliczany
+  variants Variant*                 @desc Warianty programu
+
+@transient
+def Insured                     @desc Osoba ubezpieczona - dane do oceny ryzyka indywidualnego
+  birthDate date                    @desc Data urodzenia
+  bmi number                        @desc BMI, wyliczane
+  entryAge integer                  @desc Wiek wstepu, wyliczany
+  heightCm integer                  @desc Wzrost w cm
+  monthlyIncome number              @desc Dochod miesieczny, opcjonalny
+  occupationClass integer           @desc Klasa ryzyka zawodowego 1-4
+  priorCoverFrom date               @desc Poczatek poprzedniej ochrony
+  priorCoverGapDays integer         @desc Przerwa w ochronie w dniach, wyliczane
+  priorCoverMonths integer          @desc Dlugosc poprzedniej ochrony w miesiacach, wyliczane
+  priorCoverTo date                 @desc Koniec poprzedniej ochrony
+  smoker boolean                    @desc Czy pali
+  weightKg integer                  @desc Waga w kg
+
+@transient
+def Policy                      @desc Parametry polisy wspolne dla obu galezi
+  mainSum number                    @desc Suma ubezpieczenia umowy glownej
+  paymentFrequency string           @desc MONTHLY QUARTERLY SEMIANNUAL ANNUAL
+  startDate date                    @desc Data poczatku ochrony, klucz do wersji taryfy
+
+@transient
+def Question                    @desc Pytanie APK pod iteracja
+  code string                       @desc Kod pytania
+
+@transient
+def Quote                       @desc Wniosek o ubezpieczenie na zycie
+  apk Apk                           @desc Odpowiedzi ankiety APK
+  group GroupScheme                 @desc Program grupowy, tylko sciezka grupowa
+  insured Insured                   @desc Osoba ubezpieczona, tylko sciezka indywidualna
+  lineCode string                   @desc INDIVIDUAL albo GROUP
+  policy Policy                     @desc Parametry polisy
+  riders Rider*                     @desc Wybrane umowy dodatkowe
+
+@transient
+def Reason                      @desc Uzasadnienie rekomendacji pod iteracja
+  code string                       @desc Kod uzasadnienia
+
+@transient
+def Rider                       @desc Umowa dodatkowa wybrana przez klienta
+  code string                       @desc Kod umowy dodatkowej
+  premium number                    @desc Wyliczona skladka
+  sum number                        @desc Suma lub kwota dzienna, zaleznie od rodzaju swiadczenia
+
+@transient
+def Variant                     @desc Wariant programu grupowego
+  code string                       @desc Kod wariantu
+  perEmployee number                @desc Skladka miesieczna na pracownika

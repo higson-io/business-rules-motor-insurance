@@ -1,0 +1,7 @@
+#matrix for parameter pl.decerto.demo.telco.hardware.details
+hardwareCode;details
+CAM_CI;CAM CI+ module enables watching channels from satellite and other, not encoded channels in HD and UHD quality as well as radio channels.
+MEDIABOX;Ethernet - wire internet connection. WI-FI module can be connected.
+MEDIABOX;HD Quality - High image quality.
+ULTRABOX;4K HDR Quality - The best image quality offered right now.
+ULTRABOX;WI-FI - Wireless Internet connection

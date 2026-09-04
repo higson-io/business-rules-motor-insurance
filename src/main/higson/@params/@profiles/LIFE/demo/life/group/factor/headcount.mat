@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.factor.headcount
+headcount;factor
+0 - 10;1.15
+10 - 50;1.00
+200 - 99999;0.88
+50 - 200;0.94

@@ -1,0 +1,3 @@
+name = "Na którym piętrze jest mieszkanie?"
+description = "Mieszkanie powyżej parteru traktujemy jak położone poza strefą zagrożenia powodziowego."
+tags = []

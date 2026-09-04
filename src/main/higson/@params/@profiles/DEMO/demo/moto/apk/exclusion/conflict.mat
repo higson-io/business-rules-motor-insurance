@@ -1,0 +1,7 @@
+#matrix for parameter demo.moto.apk.exclusion.conflict
+code;value;exclusion;severity;warning;remedy
+ROADWORTHY;false;NO_ROADWORTHINESS;3;Without a valid roadworthiness certificate, § 12(5) excludes losses that occur while driving the vehicle — but only where the condition of the vehicle contributed to the accident.;Have the vehicle tested before cover starts.
+SECURITY;NONE;THEFT_NO_SECURITY;2;§ 12(11)(c) excludes theft losses where not all the anti-theft devices fitted to the vehicle were engaged. A vehicle with none fitted is also markedly more expensive to insure comprehensively.;Fitting an immobiliser or an alarm changes how the theft risk is assessed.
+SHARED_DRIVERS;true;NO_LICENCE;1;If someone without a licence drives the vehicle, § 12(4)(b) excludes the loss — unless the absence of a licence had no bearing on how it happened.;Make sure everyone who uses the vehicle holds a valid driving licence.
+SMALL_DAMAGE;true;INTEGRAL_FRANCHISE;1;Losses worth up to 300 zł are not covered — that is the integral excess under § 12(1). Minor scratches stay with you whichever tier you choose.;If minor damage matters to you, look for an offer with a lower excess — this demo does not carry one.
+USAGE;HIRE;USE_NOT_AS_INTENDED;3;Using the vehicle for hire or reward — taxi, ride-hailing, rental — counts as use contrary to its intended purpose under § 12(9) of the policy wording. Losses arising from such use are not covered by comprehensive insurance.;You need a policy extended to commercial use<#s#> standard comprehensive cover will not answer.

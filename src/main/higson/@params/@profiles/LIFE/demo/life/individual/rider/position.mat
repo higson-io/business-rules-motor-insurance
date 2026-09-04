@@ -1,0 +1,10 @@
+#matrix for parameter demo.life.individual.rider.position
+rider;position
+*;99
+ACCIDENTAL_DEATH;2
+CRITICAL_ILLNESS;1
+DISABILITY;6
+HOSPITAL_STAY;4
+MEDICAL_ASSISTANCE;7
+PERMANENT_IMPAIRMENT;3
+SURGERY;5

@@ -1,0 +1,7 @@
+#matrix for parameter demo.life.paymentFrequency.factor
+frequency;factor;installments
+*;1.000;12
+ANNUAL;0.940;1
+MONTHLY;1.000;12
+QUARTERLY;0.980;4
+SEMIANNUAL;0.965;2

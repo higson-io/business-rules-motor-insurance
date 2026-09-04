@@ -1,0 +1,3 @@
+name = "Pełny"
+description = "Wszystko ze standardowego plus kradzież, powódź i assistance."
+tags = []

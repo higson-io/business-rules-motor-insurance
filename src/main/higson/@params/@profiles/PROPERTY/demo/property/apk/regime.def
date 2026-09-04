@@ -1,0 +1,70 @@
+code = "demo.property.apk.regime"
+description = "Rezim APK jako parametr, wersjonowany regionem PROPERTY. Druga polowa D-5 - domena mowi co istnieje, ten parametr mowi co wolno z tym zrobic."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK regime"
+
+[[inputLevel]]
+code = "kind"
+label = "property kind"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[outputLevel]]
+code = "code"
+label = "regime code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "name"
+label = "regime name"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "legalBasis"
+label = "legal basis"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresBudget"
+label = "requires budget"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresExclusionCheck"
+label = "requires exclusion check"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresJustification"
+label = "requires justification"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresVariantDifferences"
+label = "requires variant differences"
+type = "boolean"
+external = false
+array = false

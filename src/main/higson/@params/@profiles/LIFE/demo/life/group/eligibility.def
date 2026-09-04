@@ -1,0 +1,46 @@
+code = "demo.life.group.eligibility"
+description = "Czy program kwalifikuje sie do oferty. Bez wiersza domyslnego, bo w tabeli o samych kolumnach przedzialowych wiersz \"* - *\" dopasowuje sie ROWNOLEGLE z wlasciwym pasmem i daje dwie sprzeczne odpowiedzi. Brak dopasowania zwraca null, a funkcja group.eligible czyta to jako odmowe."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group scheme eligibility"
+
+[[inputLevel]]
+code = "headcount"
+label = "headcount"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.group.headcount"
+source = "quote.group.headcount"
+union = false
+
+[[inputLevel]]
+code = "participation"
+label = "participation percent"
+type = "number"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.group.participation"
+source = "quote.group.participation"
+union = false
+
+[[outputLevel]]
+code = "eligible"
+label = "eligible"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reason"
+label = "reason"
+type = "string"
+external = false
+array = false

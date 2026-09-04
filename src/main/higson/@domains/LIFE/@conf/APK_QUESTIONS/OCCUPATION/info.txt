@@ -1,0 +1,3 @@
+name = "Zawod klienta"
+description = "Uruchamia wylaczenie HAZARDOUS_OCCUPATION - par. 9 ust. 1 pkt 4 OWU Warta wymienia zamknieta liste zawodow."
+tags = []

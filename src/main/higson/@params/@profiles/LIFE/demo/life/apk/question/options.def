@@ -1,0 +1,35 @@
+code = "demo.life.apk.question.options"
+description = "Warianty odpowiedzi i ich etykiety, obie kolumny jako listy po przecinku."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Warianty odpowiedzi APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "options"
+label = "kody odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "labels"
+label = "etykiety"
+type = "string"
+external = false
+array = false

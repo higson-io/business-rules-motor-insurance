@@ -1,0 +1,7 @@
+#matrix for parameter demo.property.factor.security
+security;factor
+*;1.00
+ALARM;0.92
+DOOR;1.00
+MONITORED;0.85
+NONE;1.15

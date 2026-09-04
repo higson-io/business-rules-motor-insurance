@@ -1,0 +1,3 @@
+name = "Wazne badanie techniczne"
+description = "Uruchamia wylaczenie NO_ROADWORTHINESS (OWU PZU Auto par. 12 pkt 5)."
+tags = []

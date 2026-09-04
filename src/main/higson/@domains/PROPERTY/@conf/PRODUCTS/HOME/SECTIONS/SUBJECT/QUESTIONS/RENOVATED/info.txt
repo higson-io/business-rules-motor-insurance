@@ -1,0 +1,3 @@
+name = "Czy budynek przeszedł remont?"
+description = "Budynek starszy niż 50 lat bez remontu wycenia się w wartości rzeczywistej, czyli pomniejszonej o zużycie techniczne."
+tags = []

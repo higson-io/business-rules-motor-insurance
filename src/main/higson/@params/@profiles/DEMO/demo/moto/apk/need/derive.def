@@ -1,0 +1,51 @@
+code = "demo.moto.apk.need.derive"
+description = "Rek. 8.2.b - mapowanie odpowiedzi na potrzebe klienta i pokrycie, ktore ja zaspokaja."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK answer to need mapping (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "value"
+label = "answer value"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "need"
+label = "need"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "cover"
+label = "cover satisfying it"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "weight"
+label = "weight"
+type = "integer"
+external = false
+array = false

@@ -1,0 +1,7 @@
+#matrix for parameter demo.life.underwriting.sumLimit
+occupationClass;maxSum
+*;300000
+1;1000000
+2;750000
+3;500000
+4;300000

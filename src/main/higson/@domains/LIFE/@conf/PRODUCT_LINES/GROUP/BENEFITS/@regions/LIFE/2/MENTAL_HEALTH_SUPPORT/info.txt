@@ -1,0 +1,3 @@
+name = "Wsparcie psychologiczne"
+description = "Pakiet konsultacji. Element istnieje wylacznie od wersji 2 regionu - to jest cala demonstracja wersjonowania ksztaltu, nie tylko wartosci."
+tags = []

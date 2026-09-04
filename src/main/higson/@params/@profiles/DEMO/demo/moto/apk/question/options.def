@@ -1,0 +1,35 @@
+code = "demo.moto.apk.question.options"
+description = "Warianty odpowiedzi i ich etykiety, obie kolumny jako listy po przecinku."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK question options (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "options"
+label = "option codes"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "labels"
+label = "option labels"
+type = "string"
+external = false
+array = false

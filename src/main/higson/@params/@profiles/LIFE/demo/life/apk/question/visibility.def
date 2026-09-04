@@ -1,0 +1,47 @@
+code = "demo.life.apk.question.visibility"
+description = "Rek. 8.1.b - widocznosc zalezna od wczesniejszych odpowiedzi i od sciezki. Domyslna odpowiedz to POKAZ. Sciezka grupowa NIE pyta o dane osobowe, bo polisa grupowa nie prowadzi indywidualnej oceny ryzyka."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Widocznosc pytania APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "lineCode"
+label = "linia produktowa"
+type = "string"
+reverseMatcher = false
+property = "quote.lineCode"
+source = "quote.lineCode"
+union = false
+
+[[inputLevel]]
+code = "dependants"
+label = "osoby na utrzymaniu"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+property = "quote.apk.dependants"
+source = "quote.apk.dependants"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "widoczne"
+type = "boolean"
+external = false
+array = false

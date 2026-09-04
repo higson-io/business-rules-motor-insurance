@@ -1,0 +1,28 @@
+code = "demo.life.individual.rider.position"
+description = "Kolejnosc umow dodatkowych na ekranie i wydruku."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rider position"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

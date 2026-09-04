@@ -1,0 +1,6 @@
+#matrix for parameter demo.life.group.variant.availability
+variant;headcount;available
+*;* - *;false
+BASIC;3 - 5000;true
+COMPLETE;20 - 5000;true
+EXTENDED;3 - 5000;true

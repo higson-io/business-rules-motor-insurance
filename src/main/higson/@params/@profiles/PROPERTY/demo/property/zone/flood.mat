@@ -1,0 +1,12 @@
+#matrix for parameter demo.property.zone.flood
+area;zone
+*;Z0
+30;Z1
+43;Z1
+44;Z1
+50;Z2
+51;Z2
+57;ZX
+70;Z1
+80;Z1
+87;Z1

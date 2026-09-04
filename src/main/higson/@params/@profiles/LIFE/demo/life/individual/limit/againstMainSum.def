@@ -1,0 +1,35 @@
+code = "demo.life.individual.limit.againstMainSum"
+description = "Pulap produktowy. RATIO krotnosc sumy glownej, ABSOLUTE kwota, NONE brak pulapu."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Rider sum cap against main sum"
+
+[[inputLevel]]
+code = "rider"
+label = "rider code"
+type = "string"
+reverseMatcher = false
+property = "rider.code"
+source = "rider.code"
+union = false
+
+[[outputLevel]]
+code = "capKind"
+label = "cap kind"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capValue"
+label = "cap value"
+type = "number"
+external = false
+array = false

@@ -1,0 +1,11 @@
+#matrix for parameter demo.life.individual.tariff.baseRate
+age;rate
+18 - 29;0.09
+30 - 34;0.13
+35 - 39;0.19
+40 - 44;0.29
+45 - 49;0.50
+50 - 54;0.81
+55 - 59;1.32
+60 - 64;2.11
+65 - 70;3.35

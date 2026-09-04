@@ -1,0 +1,3 @@
+name = "Standardowy"
+description = "Mury, wykończenie, ruchomości i OC w życiu prywatnym."
+tags = []

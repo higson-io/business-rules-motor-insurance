@@ -1,0 +1,3 @@
+name = "Na ile szacujesz wartość swojej nieruchomości?"
+description = "Rekomendacja 8.2.c - suma ubezpieczenia ma odpowiadac wymaganiom i potrzebom klienta, wiec pytamy go, ile jego zdaniem warta jest nieruchomosc. Nowosc razem z pytaniem o oczekiwana skladke: przed progiem KNF tego pytania nie ma."
+tags = []

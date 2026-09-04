@@ -1,0 +1,13 @@
+#matrix for parameter demo.life.individual.waitingPeriod.credit
+rider;priorMonths;gapDays;creditRatio
+*;* - *;* - *;0.00
+CRITICAL_ILLNESS;6 - *;0 - 30;0.50
+CRITICAL_ILLNESS;6 - 600;0 - 30;0.50
+DISABILITY;6 - *;0 - 30;0.50
+DISABILITY;6 - 600;0 - 30;0.50
+HOSPITAL_STAY;1 - 5;0 - 30;0.50
+HOSPITAL_STAY;6 - *;0 - 30;1.00
+HOSPITAL_STAY;6 - 600;0 - 30;1.00
+SURGERY;1 - 5;0 - 30;0.50
+SURGERY;6 - *;0 - 30;1.00
+SURGERY;6 - 600;0 - 30;1.00

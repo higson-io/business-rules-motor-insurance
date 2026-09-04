@@ -1,0 +1,32 @@
+code = "demo.life.apk.question.required"
+description = "Rek. 8.4 - obowiazkowosc jest regula, nie atrybutem HTML. BUDGET celowo nieobowiazkowy."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Obowiazkowosc pytania APK (zycie)"
+
+[matrixRef]
+code = "demo.moto.apk.question.required"
+profile = "DEMO"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "required"
+label = "obowiazkowe"
+type = "boolean"
+external = false
+array = false

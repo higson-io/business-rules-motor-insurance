@@ -1,0 +1,7 @@
+#matrix for parameter demo.life.individual.waitingPeriod.base
+rider;cause;days
+*;*;0
+CRITICAL_ILLNESS;ILLNESS;90
+DISABILITY;ILLNESS;180
+HOSPITAL_STAY;ILLNESS;30
+SURGERY;ILLNESS;180

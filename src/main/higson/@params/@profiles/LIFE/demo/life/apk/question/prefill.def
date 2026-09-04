@@ -1,0 +1,35 @@
+code = "demo.life.apk.question.prefill"
+description = "Rek. 8.3 i 8.4 razem - skad wartosc pochodzi i co sie stanie, gdy klient jej nie poda. Konsekwencja odmowy ma pokrycie w par. 9 ust. 2 OWU Warta: zatajenie informacji zwalnia ubezpieczyciela z odpowiedzialnosci."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Podpowiedz i odmowa APK (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "source"
+label = "zrodlo podpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "refusal"
+label = "konsekwencja odmowy"
+type = "string"
+external = false
+array = false

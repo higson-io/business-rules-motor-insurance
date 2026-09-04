@@ -1,0 +1,35 @@
+code = "demo.property.cover.sumBasis"
+description = "Skad bierze sie suma pokrycia: wyliczana, pochodna od innej, z katalogu albo zadna."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Cover sum basis"
+
+[[inputLevel]]
+code = "cover"
+label = "cover code"
+type = "string"
+reverseMatcher = false
+property = "cover.code"
+source = "cover.code"
+union = false
+
+[[outputLevel]]
+code = "basis"
+label = "basis"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reference"
+label = "reference cover"
+type = "string"
+external = false
+array = false

@@ -1,0 +1,5 @@
+[[attr]]
+attributeCode = "RATE"
+attributeName = "Stawka miesieczna za 1000 zl sumy"
+refType = "PARAMETER"
+refName = "demo.life.individual.tariff.baseRate"

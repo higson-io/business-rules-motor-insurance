@@ -1,0 +1,10 @@
+#matrix for parameter demo.property.cover.position
+cover;position
+*;999
+ASSISTANCE;70
+BUILDING;10
+CONTENTS;30
+FIXTURES;20
+FLOOD;50
+LIABILITY;60
+THEFT;40

@@ -1,0 +1,11 @@
+#matrix for parameter demo.moto.apk.need.derive
+code;value;need;cover;weight
+ABROAD;true;Roadside assistance outside the country;ERS;2
+FINANCING;true;Protecting the value of the vehicle — required by the finance provider;COMP;3
+PARKING;GUARDED;Protection against theft;COMP;1
+PARKING;STREET;Protection against theft;COMP;3
+REPLACEMENT_CAR;true;A replacement car while yours is repaired;ERS;2
+SECURITY;NONE;Protection against theft;COMP;3
+SHARED_DRIVERS;true;Cover when other people drive the vehicle;UMBI;1
+SMALL_DAMAGE;true;Cover for minor damage;COLL;2
+USAGE;BUSINESS;High annual mileage;ERS;1

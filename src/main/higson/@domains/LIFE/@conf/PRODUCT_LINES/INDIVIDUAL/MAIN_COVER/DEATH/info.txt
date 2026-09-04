@@ -1,0 +1,3 @@
+name = "Śmierć ubezpieczonego"
+description = "Umowa glowna, obowiazkowa. Jej suma jest odniesieniem dla pulapow umow dodatkowych."
+tags = []

@@ -1,0 +1,3 @@
+name = "Jaki jest standard wykończenia?"
+description = "Standard decyduje o stawce za metr i o sumach elementów stałych oraz ruchomości."
+tags = []

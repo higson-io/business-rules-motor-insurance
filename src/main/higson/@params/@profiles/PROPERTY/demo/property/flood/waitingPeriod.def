@@ -1,0 +1,28 @@
+code = "demo.property.flood.waitingPeriod"
+description = "30 dni karencji, znoszone przez nieprzerwana kontynuacje - standard rynkowy (PZU, ERGO, Allianz, InterRisk)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Flood waiting period"
+
+[[inputLevel]]
+code = "priorCover"
+label = "prior flood cover"
+type = "boolean"
+reverseMatcher = false
+property = "quote.property.priorFloodCover"
+source = "quote.property.priorFloodCover"
+union = false
+
+[[outputLevel]]
+code = "days"
+label = "waiting days"
+type = "integer"
+external = false
+array = false

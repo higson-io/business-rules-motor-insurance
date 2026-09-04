@@ -1,0 +1,28 @@
+code = "demo.life.group.benefit.position"
+description = "Kolejnosc swiadczen w tabeli porownawczej wariantow."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group benefit position"
+
+[[inputLevel]]
+code = "benefit"
+label = "benefit code"
+type = "string"
+reverseMatcher = false
+property = "benefit.code"
+source = "benefit.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

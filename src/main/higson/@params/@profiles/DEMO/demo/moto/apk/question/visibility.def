@@ -1,0 +1,46 @@
+code = "demo.moto.apk.question.visibility"
+description = "Rek. 8.1.b - widocznosc pytania zalezna od wczesniejszych odpowiedzi. Domyslna odpowiedz to POKAZ."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK question visibility (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "usage"
+label = "vehicle usage"
+type = "string"
+reverseMatcher = false
+property = "quote.apk.usage"
+source = "quote.apk.usage"
+union = false
+
+[[inputLevel]]
+code = "parking"
+label = "night parking"
+type = "string"
+reverseMatcher = false
+property = "quote.apk.parking"
+source = "quote.apk.parking"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "visible"
+type = "boolean"
+external = false
+array = false

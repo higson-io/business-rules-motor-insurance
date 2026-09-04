@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domainDefinition>
+    <exportType>DEFINITION_ONLY</exportType>
+    <domainTypes>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>APK_QUESTION</code>
+            <name>Pytanie APK</name>
+            <description>Pytanie analizy potrzeb klienta. Jest elementem domeny, a nie wierszem tabeli, bo wiersz zawsze istnieje - a element moze NIE ISTNIEC w danej wersji regionu. Na tej roznicy stoi demonstracja progu 1 lipca 2027.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>TEXT</code>
+                    <name>Tresc pytania</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>KIND</code>
+                    <name>Typ kontrolki - CHOICE, MULTI, NUMBER, MONEY, BOOLEAN albo TEXT</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>TEXT</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>VALUE_TYPE</code>
+                    <name>Typ wartosci w kontekscie - STRING, INTEGER, DECIMAL, BOOLEAN albo DATE. Osobno od KIND, bo silnik NIE konwertuje typow</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>STRING</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SECTION</code>
+                    <name>Sekcja ankiety - SUBJECT, SITUATION, NEEDS albo EXCLUSIONS</name>
+                    <order>4</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>SUBJECT</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>HELP</code>
+                    <name>Wyjasnienie przy pytaniu (rek. 8.2.a)</name>
+                    <order>5</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CONTEXT_PATH</code>
+                    <name>Sciezka kontekstu, pod ktora trafia odpowiedz</name>
+                    <order>6</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_VISIBLE</code>
+                    <name>Widocznosc zalezna od wczesniejszych odpowiedzi (rek. 8.1.b)</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.visibility</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_REQUIRED</code>
+                    <name>Obowiazkowosc jako regula, nie atrybut HTML</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.required</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc w ankiecie</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>OPTIONS</code>
+                    <name>Kody odpowiedzi po przecinku</name>
+                    <order>1</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.options [options]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>OPTION_LABELS</code>
+                    <name>Etykiety odpowiedzi w tej samej kolejnosci</name>
+                    <order>2</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.options [labels]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>PREFILL_SOURCE</code>
+                    <name>Zrodlo wartosci podpowiedzianej (rek. 8.3)</name>
+                    <order>3</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.prefill [source]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>REFUSAL_MESSAGE</code>
+                    <name>Konsekwencja odmowy odpowiedzi (rek. 8.4)</name>
+                    <order>4</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.apk.question.prefill [refusal]</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>BENEFIT</code>
+            <name>Swiadczenie grupowe</name>
+            <description>Swiadczenie w programie pracowniczym. Dostepnosc i suma zaleza od wariantu, dlatego sa relacja w tabeli, a nie struktura drzewa.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy wchodzi w sklad danego wariantu</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.benefit.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc w tabeli porownawczej</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.benefit.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BENEFIT_KIND</code>
+                    <name>Rodzaj swiadczenia - SUM_ASSURED, DAILY_AMOUNT, PER_PERCENT albo SERVICE_PACKAGE</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.benefit.benefitKind</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_ASSURED</code>
+                    <name>Suma w danym wariancie - znaczenie zalezy od BENEFIT_KIND</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.benefit.sumAssured</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>MAIN_COVER</code>
+            <name>Umowa glowna</name>
+            <description>Umowa obowiazkowa - smierc ubezpieczonego. Stoi obok RIDERS, bo pytanie o dostepnosc nie ma dla niej sensu, a suma pochodzi z wniosku, nie z katalogu.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RATE</code>
+                    <name>Stawka miesieczna za 1000 zl sumy</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.tariff.baseRate</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>PRODUCT_LINE</code>
+            <name>Linia produktu</name>
+            <description>Pierwszy poziom drzewa. Uwaga: Higson nie pozwala na komponenty warunkowe per element, wiec obie linie widza wszystkie cztery kolekcje. Puste nie zwracaja elementow, wiec wycena dziala.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>BENEFITS</code>
+                    <name>Swiadczenia</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>BENEFIT</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>MAIN_COVER</code>
+                    <name>Umowa glowna</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>MAIN_COVER</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>RIDERS</code>
+                    <name>Umowy dodatkowe</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RIDER</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>VARIANTS</code>
+                    <name>Warianty programu</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>VARIANT</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy linia jest w ogole oferowana</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.productLine.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc na ekranie wyboru</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.productLine.position</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>RIDER</code>
+            <name>Umowa dodatkowa</name>
+            <description>Opcjonalna umowa dolaczana do umowy glownej</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy dostepna w wieku wnioskodawcy</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc na ekranie</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BENEFIT_KIND</code>
+                    <name>Rodzaj swiadczenia - decyduje, czym jest liczba w polu suma</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.benefitKind</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUMS</code>
+                    <name>Katalog sum do wyboru</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.sumsOffered [sums]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_DEFAULT</code>
+                    <name>Suma domyslna</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.sumsOffered [defaultSum]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_MAX</code>
+                    <name>Efektywny pulap sumy, nizszy z produktowego i dochodowego</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.life.individual.maxSumAssured</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>WAITING_PERIOD_DAYS</code>
+                    <name>Karencja po zaliczeniu poprzedniej ochrony</name>
+                    <order>4</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.life.individual.effectiveWaitingPeriod</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RATE</code>
+                    <name>Stawka jednostkowa</name>
+                    <order>5</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.rate [rate]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>AGE_RATED</code>
+                    <name>Czy stawka skaluje sie wiekiem</name>
+                    <order>6</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.individual.rider.rate [ageRated]</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>ROOT</code>
+            <name>ROOT</name>
+            <description>Root type, created by default</description>
+            <rootType>true</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>APK_QUESTIONS</code>
+                    <name>Katalog pytan APK</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>APK_QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>PRODUCT_LINES</code>
+                    <name>Linie produktu</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>PRODUCT_LINE</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+        </domainType>
+        <domainType>
+            <profile>LIFE</profile>
+            <code>VARIANT</code>
+            <name>Wariant programu grupowego</name>
+            <description>Wariant, ktory wybiera pracownik przy przystapieniu. POSITION niesie kolejnosc bogactwa - enrolmentStats szuka najwyzszej, nie konkretnej nazwy.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy dostepny przy tej liczebnosci grupy</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.variant.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc, zarazem miara bogactwa wariantu</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.variant.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BASE_PREMIUM</code>
+                    <name>Skladka bazowa miesieczna na pracownika</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.life.group.tariff.basePremium</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+    </domainTypes>
+</domainDefinition>

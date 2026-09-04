@@ -1,0 +1,5 @@
+#matrix for parameter demo.moto.apk.question.options
+code;options;labels
+PARKING;GARAGE,GUARDED,STREET;In a garage,In a guarded car park,On the street or an unguarded car park
+SECURITY;NONE,IMMOBILISER,ALARM,GPS;None,Immobiliser,Alarm,GPS tracker
+USAGE;PRIVATE,BUSINESS,HIRE;Private use,Commuting and company driving,For hire or reward — taxi, ride-hailing, rental

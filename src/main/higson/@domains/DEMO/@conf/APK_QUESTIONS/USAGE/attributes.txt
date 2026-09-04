@@ -1,0 +1,77 @@
+[[attr]]
+attributeCode = "CONTEXT_PATH"
+attributeName = "Sciezka kontekstu, pod ktora trafia odpowiedz"
+refType = "LITERAL"
+refName = "quote.apk.usage"
+
+[[attr]]
+attributeCode = "HELP"
+attributeName = "Wyjasnienie przy pytaniu (rek. 8.2.a)"
+refType = "LITERAL"
+refName = "Use for hire or reward — taxi, ride-hailing, rental — counts in the policy wording as use contrary to the vehicle’s intended purpose."
+
+[[attr]]
+attributeCode = "IS_REQUIRED"
+attributeName = "Obowiazkowosc jako regula, nie atrybut HTML"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.required"
+
+[[attr]]
+attributeCode = "IS_VISIBLE"
+attributeName = "Widocznosc zalezna od wczesniejszych odpowiedzi (rek. 8.1.b)"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.visibility"
+
+[[attr]]
+attributeCode = "KIND"
+attributeName = "Typ kontrolki - CHOICE, MULTI, NUMBER, MONEY, BOOLEAN albo TEXT"
+refType = "LITERAL"
+refName = "CHOICE"
+
+[[attr]]
+attributeCode = "OPTIONS"
+attributeName = "Kody odpowiedzi po przecinku"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.options [options]"
+
+[[attr]]
+attributeCode = "OPTION_LABELS"
+attributeName = "Etykiety odpowiedzi w tej samej kolejnosci"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.options [labels]"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc w ankiecie"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.position"
+
+[[attr]]
+attributeCode = "PREFILL_SOURCE"
+attributeName = "Zrodlo wartosci podpowiedzianej (rek. 8.3)"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.prefill [source]"
+
+[[attr]]
+attributeCode = "REFUSAL_MESSAGE"
+attributeName = "Konsekwencja odmowy odpowiedzi (rek. 8.4)"
+refType = "PARAMETER"
+refName = "demo.moto.apk.question.prefill [refusal]"
+
+[[attr]]
+attributeCode = "SECTION"
+attributeName = "Sekcja ankiety - SUBJECT, SITUATION, NEEDS albo EXCLUSIONS"
+refType = "LITERAL"
+refName = "SUBJECT"
+
+[[attr]]
+attributeCode = "TEXT"
+attributeName = "Tresc pytania"
+refType = "LITERAL"
+refName = "How do you use the vehicle?"
+
+[[attr]]
+attributeCode = "VALUE_TYPE"
+attributeName = "Typ wartosci w kontekscie - STRING, INTEGER, DECIMAL, BOOLEAN albo DATE. Osobno od KIND, bo silnik NIE konwertuje typow"
+refType = "LITERAL"
+refName = "STRING"

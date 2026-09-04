@@ -1,0 +1,35 @@
+code = "demo.life.paymentFrequency.factor"
+description = "Czynnik czestotliwosci platnosci. Taryfa jest miesieczna, wiec rzadsza platnosc jest tansza."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Payment frequency factor"
+
+[[inputLevel]]
+code = "frequency"
+label = "payment frequency"
+type = "string"
+reverseMatcher = false
+property = "quote.policy.paymentFrequency"
+source = "quote.policy.paymentFrequency"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "installments"
+label = "installments per year"
+type = "integer"
+external = false
+array = false

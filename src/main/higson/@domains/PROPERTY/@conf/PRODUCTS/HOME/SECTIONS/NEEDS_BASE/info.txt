@@ -1,0 +1,3 @@
+name = "Czego potrzebujesz"
+description = "Pytania o potrzeby, ktore zaklady zadaja JUZ DZIS i ktore nie zmieniaja sie po progu KNF. Sekcja NIE jest przypieta do zadnej wersji regionu i to jest cala roznica wzgledem sekcji NEEDS: tamta pojawia sie dopiero w wersji 2, ta istnieje zawsze. Na tym zestawieniu widac, co rekomendacja KNF faktycznie doklada, a co bylo wczesniej."
+tags = []

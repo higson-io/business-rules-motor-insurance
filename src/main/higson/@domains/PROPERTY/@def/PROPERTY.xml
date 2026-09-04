@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domainDefinition>
+    <exportType>DEFINITION_ONLY</exportType>
+    <domainTypes>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>COVER</code>
+            <name>Pokrycie</name>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa SPISEM TRESCI: z pokrycia widac, ktora regula mowi, w ktorym wariancie ono jest, skad bierze sie jego suma, jaka ma stawke i jaki limit. Java czyta tylko czesc z nich - drzewo domeny ma prowadzic do kazdej reguly, ktora pokrycia dotyczy, bo po to istnieje.</description>
+            <rootType>false</rootType>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc na ekranie</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy wchodzi w sklad wariantu</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_BASIS</code>
+                    <name>Skad bierze sie suma</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.sumBasis [basis]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_REFERENCE</code>
+                    <name>Pokrycie odniesienia dla sumy pochodnej</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.sumBasis [reference]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RATE</code>
+                    <name>Stawka taryfowa</name>
+                    <order>1</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.tariff.baseRate [rate]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RATE_BASIS</code>
+                    <name>Podstawa stawki - promile sumy albo kwota</name>
+                    <order>2</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.tariff.baseRate [basis]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CAP_KIND</code>
+                    <name>Rodzaj limitu</name>
+                    <order>1</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.limitRule [capKind]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CAP_LABEL</code>
+                    <name>Opis limitu dla klienta</name>
+                    <order>2</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.limitRule [label]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>EFFECTIVE_LIMIT</code>
+                    <name>Efektywny limit - nizszy z ulamka sumy i kwoty</name>
+                    <order>3</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.limit.effective</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>PRODUCT</code>
+            <name>Produkt majatkowy</name>
+            <description>Wezel produktu i WEJSCIE DO KONFIGURACJI. Trzyma kolekcje (pokrycia, warianty, sekcje ankiety) oraz wskazniki na reguly wspolne dla calego produktu: rezim APK, sumy, czynnik ryzyka i strefy. Kto otwiera to drzewo pierwszy raz, ma stad dojsc wszedzie.</description>
+            <rootType>false</rootType>
+            <typeCollections>
+                <typeCollection>
+                    <code>COVERS</code>
+                    <name>Pokrycia</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>COVER</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>SECTIONS</code>
+                    <name>Sekcje ankiety APK</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>SECTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>VARIANTS</code>
+                    <name>Warianty</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>VARIANT</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>APK_REGIME</code>
+                    <name>Rezim analizy potrzeb</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.regime [name]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUMS</code>
+                    <name>Sumy ubezpieczenia - metraz x stawka i sumy pochodne</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.sum.suggest</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RISK_FACTOR</code>
+                    <name>Czynnik ryzyka - iloczyn szesciu czynnikow taryfowych</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.risk.factor</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>ZONES</code>
+                    <name>Strefy z kodu pocztowego - powodziowa i kradziezowa</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.zone.resolve</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BUILDING_AGE</code>
+                    <name>Wiek budynku na dzien poczatku ochrony</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.util.buildingAge</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>QUESTION</code>
+            <name>Pytanie APK</name>
+            <description>Pytanie analizy potrzeb jako element domeny, a nie wiersz tabeli: wiersz zawsze istnieje, a element moze NIE ISTNIEC w danej wersji regionu - i na tej roznicy stoi cala demonstracja wersjonowania. Element niesie cztery rzeczy: o co pytamy, jakiego rodzaju jest odpowiedz, gdzie ona laduje i kiedy pytanie jest widoczne. Reszta ustawien siedzi w jednym wierszu tabeli demo.property.apk.question.</description>
+            <rootType>false</rootType>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>TEXT</code>
+                    <name>Tresc pytania</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>KIND</code>
+                    <name>Rodzaj odpowiedzi</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>TEXT</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CONTEXT_PATH</code>
+                    <name>Gdzie laduje odpowiedz</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_VISIBLE</code>
+                    <name>Kiedy pokazac</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.question.visibility</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>ROOT</code>
+            <name>ROOT</name>
+            <description>Korzen drzewa domeny profilu PROPERTY</description>
+            <rootType>true</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>PRODUCTS</code>
+                    <name>Produkty</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>PRODUCT</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>SECTION</code>
+            <name>Sekcja ankiety APK</name>
+            <description>Galaz grupujaca pytania. Sekcja jest ELEMENTEM DOMENY, a nie wartoscia atrybutu na pytaniu - dzieki temu dolozenie galezi daje nowa sekcje, sekcja ma wlasne ustawienia, a przypisanie do wersji regionu obejmuje CALA sekcje razem z jej pytaniami. KIND rozstrzyga, czy to ankieta (FORM), czy dane, ktore juz mamy (KNOWN).</description>
+            <rootType>false</rootType>
+            <typeCollections>
+                <typeCollection>
+                    <code>QUESTIONS</code>
+                    <name>Pytania w sekcji</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>TITLE</code>
+                    <name>Naglowek sekcji</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc sekcji</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>0</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>KIND</code>
+                    <name>FORM (pytamy) albo KNOWN (juz wiemy)</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>FORM</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_VISIBLE</code>
+                    <name>Kiedy pokazac</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.section.visibility</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
+            <code>VARIANT</code>
+            <name>Wariant</name>
+            <description>Pakiet ochrony. Drabinka jest scisla - kazdy wariant zawiera wszystko, co poprzedni. Atrybuty sa SPISEM TRESCI: z wariantu widac, ktora regula rozstrzyga o jego dostepnosci i ktory flow liczy jego skladke. Java czyta tylko cztery pierwsze, ale drzewo domeny ma prowadzic do kazdej reguly, ktora wariantu dotyczy.</description>
+            <rootType>false</rootType>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Miejsce w drabince</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>LIABILITY_SUM</code>
+                    <name>Suma gwarancyjna OC</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.liabilitySum</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy dostepny w tej strefie</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.availability [available]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>UNAVAILABLE_REASON</code>
+                    <name>Powod niedostepnosci</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.availability [reason]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>PREMIUM</code>
+                    <name>Skladka - flow wyceny wariantu</name>
+                    <order>1</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>FLOW</defaultRefType>
+                    <defaultRefName>demo.property.calculateQuote</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+    </domainTypes>
+</domainDefinition>

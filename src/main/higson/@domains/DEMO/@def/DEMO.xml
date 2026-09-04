@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<domainDefinition>
+    <exportType>DEFINITION_ONLY</exportType>
+    <domainTypes>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>APK_QUESTION</code>
+            <name>Pytanie APK</name>
+            <description>Pytanie analizy potrzeb klienta. Jest elementem domeny, a nie wierszem tabeli, bo wiersz zawsze istnieje - a element moze NIE ISTNIEC w danej wersji regionu. Na tej roznicy stoi demonstracja progu 1 lipca 2027.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>TEXT</code>
+                    <name>Tresc pytania</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>KIND</code>
+                    <name>Typ kontrolki - CHOICE, MULTI, NUMBER, MONEY, BOOLEAN albo TEXT</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>TEXT</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>VALUE_TYPE</code>
+                    <name>Typ wartosci w kontekscie - STRING, INTEGER, DECIMAL, BOOLEAN albo DATE. Osobno od KIND, bo silnik NIE konwertuje typow</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>STRING</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SECTION</code>
+                    <name>Sekcja ankiety - SUBJECT, SITUATION, NEEDS albo EXCLUSIONS</name>
+                    <order>4</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>SUBJECT</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>HELP</code>
+                    <name>Wyjasnienie przy pytaniu (rek. 8.2.a)</name>
+                    <order>5</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CONTEXT_PATH</code>
+                    <name>Sciezka kontekstu, pod ktora trafia odpowiedz</name>
+                    <order>6</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_VISIBLE</code>
+                    <name>Widocznosc zalezna od wczesniejszych odpowiedzi (rek. 8.1.b)</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.visibility</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_REQUIRED</code>
+                    <name>Obowiazkowosc jako regula, nie atrybut HTML</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.required</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Kolejnosc w ankiecie</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>OPTIONS</code>
+                    <name>Kody odpowiedzi po przecinku</name>
+                    <order>1</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.options [options]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>OPTION_LABELS</code>
+                    <name>Etykiety odpowiedzi w tej samej kolejnosci</name>
+                    <order>2</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.options [labels]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>PREFILL_SOURCE</code>
+                    <name>Zrodlo wartosci podpowiedzianej (rek. 8.3)</name>
+                    <order>3</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.prefill [source]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>REFUSAL_MESSAGE</code>
+                    <name>Konsekwencja odmowy odpowiedzi (rek. 8.4)</name>
+                    <order>4</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.moto.apk.question.prefill [refusal]</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>COVERAGE</code>
+            <name>Risk Coverage</name>
+            <description></description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Whether this coverage is available for current option</name>
+                    <description></description>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <groupName>configuration</groupName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.motor.coverage.availability</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Position on the screen or printout </name>
+                    <description></description>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <groupName>configuration</groupName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.motor.coverage.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>LIMIT_1</code>
+                    <name>Limit 1 for this coverage</name>
+                    <description></description>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <groupName>main</groupName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.motor.coverage.limits [limit1]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>LIMIT_2</code>
+                    <name>Limit 2 for this coverage (optional)</name>
+                    <description></description>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <groupName>main</groupName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.motor.coverage.limits [limit2]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>PREMIUM</code>
+                    <name>Base premium for this coverage</name>
+                    <description></description>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <groupName>main</groupName>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.motor.plan.full.calculatePremium</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RISK_ASSESSMENT</code>
+                    <name>Risk assessment</name>
+                    <description></description>
+                    <order>4</order>
+                    <groupOrder>2</groupOrder>
+                    <groupName>main</groupName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>DESCRIPTION</code>
+                    <name>Coverage description</name>
+                    <description></description>
+                    <order>5</order>
+                    <groupOrder>2</groupOrder>
+                    <groupName>main</groupName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>DISCOUNT</code>
+            <name>Discount applicable to insurance policy</name>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>available</code>
+                    <name>is discount available</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>value</code>
+                    <name>discount amount</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>position</code>
+                    <name>discount position</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>OPTION</code>
+            <name>Rating Option Variation</name>
+            <description></description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>ORDER</code>
+                    <name>Display order</name>
+                    <description></description>
+                    <order>1</order>
+                    <groupOrder>0</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                </typeAttribute>
+            </typeAttributes>
+        </domainType>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>RATING_PLAN</code>
+            <name>Motor Insurance Rating Plan</name>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>OPTIONS</code>
+                    <name>Options scope and rating variations</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>1</order>
+                    <collectionTypeCode>OPTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>COVERAGES</code>
+                    <name>Coverages for this plan</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>2</order>
+                    <collectionTypeCode>COVERAGE</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>DISCOUNTS</code>
+                    <name>Discounts available for this plan</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>3</order>
+                    <collectionTypeCode>DISCOUNT</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+        </domainType>
+        <domainType>
+            <profile>DEMO</profile>
+            <code>ROOT</code>
+            <name>ROOT</name>
+            <description>Root type, created by default</description>
+            <rootType>true</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>APK_QUESTIONS</code>
+                    <name>Katalog pytan APK</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>APK_QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>PLANS</code>
+                    <name>Rating Plans</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>1</order>
+                    <collectionTypeCode>RATING_PLAN</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+        </domainType>
+    </domainTypes>
+</domainDefinition>

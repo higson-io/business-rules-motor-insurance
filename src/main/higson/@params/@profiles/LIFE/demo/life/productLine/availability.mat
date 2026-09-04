@@ -1,0 +1,5 @@
+#matrix for parameter demo.life.productLine.availability
+line;available
+*;false
+GROUP;true
+INDIVIDUAL;true

@@ -1,0 +1,28 @@
+code = "pl.decerto.demo.telco.service.details"
+description = ""
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "serviceCode"
+label = "service code"
+type = "string"
+reverseMatcher = false
+property = "service.code"
+source = "service.code"
+union = false
+
+[[outputLevel]]
+code = "details"
+label = "details"
+type = "string"
+external = false
+array = false

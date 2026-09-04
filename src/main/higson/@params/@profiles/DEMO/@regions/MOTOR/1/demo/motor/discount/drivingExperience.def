@@ -1,0 +1,41 @@
+code = "demo.motor.discount.drivingExperience"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+slave = false
+label = "<no label>"
+
+[[inputLevel]]
+code = "experienceYears"
+label = "years of licence"
+type = "integer"
+matcher = "between/ii"
+reverseMatcher = false
+levelCreator = "$f demo.motor.util.drivingLicenceYears"
+source = "$f demo.motor.util.drivingLicenceYears"
+union = false
+
+[[outputLevel]]
+code = "available"
+label = "available"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "percentValue"
+label = "percent value"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "amountValue"
+label = "amount value"
+type = "number"
+external = false
+array = false

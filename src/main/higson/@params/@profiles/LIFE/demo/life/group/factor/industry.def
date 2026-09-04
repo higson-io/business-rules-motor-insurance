@@ -1,0 +1,28 @@
+code = "demo.life.group.factor.industry"
+description = "Czynnik za klase branzy pracodawcy."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group industry factor"
+
+[[inputLevel]]
+code = "industryClass"
+label = "industry class"
+type = "integer"
+reverseMatcher = false
+property = "quote.group.industryClass"
+source = "quote.group.industryClass"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

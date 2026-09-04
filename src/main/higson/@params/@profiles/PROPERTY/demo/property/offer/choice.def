@@ -1,0 +1,41 @@
+code = "demo.property.offer.choice"
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Zgodnosc wyboru z rekomendacja"
+
+[[inputLevel]]
+code = "kind"
+label = "relacja wyboru do rekomendacji"
+type = "string"
+reverseMatcher = false
+property = "choice.kind"
+source = "choice.kind"
+union = false
+
+[[outputLevel]]
+code = "label"
+label = "naglowek notatki"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "text"
+label = "tresc notatki"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "requiresAcknowledgement"
+label = "wymaga swiadomego potwierdzenia klienta"
+type = "boolean"
+external = false
+array = false

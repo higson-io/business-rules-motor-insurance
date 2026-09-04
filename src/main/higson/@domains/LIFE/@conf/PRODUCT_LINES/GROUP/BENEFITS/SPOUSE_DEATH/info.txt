@@ -1,0 +1,2 @@
+name = "Śmierć współmałżonka"
+tags = []

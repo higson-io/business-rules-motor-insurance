@@ -1,0 +1,3 @@
+name = "Pobyt w szpitalu"
+description = "Świadczenie dzienne — liczba w polu suma to kwota za dzień, nie cała suma"
+tags = []

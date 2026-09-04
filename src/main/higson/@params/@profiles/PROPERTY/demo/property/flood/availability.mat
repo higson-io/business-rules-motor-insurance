@@ -1,0 +1,7 @@
+#matrix for parameter demo.property.flood.availability
+zone;available;requiresDeductible;minDeductible;message
+*;false;false;0;Nie ustaliliśmy strefy zagrożenia powodziowego dla tego adresu.
+Z0;true;false;0;
+Z1;true;false;0;
+Z2;true;true;1000;W Twojej lokalizacji ochrona od powodzi wymaga franszyzy redukcyjnej co najmniej 1000 zł.
+ZX;false;false;0;Miejsce ubezpieczenia leży w strefie o najwyższym zagrożeniu powodziowym — ochrona od powodzi nie jest dostępna.

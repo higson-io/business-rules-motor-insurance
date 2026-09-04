@@ -1,0 +1,28 @@
+code = "demo.life.group.tariff.basePremium"
+description = "Skladka bazowa miesieczna na pracownika. Wersjonowana regionem LIFE - wersja 2 podnosi wylacznie wariant COMPLETE, bo tylko on dostal nowe swiadczenie."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group base premium per employee"
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "base"
+label = "base premium"
+type = "number"
+external = false
+array = false

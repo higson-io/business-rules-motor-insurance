@@ -1,0 +1,35 @@
+code = "demo.property.tariff.baseRate"
+description = "Stawka roczna w promilach sumy; basis FLAT znaczy kwote w zlotych. Wersjonowana. LICZBY DEMONSTRACYJNE (W-2)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Cover base rate"
+
+[[inputLevel]]
+code = "cover"
+label = "cover code"
+type = "string"
+reverseMatcher = false
+property = "cover.code"
+source = "cover.code"
+union = false
+
+[[outputLevel]]
+code = "rate"
+label = "rate"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "basis"
+label = "basis"
+type = "string"
+external = false
+array = false

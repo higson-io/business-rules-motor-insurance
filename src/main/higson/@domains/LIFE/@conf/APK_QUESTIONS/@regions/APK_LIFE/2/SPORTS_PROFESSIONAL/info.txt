@@ -1,0 +1,3 @@
+name = "Sport uprawiany zawodowo"
+description = "WERSJA 2 REGIONU APK_LIFE. Sportowiec zawodowy jest wymieniony w par. 9 ust. 1 pkt 4 OWU Warta."
+tags = []

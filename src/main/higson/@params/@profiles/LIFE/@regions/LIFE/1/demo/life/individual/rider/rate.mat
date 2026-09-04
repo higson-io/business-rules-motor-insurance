@@ -1,0 +1,10 @@
+#matrix for parameter demo.life.individual.rider.rate
+rider;rate;ageRated
+*;0;false
+ACCIDENTAL_DEATH;0.035;false
+CRITICAL_ILLNESS;0.36;true
+DISABILITY;0.21;true
+HOSPITAL_STAY;0.115;true
+MEDICAL_ASSISTANCE;9.00;false
+PERMANENT_IMPAIRMENT;0.075;false
+SURGERY;0.14;true

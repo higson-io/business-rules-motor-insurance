@@ -1,0 +1,3 @@
+name = "Oszczednosci w miesiacach"
+description = "Widoczne tylko wtedy, gdy ktos jest na utrzymaniu - bez tego pytanie nie ma konsekwencji."
+tags = []

@@ -1,0 +1,58 @@
+code = "demo.property.apk.answer"
+description = "Jedno miejsce, w ktorym biznes czyta i zmienia cala analize potrzeb: z odpowiedzi wynika POTRZEBA (co klient zglasza), POKRYCIE (co ja zaspokaja) i PAKIET (od ktorego wariantu ta ochrona jest dostepna). Rekomendacja to najbogatszy pakiet wskazany przez ktorykolwiek wiersz - Java przechodzi po odpowiedziach i bierze maksimum, nie zna zadnego kodu ani progu. Przestawienie jednej komorki zmienia rekomendacje bez wdrozenia. Waga rozstrzyga, ktora tresc potrzeby wygrywa, gdy dwie odpowiedzi wskazuja to samo pokrycie."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Co wynika z odpowiedzi klienta"
+
+[[inputLevel]]
+code = "question"
+label = "pytanie"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "answer"
+label = "odpowiedz"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "need"
+label = "potrzeba klienta"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "cover"
+label = "pokrycie"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "weight"
+label = "waga"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "package"
+label = "pakiet od ktorego dostepne"
+type = "string"
+external = false
+array = false

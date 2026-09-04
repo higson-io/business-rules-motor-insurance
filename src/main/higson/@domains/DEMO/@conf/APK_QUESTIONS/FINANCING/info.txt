@@ -1,0 +1,3 @@
+name = "Leasing lub kredyt"
+description = "Finansujacy zwykle wymaga AC - to potrzeba, ktorej klient sam nie zglosi."
+tags = []

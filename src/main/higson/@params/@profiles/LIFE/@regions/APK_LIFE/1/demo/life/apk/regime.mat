@@ -1,0 +1,3 @@
+#matrix for parameter demo.life.apk.regime
+lineCode;code;name;legalBasis;requiresBudget;requiresExclusionCheck;requiresJustification;requiresVariantDifferences
+*;STATUTORY;APK — minimum ustawowe;art. 8 ustawy o dystrybucji ubezpieczeń;false;false;false;false

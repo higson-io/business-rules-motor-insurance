@@ -1,0 +1,3 @@
+name = "Kod pocztowy miejsca ubezpieczenia"
+description = "Z kodu wyznaczamy strefę powodziową i strefę kradzieżową. To dwa różne podziały."
+tags = []

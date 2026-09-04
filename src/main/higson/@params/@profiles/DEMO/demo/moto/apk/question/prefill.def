@@ -1,0 +1,35 @@
+code = "demo.moto.apk.question.prefill"
+description = "Rek. 8.3 i 8.4 razem - skad wartosc pochodzi i co sie stanie, gdy klient jej nie poda."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK question prefill and refusal (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "source"
+label = "prefill source"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "refusal"
+label = "refusal consequence"
+type = "string"
+external = false
+array = false

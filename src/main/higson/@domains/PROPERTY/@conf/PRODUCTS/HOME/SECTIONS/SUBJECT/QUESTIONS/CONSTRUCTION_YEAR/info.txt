@@ -1,0 +1,3 @@
+name = "Rok budowy"
+description = "Wiek budynku wpływa i na składkę, i na sposób wyceny szkody."
+tags = []

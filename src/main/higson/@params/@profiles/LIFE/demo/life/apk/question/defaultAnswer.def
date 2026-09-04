@@ -1,0 +1,28 @@
+code = "demo.life.apk.question.defaultAnswer"
+description = "Odpowiedzi, ktorymi demo wypelnia ankiete na starcie. Sa TUTAJ, a nie w Javie, bo inaczej kod musialby znac kody pytan."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Domyslne odpowiedzi demo (zycie)"
+
+[[inputLevel]]
+code = "code"
+label = "kod pytania"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "value"
+label = "wartosc domyslna"
+type = "string"
+external = false
+array = false

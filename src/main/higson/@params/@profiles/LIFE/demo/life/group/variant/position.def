@@ -1,0 +1,28 @@
+code = "demo.life.group.variant.position"
+description = "Kolejnosc wariantow. Najwyzsza pozycja oznacza najbogatszy wariant, uzywane przez enrolmentStats."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Group variant position"
+
+[[inputLevel]]
+code = "variant"
+label = "variant code"
+type = "string"
+reverseMatcher = false
+property = "variant.code"
+source = "variant.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "position"
+type = "integer"
+external = false
+array = false

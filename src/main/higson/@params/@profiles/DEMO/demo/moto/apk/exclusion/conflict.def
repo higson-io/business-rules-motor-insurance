@@ -1,0 +1,58 @@
+code = "demo.moto.apk.exclusion.conflict"
+description = "Rek. 8.2.c - konfrontacja sytuacji klienta z wylaczeniami. Kazdy wiersz ma pokrycie w OWU PZU Auto (uchwala UZ/59/2024) par. 12."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "APK exclusion conflict (motor)"
+
+[[inputLevel]]
+code = "code"
+label = "question code"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "value"
+label = "answer value"
+type = "string"
+reverseMatcher = false
+property = "answer.value"
+source = "answer.value"
+union = false
+
+[[outputLevel]]
+code = "exclusion"
+label = "exclusion code"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "severity"
+label = "severity 1-3"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "warning"
+label = "warning text"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "remedy"
+label = "what the client can do"
+type = "string"
+external = false
+array = false

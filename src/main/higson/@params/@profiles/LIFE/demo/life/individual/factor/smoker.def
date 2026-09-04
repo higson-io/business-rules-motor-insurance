@@ -1,0 +1,28 @@
+code = "demo.life.individual.factor.smoker"
+description = "Czynnik za palenie tytoniu."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Smoker factor"
+
+[[inputLevel]]
+code = "smoker"
+label = "smoker"
+type = "boolean"
+reverseMatcher = false
+property = "quote.insured.smoker"
+source = "quote.insured.smoker"
+union = false
+
+[[outputLevel]]
+code = "factor"
+label = "factor"
+type = "number"
+external = false
+array = false

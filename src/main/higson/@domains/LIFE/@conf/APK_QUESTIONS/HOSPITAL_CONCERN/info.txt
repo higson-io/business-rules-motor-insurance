@@ -1,0 +1,3 @@
+name = "Potrzeba swiadczenia szpitalnego"
+description = "Mapuje sie na umowe dodatkowa HOSPITAL_STAY."
+tags = []
