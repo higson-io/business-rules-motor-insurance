@@ -1,3 +1,0 @@
-name = "Czego potrzebujesz"
-description = "Rek. 8.2.b - czego klient oczekuje od ochrony. CALA sekcja pojawia sie dopiero w wersji 2 regionu."
-tags = []

@@ -37,7 +37,7 @@
 					zgadywać, który z nich przewija pytanie, a który kończy krok. Gospodarz dowiaduje
 					się o końcu ankiety zdarzeniem.
 				-->
-				<app-property-questionnaire kind="FORM" (completed)="goTo('subject')" />
+				<app-property-questionnaire group="QUESTIONS" (completed)="goTo('subject')" />
 
 				@if (blocked()) {
 					<p class="property__blocked" role="status" data-testid="property-blocked">
@@ -53,7 +53,7 @@
 					rozmywała to, o co w kroku pierwszym chodzi. Które sekcje tu trafiają, mówi atrybut
 					`KIND` sekcji w Higsonie.
 				-->
-				<app-property-questionnaire kind="KNOWN" />
+				<app-property-questionnaire group="SUBJECT" />
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('apk')">

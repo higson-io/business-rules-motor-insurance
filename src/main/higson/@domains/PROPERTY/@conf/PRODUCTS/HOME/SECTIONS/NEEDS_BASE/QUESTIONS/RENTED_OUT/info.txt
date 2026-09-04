@@ -1,3 +1,0 @@
-name = "Czy nieruchomość jest przeznaczona na wynajem?"
-description = "Pytanie 5 z listy analityka. TAK kieruje do zakresu obejmujacego szkody wyrzadzone przez osoby trzecie."
-tags = []

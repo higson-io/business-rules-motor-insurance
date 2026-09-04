@@ -12,7 +12,6 @@ import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyOfferDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyPolicyholderDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
-import pl.decerto.higson.demo.property.api.dto.PropertySectionDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
 import pl.decerto.higson.demo.apk.Answer;
@@ -21,7 +20,6 @@ import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.Offer;
 import pl.decerto.higson.demo.property.domain.Policyholder;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
-import pl.decerto.higson.demo.property.domain.Section;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.property.domain.Variant;
 
@@ -36,7 +34,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setDeductible(quote.getPolicy().getDeductible());
 
 		dto.setRegime(convertRegime(quote));
-		dto.setSections(convertSections(quote));
 		dto.setQuestions(convertQuestions(quote));
 
 		dto.setFloodZone(quote.getZone().getFlood());
@@ -98,20 +95,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setPhone(source.getPhone());
 		dto.setSource(source.getSource());
 		return dto;
-	}
-
-	private List<PropertySectionDto> convertSections(PropertyQuote quote) {
-		List<PropertySectionDto> dtos = new ArrayList<>();
-		for (Section section : quote.getSections()) {
-			PropertySectionDto dto = new PropertySectionDto();
-			dto.setCode(section.getCode());
-			dto.setTitle(section.getTitle());
-			dto.setKind(section.getKind());
-			dto.setPosition(section.getPosition());
-			dto.setVisible(section.isVisible());
-			dtos.add(dto);
-		}
-		return dtos;
 	}
 
 	private PropertyRegimeDto convertRegime(PropertyQuote quote) {

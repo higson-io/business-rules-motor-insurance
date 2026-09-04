@@ -1,0 +1,3 @@
+name = "Czy potrzebujesz ubezpieczyć nieruchomość?"
+description = "Pytanie 1 ze specyfikacji. Bramka calej sciezki: odpowiedz NIE zatrzymuje analize."
+tags = []

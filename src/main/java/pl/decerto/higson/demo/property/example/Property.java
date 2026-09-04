@@ -29,7 +29,6 @@ import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.Offer;
 import pl.decerto.higson.demo.property.service.DocumentNumbers;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
-import pl.decerto.higson.demo.property.domain.Section;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
 import pl.decerto.higson.demo.apk.Regime;
@@ -53,7 +52,7 @@ public class Property {
 	private static final String PROFILE = "PROPERTY";
 	private static final String PRODUCT_PATH = "/PRODUCTS[HOME]";
 
-	private static final String COLLECTION_SECTIONS = "SECTIONS";
+	private static final String COLLECTION_SUBJECT = "SUBJECT";
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
@@ -173,44 +172,46 @@ public class Property {
 		if (product == null) {
 			return;
 		}
-		List<Section> sections = new ArrayList<>();
 		List<Question> questions = new ArrayList<>();
+		readInto(quote, product, COLLECTION_QUESTIONS, questions);
+		readInto(quote, product, COLLECTION_SUBJECT, questions);
 
-		for (DomainObject branch : product.getChildren(COLLECTION_SECTIONS)) {
-			PropertyContext sectionCtx = new PropertyContext(quote).withSection(branch.getCode());
-
-			Section section = new Section();
-			section.setCode(branch.getCode());
-			section.setTitle(attrString(branch, "TITLE", sectionCtx));
-			// FORM albo KNOWN — o to pytamy klienta, albo to już wiemy. Rodzaj jest atrybutem
-			// sekcji, więc przeniesienie charakterystyki przedmiotu poza ankietę było zmianą
-			// konfiguracji, nie wdrożeniem.
-			section.setKind(attrString(branch, "KIND", sectionCtx));
-			section.setPosition(intOrZero(branch.getAttrInteger("POSITION", sectionCtx)));
-			section.setVisible(Boolean.TRUE.equals(branch.getAttrBoolean("IS_VISIBLE", sectionCtx)));
-			sections.add(section);
-
-			for (DomainObject definition : branch.getChildren(COLLECTION_QUESTIONS)) {
-				questions.add(readQuestion(quote, definition, branch.getCode()));
-			}
-		}
-
-		sections.sort(Comparator.comparingInt(Section::getPosition));
 		questions.sort(Comparator.comparingInt(Question::getPosition));
 		applyReveal(quote, questions);
-		quote.setSections(sections);
 		quote.setQuestions(questions);
 	}
 
+	/**
+	 * Pytania z jednej kolekcji produktu. Kod kolekcji jedzie z pytaniem i mówi, DOKĄD ono należy.
+	 *
+	 * ⛔ Sekcji już nie ma. Do 4 września 2026 pytania wisiały pod elementami `SECTIONS[...]`,
+	 * a sekcja miała własny tytuł, kolejność, regułę widoczności i rodzaj. Był to poziom pośredni,
+	 * który przy siedmiu pytaniach nie rozstrzygał niczego, czego nie rozstrzyga sama gałąź —
+	 * a konfigurując go, konfigurowało się rzecz istniejącą wyłącznie po to, żeby grupować.
+	 *
+	 * ⛔ DWIE GAŁĘZIE, bo to dwie różne rzeczy. `QUESTIONS` to analiza potrzeb: pytamy klienta,
+	 * czego potrzebuje. `SUBJECT` to przedmiot ubezpieczenia i sytuacja — dane, które zakłady
+	 * zbierają POZA APK i mają je już zebrane. Rozdział przebiega w drzewie, więc przeniesienie
+	 * pytania z jednej strony na drugą jest przeniesieniem elementu, a nie zmianą atrybutu.
+	 */
+	private void readInto(PropertyQuote quote, DomainObject product, String collection,
+			List<Question> questions) {
+
+		for (DomainObject definition : product.getChildren(collection)) {
+			questions.add(readQuestion(quote, definition, collection));
+		}
+	}
+
 	/** Jedno pytanie. Sekcję niesie GAŁĄŹ, w której pytanie wisi — nie jego własny atrybut. */
-	private Question readQuestion(PropertyQuote quote, DomainObject definition, String sectionCode) {
+	private Question readQuestion(PropertyQuote quote, DomainObject definition, String collection) {
 		// W-22: nawigacja po domenie nie wstrzykuje kodu elementu do kontekstu, więc atrybut
 		// kluczowany question.code nie miałby się z czego rozwiązać. Kontekst budujemy sami.
 		PropertyContext ctx = new PropertyContext(quote).withQuestion(definition.getCode());
 
 		Question question = new Question();
 		question.setCode(definition.getCode());
-		question.setSection(sectionCode);
+		// Kod kolekcji: QUESTIONS albo SUBJECT. Ekran po nim rozdziela krok pierwszy od drugiego.
+		question.setSection(collection);
 
 		// Cztery rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
 		//

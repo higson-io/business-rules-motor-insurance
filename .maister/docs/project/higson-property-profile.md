@@ -2702,3 +2702,68 @@ HTML**. Zahaszowane zasoby zostają cache'owalne i tak ma być: nowa treść to 
 obejmuje wyłącznie trzy pakiety dem i nie sięga `pl.decerto` — pierwsza wersja z `@Component`
 skompilowała się, wstała i nie zrobiła nic, bo bean nigdy nie powstał. To ta sama pułapka, przed
 którą ostrzega komentarz przy skanie, tylko od strony filtra zamiast kontrolera.
+
+---
+
+## §29 Drzewo bez sekcji, pokrycia podpięte pod pakiet (2026-09-04)
+
+Dwie zmiany w drzewie domeny, obie z tego samego powodu: **konfiguracja ma być czytelna dla kogoś,
+kto widzi ją pierwszy raz na demie**.
+
+### 29.1 Sekcje zdjęte — pytania wiszą płasko w dwóch gałęziach
+
+`SECTIONS[NEEDS|NEEDS_BASE|SITUATION|SUBJECT|EXCLUSIONS]/QUESTIONS[...]` było piętrem, które po
+§24 (siedem pytań APK, jeden reżim) nie niosło już nic: sekcje z zerem pytań, sekcja `NEEDS_BASE`
+istniejąca wyłącznie po to, żeby obejść dziedziczenie regionu (W-24), i dwa poziomy kolekcji
+prowadzące do jednego pytania. Nowy układ:
+
+```
+/PRODUCTS[HOME]
+  COVERS      7 pokryc
+  VARIANTS    BASIC / STANDARD / COMPLETE
+  QUESTIONS   7 pytan APK          (pozycje 200-270)
+  SUBJECT     12 pytan o przedmiot (pozycje 10-120)
+```
+
+**Podział na dwie gałęzie nie jest tym samym co sekcje.** Sekcje dzieliły jeden formularz na
+tematy; `QUESTIONS` i `SUBJECT` to **dwa różne kroki i dwa różne reżimy prawne** — pierwsza gałąź
+to analiza potrzeb w rozumieniu rek. 8, druga to charakterystyka przedmiotu ubezpieczenia, którą
+zakłady robią od zawsze i której KNF nie dotyka (spec PM-a §4). To odróżnienie klient na demie
+widzi jako dwa kroki paska, a w Higsonie jako dwie gałęzie drzewa.
+
+⛔ **Odwraca §23.1.** Nazwa sekcji nad licznikiem i pasek postępu dzielony na segmenty zniknęły —
+nie miały czego dzielić. Zostaje sam licznik: „Pytanie 3 z 7". Razem z nimi zniknęły
+`demo.property.apk.section.visibility` i typ domenowy `SECTION` przestał mieć elementy (samego typu
+Studio nie pozwala usunąć — „cannot be deleted because is in use" — więc został w schemacie pusty).
+
+Po stronie Javy `loadQuestions` czyta dwie płaskie kolekcje i scala je w jedną listę sortowaną po
+`position`; `Section.java`, `PropertySectionDto` i pole `sections` w DTO usunięte.
+
+### 29.2 D-18 — skład pakietu jest referencją w drzewie, nie wierszem tabeli
+
+Skład wariantu (`BASIC` → mury; `COMPLETE` → wszystko) siedział w tabeli decyzyjnej. Działało, ale
+odpowiedź na pytanie „co obejmuje pakiet Komfortowy" wymagała otwarcia tabeli i przeczytania
+wierszy. Teraz pokrycia **wiszą pod pakietem w drzewie jako referencje do elementów `COVERS`**:
+
+```
+VARIANTS[BASIC]/COVERS      -> BUILDING
+VARIANTS[STANDARD]/COVERS   -> BUILDING, CONTENTS, FIXTURES, LIABILITY
+VARIANTS[COMPLETE]/COVERS   -> + THEFT, FLOOD, ASSISTANCE
+```
+
+Skład pakietu widać teraz, rozwijając gałąź — bez otwierania czegokolwiek. `applyCovers` czyta
+`definition.getChildren("COVERS")` zamiast odpytywać tabelę.
+
+⚠️ To ta sama zasada co D-16: drzewo jest spisem treści konfiguracji. Różnica względem D-16 polega
+na tym, że tam atrybut **wskazywał** regułę, a tu gałąź **jest** regułą — skład pakietu nie ma już
+drugiego miejsca, w którym mógłby się rozjechać.
+
+### 29.3 Zweryfikowane
+
+Uruchomienie przeglądarką po przebudowie: krok 1 wyświetla „Pytanie 1 z 7" i odsłania kolejne
+pytania po odpowiedzi, krok 2 pokazuje 10 widocznych pól przedmiotu (`WALL_MATERIAL` i `RENOVATED`
+ukryte dla mieszkania), krok 3 — trzy pakiety, rekomendację `STANDARD` za 993,07 zł i uzasadnienie.
+Suma murów 528 000 zł. Testy frontu: 60 przechodzi.
+
+⚠️ Test „sekcja renderuje się tylko, gdy ma widoczne pytanie" zastąpiony testem „renderuje się
+tylko gałąź, o którą poproszono" — stara asercja badała `data-section`, którego nie ma.

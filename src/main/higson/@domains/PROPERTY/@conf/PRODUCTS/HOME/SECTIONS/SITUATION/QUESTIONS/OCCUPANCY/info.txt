@@ -1,3 +1,0 @@
-name = "Jak korzystasz z nieruchomości?"
-description = "Sposób użytkowania zmienia i składkę, i zakres wyłączeń."
-tags = []

@@ -1,3 +1,0 @@
-name = "Przedmiot ubezpieczenia"
-description = "Co jest ubezpieczane. Sekcja istnieje w obu wersjach regionu."
-tags = []

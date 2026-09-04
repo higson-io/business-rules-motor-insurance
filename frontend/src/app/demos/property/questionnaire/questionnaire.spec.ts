@@ -15,10 +15,11 @@ import { PropertyQuestionDto, PropertyQuoteDto } from '../../../models/property'
 
 function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto {
 	return {
+		// ⚠️ Bez `section` — dopisze ją `render`, chyba że test poda własną.
+		section: undefined as unknown as PropertyQuestionDto['section'],
 		code: 'Q',
 		text: 'Pytanie',
 		kind: 'TEXT',
-		section: 'SUBJECT',
 		position: 10,
 		visible: true,
 		// ⚠️ Domyślnie odsłonięte: fixture bada renderowanie, a nie łańcuch odsłaniania.
@@ -35,7 +36,7 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 	};
 }
 
-function quote(questions: readonly PropertyQuestionDto[], kind: 'FORM' | 'KNOWN' = 'KNOWN'): PropertyQuoteDto {
+function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 	return {
 		startDate: '2026-08-21',
 		deductible: 0,
@@ -48,16 +49,6 @@ function quote(questions: readonly PropertyQuestionDto[], kind: 'FORM' | 'KNOWN'
 			requiresJustification: false,
 			requiresVariantDifferences: false,
 		},
-		// ⛔ Sekcje wyprowadzone z pytań, a nie wypisane obok nich. Wypisana lista rozjechałaby się
-		// z pytaniami przy pierwszym teście, który doda pytanie w nowej sekcji — a wtedy test
-		// przechodziłby albo nie z powodu, którego nie bada.
-		sections: [...new Set(questions.map((q) => q.section))].map((code, index) => ({
-			code,
-			title: `Sekcja ${code}`,
-			kind,
-			position: (index + 1) * 10,
-			visible: true,
-		})),
 		questions,
 		floodZone: 'Z0',
 		theftZone: 'T1',
@@ -144,12 +135,17 @@ describe('Questionnaire', () => {
 	 */
 	async function render(
 		questions: readonly PropertyQuestionDto[],
-		kind: 'FORM' | 'KNOWN' = 'KNOWN',
+		group: 'QUESTIONS' | 'SUBJECT' = 'SUBJECT',
 	): Promise<HTMLElement> {
 		const fixture = TestBed.createComponent(Questionnaire);
-		fixture.componentRef.setInput('kind', kind);
+		fixture.componentRef.setInput('group', group);
 		TestBed.tick();
-		httpTesting.expectOne('property').flush(quote(questions, kind));
+		// ⚠️ Gałąź stemplowana tam, gdzie test jej nie podał. Bez tego każdy test musiałby powtarzać
+		// `section` przy każdym pytaniu, a niedopasowanie objawiałoby się pustym ekranem — czyli
+		// awarią, której test nie bada. Test, który gałąź podaje jawnie, zachowuje swoją.
+		httpTesting
+			.expectOne('property')
+			.flush(quote(questions.map((q) => ({ ...q, section: q.section ?? group }))));
 		await TestBed.inject(ApplicationRef).whenStable();
 		fixture.detectChanges();
 		return fixture.nativeElement as HTMLElement;
@@ -180,14 +176,25 @@ describe('Questionnaire', () => {
 		).toBeNull();
 	});
 
-	it('renders a section only when it has a visible question', async () => {
-		const element = await render([
-			question({ code: 'AREA', section: 'SUBJECT' }),
-			question({ code: 'BUDGET', section: 'NEEDS', visible: false }),
-		]);
+	/**
+	 * ⛔ Zastąpił test „sekcja renderuje się tylko, gdy ma widoczne pytanie". Sekcji nie ma —
+	 * pytania wiszą płasko w dwóch gałęziach drzewa, a ekran renderuje jedną z nich. Test pilnuje
+	 * tego, co przejęło tamtą rolę: pytanie z DRUGIEJ gałęzi nie ma prawa się pokazać.
+	 */
+	it('renders only the branch it was asked for', async () => {
+		const element = await render(
+			[
+				question({ code: 'AREA', section: 'SUBJECT' }),
+				question({ code: 'BUDGET', section: 'QUESTIONS' }),
+			],
+			'SUBJECT',
+		);
 
-		expect(element.querySelector('[data-section="SUBJECT"]')).not.toBeNull();
-		expect(element.querySelector('[data-section="NEEDS"]')).toBeNull();
+		expect(element.querySelector('[data-question="AREA"]')).not.toBeNull();
+		expect(
+			element.querySelector('[data-question="BUDGET"]'),
+			'pytanie z gałęzi APK nie należy do kroku przedmiotu ubezpieczenia',
+		).toBeNull();
 	});
 
 	it('shows the prefill source only where the server supplied one (recommendation 8.3)', async () => {
@@ -215,7 +222,7 @@ describe('Questionnaire', () => {
 				question({ code: 'BUDGET', kind: 'MONEY', required: false }),
 				question({ code: 'PROPERTY_VALUE', kind: 'MONEY', position: 20, required: false }),
 			],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
@@ -225,7 +232,7 @@ describe('Questionnaire', () => {
 	it('still blocks a required question until it is answered', async () => {
 		const element = await render(
 			[question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', required: true })],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
@@ -247,7 +254,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
 			],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		expect(element.querySelectorAll('[data-question]').length).toBe(1);
@@ -271,7 +278,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
 			],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		expect(element.querySelector('[data-question="NEED_THEFT"]')).not.toBeNull();
@@ -289,7 +296,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', value: 'true' }),
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20, value: 'false' }),
 			],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		expect(element.textContent).toContain('Pytanie 2 z 2');
@@ -314,7 +321,7 @@ describe('Questionnaire', () => {
 				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', value: 'false' }),
 				question({ code: 'NEED_PORTABLE', kind: 'BOOLEAN', position: 20 }),
 			],
-			'FORM',
+			'QUESTIONS',
 		);
 
 		const first = element.querySelector('[data-question="NEED_PORTABLE"] mat-button-toggle-group');

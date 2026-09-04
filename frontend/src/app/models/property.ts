@@ -33,12 +33,14 @@ export type QuestionKind =
  * ⚠️ This is documentation, not a gate — the component never matches on a section code. NEEDS
  * and EXCLUSIONS exist only under the 2026 recommendations; NEEDS_BASE exists in both regimes.
  */
-export type QuestionSection =
-	| 'SUBJECT'
-	| 'SITUATION'
-	| 'NEEDS_BASE'
-	| 'NEEDS'
-	| 'EXCLUSIONS';
+/**
+ * Gałąź drzewa, w której pytanie wisi — i zarazem krok, w którym się pokazuje.
+ *
+ * ⛔ To NIE jest sekcja. Sekcje zniknęły 4 września 2026 razem z całym poziomem grupowania:
+ * pytania wiszą teraz płasko w dwóch kolekcjach pod produktem. `QUESTIONS` to analiza potrzeb,
+ * `SUBJECT` to przedmiot ubezpieczenia i sytuacja — dane zbierane poza APK.
+ */
+export type QuestionSection = 'QUESTIONS' | 'SUBJECT';
 
 export interface PropertyQuestionDto {
 	readonly code: string;
@@ -134,30 +136,6 @@ export interface PropertyOfferDto {
 }
 
 /** Ubezpieczający. Dane demonstracyjne — w prawdziwym wdrożeniu z CRM, nie z reguł. */
-/**
- * Sekcja ankiety — **gałąź drzewa domeny**, nie wartość atrybutu na pytaniu.
- *
- * ⛔ Tytuł przychodzi z reguł. Wcześniej cztery tytuły były stałą w komponencie, więc dołożenie
- * sekcji w Studio wymagało wdrożenia frontu — dokładnie tego, czemu to demo zaprzecza.
- *
- * ⚠️ `visible` (reguła `demo.property.apk.section.visibility`) to co innego niż NIEOBECNOŚĆ
- * sekcji na liście: sekcji spoza wersji regionu nie ma tu wcale, razem z jej pytaniami.
- */
-export interface PropertySectionDto {
-	readonly code: string;
-	readonly title: string;
-	/**
-	 * `FORM` — o to pytamy klienta. `KNOWN` — to już wiemy i tylko pokazujemy.
-	 *
-	 * ⛔ Charakterystyka przedmiotu ubezpieczenia nie jest analizą potrzeb: zakłady zbierają ją
-	 * i dziś, poza APK. Ekran pokazuje ją zwiniętą, jako kontekst — a o tym, która sekcja jest
-	 * którą, decyduje atrybut w Higsonie, nie lista kodów w komponencie.
-	 */
-	readonly kind: 'FORM' | 'KNOWN';
-	readonly position: number;
-	readonly visible: boolean;
-}
-
 export interface PropertyPolicyholderDto {
 	readonly firstName: string;
 	readonly lastName: string;
@@ -190,7 +168,6 @@ export interface PropertyQuoteDto {
 	readonly deductible: number;
 
 	readonly regime: PropertyRegimeDto;
-	readonly sections: readonly PropertySectionDto[];
 	readonly questions: readonly PropertyQuestionDto[];
 
 	readonly floodZone: string | null;

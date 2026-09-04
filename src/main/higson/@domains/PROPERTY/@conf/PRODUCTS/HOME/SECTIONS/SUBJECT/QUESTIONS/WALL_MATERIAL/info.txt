@@ -1,3 +1,0 @@
-name = "Z czego są ściany?"
-description = "Konstrukcja szkieletowa drewniana jest droższa w ubezpieczeniu niż murowana."
-tags = []

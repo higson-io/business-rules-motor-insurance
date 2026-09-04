@@ -2,61 +2,38 @@
 	Ankieta APK renderowana z reguł.
 
 	⛔ Ani jedno pytanie nie jest tu wypisane. Kontrolka wybiera się po polu `kind`, treść przychodzi
-	z Higsona, a widoczność jest gotową flagą z serwera — liczenie jej tutaj zamieniłoby tabelę
-	`apk.question.visibility` i kolumnę `revealedBy` w martwe wpisy.
+	z Higsona, a widoczność jest gotową flagą z serwera.
 
-	⛔ DWA UKŁADY, JEDEN BLOK PYTANIA. Analiza potrzeb to ankieta: JEDNO PYTANIE NA EKRAN, po kolei,
-	z własną nawigacją — kolejne pytanie odsłania się dopiero po domknięciu poprzedniego, więc
-	pokazywanie ich naraz przeczyłoby temu, czym ten krok jest. Przedmiot ubezpieczenia to lista,
-	bo tam nic się nie odsłania: dane są zebrane wcześniej i klient je najwyżej poprawia.
+	⛔ DWA UKŁADY, JEDEN BLOK PYTANIA. Analiza potrzeb (`QUESTIONS`) to ankieta: jedno pytanie na
+	ekran, po kolei, z własną nawigacją — kolejne odsłania się dopiero po domknięciu poprzedniego.
+	Przedmiot ubezpieczenia (`SUBJECT`) to lista, bo tam nic się nie odsłania: dane są zebrane
+	wcześniej i klient je najwyżej poprawia.
 
-	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`. Etykieta Material nie zawija się —
-	ucina długie zdanie wielokropkiem — a treść przychodzi z reguł i może mieć dowolną długość.
+	⛔ Bez sekcji i bez ich tytułów. Grupowanie pytań zniknęło razem z poziomem sekcji w drzewie —
+	podział przebiega po gałęzi i tylko po niej.
+
+	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`: etykieta Material nie zawija się,
+	a treść przychodzi z reguł i może mieć dowolną długość.
 -->
 @if (ready()) {
-	@if (kind() === 'FORM') {
-		<!--
-			⛔ Licznik liczy po REGULE, nie po odsłonięciu — patrz `stepCount`. Gdyby liczył
-			odsłonięte, mianownik rósłby z każdą odpowiedzią i pasek postępu nie znaczyłby nic.
-		-->
+	@if (group() === 'QUESTIONS') {
 		@for (question of currentAsList(); track question.code) {
-			<section class="apk__section apk__section--single" [attr.data-section]="question.section">
-				<!--
-					⛔ Nazwa sekcji NAD licznikiem. Bez niej klient przechodził od potrzeb przez
-					wymagania do wyłączeń, nie wiedząc, że zmienił temat rozmowy — a sekcje istniały
-					w domenie i nie mówiły na ekranie nic.
-
-					⛔ Pasek dzieli się NA SEKCJE, po jednym segmencie na każdą, szerokim
-					proporcjonalnie do liczby jej pytań. Po przesunięciu daty przez próg KNF segmenty
-					przybywają na oczach widza — ta sama informacja co „12 pytań, było 5" w panelu
-					ustawień, tyle że bez otwierania panelu.
-				-->
+			<section class="apk__section apk__section--single">
 				<header class="apk__step">
 					<p class="apk__step__where">
-						@if (sectionTitle(); as title) {
-							<span class="apk__step__section" data-testid="apk-section">{{ title }}</span>
-							<span class="apk__step__sep" aria-hidden="true">·</span>
-						}
 						<span class="apk__step__counter">Pytanie {{ stepNumber() }} z {{ stepCount() }}</span>
 					</p>
-
-					<span class="apk__step__bar" data-testid="apk-progress" aria-hidden="true">
-						@for (segment of segments(); track segment.code) {
+					<span class="apk__step__bar" aria-hidden="true">
+						<span class="apk__step__seg apk__step__seg--current">
 							<span
-								class="apk__step__seg"
-								[class.apk__step__seg--current]="segment.current"
-								[style.flex-grow]="segment.total"
-							>
-								<span
-									class="apk__step__fill"
-									[style.width.%]="(segment.done / segment.total) * 100"
-								></span>
-							</span>
-						}
+								class="apk__step__fill"
+								[style.width.%]="(stepNumber() / stepCount()) * 100"
+							></span>
+						</span>
 					</span>
 				</header>
 
-				<div class="apk__question apk__question--single" [class.apk__question--refused]="question.refused" [attr.data-question]="question.code">
+				<div class="apk__question apk__question--single" [attr.data-question]="question.code">
 					<div class="apk__body">
 					<!--
 						⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
@@ -123,14 +100,6 @@
 						}
 					}
 
-					<!--
-						Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
-						powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
-					
-						⛔ Nie ma tu już „nie chcę podać". Odmowa była trzecim stanem odpowiedzi i to
-						ona przepuszczała ankietę przez pytania nieobowiązkowe; jej rolę przejęła sama
-						obowiązkowość — pytanie nieobowiązkowe wolno po prostu pominąć.
-					-->
 					@if (question.prefillSource) {
 						<footer class="apk__foot">
 							<span class="apk__prefill" data-testid="property-prefill">
@@ -164,113 +133,88 @@
 		}
 	} @else {
 		<div class="apk">
-			@for (section of sections(); track section.code) {
-				<section class="apk__section" [attr.data-section]="section.code">
-					<header class="apk__section-head">
-						<h2 class="apk__section-title">{{ section.title }}</h2>
-						<span class="apk__section-count">{{ section.questions.length }}</span>
-					</header>
-
-					<ol class="apk__list">
-						@for (question of section.questions; track question.code) {
+			<section class="apk__section">
+				<ol class="apk__list">
+					@for (question of asked(); track question.code) {
+						<li class="apk__question" [attr.data-question]="question.code">
+							<div class="apk__body">
 							<!--
-								⛔ Bez numeru porządkowego. Numerowanie miało sens, gdy była to jedna
-								rosnąca lista pytań ankiety; przedmiot ubezpieczenia to dane już
-								zebrane, a nie kolejne kroki rozmowy — a na wyśrodkowanej kolumnie
-								cyfra w lewym marginesie i tak stałaby krzywo względem treści.
+								⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
+								zawinąć się na własny wiersz pod pytaniem.
 							-->
-							<li
-								class="apk__question"
-								[class.apk__question--refused]="question.refused"
-								[attr.data-question]="question.code"
-							>
-								<div class="apk__body">
-									<!--
-										⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
-										zawinąć się na własny wiersz pod pytaniem.
-									-->
-									<p class="apk__label" [id]="'q-' + question.code">
-										{{ question.text }}@if (question.required) {<span
-											class="apk__required"
-											aria-hidden="true"
-											>&nbsp;*</span
-										>}
-									</p>
+							<p class="apk__label" [id]="'q-' + question.code">
+								{{ question.text }}@if (question.required) {<span
+									class="apk__required"
+									aria-hidden="true"
+									>&nbsp;*</span
+								>}
+							</p>
 
-									@switch (question.kind) {
-										@case ('CHOICE') {
-											<mat-form-field appearance="outline" class="apk__field">
-												<mat-select
-													[value]="question.value"
-													[attr.aria-labelledby]="'q-' + question.code"
-													(selectionChange)="answer(question, $event.value)"
-												>
-													@for (option of question.options; track option) {
-														<mat-option [value]="option">{{ label(question, option) }}</mat-option>
-													}
-												</mat-select>
-											</mat-form-field>
-										}
+							@switch (question.kind) {
+								@case ('CHOICE') {
+									<mat-form-field appearance="outline" class="apk__field">
+										<mat-select
+											[value]="question.value"
+											[attr.aria-labelledby]="'q-' + question.code"
+											(selectionChange)="answer(question, $event.value)"
+										>
+											@for (option of question.options; track option) {
+												<mat-option [value]="option">{{ label(question, option) }}</mat-option>
+											}
+										</mat-select>
+									</mat-form-field>
+								}
 
-										@case ('MULTI') {
-											<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
-												@for (option of question.options; track option) {
-													<mat-checkbox
-														[checked]="isChecked(question, option)"
-														(change)="toggle(question, option, $event.checked)"
-													>
-														{{ label(question, option) }}
-													</mat-checkbox>
-												}
-											</div>
-										}
-
-										@case ('BOOLEAN') {
-											<mat-button-toggle-group
-												class="apk__toggle"
-												[value]="question.value"
-												[attr.aria-labelledby]="'q-' + question.code"
-												(change)="answer(question, $event.value)"
+								@case ('MULTI') {
+									<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
+										@for (option of question.options; track option) {
+											<mat-checkbox
+												[checked]="isChecked(question, option)"
+												(change)="toggle(question, option, $event.checked)"
 											>
-												<mat-button-toggle value="true">Tak</mat-button-toggle>
-												<mat-button-toggle value="false">Nie</mat-button-toggle>
-											</mat-button-toggle-group>
+												{{ label(question, option) }}
+											</mat-checkbox>
 										}
+									</div>
+								}
 
-										@default {
-											<mat-form-field appearance="outline" class="apk__field">
-												<input
-													matInput
-													[type]="question.kind === 'TEXT' ? 'text' : 'number'"
-													[value]="question.value"
-													[attr.aria-labelledby]="'q-' + question.code"
-													(change)="answer(question, $any($event.target).value)"
-												/>
-											</mat-form-field>
-										}
-									}
+								@case ('BOOLEAN') {
+									<mat-button-toggle-group
+										class="apk__toggle"
+										[value]="question.value"
+										[attr.aria-labelledby]="'q-' + question.code"
+										(change)="answer(question, $event.value)"
+									>
+										<mat-button-toggle value="true">Tak</mat-button-toggle>
+										<mat-button-toggle value="false">Nie</mat-button-toggle>
+									</mat-button-toggle-group>
+								}
 
-									<!--
-										Rek. 8.3 — jeśli wartość pochodzi z innego źródła niż klient, trzeba o tym
-										powiedzieć. Puste pole znaczy „klient podał sam", a nie „nie wiem".
-									
-										⛔ Nie ma tu już „nie chcę podać". Odmowa była trzecim stanem odpowiedzi i to
-										ona przepuszczała ankietę przez pytania nieobowiązkowe; jej rolę przejęła sama
-										obowiązkowość — pytanie nieobowiązkowe wolno po prostu pominąć.
-									-->
-									@if (question.prefillSource) {
-										<footer class="apk__foot">
-											<span class="apk__prefill" data-testid="property-prefill">
-												Podpowiedziane: {{ question.prefillSource }}
-											</span>
-										</footer>
-									}
-								</div>
-							</li>
-						}
-					</ol>
-				</section>
-			}
+								@default {
+									<mat-form-field appearance="outline" class="apk__field">
+										<input
+											matInput
+											[type]="question.kind === 'TEXT' ? 'text' : 'number'"
+											[value]="question.value"
+											[attr.aria-labelledby]="'q-' + question.code"
+											(change)="answer(question, $any($event.target).value)"
+										/>
+									</mat-form-field>
+								}
+							}
+
+							@if (question.prefillSource) {
+								<footer class="apk__foot">
+									<span class="apk__prefill" data-testid="property-prefill">
+										Podpowiedziane: {{ question.prefillSource }}
+									</span>
+								</footer>
+							}
+							</div>
+						</li>
+					}
+				</ol>
+			</section>
 		</div>
 	}
 }

@@ -193,10 +193,20 @@ satisfy spec §5.4 ("the same component in the summary"), which was reading the 
 literally instead of by substance — the offer already carries the chosen premium in its header,
 the agreement-with-recommendation note, and the needs and justification in its "client needs
 analysis" attachment. The component beside it repeated all of that a second time on one screen.
-**Read before** touching the property demo's rules, the APK question catalogue, or anything that
-depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
-version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
-prefix, which only breaks the *next* element someone adds (**W-25**).
+**§27–§28 (2026-09-04)** drop the legal-basis line from the justification note, and stop the
+browser caching `index.html` — a servlet filter now sends `no-cache` for `/` and `*.html`, without
+which a tab kept replaying an old hashed bundle and every change looked like it had never shipped.
+**§29 (2026-09-04)** flattens the domain tree and moves package composition into it. `SECTIONS`
+is gone: the seven APK questions and the twelve subject fields now hang directly under
+`/PRODUCTS[HOME]` as `QUESTIONS` and `SUBJECT` — **two steps under two legal regimes**, not two
+sections of one form — which reverses §23.1's section name and segmented progress bar. And
+**D-18**: a package's covers are now child references under `VARIANTS[...]/COVERS` in the tree
+rather than rows of a decision table, so what a package contains is visible by expanding a branch.
+**Read before** touching the property demo's rules, the APK question catalogue, or the domain
+tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
+breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
+dormant rather than fixed: PROPERTY carries no region any more (D-17), so it returns the moment
+anyone attaches one.
 
 ### Vision (`project/vision.md`)
 *Not created.* Add it to capture project mission, goals, target users, and long-term direction.

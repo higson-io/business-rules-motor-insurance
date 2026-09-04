@@ -1,3 +1,0 @@
-name = "Na jaki okres chcesz ochrony?"
-description = "Okres ochrony. Zszedl z ankiety APK do danych polisy: jest parametrem umowy, a nie potrzeba klienta, i nie ma go na liscie pytan ze specyfikacji. Zostaje edytowalny, bo od niego zalezy czynnik okresu i liczba rat."
-tags = []

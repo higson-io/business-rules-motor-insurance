@@ -1,0 +1,3 @@
+name = "Czy chcesz ubezpieczyć swój majątek na wypadek powodzi?"
+description = "Pytanie 3 ze specyfikacji. Zderza sie ze strefa powodziowa miejsca ubezpieczenia."
+tags = []

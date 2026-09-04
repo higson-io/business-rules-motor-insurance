@@ -6,7 +6,7 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa SPISEM TRESCI: z pokrycia widac, ktora regula mowi, w ktorym wariancie ono jest, skad bierze sie jego suma, jaka ma stawke i jaki limit. Java czyta tylko czesc z nich - drzewo domeny ma prowadzic do kazdej reguly, ktora pokrycia dotyczy, bo po to istnieje.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa spisem tresci: skad bierze sie suma, jaka jest stawka i jaki limit. To, W KTORYM PAKIECIE pokrycie sie znajduje, NIE jest juz jego cecha - sklad pakietu wisi pod pakietem (VARIANTS[..]/COVERS), bo to relacja pakietu, a nie wlasciwosc pokrycia.</description>
             <rootType>false</rootType>
             <typeAttributes>
                 <typeAttribute>
@@ -17,15 +17,6 @@
                     <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.cover.position</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>IS_AVAILABLE</code>
-                    <name>Czy wchodzi w sklad wariantu</name>
-                    <order>2</order>
-                    <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.availability</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -94,9 +85,17 @@
         </domainType>
         <domainType>
             <profile>PROPERTY</profile>
+            <code>PACKAGE_COVER</code>
+            <name>Pokrycie w pakiecie</name>
+            <description>Odwolanie do pokrycia, ktore wchodzi w sklad tego pakietu. KODEM, a nie kopia - element nie ma zadnego atrybutu, bo cala konfiguracja pokrycia (stawka, suma, limit) zostaje w /PRODUCTS[HOME]/COVERS. Gdyby ten typ mial atrybuty, ta sama rzecz dalaby sie ustawic w dwoch miejscach i zaczelaby sie rozjezdzac.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Wezel produktu i WEJSCIE DO KONFIGURACJI. Trzyma kolekcje (pokrycia, warianty, sekcje ankiety) oraz wskazniki na reguly wspolne dla calego produktu: rezim APK, sumy, czynnik ryzyka i strefy. Kto otwiera to drzewo pierwszy raz, ma stad dojsc wszedzie.</description>
+            <description>Wezel produktu i wejscie do konfiguracji. Cztery kolekcje, wszystkie PLASKIE. QUESTIONS i SUBJECT sa osobnymi galeziami, bo to dwie rozne rzeczy: APK pyta o POTRZEBY klienta, a SUBJECT opisuje przedmiot i sytuacje, ktore zaklady zbieraja poza APK. Grupowanie pytan w sekcje bylo posrednim poziomem, ktory niczego nie rozstrzygal, i zniklo.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -108,16 +107,24 @@
                     <collectionTypeCode>COVER</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
-                    <code>SECTIONS</code>
-                    <name>Sekcje ankiety APK</name>
+                    <code>QUESTIONS</code>
+                    <name>Pytania analizy potrzeb (APK)</name>
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
-                    <collectionTypeCode>SECTION</collectionTypeCode>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>SUBJECT</code>
+                    <name>Przedmiot ubezpieczenia i sytuacja (poza APK)</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
                     <code>VARIANTS</code>
-                    <name>Warianty</name>
+                    <name>Pakiety</name>
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
@@ -291,8 +298,18 @@
             <profile>PROPERTY</profile>
             <code>VARIANT</code>
             <name>Wariant</name>
-            <description>Pakiet ochrony. Drabinka jest scisla - kazdy wariant zawiera wszystko, co poprzedni. Atrybuty sa SPISEM TRESCI: z wariantu widac, ktora regula rozstrzyga o jego dostepnosci i ktory flow liczy jego skladke. Java czyta tylko cztery pierwsze, ale drzewo domeny ma prowadzic do kazdej reguly, ktora wariantu dotyczy.</description>
+            <description>Pakiet ochrony. Drabinka jest scisla - kazdy wariant zawiera wszystko, co poprzedni. Sklad pakietu wisi POD NIM w drzewie (kolekcja COVERS), zamiast byc para w tabeli dostepnosci: zeby zobaczyc, co jest w pakiecie, otwiera sie pakiet.</description>
             <rootType>false</rootType>
+            <typeCollections>
+                <typeCollection>
+                    <code>COVERS</code>
+                    <name>Pokrycia w pakiecie</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>PACKAGE_COVER</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>

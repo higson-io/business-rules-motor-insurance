@@ -37,7 +37,6 @@ public class PropertyContext extends HigsonContext {
 	private String variantCode;
 	private String reasonCode;
 	private String choiceKind;
-	private String sectionCode;
 
 	public PropertyContext(PropertyQuote quote) {
 		this.quote = quote;
@@ -62,11 +61,6 @@ public class PropertyContext extends HigsonContext {
 
 	public PropertyContext withVariant(String code) {
 		this.variantCode = code;
-		return this;
-	}
-
-	public PropertyContext withSection(String code) {
-		this.sectionCode = code;
 		return this;
 	}
 
@@ -106,13 +100,7 @@ public class PropertyContext extends HigsonContext {
 		if ("variant.code".equals(path)) {
 			return variantCode;
 		}
-		// Kod reżimu APK — tym kluczują się warunki oferty. Reżim jest wersjonowany regionem,
-		// więc tabela ofertowa dostaje wersjonowanie za darmo, bez drugiego progu.
-		// Kod sekcji — tym kluczuje się jej widoczność.
-		if ("section.code".equals(path)) {
-			return sectionCode;
-		}
-
+		// Kod reżimu APK — tym kluczują się warunki oferty.
 		if ("regime.code".equals(path)) {
 			return quote.getRegime().getCode();
 		}

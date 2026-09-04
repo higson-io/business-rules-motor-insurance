@@ -1,3 +1,0 @@
-name = "Jakie masz zabezpieczenia?"
-description = "Zabezpieczenia obniżają składkę, ale muszą działać w chwili szkody."
-tags = []

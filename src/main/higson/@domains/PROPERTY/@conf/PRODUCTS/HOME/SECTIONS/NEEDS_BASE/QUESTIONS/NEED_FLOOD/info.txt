@@ -1,3 +1,0 @@
-name = "Czy chcesz ubezpieczyć swój majątek na wypadek powodzi?"
-description = "Pytanie 3 z listy analityka. Zderza sie ze strefa powodziowa miejsca ubezpieczenia - to zderzenie jest jednym z ciekawszych momentow demo."
-tags = []

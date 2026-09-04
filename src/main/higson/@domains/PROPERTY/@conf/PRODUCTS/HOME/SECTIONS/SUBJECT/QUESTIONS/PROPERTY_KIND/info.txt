@@ -1,3 +1,0 @@
-name = "Co chcesz ubezpieczyć?"
-description = "Dom jednorodzinny albo mieszkanie w budynku wielorodzinnym."
-tags = []

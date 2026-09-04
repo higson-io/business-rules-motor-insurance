@@ -1,0 +1,3 @@
+name = "Czy potrzebujesz ubezpieczyć swój majątek od kradzieży?"
+description = "Pytanie 2 ze specyfikacji."
+tags = []

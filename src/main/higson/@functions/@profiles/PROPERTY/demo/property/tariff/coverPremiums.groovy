@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = ""
+description = "Skladki pokryc wchodzacych w sklad wariantu. Sklad czytany Z DRZEWA - pokrycia wisza pod pakietem w kolekcji COVERS - a nie z tabeli par (pokrycie, wariant)."
 
 [[arguments]]
 name = "ctx"
@@ -22,12 +22,12 @@ type = "BIG_DECIMAL"
 def variant = ctx.getString('variant.code')
 def lines = []
 
-for (def cover in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('COVERS')) {
-	def code = cover.getCode()
-	def cellCtx = higson.createContext('cover.code', code, 'variant.code', variant)
-	if (!higson.getBoolean('demo.property.cover.availability', cellCtx)) {
-		continue
-	}
+// Sklad pakietu jest POD PAKIETEM w drzewie. Do 4 wrzesnia 2026 przechodzilo sie tu po
+// wszystkich pokryciach produktu i odpytywalo tabele demo.property.cover.availability, czy dane
+// pokrycie jest w tym wariancie. Teraz iteruje sie wprost po skladzie: petla jest krotsza o jedno
+// pytanie, a odpowiedz na nie widac w drzewie bez czytania tabeli.
+for (def member in domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variant + ']').getAll('COVERS')) {
+	def code = member.getCode()
 
 	def rateRow = higson.getValue('demo.property.tariff.baseRate',
 			higson.createContext('cover.code', code))

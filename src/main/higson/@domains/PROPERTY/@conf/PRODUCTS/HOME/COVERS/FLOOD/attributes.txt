@@ -17,12 +17,6 @@ refType = "FUNCTION"
 refName = "demo.property.limit.effective"
 
 [[attr]]
-attributeCode = "IS_AVAILABLE"
-attributeName = "Czy wchodzi w sklad wariantu"
-refType = "PARAMETER"
-refName = "demo.property.cover.availability"
-
-[[attr]]
 attributeCode = "POSITION"
 attributeName = "Kolejnosc na ekranie"
 refType = "PARAMETER"

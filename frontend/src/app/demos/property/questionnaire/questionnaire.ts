@@ -19,19 +19,6 @@ import { PropertyQuestionDto } from '../../../models/property';
 import { PropertyService } from '../../../services/property-service';
 
 /**
- * ⛔ Nie ma tu ani listy sekcji, ani ich tytułów, ani kolejności — i to jest cała zmiana.
- * Do 28 sierpnia 2026 stały tu cztery tytuły i tablica `SECTION_ORDER`, więc dołożenie sekcji
- * w Studio wymagało wdrożenia frontu. Sekcja jest teraz gałęzią drzewa domeny: przychodzi
- * z serwera z tytułem, kolejnością i własną regułą widoczności.
- */
-interface Section {
-	readonly code: string;
-	readonly title: string;
-	readonly questions: readonly PropertyQuestionDto[];
-}
-
-
-/**
  * The APK questionnaire — and the component that proves the demo's claim.
  *
  * ⛔ It does not know a single question. It receives a list, renders a control per `kind`, and
@@ -78,50 +65,36 @@ export class Questionnaire {
 	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 */
 	/**
-	 * Które sekcje renderować — i, co za tym idzie, JAK.
+	 * Która gałąź drzewa: `QUESTIONS` — analiza potrzeb, `SUBJECT` — przedmiot ubezpieczenia.
 	 *
-	 * `FORM` — analiza potrzeb: **jedno pytanie na ekran**, po kolei, z własną nawigacją.
-	 * `KNOWN` — przedmiot ubezpieczenia: lista, bo to dane już zebrane, a nie rozmowa.
+	 * ⛔ Gałąź decyduje też o UKŁADZIE. Analiza potrzeb to ankieta: jedno pytanie na ekran, po
+	 * kolei, z własną nawigacją. Przedmiot ubezpieczenia to lista, bo tam nic się nie odsłania —
+	 * dane są zebrane wcześniej i klient je najwyżej poprawia.
 	 *
-	 * ⛔ Rodzaj przychodzi z Higsona (atrybut `KIND` sekcji), a komponent dostaje tylko to, którą
-	 * połowę ma pokazać. Nie ma tu ani jednego kodu sekcji: przeniesienie sekcji z kroku 1 do
-	 * kroku 2 jest zmianą jednego atrybutu w Studio.
+	 * ⛔ Sekcji nie ma. Do 4 września 2026 pytania grupowały się w sekcje z własnym tytułem
+	 * i kolejnością; przy siedmiu pytaniach był to poziom pośredni, który niczego nie rozstrzygał.
+	 * Podział przebiega teraz po gałęzi drzewa i tylko po niej.
 	 */
-	readonly kind = input.required<'FORM' | 'KNOWN'>();
+	readonly group = input.required<'QUESTIONS' | 'SUBJECT'>();
 
 	/** Zgłaszane, gdy klient domknął ostatnie pytanie ankiety — gospodarz przechodzi dalej. */
 	readonly completed = output<void>();
 
 	/**
-	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer, a lista sekcji z serwera —
-	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
-	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
+	 * Wszystkie pytania tej gałęzi, o które w tym kroku wolno zapytać — w kolejności zadawania.
 	 *
-	 * ⚠️ `visible` to reguła („czy pytanie dotyczy tego klienta"), `revealed` to łańcuch („czy już
-	 * pora"). Sekcje trzymają pytania przefiltrowane po REGULE — odsłanianie rozstrzyga się niżej,
-	 * przy wyborze pytania bieżącego, bo licznik postępu musi znać całość.
+	 * ⚠️ Filtr po `visible` to REGUŁA („czy pytanie dotyczy tego klienta"), nie łańcuch. Odsłanianie
+	 * rozstrzyga się niżej, przy wyborze pytania bieżącego, bo licznik postępu musi znać całość.
 	 */
-	readonly sections = computed<readonly Section[]>(() => {
+	readonly asked = computed<readonly PropertyQuestionDto[]>(() => {
 		const quote = this.loaded();
 		if (quote === null) {
 			return [];
 		}
-		return quote.sections
-			.filter((section) => section.visible && section.kind === this.kind())
-			.map((section) => ({
-				code: section.code,
-				title: section.title,
-				questions: quote.questions.filter(
-					(question) => question.section === section.code && question.visible,
-				),
-			}))
-			.filter((section) => section.questions.length > 0);
+		return quote.questions.filter(
+			(question) => question.section === this.group() && question.visible,
+		);
 	});
-
-	/** Wszystkie pytania, o które w tym kroku wolno zapytać — w kolejności zadawania. */
-	private readonly asked = computed<readonly PropertyQuestionDto[]>(() =>
-		this.sections().flatMap((section) => section.questions),
-	);
 
 	/** Te, do których łańcuch już doszedł. Ostatnie z nich jest bieżące. */
 	private readonly reached = computed<readonly PropertyQuestionDto[]>(() =>
@@ -181,58 +154,6 @@ export class Questionnaire {
 	readonly stepNumber = computed(() => this.cursor() + 1);
 	readonly stepCount = computed(() => this.asked().length);
 
-	/**
-	 * Nazwa sekcji, w której stoi bieżące pytanie.
-	 *
-	 * ⛔ Do 4 września 2026 sekcje w ankiecie były NIEWIDOCZNE — istniały w domenie, dzieliły
-	 * pytania i nie mówiły na ekranie nic. Przy jednym pytaniu na ekran klient przechodził od
-	 * potrzeb przez wymagania do wyłączeń, nie wiedząc, że zmienił temat rozmowy; a próg KNF,
-	 * który dokłada DWA CAŁE OBSZARY pytań, wyglądał jak siedem pytań znikąd.
-	 */
-	readonly sectionTitle = computed<string | null>(() => {
-		const question = this.current();
-		if (question === null) {
-			return null;
-		}
-		return this.sections().find((section) => section.code === question.section)?.title ?? null;
-	});
-
-	/** Pozycja bieżącego pytania w całej ankiecie — potrzebna paskowi, nie widzowi. */
-	private readonly askedIndex = computed(() => {
-		const question = this.current();
-		return question === null
-			? -1
-			: this.asked().findIndex((asked) => asked.code === question.code);
-	});
-
-	/**
-	 * Pasek postępu podzielony na sekcje.
-	 *
-	 * ⛔ Segment na sekcję, szeroki proporcjonalnie do liczby jej pytań. Jeden ciągły pasek pokazuje
-	 * tylko „ile jeszcze"; podzielony pokazuje też Z CZEGO — a po przesunięciu daty przez próg KNF
-	 * segmenty przybywają na oczach widza. To jest ta sama informacja co „12 pytań, było 5"
-	 * w panelu ustawień, tyle że bez otwierania panelu.
-	 *
-	 * ⚠️ Sekcje są rozłączne i idą po kolei, bo `asked` powstaje ze spłaszczenia `sections()` —
-	 * dlatego wystarczy bieżące przesunięcie, bez szukania pytań po kodach.
-	 */
-	readonly segments = computed(() => {
-		const at = this.askedIndex();
-		let start = 0;
-		return this.sections().map((section) => {
-			const total = section.questions.length;
-			const end = start + total;
-			const done = Math.min(Math.max(at - start + 1, 0), total);
-			const segment = {
-				code: section.code,
-				total,
-				done,
-				current: at >= start && at < end,
-			};
-			start = end;
-			return segment;
-		});
-	});
 
 	readonly hasPrevious = computed(() => this.cursor() > 0);
 
