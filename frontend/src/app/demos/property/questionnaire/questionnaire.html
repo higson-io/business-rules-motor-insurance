@@ -21,10 +21,38 @@
 		-->
 		@for (question of currentAsList(); track question.code) {
 			<section class="apk__section apk__section--single" [attr.data-section]="question.section">
+				<!--
+					⛔ Nazwa sekcji NAD licznikiem. Bez niej klient przechodził od potrzeb przez
+					wymagania do wyłączeń, nie wiedząc, że zmienił temat rozmowy — a sekcje istniały
+					w domenie i nie mówiły na ekranie nic.
+
+					⛔ Pasek dzieli się NA SEKCJE, po jednym segmencie na każdą, szerokim
+					proporcjonalnie do liczby jej pytań. Po przesunięciu daty przez próg KNF segmenty
+					przybywają na oczach widza — ta sama informacja co „12 pytań, było 5" w panelu
+					ustawień, tyle że bez otwierania panelu.
+				-->
 				<header class="apk__step">
-					<span class="apk__step__counter">Pytanie {{ stepNumber() }} z {{ stepCount() }}</span>
-					<span class="apk__step__bar" aria-hidden="true">
-						<span class="apk__step__fill" [style.width.%]="(stepNumber() / stepCount()) * 100"></span>
+					<p class="apk__step__where">
+						@if (sectionTitle(); as title) {
+							<span class="apk__step__section" data-testid="apk-section">{{ title }}</span>
+							<span class="apk__step__sep" aria-hidden="true">·</span>
+						}
+						<span class="apk__step__counter">Pytanie {{ stepNumber() }} z {{ stepCount() }}</span>
+					</p>
+
+					<span class="apk__step__bar" data-testid="apk-progress" aria-hidden="true">
+						@for (segment of segments(); track segment.code) {
+							<span
+								class="apk__step__seg"
+								[class.apk__step__seg--current]="segment.current"
+								[style.flex-grow]="segment.total"
+							>
+								<span
+									class="apk__step__fill"
+									[style.width.%]="(segment.done / segment.total) * 100"
+								></span>
+							</span>
+						}
 					</span>
 				</header>
 

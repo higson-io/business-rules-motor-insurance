@@ -181,6 +181,59 @@ export class Questionnaire {
 	readonly stepNumber = computed(() => this.cursor() + 1);
 	readonly stepCount = computed(() => this.asked().length);
 
+	/**
+	 * Nazwa sekcji, w której stoi bieżące pytanie.
+	 *
+	 * ⛔ Do 4 września 2026 sekcje w ankiecie były NIEWIDOCZNE — istniały w domenie, dzieliły
+	 * pytania i nie mówiły na ekranie nic. Przy jednym pytaniu na ekran klient przechodził od
+	 * potrzeb przez wymagania do wyłączeń, nie wiedząc, że zmienił temat rozmowy; a próg KNF,
+	 * który dokłada DWA CAŁE OBSZARY pytań, wyglądał jak siedem pytań znikąd.
+	 */
+	readonly sectionTitle = computed<string | null>(() => {
+		const question = this.current();
+		if (question === null) {
+			return null;
+		}
+		return this.sections().find((section) => section.code === question.section)?.title ?? null;
+	});
+
+	/** Pozycja bieżącego pytania w całej ankiecie — potrzebna paskowi, nie widzowi. */
+	private readonly askedIndex = computed(() => {
+		const question = this.current();
+		return question === null
+			? -1
+			: this.asked().findIndex((asked) => asked.code === question.code);
+	});
+
+	/**
+	 * Pasek postępu podzielony na sekcje.
+	 *
+	 * ⛔ Segment na sekcję, szeroki proporcjonalnie do liczby jej pytań. Jeden ciągły pasek pokazuje
+	 * tylko „ile jeszcze"; podzielony pokazuje też Z CZEGO — a po przesunięciu daty przez próg KNF
+	 * segmenty przybywają na oczach widza. To jest ta sama informacja co „12 pytań, było 5"
+	 * w panelu ustawień, tyle że bez otwierania panelu.
+	 *
+	 * ⚠️ Sekcje są rozłączne i idą po kolei, bo `asked` powstaje ze spłaszczenia `sections()` —
+	 * dlatego wystarczy bieżące przesunięcie, bez szukania pytań po kodach.
+	 */
+	readonly segments = computed(() => {
+		const at = this.askedIndex();
+		let start = 0;
+		return this.sections().map((section) => {
+			const total = section.questions.length;
+			const end = start + total;
+			const done = Math.min(Math.max(at - start + 1, 0), total);
+			const segment = {
+				code: section.code,
+				total,
+				done,
+				current: at >= start && at < end,
+			};
+			start = end;
+			return segment;
+		});
+	});
+
 	readonly hasPrevious = computed(() => this.cursor() > 0);
 
 	/**

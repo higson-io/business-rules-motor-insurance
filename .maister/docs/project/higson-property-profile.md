@@ -2466,3 +2466,60 @@ i zapadło na jego korzyść.
 ⚠️ To jest **świadome odstępstwo od litery §3 specyfikacji** na rzecz jej własnego zdania
 o priorytecie. Gdyby PM chciał wrócić do wyliczenia, wystarczy zamienić miejscami dwa znaczniki
 w `property.html`.
+
+---
+
+## §23 Sekcje widoczne, domena jako spis treści (2026-09-04)
+
+### 23.1 Sekcje w ankiecie przestają być niewidoczne
+
+Po przejściu na jedno pytanie na ekran sekcje zostały w domenie, ale **na ekranie nie mówiły nic** —
+istniały jako atrybut `data-section` w HTML i tyle. Klient przechodził od potrzeb przez wymagania
+do wyłączeń, nie wiedząc, że zmienił temat rozmowy, a próg KNF, który dokłada **dwa całe obszary
+pytań**, wyglądał jak siedem pytań znikąd.
+
+Dwie rzeczy naprawiają to naraz:
+
+- **Nazwa sekcji nad licznikiem**: „Czego potrzebujesz · Pytanie 3 z 12".
+- **Pasek postępu dzielony na sekcje** — jeden segment na sekcję, szeroki proporcjonalnie do
+  liczby jej pytań. Odstęp między segmentami jest treścią, nie ozdobą: po przesunięciu daty przez
+  próg segmenty przybywają na oczach widza. To ta sama informacja co „12 pytań, było 5" w panelu
+  ustawień, tylko bez otwierania panelu.
+
+Zweryfikowane: przed progiem **jeden** segment i „Pytanie 1 z 5", po progu **trzy** i „Pytanie 1 z 12".
+
+### 23.2 D-16 — atrybut domeny jest SPISEM TREŚCI, nie tylko wejściem dla Javy
+
+⛔ **Odwrócenie decyzji z §17.1.** Zdjąłem tam z `COVER` i `VARIANT` sześć atrybutów pod hasłem
+„Java ich nie czyta, więc to martwa konfiguracja". Kryterium było błędne. Drzewo domeny istnieje po
+to, żeby **organizować i strukturyzować konfigurację** — atrybut wskazujący regułę jest w nim
+spisem treści, a nie martwym wpisem, nawet jeśli aplikacja sięga po tę regułę inną drogą.
+
+Objaw był konkretny: z poziomu drzewa **nie dało się znaleźć składki**. `/PRODUCTS[HOME]/VARIANTS[COMPLETE]`
+mówiło o pozycji w drabince i sumie gwarancyjnej OC, a o tym, co i gdzie liczy cenę — nic.
+
+Co dołożone:
+
+| Element | Atrybut | Prowadzi do |
+|---|---|---|
+| `PRODUCT` | `APK_REGIME` | `demo.property.apk.regime [name]` |
+| | `SUMS` | `demo.property.sum.suggest` |
+| | `RISK_FACTOR` | `demo.property.risk.factor` |
+| | `ZONES` | `demo.property.zone.resolve` |
+| | `BUILDING_AGE` | `demo.property.util.buildingAge` |
+| `VARIANT` | `IS_AVAILABLE` / `UNAVAILABLE_REASON` | `demo.property.variant.availability` |
+| | **`PREMIUM`** | **flow `demo.property.calculateQuote`** |
+| `COVER` | `IS_AVAILABLE` | `demo.property.cover.availability` |
+| | `RATE` / `RATE_BASIS` | `demo.property.tariff.baseRate` |
+| | `SUM_REFERENCE` | `demo.property.cover.sumBasis [reference]` |
+| | `CAP_KIND` | `demo.property.cover.limitRule [capKind]` |
+| | `EFFECTIVE_LIMIT` | `demo.property.limit.effective` |
+
+Węzeł produktu miał **zero atrybutów** — był pustym korzeniem. Teraz jest wejściem: kto otwiera to
+drzewo pierwszy raz, ma stąd dojść wszędzie.
+
+⚠️ Java nadal czyta tylko część z nich i to jest w porządku. Zweryfikowane, że dołożenie atrybutów
+nie rusza runtime'u: wyceny wariantów bez zmian (489,52 / 891,50 / 2334,17 zł).
+
+⚠️ Kryterium przy kolejnych porządkach brzmi więc: **usuwamy atrybuty, które nie wskazują żadnej
+reguły**, a nie te, których nie czyta Java.

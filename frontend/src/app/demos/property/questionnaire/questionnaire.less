@@ -242,26 +242,48 @@
 }
 
 .apk__step {
+	margin-bottom: 26px;
+}
+
+.apk__step__where {
 	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-bottom: 22px;
+	align-items: baseline;
+	gap: 8px;
+	margin: 0 0 8px;
+	font-size: 0.8125rem;
+	color: @color-text-muted;
+}
+
+// Nazwa sekcji jest jedyną rzeczą w tym wierszu, która niesie treść — reszta to numeracja.
+.apk__step__section {
+	font-weight: 600;
+	color: @color-text;
 }
 
 .apk__step__counter {
-	flex: 0 0 auto;
-	color: @color-text-muted;
-	font-size: 0.8125rem;
 	font-variant-numeric: tabular-nums;
 }
 
-// Pasek postępu jest cienki i szary — informuje, ale nie konkuruje z pytaniem o uwagę.
+// ⛔ Pasek dzielony na sekcje: jeden segment na sekcję, szeroki proporcjonalnie do liczby jej
+// pytań. Odstęp między segmentami jest tu treścią, a nie ozdobą — to po nim widać, że po progu
+// KNF ankieta rozrasta się o CAŁE OBSZARY, a nie o kilka pytań doklejonych na końcu.
 .apk__step__bar {
-	flex: 1 1 auto;
+	display: flex;
+	gap: 4px;
 	height: 3px;
+}
+
+.apk__step__seg {
+	flex: 1 1 0;
 	border-radius: 2px;
 	background: @color-border-block;
 	overflow: hidden;
+}
+
+// Segment bieżącej sekcji jest o stopień ciemniejszy w tle — wiadomo, gdzie się jest, nawet
+// zanim wypełnienie do niego dojdzie.
+.apk__step__seg--current {
+	background: @color-border-strong;
 }
 
 .apk__step__fill {

@@ -165,6 +165,13 @@ pre-answered. Re-read the matrix after any column change. Step 2 is centred like
 **D-15** puts the recommendation ABOVE the packages — a deliberate departure from the letter of
 spec §3's ordering in favour of the priority sentence in the same paragraph ("do not show the
 client packages to choose from before they have seen the recommendation and its justification").
+**§23 (2026-09-04)** makes the questionnaire's sections visible — a section name above the counter
+and a progress bar **split into one segment per section**, so crossing the KNF threshold visibly
+adds two whole areas rather than seven questions from nowhere. And **D-16 reverses §17.1**: a
+domain attribute pointing at a rule is the tree's *table of contents*, not dead config, so the
+attributes removed there for "Java does not read them" come back and more join them — most
+importantly `VARIANT.PREMIUM` → the pricing flow, and a `PRODUCT` node that had **no attributes at
+all**. The criterion is now "remove attributes that point at no rule", not "that Java does not read".
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`
