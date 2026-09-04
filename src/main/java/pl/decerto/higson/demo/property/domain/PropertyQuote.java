@@ -8,7 +8,6 @@ import pl.decerto.higson.demo.apk.Question;
 
 import pl.decerto.higson.demo.apk.Recommendation;
 
-import pl.decerto.higson.demo.apk.Warning;
 
 import pl.decerto.higson.demo.apk.Need;
 
@@ -43,7 +42,6 @@ public class PropertyQuote {
 	private List<Cover> covers = new ArrayList<>();
 	private List<Variant> variants = new ArrayList<>();
 	private List<Need> needs = new ArrayList<>();
-	private List<Warning> warnings = new ArrayList<>();
 	private Recommendation recommendation = new Recommendation();
 
 	/** Oferta i — po akceptacji — polisa. Patrz `Offer`: jeden obiekt na oba stany. */
@@ -152,14 +150,6 @@ public class PropertyQuote {
 
 	public void setNeeds(List<Need> needs) {
 		this.needs = needs;
-	}
-
-	public List<Warning> getWarnings() {
-		return warnings;
-	}
-
-	public void setWarnings(List<Warning> warnings) {
-		this.warnings = warnings;
 	}
 
 	public Policyholder getPolicyholder() {

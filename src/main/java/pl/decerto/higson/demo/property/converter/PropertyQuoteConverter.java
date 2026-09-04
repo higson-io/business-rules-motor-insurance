@@ -24,7 +24,6 @@ import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.property.domain.Section;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.property.domain.Variant;
-import pl.decerto.higson.demo.apk.Warning;
 
 @Component
 public class PropertyQuoteConverter implements Converter<PropertyQuote, PropertyQuoteDto> {
@@ -52,9 +51,8 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 
 		dto.setCovers(convertCovers(quote.getCovers()));
 		dto.setVariants(convertVariants(quote.getVariants()));
-		// Trzy listy jadą razem, bo razem są jedną analizą — patrz RecommendationDto.
-		dto.setRecommendation(RecommendationDto.of(
-			quote.getRecommendation(), quote.getNeeds(), quote.getWarnings()));
+		// Potrzeby jadą razem z propozycją, bo razem są jedną analizą — patrz RecommendationDto.
+		dto.setRecommendation(RecommendationDto.of(quote.getRecommendation(), quote.getNeeds()));
 		dto.setOffer(convertOffer(quote.getOffer()));
 		dto.setPolicyholder(convertPolicyholder(quote.getPolicyholder()));
 		dto.setSelectedVariant(quote.getSelectedVariant());

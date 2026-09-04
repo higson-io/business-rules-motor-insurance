@@ -10,7 +10,6 @@ import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
-import pl.decerto.higson.demo.apk.Warning;
 import pl.decerto.higson.demo.apk.Regime;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -68,7 +67,6 @@ public class LifeQuote {
 	private Map<String, Answer> apkAnswers = new LinkedHashMap<>();
 
 	private List<Need> apkNeeds = new ArrayList<>();
-	private List<Warning> apkWarnings = new ArrayList<>();
 	private Recommendation apkRecommendation = new Recommendation();
 
 	public Regime getApkRegime() {
@@ -97,14 +95,6 @@ public class LifeQuote {
 
 	public void setApkNeeds(List<Need> apkNeeds) {
 		this.apkNeeds = apkNeeds;
-	}
-
-	public List<Warning> getApkWarnings() {
-		return apkWarnings;
-	}
-
-	public void setApkWarnings(List<Warning> apkWarnings) {
-		this.apkWarnings = apkWarnings;
 	}
 
 	public Recommendation getApkRecommendation() {

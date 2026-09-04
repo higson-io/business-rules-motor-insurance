@@ -20,7 +20,6 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	needsTitle: 'What your answers point to',
 	missing: 'Left outside the cover: {0}.',
 	justificationTitle: 'Why this proposal',
-	warningsTitle: 'Before you decide',
 	empty: 'Answer the questions — the proposal will appear here.',
 	premiumLabel: 'Premium',
 	premiumNote: 'for the twelve-month term',

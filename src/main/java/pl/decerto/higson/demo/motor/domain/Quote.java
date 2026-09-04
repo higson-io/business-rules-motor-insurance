@@ -10,7 +10,6 @@ import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
-import pl.decerto.higson.demo.apk.Warning;
 import pl.decerto.higson.demo.apk.Regime;
 
 public class Quote {
@@ -44,7 +43,6 @@ public class Quote {
 	private List<Need> apkNeeds = new ArrayList<>();
 
 	/** Konfrontacja sytuacji klienta z wyłączeniami OWU (rek. 8.2.c). */
-	private List<Warning> apkWarnings = new ArrayList<>();
 
 	/** Propozycja wraz z uzasadnieniem (rek. 8.2.d i 8.7). */
 	private Recommendation apkRecommendation = new Recommendation();
@@ -78,14 +76,6 @@ public class Quote {
 
 	public void setApkNeeds(List<Need> apkNeeds) {
 		this.apkNeeds = apkNeeds;
-	}
-
-	public List<Warning> getApkWarnings() {
-		return apkWarnings;
-	}
-
-	public void setApkWarnings(List<Warning> apkWarnings) {
-		this.apkWarnings = apkWarnings;
 	}
 
 	public Recommendation getApkRecommendation() {

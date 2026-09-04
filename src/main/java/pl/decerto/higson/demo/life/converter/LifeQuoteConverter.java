@@ -75,7 +75,7 @@ public class LifeQuoteConverter implements Converter<LifeQuote, LifeQuoteDto> {
 			.map(question -> QuestionDto.of(question, quote.getApkAnswers().get(question.getCode())))
 			.collect(Collectors.toList()));
 		dto.setApkRecommendation(RecommendationDto.of(
-			quote.getApkRecommendation(), quote.getApkNeeds(), quote.getApkWarnings()));
+			quote.getApkRecommendation(), quote.getApkNeeds()));
 
 		dto.setVariants(convertVariants(quote.getVariants()));
 		dto.setBenefits(convertBenefits(quote.getBenefits()));

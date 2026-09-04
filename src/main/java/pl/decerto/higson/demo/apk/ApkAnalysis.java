@@ -37,10 +37,6 @@ public final class ApkAnalysis {
 	private static final String OUT_NEED = "need";
 	private static final String OUT_COVER = "cover";
 	private static final String OUT_WEIGHT = "weight";
-	private static final String OUT_EXCLUSION = "exclusion";
-	private static final String OUT_SEVERITY = "severity";
-	private static final String OUT_WARNING = "warning";
-	private static final String OUT_REMEDY = "remedy";
 	private static final String OUT_TEXT = "text";
 	private static final String OUT_POSITION = "position";
 	private static final String OUT_PACKAGE = "package";
@@ -111,30 +107,6 @@ public final class ApkAnalysis {
 			}
 		}
 		return best;
-	}
-
-	/**
-	 * Rek. 8.2.c — konfrontacja sytuacji klienta z wyłączeniami OWU.
-	 *
-	 * Najcięższe wyłączenie ląduje na górze: kolejność wierszy w tabeli jest kolejnością
-	 * redakcyjną, nie wagą. Bez tego pięć ostrzeżeń naraz znaczy tyle samo, co zero.
-	 */
-	public static List<Warning> checkExclusions(HigsonEngine engine, String exclusionTable,
-			List<Question> questions, Map<String, Answer> answers,
-			BiFunction<String, String, HigsonContext> contextFor) {
-
-		List<Warning> warnings = new ArrayList<>();
-		for (AnswerRef ref : flatten(questions, answers)) {
-			ParamValue row = engine.get(exclusionTable, contextFor.apply(ref.questionCode, ref.value));
-			String exclusion = row.getString(OUT_EXCLUSION);
-			if (exclusion == null || exclusion.isEmpty()) {
-				continue;
-			}
-			warnings.add(new Warning(exclusion, intOrZero(row.getInteger(OUT_SEVERITY)),
-				row.getString(OUT_WARNING), row.getString(OUT_REMEDY)));
-		}
-		warnings.sort(Comparator.comparingInt(Warning::getSeverity).reversed());
-		return warnings;
 	}
 
 	/**

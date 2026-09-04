@@ -181,6 +181,13 @@ threshold that changed the questionnaire without a deployment is no longer demon
 (motor and life still version by date). ⚠️ There is no MCP call to delete a region version;
 "removing version 1" is `detach_from_region` on everything attached, and detaching keeps the
 ACTIVE version's content — **verify which one survived** rather than assuming.
+**§25 (2026-09-04)** removes the "before you decide" warnings block from **all three demos**, and
+its whole path with it — `ApkWarningDto`, the `warnings` field on model and DTO, Java's `Warning`,
+`ApkAnalysis.checkExclusions`, the per-profile exclusion tables and the reasons that pointed at the
+block. Rec. 8.2.c leaves the screen; the client's valuation vs. the computed sum survives as a
+sentence in the justification. ⚠️ **W-28**: `target/motor-insurance/` is never cleaned — the war
+plugin adds to it — so old `main-*.js` bundles keep shipping and a cached browser tab silently runs
+weeks-old code instead of 404-ing. `mvn clean package`, and check the **served** bundle, not the WAR.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`

@@ -63,7 +63,6 @@ public class Life {
 	private static final String PARAM_APK_DEFAULT_ANSWER = "demo.life.apk.question.defaultAnswer";
 
 	private static final String PARAM_APK_NEED = "demo.life.apk.need.derive";
-	private static final String PARAM_APK_EXCLUSION = "demo.life.apk.exclusion.conflict";
 	private static final String PARAM_APK_REASON = "demo.life.apk.recommendation.reason";
 	private static final String PARAM_RIDER_AVAILABILITY = "demo.life.individual.rider.availability";
 	private static final String FUNCTION_APK_SUM = "demo.life.apk.suggestSum";
@@ -274,10 +273,6 @@ public class Life {
 			(question, value) -> new LifeContext(quote).withQuestion(question).withAnswer(value));
 		quote.setApkNeeds(needs);
 
-		quote.setApkWarnings(quote.getApkRegime().isRequiresExclusionCheck()
-			? ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION, questions, answers,
-				(question, value) -> new LifeContext(quote).withQuestion(question).withAnswer(value))
-			: new ArrayList<>());
 
 		quote.setApkRecommendation(propose(quote, needs));
 	}
@@ -406,9 +401,6 @@ public class Life {
 			}
 		}
 
-		if (!quote.getApkWarnings().isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason("EXCLUSION_WARNING", quote.getApkWarnings().size()));
-		}
 		reasons.add(new ApkAnalysis.Reason("REGIME", quote.getApkRegime().getName()));
 		return reasons;
 	}

@@ -34,7 +34,6 @@ import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
 import pl.decerto.higson.demo.apk.Regime;
 import pl.decerto.higson.demo.property.domain.Variant;
-import pl.decerto.higson.demo.apk.Warning;
 
 /**
  * Orkiestrator profilu PROPERTY. Cała wiedza produktowa siedzi w Higsonie — ta klasa buduje
@@ -71,7 +70,6 @@ public class Property {
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
 	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
-	private static final String PARAM_APK_WARNING = "demo.property.apk.warning";
 	private static final String PARAM_APK_BLOCKER = "demo.property.apk.question.blocker";
 	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
@@ -438,22 +436,6 @@ public class Property {
 		// tego wymaga (rek. 8.2.b), miały do 3 września 2026 dwie osobne tabele o identycznym
 		// kształcie wyjścia. Jedna tabela z dwoma kolumnami stref robi obie rzeczy i czyta się
 		// jak lista tego, co trzeba klientowi powiedzieć — bo tym właśnie jest.
-		// ⛔ Gałąź reżimu zostaje. Wszystkie wiersze tej tabeli są konfrontacją sytuacji klienta —
-		// z wyłączeniami OWU albo ze strefą — więc jeden przełącznik `requiresExclusionCheck`
-		// rządzi całą listą. Przed progiem KNF ostrzeżeń nie ma i to jest widoczna różnica
-		// między reżimami, a nie brak danych.
-		List<Warning> warnings = quote.getRegime().isRequiresExclusionCheck()
-			? new ArrayList<>(ApkAnalysis.checkExclusions(engine, PARAM_APK_WARNING,
-				quote.getQuestions(), quote.getAnswers(),
-				(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value)))
-			: new ArrayList<>();
-		Warning valueGap = checkValueGap(quote);
-		if (valueGap != null) {
-			warnings.add(valueGap);
-		}
-		warnings.sort(Comparator.comparingInt(Warning::getSeverity).reversed());
-		quote.setWarnings(warnings);
-
 		applyBlocker(quote);
 
 		quote.setRecommendation(propose(quote, needs));
@@ -485,31 +467,6 @@ public class Property {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Rek. 8.2.c — oszacowanie klienta zderzone z sumą, którą liczą reguły.
-	 *
-	 * ⛔ Próg jest w tabeli, nie tutaj. Java liczy iloraz i pyta `demo.property.sum.valueGap`,
-	 * od którego rozjazdu warto klienta ostrzec — bo to jest decyzja produktowa, a nie liczenie.
-	 * Bez odpowiedzi klienta nie ma czego porównywać i nie ma ostrzeżenia; brak pytania jest
-	 * stanem normalnym przed progiem KNF, gdzie PROPERTY_VALUE nie istnieje w drzewie.
-	 */
-	private Warning checkValueGap(PropertyQuote quote) {
-		BigDecimal declared = decimalAt(quote, PATH_PROPERTY_VALUE);
-		BigDecimal computed = decimalAt(quote, PATH_SUM_SUGGESTED);
-		if (declared == null || declared.signum() <= 0 || computed == null || computed.signum() <= 0) {
-			return null;
-		}
-		BigDecimal ratio = declared.divide(computed, 4, RoundingMode.HALF_UP);
-		ParamValue row = engine.get(PARAM_VALUE_GAP,
-			new PropertyContext(quote).withComputed(PATH_VALUE_RATIO, ratio));
-		String warning = row.getString("warning");
-		if (warning == null || warning.isEmpty()) {
-			return null;
-		}
-		return new Warning(row.getString("outcome"), intOrZero(row.getInteger("severity")),
-			warning, row.getString("remedy"));
 	}
 
 	/**
@@ -713,9 +670,6 @@ public class Property {
 		reasons.add(new ApkAnalysis.Reason("FLOOD_WAITING",
 			engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
 
-		if (!quote.getWarnings().isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason("EXCLUSIONS_FOUND", quote.getWarnings().size()));
-		}
 		reasons.add(new ApkAnalysis.Reason("LEGAL_BASIS", quote.getRegime().getLegalBasis()));
 		return reasons;
 	}

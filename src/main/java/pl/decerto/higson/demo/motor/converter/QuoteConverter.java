@@ -33,7 +33,7 @@ public class QuoteConverter implements Converter<Quote, QuoteDto> {
 			.map(question -> QuestionDto.of(question, quote.getApkAnswers().get(question.getCode())))
 			.collect(Collectors.toList()));
 		dto.setApkRecommendation(RecommendationDto.of(
-			quote.getApkRecommendation(), quote.getApkNeeds(), quote.getApkWarnings()));
+			quote.getApkRecommendation(), quote.getApkNeeds()));
 		dto.setOptions(quote.getOptions()
 			.stream()
 			.map(this::toOptionDto)

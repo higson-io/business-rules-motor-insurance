@@ -40,7 +40,6 @@ const QUOTE: PropertyQuoteDto = {
 		alternativePremium: null,
 		justification: [],
 		needs: [],
-		warnings: [],
 	},
 	policyholder: {
 		firstName: 'Anna',

@@ -48,7 +48,6 @@ public class Motor {
 	private static final String PARAM_APK_DEFAULT_ANSWER = "demo.moto.apk.question.defaultAnswer";
 
 	private static final String PARAM_APK_NEED = "demo.moto.apk.need.derive";
-	private static final String PARAM_APK_EXCLUSION = "demo.moto.apk.exclusion.conflict";
 	private static final String PARAM_APK_REASON = "demo.moto.apk.recommendation.reason";
 	private static final String PARAM_COVERAGE_AVAILABILITY = "demo.motor.coverage.availability";
 
@@ -129,10 +128,6 @@ public class Motor {
 			(question, value) -> new MotorContext(quote).withQuestion(question).withAnswer(value));
 		quote.setApkNeeds(needs);
 
-		quote.setApkWarnings(quote.getApkRegime().isRequiresExclusionCheck()
-			? ApkAnalysis.checkExclusions(engine, PARAM_APK_EXCLUSION, questions, answers,
-				(question, value) -> new MotorContext(quote).withQuestion(question).withAnswer(value))
-			: new ArrayList<>());
 
 		quote.setApkRecommendation(propose(quote, needs));
 	}
@@ -225,9 +220,6 @@ public class Motor {
 				nameOf(plan, "OPTIONS", proposed.getCode())));
 		}
 
-		if (!quote.getApkWarnings().isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason("EXCLUSION_WARNING", quote.getApkWarnings().size()));
-		}
 		reasons.add(new ApkAnalysis.Reason("REGIME", quote.getApkRegime().getName()));
 		return reasons;
 	}

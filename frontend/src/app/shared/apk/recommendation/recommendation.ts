@@ -4,7 +4,6 @@ import {
 	ApkNeedDto,
 	ApkRecommendationCopy,
 	ApkRecommendationDto,
-	ApkWarningDto,
 } from '../../../models/apk';
 
 /**
@@ -64,11 +63,6 @@ export class ApkRecommendation {
 	readonly alternativePremium = input<string | null>(null);
 
 	readonly needs = computed<readonly ApkNeedDto[]>(() => this.recommendation()?.needs ?? []);
-
-	/** Ostrzeżenia przychodzą już posortowane wagą malejąco — sortowania po stronie klienta brak. */
-	readonly warnings = computed<readonly ApkWarningDto[]>(
-		() => this.recommendation()?.warnings ?? [],
-	);
 
 	readonly justification = computed<readonly string[]>(
 		() => this.recommendation()?.justification ?? [],

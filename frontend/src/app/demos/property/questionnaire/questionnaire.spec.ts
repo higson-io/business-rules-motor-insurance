@@ -79,7 +79,6 @@ function quote(questions: readonly PropertyQuestionDto[], kind: 'FORM' | 'KNOWN'
 			alternativePremium: null,
 			justification: [],
 			needs: [],
-			warnings: [],
 		},
 		policyholder: {
 			firstName: 'Anna',

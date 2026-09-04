@@ -2584,3 +2584,51 @@ gospodarza majątkowego.
 | Przedmiot (krok 2) | 10 pól, wszystkie wypełnione domyślnie |
 | Reżim | `KNF_190_2026`, zawsze |
 | Taryfa | 545,29 / 993,07 / 2912,65 zł |
+
+---
+
+## §25 Blok „Zanim zdecydujesz" usunięty z całej aplikacji (2026-09-04)
+
+Ostrzeżenia znikają z ekranu rekomendacji **we wszystkich trzech demach**. W praktyce traci na tym
+tylko majątkowe: komunikacyjne i życiowe deklarowały tytuł bloku w swoich napisach, ale nigdy nie
+wypełniały listy — blok nie pokazywał się tam nigdy.
+
+Usunięte razem z blokiem, żeby nie zostawiać martwej ścieżki: `ApkWarningDto` i pole `warnings`
+w modelu i w DTO, `Warning`/`WarningDto` po stronie Javy, `ApkAnalysis.checkExclusions`,
+`checkValueGap` oraz powód `EXCLUSIONS_FOUND` — ten ostatni mówił „opisujemy je nad propozycją",
+co po usunięciu bloku byłoby nieprawdą.
+
+⚠️ **Rekomendacja 8.2.c znika z ekranu.** Konfrontacja sytuacji klienta z wyłączeniami była jedną
+z rzeczy, które ten profil pokazywał; po §24.1 straciła połowę materiału, a teraz nie ma jej wcale.
+Zostaje w uzasadnieniu: zdania `VALUE_UNDERSTATED` / `VALUE_OVERSTATED` nadal porównują oszacowanie
+klienta z sumą wyliczoną z reguł, bo `demo.property.sum.valueGap` jest czytane przez powody,
+a nie przez ostrzeżenia.
+
+Treści usuniętej tabeli `demo.property.apk.warning` (do odtworzenia, gdyby blok miał wrócić):
+
+| pytanie / odpowiedź / strefa | waga | treść |
+|---|---|---|
+| `NEED_FLOOD` / false / Z1 | 60 | Miejsce leży w strefie zagrożenia powodziowego, a rezygnujesz z ochrony od powodzi i zalania. |
+| `NEED_FLOOD` / false / Z2 | 80 | Strefa o wysokim zagrożeniu powodziowym — to najczęstsza szkoda w tej lokalizacji. |
+| `NEED_FLOOD` / true / ZX | 90 | Zgłaszasz potrzebę ochrony od powodzi, ale w tej strefie nie jest dostępna w żadnym wariancie. |
+| `NEED_THEFT` / false / T3 | 70 | Strefa o najwyższej liczbie włamań, a rezygnujesz z ochrony od kradzieży. |
+| `NEED_THEFT` / false / T2 | 50 | Strefa o podwyższonej liczbie włamań, a rezygnujesz z ochrony od kradzieży. |
+| `OCCUPANCY` / RENTED | 20 | Szkody wyrządzone przez najemcę nie są objęte OC właściciela. |
+| `OCCUPANCY` / SEASONAL | 20 | Użytkowanie sezonowe bywa traktowane jak dom letniskowy. |
+| `RENOVATED` / false | 40 | Budynek starszy niż 50 lat bez remontu wycenia się w wartości rzeczywistej. |
+| `SECURITY` / NONE | 20 | Bez zabezpieczeń ochrona od kradzieży bywa ograniczona albo niedostępna. |
+
+### 25.1 W-28 — stare bundle zostają w `target/` i karmią zakeszowaną kartę
+
+⚠️ `frontend/dist` jest czyszczony przez `ng build`, ale **`target/motor-insurance/` nie jest
+czyszczony przez nic**: `maven-war-plugin` dokłada zasoby do istniejącego katalogu. Po kilkunastu
+przebudowach WAR wiózł **25 plików `main-*.js`** z różnych wersji.
+
+Skutek jest mylący: przeglądarka z zakeszowanym `index.html` ładuje swój stary `main-*.js`, bo ten
+plik **nadal jest w artefakcie** — zamiast dostać 404 i przeładować stronę, działa dalej na kodzie
+sprzed kilku zmian. Tak właśnie wyglądał „panel ustawień, który miał zniknąć": był usunięty
+z serwowanego bundle'a, ale karta widza trzymała poprzedni.
+
+Lekarstwo: `mvn clean package` albo `rm -rf target/motor-insurance` przed pakowaniem. Przy
+sprawdzaniu, czy zmiana doszła, porównywać **serwowany** bundle (`curl .../demo/ | grep main-`),
+a nie zawartość WAR-a.

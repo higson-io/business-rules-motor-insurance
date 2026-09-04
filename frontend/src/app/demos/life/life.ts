@@ -28,7 +28,6 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 	needsTitle: 'Potrzeby wynikające z odpowiedzi',
 	missing: 'Poza zakresem zostaje: {0}.',
 	justificationTitle: 'Dlaczego ta propozycja',
-	warningsTitle: 'Zanim zdecydujesz',
 	empty: 'Odpowiedz na pytania ankiety — propozycja pojawi się tutaj.',
 	premiumLabel: 'Składka miesięczna',
 	premiumNote: 'za jedną osobę',

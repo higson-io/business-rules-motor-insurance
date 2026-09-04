@@ -6,14 +6,15 @@ import java.util.List;
 
 import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.apk.Recommendation;
-import pl.decerto.higson.demo.apk.Warning;
 
 /**
  * Wynik analizy potrzeb na drucie — wspólny dla trzech linii.
  *
- * Niesie trzy listy razem, bo razem są jedną analizą: co klient zgłosił, co z tym kłóci się
- * w OWU i co z tego wynika. Rozdzielone na trzy pola najwyższego poziomu kusiłyby, żeby
- * pokazać jedno bez drugiego.
+ * Niesie potrzeby razem z propozycją, bo razem są jedną analizą: co klient zgłosił i co z tego
+ * wynika. Rozdzielone na dwa pola najwyższego poziomu kusiłyby, żeby pokazać jedno bez drugiego.
+ *
+ * ⛔ Trzecią listą były OSTRZEŻENIA (rek. 8.2.c). Zniknęły z ekranu 4 września 2026, a razem
+ * z nimi stąd — pole, którego nikt nie renderuje, jest martwym ładunkiem na drucie.
  */
 public class RecommendationDto {
 
@@ -34,7 +35,6 @@ public class RecommendationDto {
 	private List<String> justification = new ArrayList<>();
 
 	private List<NeedDto> needs = new ArrayList<>();
-	private List<WarningDto> warnings = new ArrayList<>();
 
 	public String getVariantCode() { return variantCode; }
 	public void setVariantCode(String variantCode) { this.variantCode = variantCode; }
@@ -54,10 +54,8 @@ public class RecommendationDto {
 	public void setJustification(List<String> justification) { this.justification = justification; }
 	public List<NeedDto> getNeeds() { return needs; }
 	public void setNeeds(List<NeedDto> needs) { this.needs = needs; }
-	public List<WarningDto> getWarnings() { return warnings; }
-	public void setWarnings(List<WarningDto> warnings) { this.warnings = warnings; }
 
-	public static RecommendationDto of(Recommendation source, List<Need> needs, List<Warning> warnings) {
+	public static RecommendationDto of(Recommendation source, List<Need> needs) {
 		RecommendationDto dto = new RecommendationDto();
 		dto.setVariantCode(source.getVariantCode());
 		dto.setCoveredNeeds(source.getCoveredNeeds());
@@ -69,9 +67,6 @@ public class RecommendationDto {
 		dto.setJustification(source.getJustification());
 		for (Need need : needs) {
 			dto.getNeeds().add(NeedDto.of(need));
-		}
-		for (Warning warning : warnings) {
-			dto.getWarnings().add(WarningDto.of(warning));
 		}
 		return dto;
 	}
@@ -98,29 +93,4 @@ public class RecommendationDto {
 		}
 	}
 
-	/** Wyłączenie, które styka się z sytuacją klienta. `remedy` jedzie razem — patrz rek. 8.2.c. */
-	public static class WarningDto {
-		private String code;
-		private int severity;
-		private String text;
-		private String remedy;
-
-		public String getCode() { return code; }
-		public void setCode(String code) { this.code = code; }
-		public int getSeverity() { return severity; }
-		public void setSeverity(int severity) { this.severity = severity; }
-		public String getText() { return text; }
-		public void setText(String text) { this.text = text; }
-		public String getRemedy() { return remedy; }
-		public void setRemedy(String remedy) { this.remedy = remedy; }
-
-		static WarningDto of(Warning warning) {
-			WarningDto dto = new WarningDto();
-			dto.setCode(warning.getCode());
-			dto.setSeverity(warning.getSeverity());
-			dto.setText(warning.getText());
-			dto.setRemedy(warning.getRemedy());
-			return dto;
-		}
-	}
 }

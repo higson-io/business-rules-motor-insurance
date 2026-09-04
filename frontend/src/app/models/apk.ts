@@ -88,13 +88,6 @@ export interface ApkNeedDto {
 	readonly weight: number;
 }
 
-/** Wyłączenie kolidujące z sytuacją klienta (rek. 8.2.c). Bez `remedy` byłoby niedokończone. */
-export interface ApkWarningDto {
-	readonly code: string;
-	readonly severity: number;
-	readonly text: string;
-	readonly remedy: string;
-}
 
 export interface ApkRecommendationDto {
 	/**
@@ -119,7 +112,6 @@ export interface ApkRecommendationDto {
 	readonly alternativePremium: number | null;
 	readonly justification: readonly string[];
 	readonly needs: readonly ApkNeedDto[];
-	readonly warnings: readonly ApkWarningDto[];
 }
 
 /**
@@ -143,7 +135,6 @@ export interface ApkRecommendationCopy {
 	/** `{0}` — lista nazw po przecinku. */
 	readonly missing: string;
 	readonly justificationTitle: string;
-	readonly warningsTitle: string;
 	readonly empty: string;
 
 	/**

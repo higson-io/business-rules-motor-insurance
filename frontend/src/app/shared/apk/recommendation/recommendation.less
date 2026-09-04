@@ -25,43 +25,6 @@
 	font-size: @font-sm;
 }
 
-// ⛔ Ostrzeżenia dostają WŁASNY panel, a nie leżą wprost na tle. Bez niego nagłówek sekcji siedział
-// na szarym tle tuż pod paskiem kroków i wyglądał jak błąd renderowania, a nie jak treść.
-// Nad propozycją i wizualnie od niej oddzielone — dotyczą decyzji, nie wyniku.
-.reco__warnings {
-	padding: @space-panel;
-	margin-bottom: @space-gap;
-	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
-}
-
-.reco__warning {
-	padding: 14px 16px;
-	margin-bottom: 8px;
-	border: 1px solid @color-border-block;
-	// Karta wewnątrz białego panelu musi mieć inne tło niż panel, inaczej granica jest niewidoczna.
-	border-left: 3px solid @color-text-muted;
-	background: @color-ground;
-	border-radius: 0 6px 6px 0;
-}
-
-.reco__warning--severe {
-	border-left-color: @color-warn;
-}
-
-.reco__warning-text {
-	margin: 0;
-	font-size: @font-md;
-	line-height: 1.5;
-}
-
-.reco__warning-remedy {
-	margin: 4px 0 0;
-	font-size: @font-sm;
-	color: @color-text-muted;
-}
-
 // Panel portalu: 8px, 1.5rem, bez obrysu — patrz `.apk__section`.
 .reco__pick {
 	padding: @space-panel;
