@@ -188,6 +188,11 @@ block. Rec. 8.2.c leaves the screen; the client's valuation vs. the computed sum
 sentence in the justification. ⚠️ **W-28**: `target/motor-insurance/` is never cleaned — the war
 plugin adds to it — so old `main-*.js` bundles keep shipping and a cached browser tab silently runs
 weeks-old code instead of 404-ing. `mvn clean package`, and check the **served** bundle, not the WAR.
+**§26 (2026-09-04)** drops the recommendation component from the offer step. §19.2 had added it to
+satisfy spec §5.4 ("the same component in the summary"), which was reading the requirement
+literally instead of by substance — the offer already carries the chosen premium in its header,
+the agreement-with-recommendation note, and the needs and justification in its "client needs
+analysis" attachment. The component beside it repeated all of that a second time on one screen.
 **Read before** touching the property demo's rules, the APK question catalogue, or anything that
 depends on the region version — a question added under `SECTIONS[NEEDS]` silently inherits region
 version 2 (**W-24**), and a PARAMETER `defaultValue` written through the API doubles its `$p`

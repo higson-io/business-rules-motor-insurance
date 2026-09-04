@@ -99,23 +99,17 @@
 			}
 
 			@case ('offer') {
-				<app-property-offer />
-
 				<!--
-					⛔ TEN SAM KOMPONENT W PODSUMOWANIU — wymóg specyfikacji. Klient ma zobaczyć
-					rekomendację i jej uzasadnienie jeszcze raz, obok tego, co faktycznie wybrał;
-					notatkę o zgodności wyboru z rekomendacją niesie już sama oferta i wynika ona
-					automatycznie z wybranego wariantu, więc nie ma tu drugiego pola do wypełnienia.
+					⛔ BEZ komponentu rekomendacji. Stał tu od 3 września 2026, bo specyfikacja PM-a każe
+					powtórzyć w podsumowaniu składkę, rekomendację i uzasadnienie — ale oferta niesie to
+					wszystko sama: składkę w nagłówku dokumentu, zgodność wyboru z rekomendacją w notatce,
+					a potrzeby i uzasadnienie w załączniku „analiza potrzeb klienta". Komponent obok
+					powtarzał te same zdania dwa razy na jednym ekranie.
+
+					Wymóg specyfikacji jest więc spełniony CO DO TREŚCI, tylko w kształcie dokumentu,
+					a nie ekranu sprzedażowego — i tak jest właściwie, bo to jest dokument.
 				-->
-				<app-apk-recommendation
-					[recommendation]="recommendation()"
-					[copy]="copy"
-					[variantName]="recommendedName()"
-					[missingNames]="missingNames()"
-					[premium]="proposedPremium()"
-					[alternativeName]="alternative()?.name ?? null"
-					[alternativePremium]="alternative()?.premium ?? null"
-				/>
+				<app-property-offer />
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('proposal')">

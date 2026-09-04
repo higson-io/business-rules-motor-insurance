@@ -2632,3 +2632,26 @@ z serwowanego bundle'a, ale karta widza trzymała poprzedni.
 Lekarstwo: `mvn clean package` albo `rm -rf target/motor-insurance` przed pakowaniem. Przy
 sprawdzaniu, czy zmiana doszła, porównywać **serwowany** bundle (`curl .../demo/ | grep main-`),
 a nie zawartość WAR-a.
+
+---
+
+## §26 Podsumowanie przestaje powtarzać samo siebie (2026-09-04)
+
+Na kroku oferty pod dokumentem stał komponent rekomendacji — ten sam, co na kroku trzecim.
+Dołożyłem go w §19.2, bo §5.4 specyfikacji PM-a każe umieścić w podsumowaniu „wybraną składkę,
+rekomendację i uzasadnienie". Był to błąd czytania wymagania **dosłownie zamiast co do treści**:
+oferta niesie to wszystko sama i niosła już wcześniej.
+
+| Czego żąda §5.4 | Gdzie to w ofercie jest |
+|---|---|
+| wybrana składka | nagłówek dokumentu, „Składka za okres ochrony" |
+| rekomendacja i zgodność wyboru | notatka „Wybór zgodny z rekomendacją" / „Wybór węższy niż rekomendacja" |
+| uzasadnienie | załącznik „Analiza potrzeb klienta" — zgłoszone potrzeby i uzasadnienie rekomendacji |
+
+Komponent obok powtarzał te same zdania drugi raz na tym samym ekranie — łącznie z całą listą
+uzasadnienia. Usunięty; wymóg zostaje spełniony **w kształcie dokumentu, a nie ekranu
+sprzedażowego**, co dla oferty jest właściwsze.
+
+⚠️ Weryfikacja tej zmiany wymagała **wymuszenia świeżego `index.html`** — przeglądarka trzymała
+poprzedni i ładowała bundle sprzed zmiany, mimo że serwer miał już nowy (patrz W-28). Pierwszy
+zrzut po przebudowie pokazywał usunięty blok jako nadal obecny.
