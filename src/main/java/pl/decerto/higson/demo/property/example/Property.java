@@ -60,7 +60,6 @@ public class Property {
 
 	private static final String PARAM_REGIME = "demo.property.apk.regime";
 	private static final String PARAM_QUESTION = "demo.property.apk.question";
-	private static final String PARAM_COVER_AVAILABILITY = "demo.property.cover.availability";
 
 	private static final String FUNCTION_BUILDING_AGE = "demo.property.util.buildingAge";
 	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
@@ -374,7 +373,7 @@ public class Property {
 			variant.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
 			variant.setLiabilitySum(definition.getAttrDecimal("LIABILITY_SUM", ctx));
 
-			applyCovers(quote, variant);
+			applyCovers(definition, variant);
 
 			Map<String, Object> result = engine.flow(FLOW_QUOTE, ctx).getResult();
 			// ⛔ Boolean, nie „YES". Flow czyta dostępność TABELĄ WPROST, odkąd zniknęła nakładka
@@ -399,22 +398,26 @@ public class Property {
 	}
 
 	/**
-	 * Zakres wariantu czytany WPROST z tabeli dostępności, para (pokrycie, wariant).
+	 * Skład pakietu czytany Z DRZEWA: pokrycia wiszą pod wariantem jako kolekcja `COVERS`.
 	 *
-	 * ⚠️ Nie da się go wyprowadzić z listy braków zwróconej przez apk.scoreVariants — tamta jest
+	 * ⛔ Do 4 września 2026 rozstrzygała o tym tabela `demo.property.cover.availability` — para
+	 * (pokrycie, wariant) w dwudziestu jeden wierszach. Odpowiadała na pytanie „czy X jest w Y",
+	 * ale żeby zobaczyć SKŁAD pakietu, trzeba było przeczytać całą tabelę i odfiltrować kolumnę.
+	 * W drzewie skład pakietu jest tam, gdzie pakiet: otwiera się wariant i widać, co zawiera.
+	 *
+	 * ⛔ Element w tej kolekcji nie ma ŻADNEGO atrybutu — jego kod jest odwołaniem do pokrycia
+	 * z `/PRODUCTS[HOME]/COVERS`. Gdyby miał atrybuty, stawka albo limit dałyby się ustawić
+	 * w dwóch miejscach i zaczęłyby się rozjeżdżać.
+	 *
+	 * ⚠️ Nie da się go wyprowadzić z listy braków zwróconej przez `ApkAnalysis.score` — tamta jest
 	 * liczona względem POTRZEB klienta, więc pokrycie, którego klient nie potrzebuje, nie trafia
 	 * ani do pokrytych, ani do brakujących. Macierz porównawcza zbudowana na tamtej liście
 	 * pokazywałaby ptaszki wszędzie tam, gdzie klient o nic nie prosił.
 	 */
-	private void applyCovers(PropertyQuote quote, Variant variant) {
+	private void applyCovers(DomainObject definition, Variant variant) {
 		variant.getCovers().clear();
-		for (Cover cover : quote.getCovers()) {
-			PropertyContext cellCtx = new PropertyContext(quote)
-				.withCover(cover.getCode())
-				.withVariant(variant.getCode());
-			if (Boolean.TRUE.equals(engine.get(PARAM_COVER_AVAILABILITY, cellCtx).getBoolean("available"))) {
-				variant.getCovers().add(cover.getCode());
-			}
+		for (DomainObject member : definition.getChildren(COLLECTION_COVERS)) {
+			variant.getCovers().add(member.getCode());
 		}
 	}
 
