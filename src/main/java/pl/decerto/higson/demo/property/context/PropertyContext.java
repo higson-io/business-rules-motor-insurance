@@ -37,6 +37,10 @@ public class PropertyContext extends HigsonContext {
 	private String variantCode;
 	private String reasonCode;
 	private String choiceKind;
+	private Boolean revealHasSource;
+	private Boolean revealSourceAnswered;
+	private Boolean revealSourceRefused;
+	private Boolean revealSourceRequired;
 	private String choiceRecommended;
 	private String choiceSelected;
 
@@ -63,6 +67,17 @@ public class PropertyContext extends HigsonContext {
 
 	public PropertyContext withVariant(String code) {
 		this.variantCode = code;
+		return this;
+	}
+
+	/** Stan pytania odsłaniającego — z niego reguła wyprowadza, czy kolejne pytanie już pora zadać. */
+	public PropertyContext withReveal(boolean hasSource, boolean answered, boolean refused,
+			boolean required) {
+
+		this.revealHasSource = hasSource;
+		this.revealSourceAnswered = answered;
+		this.revealSourceRefused = refused;
+		this.revealSourceRequired = required;
 		return this;
 	}
 
@@ -115,6 +130,18 @@ public class PropertyContext extends HigsonContext {
 		}
 
 		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
+		if ("reveal.hasSource".equals(path)) {
+			return revealHasSource;
+		}
+		if ("reveal.sourceAnswered".equals(path)) {
+			return revealSourceAnswered;
+		}
+		if ("reveal.sourceRefused".equals(path)) {
+			return revealSourceRefused;
+		}
+		if ("reveal.sourceRequired".equals(path)) {
+			return revealSourceRequired;
+		}
 		if ("quote.choice.recommended".equals(path)) {
 			return choiceRecommended;
 		}

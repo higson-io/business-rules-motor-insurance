@@ -88,10 +88,12 @@ public class Property {
 	private static final String REASON_ALTERNATIVE = "BUDGET_ALTERNATIVE";
 	private static final String REASON_NO_ALTERNATIVE = "BUDGET_NO_ALTERNATIVE";
 
+	private static final String PARAM_REVEAL = "demo.property.apk.question.reveal";
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
 	private static final String PATH_APK_INDICATED = "quote.apk.indicated";
 	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
+	private static final String FUNCTION_APK_NEEDS = "demo.property.apk.needs";
 	private static final String FUNCTION_APK_INDICATED = "demo.property.apk.indicated";
 	private static final String FUNCTION_APK_BUDGET = "demo.property.apk.budgetOutcome";
 	private static final String FUNCTION_APK_ALTERNATIVE = "demo.property.apk.alternative";
@@ -285,14 +287,21 @@ public class Property {
 		}
 		for (Question question : questions) {
 			String revealedBy = question.getRevealedBy();
-			if (revealedBy == null || revealedBy.isEmpty()) {
-				question.setRevealed(true);
-				continue;
-			}
-			Question source = byCode.get(revealedBy);
-			Answer answer = quote.getAnswers().get(revealedBy);
-			boolean settled = answer != null && answer.isSettled();
-			question.setRevealed(settled || source == null || !source.isRequired());
+			Question source = revealedBy == null || revealedBy.isEmpty() ? null : byCode.get(revealedBy);
+			Answer answer = source == null ? null : quote.getAnswers().get(revealedBy);
+
+			// ⛔ ROZSTRZYGA TABELA `demo.property.apk.question.reveal`. Java podaje jej cztery
+			// fakty o pytaniu odsłaniającym i nie wie, co z nich wynika. Do 7 września 2026 stało
+			// tu wyrażenie, w którym siedziały dwie reguły naraz i obie łatwo było przeoczyć:
+			// odmowa liczy się jak odpowiedź, a pytanie nieobowiązkowe przepuszcza łańcuch dalej.
+			PropertyContext ctx = new PropertyContext(quote).withReveal(
+				source != null,
+				answer != null && answer.isAnswered(),
+				answer != null && answer.isRefused(),
+				source != null && source.isRequired());
+
+			question.setRevealed(
+				Boolean.TRUE.equals(engine.get(PARAM_REVEAL, ctx).getBoolean("revealed")));
 		}
 	}
 
@@ -451,9 +460,13 @@ public class Property {
 	 * dla klienta nie ma w tym pliku — wszystkie siedzą w `demo.property.apk.*`.
 	 */
 	private void recommend(PropertyQuote quote) {
-		List<Need> needs = ApkAnalysis.deriveNeeds(engine, PARAM_APK_ANSWER,
-			quote.getQuestions(), quote.getAnswers(),
-			(question, value) -> new PropertyContext(quote).withQuestion(question).withAnswer(value));
+		// ⛔ POTRZEBY LICZY REGUŁA. `demo.property.apk.needs` przechodzi po odpowiedziach, pyta
+		// tabelę, co każda znaczy, i rozstrzyga kolizje: gdy dwie wskazują to samo pokrycie,
+		// wygrywa wyższa waga. Ta ostatnia reguła stała do 7 września 2026 w `ApkAnalysis`, przez
+		// co o treści potrzeby decydowała kolejność pytań na ekranie.
+		PropertyContext ctx = new PropertyContext(quote)
+			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(quote.getQuestions(), quote.getAnswers()));
+		List<Need> needs = parseNeeds(asString(engine.call(FUNCTION_APK_NEEDS, ctx)));
 		quote.setNeeds(needs);
 
 		// Jedna tabela, jeden przebieg, jedna lista. Wyłączenia OWU stykające się z sytuacją
@@ -877,6 +890,29 @@ public class Property {
 		}
 	}
 
+
+	/**
+	 * Lista potrzeb z reguły: `POKRYCIE|treść|waga`, rekordy rozdzielone średnikiem.
+	 *
+	 * ⚠️ Rozdzielamy po PIERWSZYCH dwóch kreskach, nie przez `split` po całości — treść potrzeby
+	 * jest zdaniem dla klienta i nie ma powodu, żeby kod aplikacji dyktował, czego w niej nie ma.
+	 */
+	private List<Need> parseNeeds(String raw) {
+		List<Need> needs = new ArrayList<>();
+		if (raw == null || raw.isEmpty()) {
+			return needs;
+		}
+		for (String line : raw.split(";")) {
+			int cover = line.indexOf('|');
+			int weight = line.lastIndexOf('|');
+			if (cover < 1 || weight <= cover) {
+				continue;
+			}
+			needs.add(new Need(line.substring(0, cover), line.substring(cover + 1, weight),
+				intOrZero(asInt(line.substring(weight + 1)))));
+		}
+		return needs;
+	}
 
 	private List<String> split(String raw) {
 		if (raw == null || raw.isEmpty()) {

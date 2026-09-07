@@ -1,0 +1,55 @@
+code = "demo.property.apk.question.reveal"
+description = "Ankieta jest lancuchem: pytanie pojawia sie dopiero, gdy poprzednie zostalo zalatwione. Ta tabela mowi, co znaczy zalatwione. Dwie reguly, obie latwe do przeoczenia i obie kosztowne: ODMOWA ROZSTRZYGA (klient, ktory nie chce podac odpowiedzi, przechodzi dalej), a PYTANIE OPCJONALNE PRZEPUSZCZA LANCUCH (bez tego jedno pominiete pytanie nieobowiazkowe zatrzymaloby ankiete na zawsze)."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Kiedy pytanie sie odslania"
+
+[[inputLevel]]
+code = "hasSource"
+label = "ma pytanie odslaniajace"
+type = "boolean"
+reverseMatcher = false
+property = "reveal.hasSource"
+source = "reveal.hasSource"
+union = false
+
+[[inputLevel]]
+code = "answered"
+label = "odslaniajace odpowiedziane"
+type = "boolean"
+reverseMatcher = false
+property = "reveal.sourceAnswered"
+source = "reveal.sourceAnswered"
+union = false
+
+[[inputLevel]]
+code = "refused"
+label = "odslaniajace - odmowa"
+type = "boolean"
+reverseMatcher = false
+property = "reveal.sourceRefused"
+source = "reveal.sourceRefused"
+union = false
+
+[[inputLevel]]
+code = "required"
+label = "odslaniajace obowiazkowe"
+type = "boolean"
+reverseMatcher = false
+property = "reveal.sourceRequired"
+source = "reveal.sourceRequired"
+union = false
+
+[[outputLevel]]
+code = "revealed"
+label = "czy odslonic"
+type = "boolean"
+external = false
+array = false

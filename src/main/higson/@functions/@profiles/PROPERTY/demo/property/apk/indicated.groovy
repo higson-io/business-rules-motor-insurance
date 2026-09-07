@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Serce rekomendacji. Z odpowiedzi wyprowadza wymagane pokrycia (tabela apk.answer), a potem szuka NAJTANSZEGO pakietu, ktory je wszystkie ma - sklad pakietow czyta z drzewa. Gdy zaden nie pokrywa wszystkiego, wygrywa pakiet o najwiekszym pokryciu, a przy remisie tanszy; luki nie zamiatamy, nazywa je uzasadnienie. Funkcja nie zna ANI JEDNEGO kodu pakietu i ani jednego kodu pytania - dolozenie czwartego pakietu to jeden element w drzewie."
+description = "Serce rekomendacji: najtanszy pakiet, ktory ma wszystkie wymagane pokrycia - sklad pakietow czyta z drzewa. Gdy zaden nie pokrywa wszystkiego, wygrywa pakiet o najwiekszym pokryciu, a przy remisie tanszy; luki nie zamiatamy, nazywa je uzasadnienie. Potrzeby bierze z apk.needs, a nie wyprowadza ich sama. Nie zna ANI JEDNEGO kodu pakietu i ani jednego kodu pytania."
 
 [[arguments]]
 name = "ctx"
@@ -15,39 +15,21 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-def answers = ctx.getString('quote.apk.answers')
-if (answers == null || answers.isEmpty()) {
-	return null
-}
-
-// 1. Czego wymagaja odpowiedzi. Tabela mowi, jakie POKRYCIE zaspokaja dana odpowiedz.
-def required = new HashSet()
-for (def pair in answers.split(';')) {
-	def sep = pair.indexOf('=')
-	if (sep < 1) {
-		continue
-	}
-	def row = higson.getValue('demo.property.apk.answer', higson.createContext(
-			'question.code', pair.substring(0, sep),
-			'answer.value', pair.substring(sep + 1)))
-	def cover = row.get(0, 'cover')
-	if (cover != null && !cover.toString().isEmpty()) {
-		required.add(cover.toString())
-	}
-}
+// Potrzeby liczy apk.needs i tylko ona. Wczesniej ta funkcja przechodzila po odpowiedziach
+// sama, wiec ta sama regula stala w dwoch miejscach i mogla sie rozjechac.
+def required = higson.call('demo.property.apk.covers', ctx)
 if (required.isEmpty()) {
 	return null
 }
 
-// 2. Drabinka pakietow prosto z drzewa, rosnaco po pozycji. Pozycja jest scisla: wyzsza znaczy
+// Drabinka pakietow prosto z drzewa, rosnaco po pozycji. Pozycja jest scisla: wyzsza znaczy
 // szerszy zakres, wiec pierwszy pakiet pokrywajacy wszystko jest zarazem najtanszym takim.
 def zone = ctx.getString('quote.zone.flood')
 def ladder = []
 for (def variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')) {
 	def code = variant.getCode()
 
-	// Pakiet niedostepny w tej strefie nie jest propozycja - milczenie tez nia nie jest,
-	// dlatego nizej jest fallback na najubozszy dostepny.
+	// Pakiet niedostepny w tej strefie nie jest propozycja.
 	def availability = higson.getValue('demo.property.variant.availability',
 			higson.createContext('variant.code', code, 'quote.zone.flood', zone))
 	if (!Boolean.TRUE.equals(availability.get(0, 'available'))) {
@@ -68,7 +50,6 @@ if (ladder.isEmpty()) {
 }
 ladder.sort { a, b -> a.position <=> b.position }
 
-// 3. Najtanszy pakiet pokrywajacy WSZYSTKIE potrzeby; gdy takiego nie ma - najwieksze pokrycie.
 def best = null
 def bestCovered = -1
 for (def candidate in ladder) {

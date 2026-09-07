@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa - razem z lista tego, czego w nim brakuje. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie; moze nie byc zadnego i to tez jest odpowiedz."
+description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa - razem z lista tego, czego w nim brakuje. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie, przy remisie tanszy; moze nie byc zadnego i to tez jest odpowiedz. Pokrycia bierze z apk.covers, tak samo jak apk.indicated."
 
 [[arguments]]
 name = "ctx"
@@ -20,25 +20,9 @@ if (budget == null || budget <= 0) {
 	return null
 }
 
-def answers = ctx.getString('quote.apk.answers')
-def required = new HashSet()
-if (answers != null) {
-	for (def pair in answers.split(';')) {
-		def sep = pair.indexOf('=')
-		if (sep < 1) {
-			continue
-		}
-		def row = higson.getValue('demo.property.apk.answer', higson.createContext(
-				'question.code', pair.substring(0, sep),
-				'answer.value', pair.substring(sep + 1)))
-		def cover = row.get(0, 'cover')
-		if (cover != null && !cover.toString().isEmpty()) {
-			required.add(cover.toString())
-		}
-	}
-}
-
+def required = higson.call('demo.property.apk.covers', ctx)
 def zone = ctx.getString('quote.zone.flood')
+
 def best = null
 def bestCovered = -1
 def bestPosition = null
