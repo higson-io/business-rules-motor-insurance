@@ -77,6 +77,7 @@ public class Property {
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
 	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
 	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
+	private static final String FUNCTION_CHOICE_KIND = "demo.property.offer.choiceKind";
 	private static final String PARAM_PERIOD = "demo.property.factor.period";
 
 	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
@@ -766,9 +767,14 @@ public class Property {
 			return;
 		}
 
-		String kind = "MATCHES";
-		if (!chosen.equals(recommended)) {
-			kind = positionOf(quote, chosen) > positionOf(quote, recommended) ? "RICHER" : "POORER";
+		// ⛔ ROZSTRZYGA REGUŁA, nie Java. Do 7 września 2026 stało tu porównanie pozycji obu
+		// wariantów — czyli zdanie „klient wybrał szerzej niż rekomendowaliśmy", które trafia do
+		// dokumentu oferty (rek. 9.3), rodziło się w kodzie aplikacji.
+		String kind = asString(engine.call(FUNCTION_CHOICE_KIND,
+			new PropertyContext(quote).withChoiceVariants(recommended, chosen)));
+		if (kind == null) {
+			offer.setChoiceKind(null);
+			return;
 		}
 
 		ParamValue note = engine.get(PARAM_OFFER_CHOICE, new PropertyContext(quote).withChoice(kind));
@@ -781,12 +787,8 @@ public class Property {
 		offer.setUnmetNeeds(unmetBy(quote, chosen));
 	}
 
-	/**
-	 * Nazwy potrzeb, których wybrany wariant NIE pokrywa.
-	 *
-	 * ⛔ Punktowanie idzie przez `ApkAnalysis.score`, tę samą metodę, którą liczy się pokrycie
-	 * rekomendacji. Drugie, ręczne porównanie list dałoby drugą definicję słowa „pokryta".
-	 */
+
+	/** Potrzeby, których wybrany wariant nie pokrywa — nazwy pokryć, nie kody. */
 	private List<String> unmetBy(PropertyQuote quote, String variantCode) {
 		List<String> names = new ArrayList<>();
 		for (Variant variant : quote.getVariants()) {
@@ -802,14 +804,6 @@ public class Property {
 		return names;
 	}
 
-	private int positionOf(PropertyQuote quote, String code) {
-		for (Variant variant : quote.getVariants()) {
-			if (variant.getCode().equals(code)) {
-				return variant.getPosition();
-			}
-		}
-		return 0;
-	}
 
 	/**
 	 * Akceptacja oferty: ten sam dokument dostaje numer polisy i okres ochrony.

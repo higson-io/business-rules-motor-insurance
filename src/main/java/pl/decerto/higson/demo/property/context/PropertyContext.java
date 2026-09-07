@@ -37,6 +37,8 @@ public class PropertyContext extends HigsonContext {
 	private String variantCode;
 	private String reasonCode;
 	private String choiceKind;
+	private String choiceRecommended;
+	private String choiceSelected;
 
 	public PropertyContext(PropertyQuote quote) {
 		this.quote = quote;
@@ -61,6 +63,13 @@ public class PropertyContext extends HigsonContext {
 
 	public PropertyContext withVariant(String code) {
 		this.variantCode = code;
+		return this;
+	}
+
+	/** Wariant rekomendowany i wybrany — z nich reguła wyprowadza, czy klient poszedł za radą. */
+	public PropertyContext withChoiceVariants(String recommended, String selected) {
+		this.choiceRecommended = recommended;
+		this.choiceSelected = selected;
 		return this;
 	}
 
@@ -106,6 +115,12 @@ public class PropertyContext extends HigsonContext {
 		}
 
 		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
+		if ("quote.choice.recommended".equals(path)) {
+			return choiceRecommended;
+		}
+		if ("quote.choice.selected".equals(path)) {
+			return choiceSelected;
+		}
 		if ("choice.kind".equals(path)) {
 			return choiceKind;
 		}
