@@ -213,10 +213,12 @@ none covers all). Three artifacts nobody read are deleted — `cover.sumBasis`, 
 the flow `flood.decision`, which looked like a live decision diagram and had never run — and the
 `refusal` column leaves the question catalogue (§22 took the control off the screen). ⚠️ The unused
 `SECTION` type is still in the schema.
-**§31 (2026-09-04)** merges each step's questions with the rules that settle them. A new `STEP`
-type holds `QUESTIONS` and `RULES` side by side, so `NEEDS` (7 APK questions + 4 APK rules) and
-`SUBJECT` (12 fields + zones and sums) each read as one thing instead of two unrelated branches at
-the same level; the product drops from ten branches to six with no empty collection. **D-20**: a
+**§31 (2026-09-04, corrected 2026-09-07)** merges the needs analysis into one branch. A
+`NEEDS_ANALYSIS` element holds `QUESTIONS` and `RULES` side by side, so the 7 APK questions and the
+4 APK rules stop being two unrelated branches at the same level. ⛔ The first version grouped the
+whole tree into `STEPS` named "Krok 1"/"Krok 2" — mirroring the app's step bar in the domain — and
+was **reversed**: that couples configuration to presentation, and the screens have already been
+reordered once (§18). The grouping criterion is the subject matter, never the screen. **D-20**: a
 question's text is now the **element name** — it used to sit in a `TEXT` attribute as well, and 4
 of 19 had already diverged, invisibly. §31.3 records a regression this pass caused and fixed: the
 `cover.sumBasis` table deleted in §30.3 was **not** dead — Java reached it through the `SUM_BASIS`

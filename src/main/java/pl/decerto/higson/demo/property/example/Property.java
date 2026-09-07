@@ -52,10 +52,10 @@ public class Property {
 	private static final String PROFILE = "PROPERTY";
 	private static final String PRODUCT_PATH = "/PRODUCTS[HOME]";
 
-	private static final String COLLECTION_STEPS = "STEPS";
+	private static final String COLLECTION_APK = "APK";
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
-	private static final String STEP_NEEDS = "NEEDS";
-	private static final String STEP_SUBJECT = "SUBJECT";
+	private static final String COLLECTION_SUBJECT = "SUBJECT";
+	private static final String APK_ELEMENT = "NEEDS";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
 
@@ -175,8 +175,11 @@ public class Property {
 			return;
 		}
 		List<Question> questions = new ArrayList<>();
-		readInto(quote, product, STEP_NEEDS, questions);
-		readInto(quote, product, STEP_SUBJECT, questions);
+		DomainObject apk = product.getChild(COLLECTION_APK, APK_ELEMENT);
+		if (apk != null) {
+			readInto(quote, apk.getChildren(COLLECTION_QUESTIONS), APK_ELEMENT, questions);
+		}
+		readInto(quote, product.getChildren(COLLECTION_SUBJECT), COLLECTION_SUBJECT, questions);
 
 		questions.sort(Comparator.comparingInt(Question::getPosition));
 		applyReveal(quote, questions);
@@ -184,33 +187,29 @@ public class Property {
 	}
 
 	/**
-	 * Pytania jednego KROKU rozmowy. Kod kroku jedzie z pytaniem i mówi, DOKĄD ono należy.
+	 * Pytania z jednej gałęzi. Kod gałęzi jedzie z pytaniem i mówi, DOKĄD ono należy.
 	 *
-	 * ⛔ DWA KROKI, bo to dwie różne rzeczy pod dwoma różnymi reżimami. `NEEDS` to analiza
-	 * potrzeb w rozumieniu rek. 8: pytamy klienta, czego potrzebuje. `SUBJECT` to przedmiot
-	 * ubezpieczenia i sytuacja — dane, które zakłady zbierają POZA APK i mają je już zebrane.
-	 * Rozdział przebiega w drzewie, więc przeniesienie pytania z jednej strony na drugą jest
-	 * przeniesieniem elementu, a nie zmianą atrybutu.
+	 * ⛔ DWIE GAŁĘZIE, bo to dwie różne rzeczy pod dwoma różnymi reżimami. `APK` to analiza
+	 * potrzeb w rozumieniu rek. 8 — pytania stoją tam RAZEM z regułami, które z odpowiedzi robią
+	 * potrzeby i rekomendację, bo dotyczą tej samej rzeczy. `SUBJECT` to przedmiot ubezpieczenia
+	 * i sytuacja: dane, które zakłady zbierają POZA APK i mają je już zebrane.
 	 *
-	 * ⛔ Krok trzyma pytania RAZEM z regułami, które te odpowiedzi rozstrzygają. Do 4 września
-	 * 2026 były to dwie niezwiązane gałęzie na tym samym poziomie — `QUESTIONS` obok `APK`,
-	 * `SUBJECT` obok `ZONES` i `SUMS` — i trzeba było wiedzieć, że mają ze sobą cokolwiek
-	 * wspólnego. Java czyta stąd tylko pytania; reguły są dla czytającego drzewo.
+	 * ⛔ PODZIAŁ JEST DZIEDZINOWY, NIE EKRANOWY. Przez chwilę 4 września 2026 gałęzie nazywały się
+	 * „Krok 1" i „Krok 2" i wisiały pod kolekcją `STEPS` — czyli drzewo konfiguracji odwzorowywało
+	 * pasek kroków aplikacji. To wiąże konfigurację z prezentacją: przestawienie ekranów każe
+	 * przenosić elementy domeny, choć biznesowo nic się nie stało. Kolejność i podział ekranów
+	 * należą do aplikacji.
 	 */
-	private void readInto(PropertyQuote quote, DomainObject product, String stepCode,
+	private void readInto(PropertyQuote quote, List<DomainObject> definitions, String branch,
 			List<Question> questions) {
 
-		DomainObject step = product.getChild(COLLECTION_STEPS, stepCode);
-		if (step == null) {
-			return;
-		}
-		for (DomainObject definition : step.getChildren(COLLECTION_QUESTIONS)) {
-			questions.add(readQuestion(quote, definition, stepCode));
+		for (DomainObject definition : definitions) {
+			questions.add(readQuestion(quote, definition, branch));
 		}
 	}
 
-	/** Jedno pytanie. Krok niesie GAŁĄŹ, w której pytanie wisi — nie jego własny atrybut. */
-	private Question readQuestion(PropertyQuote quote, DomainObject definition, String stepCode) {
+	/** Jedno pytanie. Przynależność niesie GAŁĄŹ, w której pytanie wisi — nie jego atrybut. */
+	private Question readQuestion(PropertyQuote quote, DomainObject definition, String branch) {
 		// W-22: nawigacja po domenie nie wstrzykuje kodu elementu do kontekstu, więc atrybut
 		// kluczowany question.code nie miałby się z czego rozwiązać. Kontekst budujemy sami.
 		PropertyContext ctx = new PropertyContext(quote).withQuestion(definition.getCode());
@@ -218,7 +217,7 @@ public class Property {
 		Question question = new Question();
 		question.setCode(definition.getCode());
 		// Kod kolekcji: QUESTIONS albo SUBJECT. Ekran po nim rozdziela krok pierwszy od drugiego.
-		question.setSection(stepCode);
+		question.setSection(branch);
 
 		// Cztery rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
 		//

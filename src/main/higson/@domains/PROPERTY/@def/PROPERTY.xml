@@ -68,6 +68,32 @@
         </domainType>
         <domainType>
             <profile>PROPERTY</profile>
+            <code>NEEDS_ANALYSIS</code>
+            <name>Analiza potrzeb klienta</name>
+            <description>Analiza potrzeb klienta jako jedna dziedzina konfiguracji: pytania, ktore zadajemy, i reguly, ktore z odpowiedzi robia potrzeby, rekomendacje i jej uzasadnienie. Trzymane razem dlatego, ze dotycza tej samej rzeczy - a NIE dlatego, ze wyswietlaja sie na tym samym ekranie. Kolejnosc i podzial ekranow nalezy do aplikacji i moze sie zmienic bez ruszania tego drzewa.</description>
+            <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
+            <typeCollections>
+                <typeCollection>
+                    <code>QUESTIONS</code>
+                    <name>O co pytamy</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>RULES</code>
+                    <name>Co rozstrzyga odpowiedzi</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RULE</collectionTypeCode>
+                </typeCollection>
+            </typeCollections>
+        </domainType>
+        <domainType>
+            <profile>PROPERTY</profile>
             <code>PACKAGE_COVER</code>
             <name>Pokrycie w pakiecie</name>
             <description>Odwolanie do pokrycia, ktore wchodzi w sklad tego pakietu. KODEM, a nie kopia - element nie ma zadnego atrybutu, bo cala konfiguracja pokrycia (stawka, suma, limit) zostaje w /PRODUCTS[HOME]/COVERS. Gdyby ten typ mial atrybuty, ta sama rzecz dalaby sie ustawic w dwoch miejscach i zaczelaby sie rozjezdzac.</description>
@@ -78,10 +104,18 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu calej konfiguracji. STEPS to rozmowa z klientem - w kazdym kroku pytania i reguly, ktore te odpowiedzi rozstrzygaja, stoja obok siebie. COVERS i VARIANTS to co sprzedajemy. FACTORS, PRICING i OFFER to co dzieje sie potem, gdy o nic juz nie pytamy. Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
+            <description>Punkt startu calej konfiguracji, uporzadkowany DZIEDZINAMI, nie ekranami aplikacji. APK to analiza potrzeb - pytania razem z regulami, ktore je rozstrzygaja. SUBJECT to przedmiot ubezpieczenia, czyli dane zbierane poza APK. COVERS i VARIANTS to co sprzedajemy. SUMS, ZONES, FACTORS, PRICING, OFFER to reguly wyceny i oferty. Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeCollections>
+                <typeCollection>
+                    <code>APK</code>
+                    <name>Analiza potrzeb klienta</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>NEEDS_ANALYSIS</collectionTypeCode>
+                </typeCollection>
                 <typeCollection>
                     <code>COVERS</code>
                     <name>Pokrycia</name>
@@ -115,12 +149,20 @@
                     <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
-                    <code>STEPS</code>
-                    <name>Kroki rozmowy z klientem</name>
+                    <code>SUBJECT</code>
+                    <name>Przedmiot ubezpieczenia i sytuacja (poza APK)</name>
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
-                    <collectionTypeCode>STEP</collectionTypeCode>
+                    <collectionTypeCode>QUESTION</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>SUMS</code>
+                    <name>Sumy ubezpieczenia</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
                     <code>VARIANTS</code>
@@ -129,6 +171,14 @@
                     <visible>true</visible>
                     <order>0</order>
                     <collectionTypeCode>VARIANT</collectionTypeCode>
+                </typeCollection>
+                <typeCollection>
+                    <code>ZONES</code>
+                    <name>Strefy z kodu pocztowego</name>
+                    <multiple>true</multiple>
+                    <visible>true</visible>
+                    <order>0</order>
+                    <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
             </typeCollections>
             <typeAttributes>

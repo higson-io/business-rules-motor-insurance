@@ -2841,33 +2841,44 @@ zostało zablokowane w tej sesji na poziomie uprawnień; do skasowania w Studio 
 
 ---
 
-## §31 Krok trzyma pytania razem z regułami, które je rozstrzygają (2026-09-04)
+## §31 Pytania razem z regułami, które je rozstrzygają (2026-09-04, poprawione 2026-09-07)
+
+> ⛔ **§31.1 zostało odwrócone 7 września.** Pierwsza wersja grupowała konfigurację w `STEPS`
+> o nazwach „Krok 1 — Analiza potrzeb" i „Krok 2 — Przedmiot ubezpieczenia", czyli odwzorowywała
+> w drzewie pasek kroków aplikacji. To **wiąże konfigurację z prezentacją**: przestawienie ekranów
+> każe przenosić elementy domeny, choć biznesowo nic się nie stało — a ekrany już raz zmieniły
+> układ (§18). Obowiązuje wersja z §31.1a: podział **dziedzinowy**, bez języka kroków.
 
 Trzy równoległe analizy całej konfiguracji (duplikaty / możliwości modelu / nawigacja) i jedna
 skarga, od której się zaczęło: **„w drzewie są dwie sekcje związane z APK — jedna z pytaniami,
 druga z regułami"**. To samo dotyczyło przedmiotu ubezpieczenia: `SUBJECT` stał osobno,
 a `ZONES` i `SUMS` osobno, i trzeba było wiedzieć, że mają ze sobą cokolwiek wspólnego.
 
-### 31.1 Nowy typ `STEP`
+### 31.1a Jedna gałąź APK, dwie kolekcje (obowiązuje)
 
 ```
 /PRODUCTS[HOME]
-  STEPS
-    NEEDS     Krok 1 — Analiza potrzeb klienta
-              QUESTIONS  7 pytań APK
-              RULES      katalog pytań, blokady, mapa odpowiedzi, uzasadnienie
-    SUBJECT   Krok 2 — Przedmiot ubezpieczenia
-              QUESTIONS  12 pól
-              RULES      strefy (5) i sumy (4)
-  COVERS      7 · VARIANTS 3 · FACTORS 8 · PRICING 6 · OFFER 2
+  APK        Analiza potrzeb klienta      ← typ NEEDS_ANALYSIS
+     QUESTIONS  7 pytań APK
+     RULES      katalog pytań, blokady, mapa odpowiedzi, uzasadnienie
+  SUBJECT    12 pól przedmiotu ubezpieczenia
+  COVERS 7 · VARIANTS 3 · SUMS 4 · ZONES 5 · FACTORS 8 · PRICING 6 · OFFER 2
 ```
 
-Sześć gałęzi zamiast dziesięciu, **żadnej pustej kolekcji**, i pytanie stoi obok reguły, która
-z jego odpowiedzi coś robi. Kroki 3 i 4 z ekranu (rekomendacja, oferta) nie są krokami rozmowy —
-o nic w nich nie pytamy — więc ich reguły wiszą wprost pod produktem, jako `PRICING` i `OFFER`.
+Skarga, od której się zaczęło: **„w drzewie są dwie sekcje związane z APK — jedna z pytaniami,
+druga z regułami"**. Teraz jest jedna: pytania i reguły analizy potrzeb stoją pod wspólnym
+elementem, bo **dotyczą tej samej rzeczy** — a nie dlatego, że wyświetlają się na tym samym
+ekranie. Reszta zostaje uporządkowana dziedzinami: sumy, strefy, czynniki, wycena, oferta.
 
 ⛔ Nie da się tego zrobić jedną kolekcją: **jedna kolekcja = jeden typ**, a pytanie i reguła to
-dwa różne typy. Stąd krok jako element z dwiema kolekcjami.
+dwa różne typy. Stąd element z dwiema kolekcjami.
+
+⛔ **Kryterium grupowania jest dziedzinowe, nie ekranowe.** Wersja z 4 września nazywała gałęzie
+„Krok 1" i „Krok 2" i wieszała je pod `STEPS`; wycofana, bo uzależniała konfigurację od układu
+aplikacji. Kolejność i podział ekranów należą do aplikacji i mogą się zmienić bez ruszania drzewa.
+
+⚠️ Typ `STEP` został w schemacie bez elementów — Higson odmawia usunięcia typu, który był
+kiedykolwiek użyty („cannot be deleted because is in use"), tak samo jak przy `SECTION` (§30.5).
 
 ### 31.2 D-20 — treść pytania to NAZWA elementu
 

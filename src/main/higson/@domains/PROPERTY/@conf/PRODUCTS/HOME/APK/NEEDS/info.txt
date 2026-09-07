@@ -1,0 +1,3 @@
+name = "Analiza potrzeb klienta"
+description = "Pytania rekomendowane przez KNF i reguly, ktore z odpowiedzi robia potrzeby, rekomendacje i jej uzasadnienie. Razem, bo dotycza tej samej rzeczy."
+tags = []

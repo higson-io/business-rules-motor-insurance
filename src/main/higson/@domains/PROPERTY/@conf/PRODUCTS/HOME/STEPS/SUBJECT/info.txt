@@ -1,3 +1,0 @@
-name = "Krok 2 — Przedmiot ubezpieczenia"
-description = "Charakterystyka nieruchomosci - to nie jest APK, tylko dane, ktore zaklady zbieraja od zawsze. Obok reguly, ktore z tych danych wyprowadzaja strefy i sumy ubezpieczenia."
-tags = []
