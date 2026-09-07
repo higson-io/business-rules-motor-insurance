@@ -66,7 +66,6 @@ public class Property {
 	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
 	private static final String FUNCTION_SUMS = "demo.property.sum.suggest";
 	private static final String FUNCTION_RISK = "demo.property.risk.factor";
-	private static final String FUNCTION_LIMIT = "demo.property.limit.effective";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
 	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
@@ -332,14 +331,10 @@ public class Property {
 		}
 		quote.getSums().setFixtures(asDecimal(sums.get(0, "fixtures")));
 		quote.getSums().setContents(asDecimal(sums.get(0, "contents")));
-		// Kradzież i powódź nie mają własnej sumy — ubezpieczają to samo mienie, więc dziedziczą
-		// sumę ruchomości i murów. ⚠️ To jest reguła, a stoi w kodzie: tabela `cover.sumBasis`
-		// miała ją nieść, ale nikt jej nigdy nie czytał poza jedną komórką (OC), więc została
-		// usunięta razem z martwymi wierszami. Jeśli dziedziczenie sum ma być konfiguracją,
-		// wraca jako kolumny katalogu pokryć, a nie jako osobna tabela.
-		quote.getSums().setTheft(quote.getSums().getContents());
-		quote.getSums().setFlood(quote.getSums().getBuilding());
-		quote.getSums().setAssistance(BigDecimal.ZERO);
+		// ⛔ Kradzież, powódź i assistance NIE dostają tu sum. Skąd pokrycie bierze sumę,
+		// rozstrzyga `demo.property.cover.sumBasis`, a wylicza `demo.property.cover.sum`.
+		// Do 7 września 2026 stały tu trzy przypisania na sztywno i to one były prawdziwą
+		// definicją produktu — tabela o tej samej nazwie istniała, ale nikt jej nie czytał.
 
 		quote.setRiskFactor(asDecimal(engine.call(FUNCTION_RISK, new PropertyContext(quote))));
 	}
@@ -351,16 +346,24 @@ public class Property {
 		}
 		List<Cover> covers = new ArrayList<>();
 		for (DomainObject definition : product.getChildren(COLLECTION_COVERS)) {
-			PropertyContext ctx = new PropertyContext(quote).withCover(definition.getCode());
+			// Wariant w kontekście, bo suma gwarancyjna OC bierze się z katalogu WARIANTU,
+			// a nie z metrażu mieszkania — bez tego pokrycie OC nie ma jak dostać sumy.
+			PropertyContext ctx = new PropertyContext(quote)
+				.withCover(definition.getCode())
+				.withVariant(shownVariant(quote));
 
 			Cover cover = new Cover();
 			cover.setCode(definition.getCode());
 			cover.setName(definition.getName());
 			cover.setDescription(definition.getDescription());
 			cover.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
-			cover.setCapLabel(attrString(definition, "CAP_LABEL", ctx));
-			cover.setEffectiveLimit(asDecimal(engine.call(FUNCTION_LIMIT, ctx)));
-			cover.setSum(sumFor(quote, definition.getCode()));
+			cover.setCapLabel(attrString(definition, "LIMIT_LABEL", ctx));
+			cover.setEffectiveLimit(definition.getAttrDecimal("LIMIT", ctx));
+			// ⛔ SUMA POKRYCIA JEST ATRYBUTEM, nie switchem po kodzie. Do 7 września 2026 stał
+			// tu `sumFor`, a razem z nim trzy przypisania na sztywno w `computeDerived`:
+			// kradzież = suma ruchomości, powódź = suma murów, assistance = zero. To jest kształt
+			// produktu, a nie mechanika, więc rozstrzyga go teraz `demo.property.cover.sumBasis`.
+			cover.setSum(definition.getAttrDecimal("SUM", ctx));
 			covers.add(cover);
 		}
 		covers.sort(Comparator.comparingInt(Cover::getPosition));
@@ -468,13 +471,25 @@ public class Property {
 		// mówiła nic ponadto (pozostałe wiersze były martwe — wykonanie siedziało na sztywno
 		// w `computeDerived`), więc znikła razem z nią. Suma ląduje teraz w polu, które od
 		// zawsze na nią czekało, i pokrycie OC ma po prostu swoją sumę jak każde inne.
-		Variant shown = variantByCode(quote, quote.getSelectedVariant());
-		quote.getSums().setLiability(shown == null ? null : shown.getLiabilitySum());
-		for (Cover cover : quote.getCovers()) {
-			cover.setSum(sumFor(quote, cover.getCode()));
-		}
+		// Suma gwarancyjna OC zależy od pokazywanego wariantu, a wariant znamy dopiero tutaj —
+		// więc pokrycia trzeba przeczytać ponownie, tym razem z właściwym wariantem w kontekście.
+		loadCovers(quote);
 	}
 
+
+	/**
+	 * Wariant, na który patrzy klient: wybrany, a zanim cokolwiek wybrał — rekomendowany.
+	 *
+	 * ⚠️ Pokrycia czyta się DWA RAZY: raz przed rekomendacją, gdy nie wiadomo jeszcze, który
+	 * wariant jest pokazywany, i raz po niej. Pierwszy przebieg zna sumy z metrażu, ale nie zna
+	 * sumy gwarancyjnej OC, bo ta wisi na wariancie. Drugi domyka.
+	 */
+	private String shownVariant(PropertyQuote quote) {
+		if (quote.getSelectedVariant() != null) {
+			return quote.getSelectedVariant();
+		}
+		return quote.getRecommendation() == null ? null : quote.getRecommendation().getVariantCode();
+	}
 
 	private Variant variantByCode(PropertyQuote quote, String code) {
 		if (code == null) {
@@ -892,24 +907,6 @@ public class Property {
 		}
 	}
 
-	private BigDecimal sumFor(PropertyQuote quote, String coverCode) {
-		switch (coverCode) {
-			case "BUILDING":
-				return quote.getSums().getBuilding();
-			case "FIXTURES":
-				return quote.getSums().getFixtures();
-			case "CONTENTS":
-				return quote.getSums().getContents();
-			case "THEFT":
-				return quote.getSums().getTheft();
-			case "FLOOD":
-				return quote.getSums().getFlood();
-			case "LIABILITY":
-				return quote.getSums().getLiability();
-			default:
-				return null;
-		}
-	}
 
 	private List<String> split(String raw) {
 		if (raw == null || raw.isEmpty()) {

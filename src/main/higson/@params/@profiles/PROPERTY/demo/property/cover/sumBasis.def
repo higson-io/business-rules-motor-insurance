@@ -1,0 +1,35 @@
+code = "demo.property.cover.sumBasis"
+description = "Kazde pokrycie ma sume ubezpieczenia, ale kazde bierze ja skadinad - i to jest realny ksztalt produktu majatkowego na polskim rynku. COMPUTED: suma wyliczona dla tego pokrycia (mury z metrazu i stawki, elementy stale i ruchomosci jako ulamek murow). DERIVED: pokrycie nie ma wlasnej sumy, bo ubezpiecza TO SAMO mienie co inne - kradziez idzie na sumie ruchomosci, powodz na sumie murow. CATALOGUE: suma gwarancyjna z katalogu wariantu, nie liczona z metrazu - tak dziala OC w zyciu prywatnym. NONE: pokrycie bez sumy, ograniczone samym limitem - assistance kupuje usluge, nie transfer ryzyka."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Skad bierze sie suma ubezpieczenia pokrycia"
+
+[[inputLevel]]
+code = "cover"
+label = "pokrycie"
+type = "string"
+reverseMatcher = false
+property = "cover.code"
+source = "cover.code"
+union = false
+
+[[outputLevel]]
+code = "basis"
+label = "skad suma"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reference"
+label = "pokrycie odniesienia dla sumy pochodnej"
+type = "string"
+external = false
+array = false

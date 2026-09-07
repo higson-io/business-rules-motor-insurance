@@ -6,18 +6,26 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty sa spisem tresci: kolejnosc na ekranie, stawka i limit. To, W KTORYM PAKIECIE pokrycie sie znajduje, NIE jest jego cecha - sklad pakietu wisi pod pakietem (VARIANTS[..]/COVERS). Skad bierze sie suma, tez nie: sumy licza sie raz dla calej wyceny w SUMS[SUGGEST].</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na cztery pytania, ktore zadaje sie o kazde pokrycie na polskim rynku majatkowym: ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kod i opis pokrycia to sam element, nie atrybuty. To, w ktorym pakiecie pokrycie sie znajduje, tez nie - sklad pakietu wisi pod pakietem.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>POSITION</code>
-                    <name>Kolejnosc na ekranie</name>
+                    <code>SUM</code>
+                    <name>Suma ubezpieczenia</name>
                     <order>1</order>
                     <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.position</defaultRefName>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.cover.sum</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>PREMIUM</code>
+                    <name>Skladka za to pokrycie</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.cover.premium</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -39,16 +47,16 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>CAP_KIND</code>
-                    <name>Rodzaj limitu</name>
+                    <code>LIMIT</code>
+                    <name>Limit odpowiedzialnosci</name>
                     <order>1</order>
                     <groupOrder>3</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.limitRule [capKind]</defaultRefName>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.limit.effective</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>CAP_LABEL</code>
+                    <code>LIMIT_LABEL</code>
                     <name>Opis limitu dla klienta</name>
                     <order>2</order>
                     <groupOrder>3</groupOrder>
@@ -57,12 +65,12 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>EFFECTIVE_LIMIT</code>
-                    <name>Efektywny limit - nizszy z ulamka sumy i kwoty</name>
-                    <order>3</order>
-                    <groupOrder>3</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.limit.effective</defaultRefName>
+                    <code>POSITION</code>
+                    <name>Kolejnosc na ekranie</name>
+                    <order>1</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.position</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>

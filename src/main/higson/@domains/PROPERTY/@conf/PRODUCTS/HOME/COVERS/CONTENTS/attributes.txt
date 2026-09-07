@@ -1,26 +1,26 @@
 [[attr]]
-attributeCode = "CAP_KIND"
-attributeName = "Rodzaj limitu"
-refType = "PARAMETER"
-refName = "demo.property.cover.limitRule [capKind]"
+attributeCode = "LIMIT"
+attributeName = "Limit odpowiedzialnosci"
+refType = "FUNCTION"
+refName = "demo.property.limit.effective"
 
 [[attr]]
-attributeCode = "CAP_LABEL"
+attributeCode = "LIMIT_LABEL"
 attributeName = "Opis limitu dla klienta"
 refType = "PARAMETER"
 refName = "demo.property.cover.limitRule [label]"
-
-[[attr]]
-attributeCode = "EFFECTIVE_LIMIT"
-attributeName = "Efektywny limit - nizszy z ulamka sumy i kwoty"
-refType = "FUNCTION"
-refName = "demo.property.limit.effective"
 
 [[attr]]
 attributeCode = "POSITION"
 attributeName = "Kolejnosc na ekranie"
 refType = "PARAMETER"
 refName = "demo.property.cover.position"
+
+[[attr]]
+attributeCode = "PREMIUM"
+attributeName = "Skladka za to pokrycie"
+refType = "FUNCTION"
+refName = "demo.property.cover.premium"
 
 [[attr]]
 attributeCode = "RATE"
@@ -33,3 +33,9 @@ attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
 refType = "PARAMETER"
 refName = "demo.property.tariff.baseRate [basis]"
+
+[[attr]]
+attributeCode = "SUM"
+attributeName = "Suma ubezpieczenia"
+refType = "FUNCTION"
+refName = "demo.property.cover.sum"

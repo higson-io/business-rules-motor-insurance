@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Wzorzec min(ulamek x suma, kwota) z OWU PZU par. 46 ust. 3 - gorna granica to NAJNIZSZY z limitow, do ktorych przedmiot sie kwalifikuje."
+description = "Efektywny limit odpowiedzialnosci pokrycia - nizszy z ulamka sumy i kwoty. Sume bierze z demo.property.cover.sum, czyli z tej samej reguly co reszta systemu; wczesniej siegal wprost do quote.sums.KOD i przez to nie widzial sum pochodnych."
 
 [[arguments]]
 name = "ctx"
@@ -30,8 +30,10 @@ if ('ABSOLUTE' == capKind) {
 	return capAbsolute
 }
 
-def code = ctx.getString('cover.code')
-def base = ctx.getDecimal('quote.sums.' + code.toLowerCase())
+// ⛔ Suma przez cover.sum, a NIE wprost z quote.sums.KOD. Kradziez i powodz nie maja wlasnej
+// sumy - ida na sumie ruchomosci i murow - wiec odczyt po kodzie pokrycia zwracal dla nich null
+// i limit kradziezy (40% sumy, max 50 000 zl) po cichu znikal z oferty.
+def base = higson.call('demo.property.cover.sum', ctx)
 if (base == null) {
 	return null
 }

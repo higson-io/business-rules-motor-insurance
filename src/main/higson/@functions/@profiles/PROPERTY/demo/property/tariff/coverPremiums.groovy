@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Skladki pokryc wchodzacych w sklad wariantu. Sklad czytany Z DRZEWA - pokrycia wisza pod pakietem w kolekcji COVERS - a nie z tabeli par (pokrycie, wariant)."
+description = "Rozbicie skladki na pokrycia wchodzace w sklad wariantu. Sklad czytany Z DRZEWA - pokrycia wisza pod pakietem w kolekcji COVERS. Wzor na skladke JEDNEGO pokrycia stoi w demo.property.cover.premium i tylko tam; ta funkcja jest petla, nie taryfa."
 
 [[arguments]]
 name = "ctx"
@@ -22,30 +22,28 @@ type = "BIG_DECIMAL"
 def variant = ctx.getString('variant.code')
 def lines = []
 
-// Sklad pakietu jest POD PAKIETEM w drzewie. Do 4 wrzesnia 2026 przechodzilo sie tu po
-// wszystkich pokryciach produktu i odpytywalo tabele demo.property.cover.availability, czy dane
-// pokrycie jest w tym wariancie. Teraz iteruje sie wprost po skladzie: petla jest krotsza o jedno
-// pytanie, a odpowiedz na nie widac w drzewie bez czytania tabeli.
+// ⛔ Kontekst dla pojedynczego pokrycia budujemy JAWNIE. higson.createContext tworzy kontekst
+// od zera, wiec funkcja liczaca sume musi dostac wszystko, czego potrzebuje: kod pokrycia,
+// kod wariantu (suma gwarancyjna OC bierze sie z katalogu wariantu) i trzy sumy wyliczone
+// przez sum.suggest. Trzy wystarcza: kradziez i powodz sa sumami pochodnymi od ruchomosci
+// i murow, OC idzie z katalogu, a assistance sumy nie ma wcale.
+def building = ctx.getDecimal('quote.sums.building')
+def fixtures = ctx.getDecimal('quote.sums.fixtures')
+def contents = ctx.getDecimal('quote.sums.contents')
+
+// Sklad pakietu jest POD PAKIETEM w drzewie - petla idzie po tym, co widac po rozwinieciu
+// galezi, a nie po tabeli par (pokrycie, wariant).
 for (def member in domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variant + ']').getAll('COVERS')) {
 	def code = member.getCode()
 
-	def rateRow = higson.getValue('demo.property.tariff.baseRate',
-			higson.createContext('cover.code', code))
-	def rate = rateRow.get(0, 'rate')
-	def basis = rateRow.get(0, 'basis')
+	def coverCtx = higson.createContext(
+			'cover.code', code,
+			'variant.code', variant,
+			'quote.sums.building', building,
+			'quote.sums.fixtures', fixtures,
+			'quote.sums.contents', contents)
 
-	def premium
-	if ('FLAT' == basis) {
-		// Assistance kupuje uslugi, nie transfer ryzyka - czynniki ryzyka nie maja na co dzialac.
-		premium = rate
-	} else {
-		def sum = ctx.getDecimal('quote.sums.' + code.toLowerCase())
-		premium = sum == null ? 0 : sum * rate / 1000 * riskFactor
-	}
-
-	// Zaokraglenie NA LINIE, raz. Suma niezaokraglonych linii zaokraglona na koncu daje total,
-	// ktory nie zgadza sie z wlasnym rozbiciem, a czytelnik oferty zawsze to wylapie.
-	lines.add(code + '=' + math.round(premium, 2))
+	lines.add(code + '=' + higson.call('demo.property.cover.premium', coverCtx, riskFactor))
 }
 
 return lines.join(';')
