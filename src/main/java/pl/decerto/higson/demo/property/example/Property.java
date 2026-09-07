@@ -89,6 +89,12 @@ public class Property {
 	private static final String REASON_NO_ALTERNATIVE = "BUDGET_NO_ALTERNATIVE";
 
 	private static final String PATH_BUDGET = "quote.needs.budget";
+	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
+	private static final String PATH_APK_INDICATED = "quote.apk.indicated";
+	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
+	private static final String FUNCTION_APK_INDICATED = "demo.property.apk.indicated";
+	private static final String FUNCTION_APK_BUDGET = "demo.property.apk.budgetOutcome";
+	private static final String FUNCTION_APK_ALTERNATIVE = "demo.property.apk.alternative";
 	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
 	private static final String PATH_VALUE_RATIO = "quote.sums.valueRatio";
 	private static final String PATH_AREA = "quote.property.area";
@@ -550,66 +556,36 @@ public class Property {
 	 */
 	private Recommendation propose(PropertyQuote quote, List<Need> needs) {
 		Recommendation recommendation = new Recommendation();
-		List<Variant> ladder = new ArrayList<>();
-		for (Variant variant : quote.getVariants()) {
-			if (variant.isAvailable() && variant.getAnnualPremium() != null) {
-				ladder.add(variant);
-			}
-		}
-		if (ladder.isEmpty() || needs.isEmpty()) {
+		if (quote.getVariants().isEmpty() || needs.isEmpty()) {
 			return recommendation;
 		}
-		ladder.sort(Comparator.comparingInt(Variant::getPosition));
 
-		// ⛔ PAKIET WYNIKA ZE SKŁADU PAKIETÓW, NIE Z KOLUMNY W TABELI. `demo.property.apk.answer`
-		// mówi, jakiego POKRYCIA wymaga odpowiedź; co zawiera pakiet, stoi pod pakietem w drzewie
-		// (VARIANTS[..]/COVERS). Propozycją zostaje NAJTAŃSZY pakiet pokrywający wszystkie potrzeby.
-		//
-		// Wcześniej tabela niosła czwartą kolumnę „pakiet, od którego dostępne". Działało, ale ta
-		// kolumna powtarzała skład pakietów: dołożenie albo przebudowa pakietu wymagały ręcznego
-		// poprawienia kilkunastu wierszy, żeby konfiguracja przestała kłamać. Teraz nie wymagają
-		// niczego — jedyne miejsce, w którym stoi skład pakietu, to drzewo.
-		//
-		// ⚠️ Gdy żaden pakiet nie pokrywa wszystkiego, wygrywa ten z NAJWIĘKSZYM pokryciem, a przy
-		// remisie tańszy. Luka zostaje nazwana na ekranie w `NEEDS_PARTIAL` — tak samo jak luka
-		// budżetowa. Nie podnosimy pakietu po cichu i nie milczymy o brakach.
-		Variant best = null;
-		int bestCovered = -1;
-		for (Variant variant : ladder) {
-			int covered = ApkAnalysis.score(needs, variant.getCovers()::contains).getCovered();
-			if (covered > bestCovered) {
-				best = variant;
-				bestCovered = covered;
-				if (covered == needs.size()) {
-					// Drabinka jest posortowana rosnąco, więc pierwszy pełny pokrywacz jest najtańszy.
-					break;
-				}
+		// Kontekst dla reguł rekomendacji: odpowiedzi jako jeden łańcuch i składka każdego
+		// policzonego pakietu pod własną ścieżką. Reguła nie zna listy pytań ani listy pakietów —
+		// jedno i drugie czyta z tego, co tu dostanie, i z drzewa.
+		PropertyContext ctx = new PropertyContext(quote)
+			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(quote.getQuestions(), quote.getAnswers()));
+		for (Variant variant : quote.getVariants()) {
+			if (variant.isAvailable() && variant.getAnnualPremium() != null) {
+				ctx.withComputed(PATH_PREMIUM_PREFIX + variant.getCode(), variant.getAnnualPremium());
 			}
 		}
 
-		// Propozycją zostaje `best` BEZ WZGLĘDU NA CENĘ — patrz komentarz nad metodą.
-		Variant proposed = best;
-		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
-		if (!quote.getRegime().isRequiresBudget() || budget == null || budget.signum() <= 0) {
-			recommendation.setBudgetOutcome(OUTCOME_ABSENT);
-		} else if (best.getAnnualPremium().compareTo(budget) <= 0) {
-			recommendation.setBudgetOutcome(OUTCOME_FIT);
-		} else {
-			recommendation.setBudgetOutcome(OUTCOME_EXCEEDED);
-			// Najlepiej dopasowany spośród tych, które mieszczą się w oczekiwanej składce.
-			// Może nie być żadnego i to też jest odpowiedź — mówimy o tym osobnym zdaniem.
-			Variant alternative = null;
-			int covered = -1;
-			for (Variant variant : ladder) {
-				if (variant.getAnnualPremium().compareTo(budget) > 0) {
-					continue;
-				}
-				int score = ApkAnalysis.score(needs, variant.getCovers()::contains).getCovered();
-				if (score > covered) {
-					alternative = variant;
-					covered = score;
-				}
-			}
+		Variant proposed = variantByCode(quote, asString(engine.call(FUNCTION_APK_INDICATED, ctx)));
+		if (proposed == null) {
+			return recommendation;
+		}
+		ctx.withComputed(PATH_APK_INDICATED, proposed.getCode());
+
+		// ⛔ OCZEKIWANA SKŁADKA NIE OBNIŻA ZAKRESU — i to jest teraz zapisane w regule, a nie
+		// w komentarzu nad linijką kodu. `apk.budgetOutcome` NAZYWA, czy propozycja mieści się
+		// w oczekiwaniu klienta; nie ma prawa jej podmienić. Tańszy pakiet jedzie obok jako
+		// alternatywa, razem z listą tego, czego w nim brakuje.
+		String outcome = asString(engine.call(FUNCTION_APK_BUDGET, ctx));
+		recommendation.setBudgetOutcome(outcome);
+		if (OUTCOME_EXCEEDED.equals(outcome)) {
+			Variant alternative =
+				variantByCode(quote, asString(engine.call(FUNCTION_APK_ALTERNATIVE, ctx)));
 			if (alternative != null) {
 				recommendation.setAlternativeVariantCode(alternative.getCode());
 				recommendation.setAlternativePremium(alternative.getAnnualPremium());

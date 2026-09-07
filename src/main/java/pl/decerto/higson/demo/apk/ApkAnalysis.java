@@ -126,6 +126,29 @@ public final class ApkAnalysis {
 	 * Pytanie wielokrotnego wyboru daje kilka pozycji, bo każda wartość osobno trafia w tabelę —
 	 * inaczej „mam alarm i GPS" nie dopasowałoby się do żadnego wiersza.
 	 */
+	/**
+	 * Odpowiedzi jako jeden łańcuch `KOD=wartość;KOD=wartość` — postać, w której reguła Higsona
+	 * może po nich przejść.
+	 *
+	 * ⛔ Istnieje po to, żeby reguła NIE MUSIAŁA znać listy pytań. Gdyby zamiast tego czytała
+	 * odpowiedzi ze ścieżek kontekstu, musiałaby te ścieżki wymienić — a wtedy dołożenie pytania
+	 * wymagałoby zmiany reguły, czyli dokładnie tego, czego katalog pytań w tabeli ma unikać.
+	 * Pytanie wielokrotnego wyboru daje tyle par, ile zaznaczono odpowiedzi.
+	 */
+	public static String serialize(List<Question> questions, Map<String, Answer> answers) {
+		StringBuilder out = new StringBuilder();
+		for (AnswerRef ref : flatten(questions, answers)) {
+			if (ref.value == null || ref.value.isEmpty()) {
+				continue;
+			}
+			if (out.length() > 0) {
+				out.append(';');
+			}
+			out.append(ref.questionCode).append('=').append(ref.value);
+		}
+		return out.toString();
+	}
+
 	private static List<AnswerRef> flatten(List<Question> questions, Map<String, Answer> answers) {
 		List<AnswerRef> refs = new ArrayList<>();
 		for (Question question : questions) {
