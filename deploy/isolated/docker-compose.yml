@@ -1,0 +1,84 @@
+# Odizolowany stos demo APK — przeznaczony do postawienia OBOK istniejących kontenerów
+# na współdzielonym serwerze. Izolacja stoi na czterech rzeczach naraz, i wszystkie cztery
+# są potrzebne:
+#
+#   1. `name:` — własny projekt Compose, więc `docker compose down` w innym katalogu
+#      nie ma jak dotknąć tych kontenerów;
+#   2. `container_name` z prefiksem — nazwa nie zderzy się z niczym istniejącym;
+#   3. porty z .env — publikowane w bloku 58xxx, z dala od domyślnych 8080/8082/38080/48080;
+#   4. własna sieć i własny wolumen, oba prefiksowane nazwą projektu.
+#
+# ⚠️ Zanim postawisz: `docker ps --format '{{.Ports}}'` na serwerze i sprawdź, czy blok
+# portów z .env jest wolny. Compose nie ostrzeże — po prostu nie wstanie.
+name: ${STACK_NAME:-apk-demo}
+
+services:
+  db:
+    image: decerto/higson-demo-database:${DEMO_DB_VERSION:-4.3.0}
+    container_name: ${STACK_NAME:-apk-demo}-db
+    restart: unless-stopped
+    ports:
+      - "${PORT_DB_CONSOLE:-58082}:8082"
+      - "${PORT_DB_TCP:-59092}:9092"
+    volumes:
+      # ⛔ Wolumen jest wypełniany przez install.sh PRZED pierwszym startem — leży w nim
+      # baza z naszą konfiguracją. Gdyby wystartował pusty, obraz wsiałby własną bazę
+      # demonstracyjną i zniknęłyby wszystkie trzy profile.
+      - h2-data:/h2-data
+    networks: [net]
+
+  studio:
+    image: decerto/higson-studio:${HIGSON_VERSION:-4.3.1}
+    container_name: ${STACK_NAME:-apk-demo}-studio
+    restart: unless-stopped
+    ports:
+      - "${PORT_STUDIO:-58080}:38080"
+    volumes:
+      - ./conf/application.properties:/usr/local/tomcat/conf/application.properties:ro
+      - ./conf/vertex-ai-credentials.json:/usr/local/tomcat/conf/vertex-ai-credentials.json:ro
+      - ./conf/license:/usr/local/tomcat/conf/license:ro
+    environment:
+      - "CONTEXT_PATH=studio"
+      - "LOCALE=${LOCALE:-en_EN}"
+    depends_on: [db]
+    networks: [net]
+    logging:
+      options: { max-size: "200k", max-file: "10" }
+
+  runtime-rest:
+    image: decerto/higson-runtime-rest:${HIGSON_VERSION:-4.3.1}
+    container_name: ${STACK_NAME:-apk-demo}-runtime-rest
+    restart: unless-stopped
+    environment:
+      - "HIGSON_DATABASE_URL=jdbc:h2:tcp://db:9092/higson.demo;NON_KEYWORDS=VALUE"
+      - "HIGSON_DATABASE_USERNAME=sa"
+      - "HIGSON_DATABASE_PASSWORD=sa"
+      - "SERVER_SERVLET_CONTEXT_PATH=/runtime-rest"
+      - "HIGSON_RUNTIME_INSTANCE_NAME=${STACK_NAME:-apk-demo}-runtime-rest"
+    ports:
+      - "${PORT_RUNTIME:-58081}:8081"
+    depends_on: [db]
+    networks: [net]
+    logging:
+      options: { max-size: "200k", max-file: "10" }
+
+  web:
+    image: ${APP_IMAGE:-decerto/higson-motor-insurance-demo:apk-demo}
+    container_name: ${STACK_NAME:-apk-demo}-web
+    restart: unless-stopped
+    environment:
+      # Nazwa hosta to nazwa USŁUGI w tej sieci (`db`), nie container_name — dzięki temu
+      # zmiana STACK_NAME nie każe ruszać żadnego adresu.
+      - "HIGSON_DATABASE_URL=jdbc:h2:tcp://db:9092/higson.demo;NON_KEYWORDS=VALUE"
+      - "SERVER_SERVLET_CONTEXT_PATH=${APP_CONTEXT_PATH:-/demo}"
+    ports:
+      - "${PORT_WEB:-58090}:48080"
+    depends_on: [db]
+    networks: [net]
+
+volumes:
+  h2-data:
+
+networks:
+  net:
+    driver: bridge

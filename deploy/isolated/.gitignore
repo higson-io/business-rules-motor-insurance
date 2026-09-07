@@ -1,0 +1,6 @@
+# Sekrety i artefakty paczki — składane przez package.sh, nigdy nie w repozytorium.
+conf/
+db/
+images/
+.env
+*.tar.gz
