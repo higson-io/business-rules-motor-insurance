@@ -1,6 +1,6 @@
 #matrix for parameter demo.property.factor.period
-months;factor;installments
-*;1.00;1
-12;1.00;1
-24;1.92;2
-36;2.76;3
+months;factor;installments;coverMonths
+*;1.00;1;12
+12;1.00;1;12
+24;1.92;2;24
+36;2.76;3;36

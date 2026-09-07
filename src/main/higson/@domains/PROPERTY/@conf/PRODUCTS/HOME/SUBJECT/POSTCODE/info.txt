@@ -1,2 +1,0 @@
-name = "Kod pocztowy miejsca ubezpieczenia"
-tags = []

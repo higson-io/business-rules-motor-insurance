@@ -1,2 +1,0 @@
-name = "Wiek budynku na dzień początku ochrony"
-tags = []

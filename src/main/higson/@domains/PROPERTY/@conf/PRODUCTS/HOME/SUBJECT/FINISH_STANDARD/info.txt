@@ -1,2 +1,0 @@
-name = "Jaki jest standard wykończenia?"
-tags = []

@@ -1,2 +1,0 @@
-name = "Z czego są ściany?"
-tags = []

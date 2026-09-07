@@ -1,5 +1,5 @@
 code = "demo.property.apk.question"
-description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \\\"odslania je\\\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo rozstrzygniete. Pusta wartosc znaczy \\\"widoczne od razu\\\". Lancuch jest konfiguracja, wiec przestawienie kolejnosci odslaniania nie wymaga wdrozenia."
+description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \\\"odslania je\\\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo rozstrzygniete. Trzy ostatnie kolumny (tresc, rodzaj, sciezka) wypelnia sie TYLKO dla pol przedmiotu ubezpieczenia, ktore nie sa elementami drzewa; pytania APK biora te trzy rzeczy ze swojego elementu domeny."
 nullable = false
 dictionary = false
 cacheable = true
@@ -65,6 +65,27 @@ array = false
 [[outputLevel]]
 code = "revealedBy"
 label = "odslania je"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "text"
+label = "tresc pytania (tylko pola przedmiotu)"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "kind"
+label = "rodzaj odpowiedzi (tylko pola przedmiotu)"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "contextPath"
+label = "gdzie laduje odpowiedz (tylko pola przedmiotu)"
 type = "string"
 external = false
 array = false

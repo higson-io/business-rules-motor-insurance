@@ -1,3 +1,0 @@
-name = "Czynnik za wiek budynku"
-description = "Kluczowany wiekiem z BUILDING_AGE_YEARS."
-tags = []

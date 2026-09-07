@@ -8,6 +8,7 @@
             <name>Pokrycie</name>
             <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na cztery pytania, ktore zadaje sie o kazde pokrycie na polskim rynku majatkowym: ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kod i opis pokrycia to sam element, nie atrybuty. To, w ktorym pakiecie pokrycie sie znajduje, tez nie - sklad pakietu wisi pod pakietem.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -112,9 +113,8 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu calej konfiguracji, uporzadkowany DZIEDZINAMI, nie ekranami aplikacji. APK to analiza potrzeb - pytania razem z regulami, ktore je rozstrzygaja. SUBJECT to przedmiot ubezpieczenia, czyli dane zbierane poza APK. COVERS i VARIANTS to co sprzedajemy. SUMS, ZONES, FACTORS, PRICING, OFFER to reguly wyceny i oferty. Zadna tabela ani funkcja uzywana przez aplikacje nie lezy poza tym drzewem.</description>
+            <description>Punkt startu konfiguracji. Sa tu tylko rzeczy, od ktorych warto zaczac czytanie produktu: APK to analiza potrzeb, COVERS i VARIANTS to co sprzedajemy, SUMS, ZONES, PRICING i OFFER to reguly sumy, stref, wyceny i oferty. Czynnikow taryfowych tu NIE MA - sa czescia taryfy, nie punktem wyjscia, siedza w tabelach demo.property.factor.* i wola je PRICING. Pol przedmiotu ubezpieczenia tez nie: to formularz, opisuje go katalog demo.property.apk.question.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>APK</code>
@@ -133,14 +133,6 @@
                     <collectionTypeCode>COVER</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
-                    <code>FACTORS</code>
-                    <name>Czynniki taryfowe</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
                     <code>OFFER</code>
                     <name>Oferta</name>
                     <multiple>true</multiple>
@@ -155,14 +147,6 @@
                     <visible>true</visible>
                     <order>0</order>
                     <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>SUBJECT</code>
-                    <name>Przedmiot ubezpieczenia i sytuacja (poza APK)</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>QUESTION</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
                     <code>SUMS</code>

@@ -1,2 +1,0 @@
-name = "Czynnik za materiał ścian"
-tags = []

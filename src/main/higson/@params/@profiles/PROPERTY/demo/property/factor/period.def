@@ -1,5 +1,5 @@
 code = "demo.property.factor.period"
-description = "Czynnik mniejszy niz wielokrotnosc okresu - znizka za dluzsze zobowiazanie."
+description = "Okres ochrony rozstrzyga trzy rzeczy naraz: o ile drozsza jest skladka (factor), na ile rat sie ja rozklada (installments) i ILE MIESIECY trwa ochrona (coverMonths). Ostatnia kolumna istnieje, bo dlugosc okresu byla do 7 wrzesnia 2026 wyliczana w Javie jako installments razy 12, z zaszyta dwunastka na wypadek braku wiersza - czyli dwie liczby produktowe mieszkaly w kodzie aplikacji."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,11 +9,11 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Cover period factor"
+label = "Czynnik i rozlozenie skladki za okres ochrony"
 
 [[inputLevel]]
 code = "months"
-label = "period months"
+label = "okres ochrony"
 type = "integer"
 reverseMatcher = false
 property = "quote.policy.periodMonths"
@@ -22,14 +22,21 @@ union = false
 
 [[outputLevel]]
 code = "factor"
-label = "factor"
+label = "czynnik skladki"
 type = "number"
 external = false
 array = false
 
 [[outputLevel]]
 code = "installments"
-label = "installments"
+label = "liczba rat"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "coverMonths"
+label = "dlugosc ochrony w miesiacach"
 type = "integer"
 external = false
 array = false

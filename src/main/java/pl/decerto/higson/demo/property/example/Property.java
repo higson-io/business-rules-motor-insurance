@@ -54,7 +54,21 @@ public class Property {
 
 	private static final String COLLECTION_APK = "APK";
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
-	private static final String COLLECTION_SUBJECT = "SUBJECT";
+	private static final String BRANCH_SUBJECT = "SUBJECT";
+
+	/**
+	 * Pola przedmiotu ubezpieczenia — w KOLEJNOŚCI, w jakiej stoją na ekranie.
+	 *
+	 * ⛔ Jedyna lista kodów w tym pliku i jedyne miejsce, w którym aplikacja wie coś o treści
+	 * formularza. Do 7 września 2026 były to elementy drzewa domeny, ale zaciemniały je: drzewo
+	 * ma być punktem, od którego zaczyna się czytanie PRODUKTU, a metraż i rok budowy nie są
+	 * konfiguracją produktu, tylko formularzem. Wszystko poza samą listą — treść pytania, rodzaj
+	 * odpowiedzi, ścieżka kontekstu, kolejność, opcje, podpowiedź — nadal siedzi w katalogu
+	 * `demo.property.apk.question`, więc zmiana brzmienia pytania to nadal jedna komórka.
+	 */
+	private static final List<String> SUBJECT_FIELDS = List.of(
+		"PROPERTY_KIND", "AREA", "CONSTRUCTION_YEAR", "WALL_MATERIAL", "FLOOR", "RENOVATED",
+		"FINISH_STANDARD", "POSTCODE", "OCCUPANCY", "SECURITY", "CLAIMS_3Y", "COVER_PERIOD");
 	private static final String APK_ELEMENT = "NEEDS";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
@@ -89,6 +103,8 @@ public class Property {
 	private static final String REASON_NO_ALTERNATIVE = "BUDGET_NO_ALTERNATIVE";
 
 	private static final String PARAM_REVEAL = "demo.property.apk.question.reveal";
+	private static final String PARAM_VISIBILITY = "demo.property.apk.question.visibility";
+	private static final String PARAM_RECALCULATION = "demo.property.quote.recalculation";
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
 	private static final String PATH_APK_INDICATED = "quote.apk.indicated";
@@ -187,7 +203,9 @@ public class Property {
 		if (apk != null) {
 			readInto(quote, apk.getChildren(COLLECTION_QUESTIONS), APK_ELEMENT, questions);
 		}
-		readInto(quote, product.getChildren(COLLECTION_SUBJECT), COLLECTION_SUBJECT, questions);
+		for (String code : SUBJECT_FIELDS) {
+			questions.add(readCatalogueQuestion(quote, code));
+		}
 
 		questions.sort(Comparator.comparingInt(Question::getPosition));
 		applyReveal(quote, questions);
@@ -214,6 +232,29 @@ public class Property {
 		for (DomainObject definition : definitions) {
 			questions.add(readQuestion(quote, definition, branch));
 		}
+	}
+
+	/**
+	 * Pole przedmiotu ubezpieczenia — całe z katalogu, bez elementu domeny.
+	 *
+	 * Różni się od pytania APK tylko tym, skąd bierze treść, rodzaj i ścieżkę kontekstu:
+	 * pytanie APK ma je na elemencie drzewa, pole przedmiotu w trzech kolumnach katalogu.
+	 * Wszystko pozostałe czyta ta sama metoda.
+	 */
+	private Question readCatalogueQuestion(PropertyQuote quote, String code) {
+		PropertyContext ctx = new PropertyContext(quote).withQuestion(code);
+		ParamValue row = engine.get(PARAM_QUESTION, ctx);
+
+		Question question = new Question();
+		question.setCode(code);
+		question.setSection(BRANCH_SUBJECT);
+		question.setText(row.getString("text"));
+		question.setKind(row.getString("kind"));
+		question.setContextPath(row.getString("contextPath"));
+		question.setVisible(Boolean.TRUE.equals(
+			engine.get(PARAM_VISIBILITY, ctx).getBoolean("visible")));
+		applyCatalogue(question, row);
+		return question;
 	}
 
 	/** Jedno pytanie. Przynależność niesie GAŁĄŹ, w której pytanie wisi — nie jego atrybut. */
@@ -250,13 +291,7 @@ public class Property {
 
 		// Reszta z KATALOGU — te, które na elemencie były identycznym wskaźnikiem `$p` i tylko
 		// zasłaniały pięć powyższych. Jeden odczyt zamiast sześciu atrybutów i pięciu tabel.
-		ParamValue row = engine.get(PARAM_QUESTION, ctx);
-		question.setPosition(intOrZero(row.getInteger("position")));
-		question.setRequired(Boolean.TRUE.equals(row.getBoolean("required")));
-		question.setOptions(split(row.getString("options")));
-		question.setOptionLabels(split(row.getString("labels")));
-		question.setPrefillSource(row.getString("prefill"));
-		question.setRevealedBy(row.getString("revealedBy"));
+		applyCatalogue(question, engine.get(PARAM_QUESTION, ctx));
 
 		// ⛔ DWIE FLAGI, NIE JEDNA — i nie wolno ich tu sklejać. Reguła `IS_VISIBLE` mówi, czy
 		// pytanie DOTYCZY tego klienta (piętro nie dotyczy domu); łańcuch `revealedBy` — czy już
@@ -280,6 +315,16 @@ public class Property {
 	 * odpowiadania na nie; po jej usunięciu z ekranu bez tej gałęzi jedno pominięte pytanie
 	 * o oczekiwaną składkę zatrzymywałoby resztę ankiety na zawsze.
 	 */
+	/** Ustawienia wspólne dla pytania APK i pola przedmiotu — jeden wiersz katalogu. */
+	private void applyCatalogue(Question question, ParamValue row) {
+		question.setPosition(intOrZero(row.getInteger("position")));
+		question.setRequired(Boolean.TRUE.equals(row.getBoolean("required")));
+		question.setOptions(split(row.getString("options")));
+		question.setOptionLabels(split(row.getString("labels")));
+		question.setPrefillSource(row.getString("prefill"));
+		question.setRevealedBy(row.getString("revealedBy"));
+	}
+
 	private void applyReveal(PropertyQuote quote, List<Question> questions) {
 		Map<String, Question> byCode = new LinkedHashMap<>();
 		for (Question question : questions) {
@@ -342,7 +387,11 @@ public class Property {
 		ParamValue sums = (ParamValue) engine.call(FUNCTION_SUMS, new PropertyContext(quote));
 		BigDecimal building = asDecimal(sums.get(0, "building"));
 		quote.getSums().setSuggestedBuilding(building);
-		if (!quote.isBuildingSumOverridden()) {
+		// ⛔ ROZSTRZYGA REGUŁA. „Suma podana ręcznie przez klienta wygrywa z wyliczeniem" to
+		// decyzja produktowa, nie mechanika — do 7 września 2026 była warunkiem w tej metodzie.
+		boolean overwrite = Boolean.TRUE.equals(engine.get(PARAM_RECALCULATION,
+			new PropertyContext(quote)).getBoolean("overwriteManualSum"));
+		if (overwrite || !quote.isBuildingSumOverridden()) {
 			quote.getSums().setBuilding(building);
 		}
 		quote.getSums().setFixtures(asDecimal(sums.get(0, "fixtures")));
@@ -723,7 +772,11 @@ public class Property {
 	 */
 	private void prepareOffer(PropertyQuote quote) {
 		Offer offer = quote.getOffer();
-		if (offer.isIssued()) {
+		// ⛔ ROZSTRZYGA REGUŁA. Wystawiony dokument ma numer i datę — zmiana odpowiedzi nie ma
+		// prawa przestawić mu okresu ani numeru. Czy tak jest, mówi konfiguracja, nie ten `if`.
+		boolean frozen = Boolean.TRUE.equals(engine.get(PARAM_RECALCULATION,
+			new PropertyContext(quote)).getBoolean("freezeIssuedOffer"));
+		if (offer.isIssued() && frozen) {
 			return;
 		}
 
@@ -838,9 +891,12 @@ public class Property {
 		if (answered instanceof Number) {
 			return ((Number) answered).intValue();
 		}
-		// Tabela okresu ma wiersz domyślny, więc odpowiedź bez wartości nadal daje sensowny okres.
-		Integer months = engine.get(PARAM_PERIOD, new PropertyContext(quote)).getInteger("installments");
-		return months == null ? 12 : months * 12;
+		// ⛔ DŁUGOŚĆ OCHRONY CZYTA SIĘ Z TABELI, a nie wylicza z liczby rat. Do 7 września 2026
+		// stało tu `installments * 12` z zaszytą dwunastką na wypadek braku wiersza — dwie liczby
+		// produktowe w kodzie aplikacji, i to takie, które przy zmianie oferty na półroczną
+		// dawałyby cichy błąd zamiast błędu. Tabela ma wiersz domyślny, więc odpowiedź bez
+		// wartości nadal daje sensowny okres.
+		return intOrZero(engine.get(PARAM_PERIOD, new PropertyContext(quote)).getInteger("coverMonths"));
 	}
 
 	/**

@@ -1,3 +1,0 @@
-name = "Na jaki okres ochrony?"
-description = "Parametr umowy, nie potrzeba klienta - dlatego poza APK. Od niego zalezy czynnik okresu i liczba rat."
-tags = []

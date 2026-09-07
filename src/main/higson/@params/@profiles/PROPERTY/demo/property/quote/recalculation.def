@@ -1,0 +1,35 @@
+code = "demo.property.quote.recalculation"
+description = "Dwa przelaczniki o tym, kiedy wynik przestaje sie zmieniac. overwriteManualSum: czy wyliczenie sumy z metrazu nadpisuje sume, ktora klient podal recznie - domyslnie NIE, bo wola klienta wygrywa z podpowiedzia. freezeIssuedOffer: czy wystawiony dokument zostaje niezmienny - domyslnie TAK, bo oferta z numerem i data jest juz wydana i zmiana odpowiedzi nie ma prawa przestawic jej okresu ani numeru. Obie reguly byly do 7 wrzesnia 2026 warunkami w Javie."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Co wolno przeliczyc ponownie"
+
+[[inputLevel]]
+code = "regime"
+label = "rezim analizy potrzeb"
+type = "string"
+reverseMatcher = false
+property = "regime.code"
+source = "regime.code"
+union = false
+
+[[outputLevel]]
+code = "overwriteManualSum"
+label = "wyliczenie nadpisuje reczna sume"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "freezeIssuedOffer"
+label = "wystawiona oferta niezmienna"
+type = "boolean"
+external = false
+array = false

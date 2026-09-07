@@ -1,2 +1,0 @@
-name = "Powierzchnia użytkowa w metrach kwadratowych"
-tags = []
