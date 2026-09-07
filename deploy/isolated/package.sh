@@ -36,6 +36,14 @@ done
 # W paczce baza jest widoczna pod nazwą usługi 'db', a nie 'higson-demo-db' jak lokalnie.
 sed -i.bak 's#jdbc:h2:tcp://higson-demo-db:9092#jdbc:h2:tcp://db:9092#' "$OUT/conf/application.properties" && rm -f "$OUT/conf/application.properties.bak"
 
+# Sekret JWT musi trafic do zmiennych srodowiskowych runtime-rest, a nie tylko do
+# application.properties Studia - inaczej kontener runtime nie wstanie. .env powstaje tu,
+# bo zawiera sekret i nie moze byc w repozytorium.
+SECRET="$(grep -E '^higson\.security\.jwt\.secret-key=' "$OUT/conf/application.properties" | head -1 | cut -d= -f2-)"
+[ -n "$SECRET" ] || { echo "nie znalazlem higson.security.jwt.secret-key w application.properties" >&2; exit 1; }
+cp "$REPO/deploy/isolated/.env.example" "$OUT/.env"
+printf 'JWT_SECRET=%s\n' "$SECRET" >> "$OUT/.env"
+
 TAR="$OUT.tar.gz"
 tar -czf "$TAR" -C "$(dirname "$OUT")" "$(basename "$OUT")"
 echo

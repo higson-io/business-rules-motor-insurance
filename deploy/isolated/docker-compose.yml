@@ -55,8 +55,26 @@ services:
       - "HIGSON_DATABASE_PASSWORD=sa"
       - "SERVER_SERVLET_CONTEXT_PATH=/runtime-rest"
       - "HIGSON_RUNTIME_INSTANCE_NAME=${STACK_NAME:-apk-demo}-runtime-rest"
+      # ⛔ BEZ TEGO KONTENER NIE WSTAJE. runtime-rest domyslnie wlacza zabezpieczenie JWT
+      # i bez klucza wywala sie na starcie, przy czym komunikat jest myslacy: zamiast
+      # "brak klucza" leci MissingResourceException o brakujacym tlumaczeniu tego bledu.
+      # Klucz wypelnia package.sh do .env, czytajac go z application.properties Studia -
+      # oba konce musza miec TEN SAM sekret, inaczej Studio wystawi token, ktorego
+      # runtime nie zweryfikuje.
+      - "HIGSON_RUNTIME_REST_SECURITY_TYPE=${RUNTIME_SECURITY:-jwt}"
+      - "HIGSON_SECURITY_JWT_SECRET_KEY=${JWT_SECRET:?ustaw JWT_SECRET w .env - package.sh robi to sam}"
     ports:
       - "${PORT_RUNTIME:-58081}:8081"
+    # ⚠️ Healthcheck NADPISANY. Ten wbudowany w obraz puka pod /actuator/health, a aplikacja
+    # stoi pod context path /runtime-rest, wiec dostaje 404 i kontener na zawsze zostaje
+    # "unhealthy", chociaz dziala. Ten sam objaw ma instancja lokalna od tygodnia - to cecha
+    # obrazu, nie konfiguracji. Sciezka musi isc za SERVER_SERVLET_CONTEXT_PATH.
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8081/runtime-rest/actuator/health | grep UP || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     depends_on: [db]
     networks: [net]
     logging:
