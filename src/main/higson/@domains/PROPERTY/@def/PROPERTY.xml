@@ -206,9 +206,8 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, sposob liczenia sumy ubezpieczenia z metrazu, warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja. Mechanika taryfy - czynniki, strefy, stawki - siedzi w tabelach i nie jest punktem wyjscia.</description>
+            <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, suma ubezpieczenia z metrazu, CZYNNIK RYZYKA (jeden na wycene, nie na pakiet), warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>APK</code>
@@ -253,6 +252,15 @@
                     <groupOrder>1</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.sum.suggest</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RISK_FACTOR</code>
+                    <name>Czynnik ryzyka - diagram siedmiu czynnikow</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>FLOW</defaultRefType>
+                    <defaultRefName>demo.property.risk.calculate</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -438,7 +446,7 @@
             <profile>PROPERTY</profile>
             <code>VARIANT</code>
             <name>Pakiet</name>
-            <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie, jaki ma czynnik ryzyka i jak ta skladka rozklada sie na pokrycia. Miejsce w drabince i suma gwarancyjna sa WARTOSCIAMI na elemencie - tabele kluczowane samym kodem pakietu byly indirekcja. Sklad pakietu wisi pod nim jako referencje do pokryc.</description>
+            <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie oraz jak ta skladka rozklada sie na pokrycia. Czynnika ryzyka tu NIE MA - jest cecha calej wyceny, nie pakietu, wiec wisi na produkcie. Sklad pakietu to referencje do pokryc.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -516,18 +524,9 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>RISK_FACTOR</code>
-                    <name>Czynnik ryzyka tej wyceny</name>
-                    <order>4</order>
-                    <groupOrder>2</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.risk.factor</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
                     <code>COVER_PREMIUMS</code>
                     <name>Rozbicie skladki na pokrycia</name>
-                    <order>5</order>
+                    <order>4</order>
                     <groupOrder>2</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.tariff.coverPremiums</defaultRefName>

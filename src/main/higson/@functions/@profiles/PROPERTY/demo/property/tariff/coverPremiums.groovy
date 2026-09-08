@@ -7,19 +7,16 @@
 
 categories = []
 logLevel = "INFO"
-description = "Rozbicie skladki na pokrycia wchodzace w sklad wariantu. Sklad czytany Z DRZEWA - pokrycia wisza pod pakietem w kolekcji COVERS. Wzor na skladke JEDNEGO pokrycia stoi w demo.property.cover.premium i tylko tam; ta funkcja jest petla, nie taryfa."
+description = "Rozbicie skladki na pokrycia wchodzace w sklad wariantu. Sklad czytany Z DRZEWA. Wzor na skladke JEDNEGO pokrycia stoi w demo.property.cover.premium i tylko tam; ta funkcja jest petla, nie taryfa. Czynnik ryzyka bierze z kontekstu, bo jest cecha WYCENY, a nie wariantu - liczyl sie wczesniej raz na kazdy wariant, choc za kazdym razem wychodzil ten sam."
 
 [[arguments]]
 name = "ctx"
 type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
-
-[[arguments]]
-name = "riskFactor"
-type = "BIG_DECIMAL"
 */
 
 def variant = ctx.getString('variant.code')
+def riskFactor = ctx.getDecimal('quote.risk.factor')
 def lines = []
 
 // ⛔ Kontekst dla pojedynczego pokrycia budujemy JAWNIE. higson.createContext tworzy kontekst

@@ -41,12 +41,6 @@ refType = "FLOW"
 refName = "demo.property.calculateQuote"
 
 [[attr]]
-attributeCode = "RISK_FACTOR"
-attributeName = "Czynnik ryzyka tej wyceny"
-refType = "FUNCTION"
-refName = "demo.property.risk.factor"
-
-[[attr]]
 attributeCode = "UNAVAILABLE_REASON"
 attributeName = "Powod niedostepnosci"
 refType = "PARAMETER"

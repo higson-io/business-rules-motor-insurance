@@ -79,7 +79,7 @@ public class Property {
 	private static final String FUNCTION_BUILDING_AGE = "demo.property.util.buildingAge";
 	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
 	private static final String FUNCTION_SUMS = "demo.property.sum.suggest";
-	private static final String FUNCTION_RISK = "demo.property.risk.factor";
+	private static final String FLOW_RISK = "demo.property.risk.calculate";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
 	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
@@ -402,7 +402,11 @@ public class Property {
 		// Do 7 września 2026 stały tu trzy przypisania na sztywno i to one były prawdziwą
 		// definicją produktu — tabela o tej samej nazwie istniała, ale nikt jej nie czytał.
 
-		quote.setRiskFactor(asDecimal(engine.call(FUNCTION_RISK, new PropertyContext(quote))));
+		// ⛔ CZYNNIK RYZYKA JEST FLOW, nie funkcją. Siedem tabel czynnikowych i łańcuch mnożeń
+		// widać na diagramie zamiast czytać z dwudziestu linii Groovy'ego — a że flow nie umie
+		// arytmetyki, mnoży `demo.util.multiply`, dla którego BRAK WARTOŚCI ZNACZY JEDEN.
+		quote.setRiskFactor(asDecimal(
+			engine.flow(FLOW_RISK, new PropertyContext(quote)).getResult().get("factor")));
 	}
 
 	private void loadCovers(PropertyQuote quote) {

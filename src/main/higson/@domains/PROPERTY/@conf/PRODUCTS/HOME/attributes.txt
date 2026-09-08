@@ -29,6 +29,12 @@ refType = "PARAMETER"
 refName = "demo.property.quote.recalculation [freezeIssuedOffer]"
 
 [[attr]]
+attributeCode = "RISK_FACTOR"
+attributeName = "Czynnik ryzyka - diagram siedmiu czynnikow"
+refType = "FLOW"
+refName = "demo.property.risk.calculate"
+
+[[attr]]
 attributeCode = "SUM_INSURED"
 attributeName = "Suma ubezpieczenia z metrazu i stawki"
 refType = "FUNCTION"
