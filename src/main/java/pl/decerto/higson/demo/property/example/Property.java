@@ -283,7 +283,12 @@ public class Property {
 		// przestał być potrzebny.
 		question.setKind(attrString(definition, "KIND", ctx));
 		question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
-		question.setVisible(Boolean.TRUE.equals(definition.getAttrBoolean("IS_VISIBLE", ctx)));
+		// ⛔ Widoczność czyta się z reguły WPROST, tak samo jak dla pól przedmiotu. Do 8 września
+		// 2026 pytanie APK miało atrybut `IS_VISIBLE`, ale na wszystkich siedmiu był to TEN SAM
+		// wskaźnik na tę samą tabelę — czyli siedem kopii jednej informacji, zasłaniających dwa
+		// atrybuty, które faktycznie różnią pytania od siebie.
+		question.setVisible(Boolean.TRUE.equals(
+			engine.get(PARAM_VISIBILITY, ctx).getBoolean("visible")));
 
 		// Reszta z KATALOGU — te, które na elemencie były identycznym wskaźnikiem `$p` i tylko
 		// zasłaniały pięć powyższych. Jeden odczyt zamiast sześciu atrybutów i pięciu tabel.

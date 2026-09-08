@@ -5,12 +5,6 @@ refType = "LITERAL"
 refName = "quote.needs.budget"
 
 [[attr]]
-attributeCode = "IS_VISIBLE"
-attributeName = "Czy pytanie dotyczy tego klienta"
-refType = "PARAMETER"
-refName = "demo.property.apk.question.visibility"
-
-[[attr]]
 attributeCode = "KIND"
 attributeName = "Rodzaj odpowiedzi"
 refType = "LITERAL"

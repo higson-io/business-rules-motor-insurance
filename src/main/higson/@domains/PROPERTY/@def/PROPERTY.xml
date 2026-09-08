@@ -296,9 +296,8 @@
             <profile>PROPERTY</profile>
             <code>QUESTION</code>
             <name>Pytanie</name>
-            <description>Pytanie zadawane klientowi. NAZWA ELEMENTU JEST TRESCIA PYTANIA - do 4 wrzesnia 2026 tresc stala osobno w atrybucie TEXT, wiec kazde pytanie mialo dwie wersje siebie i cztery z dziewietnastu zdazyly sie rozjechac: drzewo mowilo co innego niz ekran. Zostaja trzy atrybuty: jakiego rodzaju jest odpowiedz, gdzie ona laduje i kiedy pytanie w ogole dotyczy tego klienta. Reszta ustawien to jeden wiersz demo.property.apk.question.</description>
+            <description>Pytanie zadawane klientowi. NAZWA ELEMENTU JEST TRESCIA PYTANIA. Zostaja dwa atrybuty, bo tylko one roznia pytania od siebie: jakiego rodzaju jest odpowiedz i GDZIE ONA LADUJE w kontekscie wyceny - ta druga to jedyne polaczenie miedzy tym, co klient wpisal, a tym, co widza reguly. Kiedy pytanie dotyczy tego klienta, rozstrzyga demo.property.apk.question.visibility, a reszta ustawien to jeden wiersz demo.property.apk.question.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -315,15 +314,6 @@
                     <order>2</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>LITERAL</defaultRefType>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>IS_VISIBLE</code>
-                    <name>Czy pytanie dotyczy tego klienta</name>
-                    <order>3</order>
-                    <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.apk.question.visibility</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>
