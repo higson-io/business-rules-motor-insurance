@@ -28,10 +28,11 @@ export type QuestionKind =
 	| 'TEXT';
 
 /**
- * Sections of the questionnaire.
+ * Gałąź drzewa, z której pochodzi pytanie — i zarazem krok, w którym się je zadaje.
  *
- * ⚠️ This is documentation, not a gate — the component never matches on a section code. NEEDS
- * and EXCLUSIONS exist only under the 2026 recommendations; NEEDS_BASE exists in both regimes.
+ * ⛔ To NIE jest dokumentacja: komponent filtruje po tej wartości (`questionnaire.ts`, wejście
+ * `group`). `NEEDS` to siedem pytań analizy potrzeb, elementów drzewa domeny; `SUBJECT` to
+ * dwanaście pól przedmiotu ubezpieczenia, które elementami nie są i idą z katalogu.
  */
 /**
  * Gałąź drzewa, w której pytanie wisi — i zarazem krok, w którym się pokazuje.

@@ -23,7 +23,7 @@ Located in `.maister/docs/project/`
 *Generated from analysis of this codebase. **Written in Polish** (team language preference). Standards and this index are in English.*
 
 ### Tech Stack (`project/tech-stack.md`)
-Technology choices with rationale for the **Business Rules for Motor Insurance** demo (`pl.decerto:motor-insurance` 4.3.0-SNAPSHOT) — a reference application for the **Higson BRMS** rules engine. Covers: Java 17 backend and a **TypeScript ~6.0.3 / Angular 22.1.0** frontend in `frontend/` plus LESS (with the single documented `theme.scss` Sass exception); Spring Boot 3.5.16 with `spring-boot-starter-higson-runtime` 4.3.1 and the rules snapshot layout under `src/main/higson/` (`@domains`, `@params`, `@functions`, `@tests`, `@profiles`, `@flows`) — including the warning that the snapshot is **not tracked in git** and that Higson Studio's database is the system of record; the UI library set (**Angular Material 22.1.1 + CDK**, with Bootstrap 3 / Font Awesome 4 / angular-tooltips / spin.js removed rather than replaced, and Manrope self-hosted); PostgreSQL as default datastore and H2 2.1.212 for demo/tests, with no ORM; Maven build producing `motor-insurance.war` with **`npm ci && ng build`** wired into `prepare-package` and the deliberately unpinned `maven-war-plugin`, plus the `higson-cli-maven-plugin` pull/push snapshot sync; the **Node version floor** and the fact that nothing in the repository enforces it; Docker / docker-compose topology (`db`, `studio`, `runtime-rest`, `web`) and the continuing absence of CI and linting; the three test suites and their honest limits; the key dependency table, version-pinning policy, and a migration path in which **frontend modernization is now marked done** and CI, the bundle budget and API docs are what remain.
+Technology choices with rationale for the **Business Rules for Motor Insurance** demo (`pl.decerto:motor-insurance` 4.3.0-SNAPSHOT) — a reference application for the **Higson BRMS** rules engine. Covers: Java 17 backend and a **TypeScript ~6.0.3 / Angular 22.1.0** frontend in `frontend/` plus LESS (with the single documented `theme.scss` Sass exception); Spring Boot 3.5.16 with `spring-boot-starter-higson-runtime` 4.3.1 and the rules snapshot layout under `src/main/higson/` (`@domains`, `@params`, `@functions`, `@flows`, `@profiles`, `@tags`) — including the warning that Studio's database is where rules are changed, so the committed tree drifts the moment someone edits without exporting; the UI library set (**Angular Material 22.1.1 + CDK**, with Bootstrap 3 / Font Awesome 4 / angular-tooltips / spin.js removed rather than replaced, and Manrope self-hosted); PostgreSQL as default datastore and H2 2.1.212 for demo/tests, with no ORM; Maven build producing `motor-insurance.war` with **`npm ci && ng build`** wired into `prepare-package` and the deliberately unpinned `maven-war-plugin`, plus the `higson-cli-maven-plugin` pull/push snapshot sync; the **Node version floor** and the fact that nothing in the repository enforces it; Docker / docker-compose topology (`db`, `studio`, `runtime-rest`, `web`) and the continuing absence of CI and linting; the three test suites and their honest limits; the key dependency table, version-pinning policy, and a migration path in which **frontend modernization is now marked done** and CI, the bundle budget and API docs are what remain.
 **Read before** adding dependencies, bumping Higson or Spring Boot versions, touching the build, or making any technology decision.
 
 ### Architecture (`project/architecture.md`)
@@ -91,7 +91,22 @@ assuming a given piece exists in Studio — the body of the document is the desi
 what was built afterwards, and the two are close but not identical.
 
 ### Profil PROPERTY — projekt konfiguracji (`project/higson-property-profile.md`)
-> ⚙️ **Zbudowane i działające** w profilu `PROPERTY` (2026-08-21), zweryfikowane przeglądarką.
+> ⚙️ **Zbudowane i działające** w profilu `PROPERTY`, zweryfikowane przeglądarką.
+>
+> ⛔ **STAN NA 2026-09-08 — czytaj go zamiast akapitu poniżej.** Dokument jest pisany
+> chronologicznie i akapit otwierający opisuje projekt z sierpnia, nie dzisiejszą konfigurację.
+> Dziś w profilu `PROPERTY` jest: **32 tabele decyzyjne, 19 funkcji Groovy, 3 flow**, a drzewo
+> domeny to `/PRODUCTS[HOME]` z trzema gałęziami — `APK[NEEDS]` (9 atrybutów reguł + **7 pytań**
+> jako elementy), `COVERS` (7 pokryć, każde z własnym kompletem tabel) i `VARIANTS`
+> (BASIC/STANDARD/COMPLETE, a skład pakietu to **referencje** do pokryć, nie wiersze tabeli).
+> **Dwanaście pól przedmiotu ubezpieczenia nie jest już elementami domeny** — siedzą na sztywno
+> w `Property.SUBJECT_FIELDS`, świadomie, bo to nie jest analiza potrzeb. Gałęzie `SECTIONS`,
+> `SUBJECT`, `FACTORS`, `ZONES` i `USES` **nie istnieją**; tabele czynników i stref żyją dalej
+> i są używane w taryfikacji, tyle że nie są punktem startu w drzewie. Region `PROPERTY` nadal
+> istnieje z dwiema wersjami, ale **nic do niego nie jest podpięte** — wersjonowanie datą polisy
+> w tym profilu niczego nie zmienia (demonstrują je MOTOR i LIFE). §16…§31 opisują drogę tutaj;
+> §2/§4/§6/§7/§8/§9 są nieaktualne.
+
 Trzecie demo aplikacji: **ubezpieczenie domu i mieszkania (detal)**, w którym osią nie jest taryfa,
 tylko **analiza potrzeb klienta (APK) jako konfiguracja wersjonowana datą polisy**. Zawiera: drzewo
 domeny `/PRODUCTS[HOME]/{COVERS,VARIANTS,QUESTIONS}`, gdzie **katalog 18 pytań APK to elementy
@@ -228,6 +243,21 @@ to `action: SET_TO_ALL`, which overwrites every element's value with the type de
 one attribute wiped `KIND` and `CONTEXT_PATH` on all 19 questions and returned HTTP 500.
 §31.5 lists what the analysis found and this pass did not do — chief among it that Higson's real
 element references (`reference.txt`) are unused, so a package's covers are hand-copied stubs.
+**§32 (2026-09-07/08)** makes the tree the way in: everything the application asks Higson for is
+reachable by walking it. `SUBJECT`, `FACTORS`, `ZONES` and `USES` leave the tree (their tables stay
+and are still used — they are tariff inputs, not a place anyone starts reading); **D-21** gives an
+element behaviour instead of one `RULE` pointer (`COVER` 12 attributes, `APK[NEEDS]` 9);
+**D-22** hangs a package's covers as **real references** to `COVERS[...]` rather than copies —
+⚠️ a reference path needs a **trailing slash**; **D-23** puts a per-element constant on the element,
+so a table survives only when it has a second dimension. Answers become configuration (yes/no by
+default); the risk factor and the package choice become **flows** with util functions for the
+arithmetic — ⛔ **`EXPRESSION` is forbidden**, newer Higson removed it; and every cover gets its own
+table keyed by what actually decides it, which is the **opposite** of §31.5's merge proposal and the
+reason those tables can be rich. Five parallel reviews then found two defects: `sum.valueGap` asked
+for a context path Java had renamed, so its sentence could never fire; and the package rules counted
+covers the client cannot buy, so "no security" chose COMPLETE and reported the theft it had just
+credited as a gap. ⚠️ Fixing that **deliberately changes one outcome** — no security now proposes
+STANDARD. §32.11 lists nine open items that are decisions, not litter.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -394,7 +424,7 @@ Project-specific, **frontend unit tests** (Vitest through the Angular CLI): ⛔ 
 Project-specific, **end-to-end goldens** (`e2e/`, Playwright): select by test id and accessible role rather than markup; goldens are committed evidence while screenshots are documentation only and never a gate; **a golden is never edited to make a replay pass**.
 
 #### Rule Tests (`standards/testing/rule-tests.md`)
-Testing the part of this system that actually holds the business logic. Three standards: *Business Logic Is Covered by Higson Rule Tests* (coverage lives in `src/main/higson/@tests` — 9 files run by Studio or the runtime — not in Java unit tests; a new business rule's test belongs in the snapshot, **and because the snapshot is not committed those tests are not visible in the repository either**); *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
+Testing the part of this system that actually holds the business logic. Three standards: ⛔ *Business Logic Is Covered by Higson Rule Tests* — **aspirational, not current**: `src/main/higson/@tests` does not exist, so the rules that hold this system's behaviour have no automated coverage at all; a new business rule's test belongs in the snapshot, and the snapshot is now committed, so such tests would be visible in the repository; *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
 
 > ⚠️ A snapshot-booted engine is **not** identical to the live runtime. Enabling function argument validation on a hand-built snapshot engine makes a flow-invoked Groovy function fail to bind its `ParamContext` argument, while the same configuration against a live database works. Do not generalise a snapshot-engine failure into a production configuration change.
 
@@ -468,4 +498,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-04 (questionnaire cut to spec §2's seven questions; region versioning and the settings drawer removed)
+**Last regenerated**: 2026-09-08 (§32 — the domain tree becomes the way in; five reviews, two defects fixed)

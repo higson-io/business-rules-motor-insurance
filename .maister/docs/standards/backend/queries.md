@@ -5,7 +5,7 @@ Project-specific standards discovered from this codebase come first and take pre
 ### No ORM and No Application-Owned Schema
 The application defines no JPA entities, no repositories and no SQL. All data access goes through the Higson runtime over JDBC, because the database schema is owned entirely by Higson. Do not add Spring Data, JPA, or hand-written DAOs — if you need data, it comes from a rule.
 
-*Evidence:* no ORM on the classpath; 0 entity or repository classes across 47 Java files; HikariCP present only because the Higson starter uses it.
+*Evidence (2026-09-08):* no ORM on the classpath; 0 entity or repository classes across 107 Java files; HikariCP present only because the Higson starter uses it.
 
 ### Dictionary Lookups Go Through the Higson Engine
 Reference data (vehicle makes, models, types) is served by Higson parameters queried through the engine with a constant code plus a `HigsonContext`, then mapped to DTOs by a row-mapper method reference. There is no separate lookup table or cache in the application.

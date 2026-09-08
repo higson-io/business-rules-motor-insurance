@@ -2933,3 +2933,135 @@ Trzy niezależne analizy wskazały więcej niż zmieściło się w tej rundzie. 
 | 4 | **Drugi poziom wejściowy w tabelach pokryć** | MOTO kluczuje limity parą `coverage × option`, LIFE parą `benefit × variant`. Majątek nie — dlatego `THEFT` ma ten sam limit w STANDARD i COMPLETE. `PropertyContext` **już niesie oba pola** |
 | 5 | **`variant.position`, `variant.availability[COMPLETE×ZX]`, `variant.liabilitySum[BASIC=0]`** | wszystkie trzy wyprowadzalne ze składu pakietu w drzewie |
 | 6 | **Martwe resztki** | `QuestionCatalogue.java` czyta 8 atrybutów, których typ `QUESTION` nie ma; osierocony wiersz `CIRCUMSTANCES` w `question.visibility`; martwe typy kontekstu (`Situation`, `Apk`); `quote.property.priorFloodCover`, którego nikt nie ustawia, więc karencja zawsze trafia w wiersz `*`; nieczytane kolumny w `sum.valueGap` i `flood.availability` powtarzające zdania z `reason.mat`; typ `SECTION` |
+
+## §32 Drzewo jako punkt startu, reguły jako zachowanie elementu (2026-09-07/08)
+
+Runda zaczęła się od jednego wymagania: **wszystko, o co aplikacja pyta Higsona, ma być osiągalne
+z drzewa domeny** — „nie mogą latać sobie luźne tabele czy funkcje". Konfigurator wchodzi w drzewo,
+schodzi w dół po nitce do kłębka i po drodze widzi, co produkt ma i czym to jest rozstrzygane.
+Skończyła się przeglądem pięcioma agentami i sprzątaniem po samej sobie.
+
+⛔ **Kryterium jest dziedzinowe, nie ekranowe** — potwierdzenie §31.1a. Drzewo nie odwzorowuje
+kroków aplikacji ani jej wyglądu; odwzorowuje produkt.
+
+### 32.1 Co zniknęło z drzewa i dlaczego to nie jest strata
+
+| Gałąź | Powód usunięcia | Co się stało z regułami |
+|---|---|---|
+| `SUBJECT` (12 pól) | To nie jest analiza potrzeb, tylko dane, które zakład i dziś ma z poprzedniej polisy. W drzewie zaciemniało, bo wyglądało jak drugi katalog pytań | Lista wbita na sztywno w `Property.SUBJECT_FIELDS` — świadomie, jako jedyne miejsce w tym demie, gdzie Java trzyma listę czegokolwiek |
+| `FACTORS` (8) | Czynnik składki jest **częścią taryfy**, a nie punktem, od którego ktokolwiek zaczyna czytać produkt | Tabele nietknięte i dalej używane w wycenie; przestały być pozycją w spisie treści |
+| `ZONES` (5) | To samo: strefa to wejście do taryfy | Dostępność zeszła **na pokrycie** — jako jego atrybut, tam gdzie się jej szuka |
+| `USES` | Puste gałęzie bez atrybutów, artefakt wcześniejszej rundy | — |
+| `SECTIONS` | §29 | — |
+
+### 32.2 D-21 — element domeny ma być bogaty, nie być opakowaniem na jedną regułę
+
+Poprzednia wersja dawała elementom po jednym atrybucie `RULE`. To jest wskaźnik przebrany za obiekt:
+klikając „Kradzież" widziało się jedną linijkę, a nie pokrycie. Dziś **`COVER` ma 12 atrybutów**
+(dostępność, stawka bazowa, limit, podstawa sumy, franszyza, karencja, pozycja, zdanie
+uzasadnienia…), a element `APK[NEEDS]` — 9, czyli komplet reguł analizy potrzeb, od widoczności
+pytania po treść uzasadnienia rekomendacji. Kryterium doboru atrybutu pozostaje z D-16: **atrybut
+istnieje, gdy wskazuje na regułę** — nie „gdy Java go czyta".
+
+### 32.3 D-22 — skład pakietu to prawdziwe referencje (zamyka §31.5 poz. 1)
+
+`VARIANTS[COMPLETE]/COVERS` nie zawiera już atrap typu `PACKAGE_COVER` z ręcznie przepisaną nazwą.
+Zawiera **referencje** (`reference.txt` w snapshocie, `<references>` w eksporcie) do elementów
+`COVERS[...]`. Klikając pokrycie pod pakietem, wchodzi się w to samo pokrycie z jego dwunastoma
+atrybutami — jedna definicja, siedem miejsc, w których jest widoczna.
+
+⚠️ Ścieżka referencji wymaga **ukośnika na końcu**: `/PRODUCTS[HOME]/COVERS[BUILDING]/`. Bez niego
+API odpowiada „incorrect path" i nic więcej.
+
+### 32.4 D-23 — stała elementu należy do elementu, nie do tabeli kluczowanej tym elementem
+
+Tabela `demo.property.cover.position` miała jedno wejście — kod pokrycia — i jedno wyjście.
+To jest indirekcja bez treści: „żeby dowiedzieć się, jaką pozycję ma pokrycie, wejdź w pokrycie,
+przeczytaj wskaźnik, wejdź w tabelę, znajdź wiersz o kodzie tego pokrycia". Takie wartości siedzą
+teraz **wprost na elemencie** jako `LITERAL`. Tabela zostaje wtedy i tylko wtedy, gdy ma **drugi
+wymiar** — coś, co poza kodem elementu też decyduje.
+
+### 32.5 Możliwe odpowiedzi jako konfiguracja
+
+Pytanie niesie listę dopuszczalnych odpowiedzi; brak listy znaczy **tak/nie**, bo tak wygląda
+większość APK. Front nie zna żadnego zestawu odpowiedzi z nazwy — renderuje to, co dostał.
+
+### 32.6 Flow zamiast funkcji, z warunkiem w środku
+
+`demo.property.risk.factor` i dobór pakietu przestały być Groovym i są flow. Arytmetykę robią
+**funkcje util** (`multiply`, `round4`) wołane z flow, bo flow nie liczy.
+
+⛔ **`EXPRESSION` jest w akcjach flow ZAKAZANE** — nowsze wersje Higsona wycofały ten typ akcji
+i poprawiły dokumentację. Zostają `DECISION_TABLE`, `FUNCTION`, `FLOW`. Zapisane też jako ósmy
+standard w `standards/higson/rules-authoring.md`.
+
+⚠️ Akcja typu `FLOW` zwraca `FlowResult`, a nie liczbę — podflow nie da się użyć jak funkcji.
+
+### 32.7 Jedna tabela na pokrycie (zamyka §31.5 poz. 2 i 4 inaczej, niż zakładano)
+
+§31.5 proponował **scalić** trzy tabele o kluczu „kod pokrycia" w jeden katalog. Zrobiliśmy
+odwrotnie: każde pokrycie dostało **własną tabelę**, kluczowaną tym, co przy tym pokryciu naprawdę
+decyduje — bo przy kradzieży decyduje zabezpieczenie, przy powodzi strefa, a przy OC nic z tego.
+Wspólna tabela kluczowana kodem pokrycia jest sumą siedmiu różnych logik zapisaną jednym kluczem
+i dlatego musiała być uboga. Osobne tabele są bogatsze i pokazują realne przypadki, w tym
+dostępność.
+
+### 32.8 Ostatnia logika, która została w Javie, jest już w Higsonie
+
+Przeniesione w tej rundzie: algorytm doboru pakietu, łańcuch odsłaniania pytań, kolizja potrzeb,
+obsługa odmowy, zamrożenie oferty, ręczne nadpisanie sumy, okres ochrony, wyzwalacze zdań
+uzasadnienia i werdykt „klient wziął rekomendację / wybrał inaczej". Java pyta i przetwarza
+odpowiedź; nie rozstrzyga.
+
+### 32.9 Pięć przeglądów i dwa defekty (2026-09-08)
+
+Pięć równoległych analiz (tabele / funkcje i flow / drzewo / Java / front i dokumentacja).
+Usunięto tylko to, co udowodnione **wszystkimi czterema drogami** dojścia do reguły — Java, Groovy,
+flow, `refName` atrybutu domeny — bo szukanie samego kodu tabeli w Javie to dokładnie to, co
+w §31.3 skasowało żywą tabelę.
+
+Dwa znaleziska były defektami, nie śmieciem:
+
+1. **`demo.property.sum.valueGap` pytała o `quote.value.ratio`, a Java publikuje
+   `quote.sums.valueRatio`** (od zmiany nazwy w 680fd97). Tabela nie ma wiersza `*`, więc zdanie
+   porównujące wycenę klienta z sumą wyliczoną **nie mogło paść nigdy**. Przed wyjątkiem chroniło
+   tylko to, że pytanie jest opcjonalne i nie ma odpowiedzi demonstracyjnej.
+2. **Reguły doboru pakietu liczyły pokrycia, których klient nie może kupić.** Java przy punktacji
+   już wykluczała pokrycie niedostępne, `apk.indicated` i `apk.alternative` nie — więc przy braku
+   zabezpieczeń rekomendacja wybierała COMPLETE, zaliczając kradzież, i w tym samym zdaniu
+   raportowała tę kradzież jako lukę. Wybór i punktacja mają teraz jedną definicję
+   (`apk.packageCovers`). ⚠️ To **celowo zmienia jeden wynik**: brak zabezpieczeń proponuje dziś
+   STANDARD, bo COMPLETE nie pokrywa ani jednej potrzeby więcej, a kosztuje trzy razy tyle.
+
+Usunięte jako martwe: typy `SECTION`, `STEP`, `RULE` (bez elementów — trzymały je przy życiu ich
+własne kolekcje), osierocony wiersz `CIRCUMSTANCES`, kolumna `outcome` w `valueGap`, zdublowany
+wiersz `ratePerSqm` dla metrażu 50, `minDeductible` i `waitingReason` w sześciu tabelach pokryć,
+stała `PARAM_APK_ANSWER`, nieużywany import i `PropertyContext.getQuote`.
+
+Zweryfikowane ośmioma scenariuszami zachowania zdjętymi **przed** sprzątaniem: identyczne poza
+zamierzoną zmianą rekomendacji. 11 testów Javy i 60 frontu przechodzi.
+
+### 32.10 Stan konfiguracji po rundzie
+
+```
+/PRODUCTS[HOME]                    7 atrybutów
+   APK[NEEDS]      9 atrybutów  +  QUESTIONS: 7 pytań
+   COVERS          7 pokryć, po 12 atrybutów, każde z własną tabelą
+   VARIANTS        BASIC / STANDARD / COMPLETE, skład jako referencje do COVERS
+```
+
+32 tabele decyzyjne · 19 funkcji Groovy (w tym util do arytmetyki) · 3 flow.
+
+### 32.11 Otwarte — do decyzji, nie do posprzątania
+
+| # | Rzecz | Na czym polega |
+|---|---|---|
+| 1 | **Region `PROPERTY`** | Istnieje z dwiema wersjami, ale **nic do niego nie jest podpięte**; sześć komentarzy w Javie obiecuje próg 1 lipca 2027, który niczego nie zmienia. Albo skasować region, albo podpiąć pod niego cokolwiek |
+| 2 | **`apk.regime`: `legalBasis`, `requiresExclusionCheck`, `requiresVariantDifferences`** | Kolumny martwe w tym profilu, ale klasa `Regime` jest wspólna z MOTO i LIFE |
+| 3 | **Zdanie „nic — pokrywa te same potrzeby"** | Jedyny polski tekst zaszyty w `Property.java` |
+| 4 | **12 wierszy równych swojemu `*`** | Nie szkodzą, ale udają, że coś rozstrzygają |
+| 5 | **`quote.property.priorFloodCover`** | Nikt tego nie ustawia, więc karencja zawsze trafia w `*` |
+| 6 | **Remis wag `NEEDS_PROPERTY` i `PROPERTY_KIND;HOUSE`** | Dwa wiersze o tej samej wadze rozstrzygają o pakiecie kolejnością |
+| 7 | **`quote.recalculation`** | Dwie stałe udające regułę |
+| 8 | **Domyślne wartości atrybutów `COVER`** | Wskazują na tabelę budynku, więc nowe pokrycie startuje z cudzą taryfą |
+| 9 | **`blocked` nie blokuje** | Pytanie oznaczone blokadą jest dalej zadawane |

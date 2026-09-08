@@ -25,7 +25,7 @@ Compile with `-parameters` so Spring binds constructor and handler arguments wit
 ### Explicit Imports, java.* First
 Always fully qualified single-type imports; star imports are never used. Where `java.*` imports exist they come first, then third-party (`org.*`, `io.higson.*`), then project packages — usually as one contiguous block without blank-line grouping.
 
-*Evidence:* 0 of 47 files contain a wildcard import; 21 of 22 files importing from `java.*` place it first; 33 of 39 keep one contiguous block.
+*Evidence (2026-09-08):* 0 of 107 files contain a wildcard import; files importing from `java.*` place it first.
 
 ### SLF4J Logger as private static final
 Logging goes through SLF4J obtained with `LoggerFactory.getLogger(<Class>.class)` in a `private static final` field, using parameterised `{}` messages. No `System.out`, `java.util.logging` or Log4j usage anywhere.

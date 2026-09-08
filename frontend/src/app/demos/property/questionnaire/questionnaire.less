@@ -4,7 +4,7 @@
 	display: block;
 }
 
-// Sekcja jest kartą, nie samym nagłówkiem. Ankieta rośnie z 9 do 16 pytań po przesunięciu daty,
+// Sekcja jest kartą, nie samym nagłówkiem. Ankieta ma siedem pytań i rośnie wraz z katalogiem w Higsonie,
 // więc granice sekcji muszą być widoczne bez czytania — inaczej „przybyły dwie sekcje" wygląda
 // jak „strona zrobiła się dłuższa".
 // ⛔ Wymiary panelu przepisane z portalu (`common.scss`, `.section-block`): białe tło, promień
@@ -19,40 +19,8 @@
 	box-shadow: @shadow-panel;
 }
 
-.apk__section-head {
-	display: flex;
-	align-items: baseline;
-	gap: 8px;
-	margin-bottom: 18px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid @color-border-block;
-}
 
-// Portal koloruje tytuł panelu na `--primary-150` (`.panel-title`, `.title`). To jedyne miejsce,
-// w którym turkus występuje jako TEKST — reszta to przyciski i stany.
-.apk__section-title {
-	margin: 0;
-	font-size: @font-lg;
-	font-weight: 600;
-	color: @color-panel-title;
-}
 
-// Kółko z liczbą — portal rysuje tak numery pytań (`.number-question`): obrys `--Outline-Grey`,
-// tekst `--grid-header-txt-color`, tło białe.
-.apk__section-count {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 24px;
-	height: 24px;
-	padding: 0 6px;
-	border: 2px solid @color-outline;
-	border-radius: 12px;
-	background: @color-paper;
-	font-size: @font-xs;
-	font-weight: 700;
-	color: @color-action;
-}
 
 // ═══ UKŁAD PYTAŃ ═══════════════════════════════════════════════════════════════════════════
 //
@@ -130,11 +98,6 @@
 	min-width: 0;
 }
 
-.apk__question--refused .apk__field,
-.apk__question--refused .apk__options,
-.apk__question--refused .apk__toggle {
-	opacity: 0.5;
-}
 
 // Odstęp pod polem daje układ pytania, nie pole. Globalny `margin-bottom: 14px` z `_forms.less`
 // sumowałby się z wyściółką wiersza.
@@ -196,32 +159,8 @@
 	color: @color-text-muted;
 }
 
-.apk__refuse {
-	padding: 0;
-	border: 0;
-	background: none;
-	font-size: 0.6875rem;
-	color: @color-text-muted;
-	cursor: pointer;
-}
 
-// ⚠️ Bez podkreślenia w stanie spoczynku. Przy szesnastu pytaniach szesnaście podkreślonych
-// linków czyta się jak szesnaście rzeczy do zrobienia — a to jest wyjście awaryjne, nie krok.
-// Podkreślenie wraca na hover i na focus, więc nadal wygląda na klikalne wtedy, gdy o nie pytasz.
-.apk__refuse:hover,
-.apk__refuse:focus-visible {
-	color: @color-text;
-	text-decoration: underline;
-}
 
-.apk__refusal {
-	margin: 6px 0 0;
-	padding: 6px 8px;
-	border-left: 2px solid fade(@color-blue, 65%);
-	background: @color-gray-light;
-	font-size: 0.75rem;
-	line-height: 1.35;
-}
 
 // ═══ TRYB ANKIETY: JEDNO PYTANIE NA EKRAN ═════════════════════════════════════════════════════
 //
@@ -254,11 +193,6 @@
 	color: @color-text-muted;
 }
 
-// Nazwa sekcji jest jedyną rzeczą w tym wierszu, która niesie treść — reszta to numeracja.
-.apk__step__section {
-	font-weight: 600;
-	color: @color-text;
-}
 
 .apk__step__counter {
 	font-variant-numeric: tabular-nums;

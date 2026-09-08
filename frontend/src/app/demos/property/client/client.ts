@@ -7,8 +7,9 @@ import { PropertyStore } from '../../../core/property-store';
  *
  * ⛔ Zajęła miejsce paska technicznego (data polisy, nazwa reżimu, liczniki pytań). Tamten pasek
  * mówił prawdę o mechanizmie, ale mówił ją najgłośniejszą rzeczą na ekranie — a demo pokazuje
- * proces sprzedaży, nie panel konfiguracji. Reżim i data zeszły do wysuwanego panelu, gdzie są
- * o jedno kliknięcie, a pierwszy plan dostał to, co w tym miejscu jest w prawdziwej aplikacji.
+ * proces sprzedaży, nie panel konfiguracji. Reżim jest jeden i nie zmienia się datą (D-17), więc
+ * nie ma już czego chować w panelu; pierwszy plan dostał to, co w tym miejscu jest w prawdziwej
+ * aplikacji.
  *
  * ⛔ DANE DEMONSTRACYJNE i ekran mówi to wprost. W prawdziwym wdrożeniu przyszłyby z CRM, a nie
  * z reguł — dlatego `source` jedzie z serwera razem z nimi i jest tu renderowane. Karta klienta

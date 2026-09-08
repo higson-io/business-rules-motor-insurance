@@ -29,9 +29,9 @@ export class PropertyService {
 	 * so a `Date` takes the object branch and is serialised to a quoted ISO-8601 string as
 	 * `application/json`. A string would arrive as `text/plain` and Jackson rejects it with 415.
 	 *
-	 * This one date does more than filter a form: the backend feeds it to
-	 * `HigsonEngine.setEffectiveDate`, so moving it across 1 July 2027 switches the APK regime and
-	 * the question catalogue at once.
+	 * The backend feeds it to `HigsonEngine.setEffectiveDate`, so every rule resolves as of this
+	 * date. ⚠️ Nothing in the property profile is versioned by it today — D-17 detached the region
+	 * — so moving it changes no question and no regime. Nothing on the screen calls this method.
 	 */
 	updateStartDate(startDate: Date): Observable<void> {
 		return this.http.put<void>('property/policy/startDate', startDate);

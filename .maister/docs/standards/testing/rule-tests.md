@@ -1,9 +1,15 @@
 ## Testing Higson Rules
 
+> ⛔ **STAN NA 2026-09-08: KATALOG `@tests` NIE ISTNIEJE.** Ten standard opisuje pokrycie, którego
+> w tym repozytorium nie ma — ani jednego testu regułowego. Reguły trzymające całe zachowanie
+> systemu (taryfa, dostępność pokryć, dobór pakietu, treść uzasadnienia) nie mają automatycznej
+> weryfikacji; jedyne, co je sprawdza, to ręczne przejście przez demo. Reguła poniżej jest nadal
+> tym, co chcemy robić — ale nie opisuje tego, co jest.
+
 The business logic of this application lives in rules, not in Java. Consequently most meaningful test coverage here is rule coverage: the Java layer only prepares the context and reads results back, so testing it proves almost nothing about pricing behaviour. These standards define where rule tests live and how Java-side tests exercise rules without a live Studio database.
 
 ### Business Logic Is Covered by Higson Rule Tests
-Coverage of the pricing logic comes from Higson rule tests in `src/main/higson/@tests` (9 files, run by Studio or the runtime), not from Java unit tests. Java tests cover integration wiring. When you add a new business rule, its test belongs in the snapshot. Note the caveat in `higson/snapshot.md`: the snapshot is not committed to git, so these tests are not visible in the repository.
+Coverage of the pricing logic comes from Higson rule tests in `src/main/higson/@tests` (9 files, run by Studio or the runtime), not from Java unit tests. Java tests cover integration wiring. When you add a new business rule, its test belongs in the snapshot. Note the caveat in `higson/snapshot.md`: the snapshot is committed to git since 2026-09-04, so these tests are not visible in the repository.
 
 *Evidence:* `src/main/higson/@tests` holds 9 test files plus 2 `@testPackages`; the Java side has one integration test.
 

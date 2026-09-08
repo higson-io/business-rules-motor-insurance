@@ -31,7 +31,7 @@ Extract repeated logic into reusable functions or modules.
 ### Tab Indentation Everywhere
 All source files — Java, JavaScript, HTML — are indented with hard tabs, not spaces. Continuation lines inside fluent chains get one extra tab. Note there is no `.editorconfig`, no Prettier and no Spotless in this project, so this is maintained by convention alone; configure your editor accordingly.
 
-*Evidence:* 47 of 47 Java files and 13 of 13 JavaScript files are tab-indented.
+*Evidence (2026-09-08):* 107 of 107 Java files and 79 of 80 TypeScript files are tab-indented. ⚠️ The earlier count of "13 of 13 JavaScript files" referred to the AngularJS build that the August 2026 migration deleted — `src/main/webapp/` now holds nothing but a `.gitkeep`.
 
 ### UTF-8 Everywhere
 Every source and resource root is explicitly configured as UTF-8 in both IDE configurations and in the POM's XML declaration. Never rely on the platform default encoding.

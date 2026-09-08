@@ -5,7 +5,7 @@ Project-specific standards discovered from this codebase come first and take pre
 ### Mutable POJOs — No Records, Builders or Lombok
 Domain objects and DTOs are plain mutable classes: private fields, public getters, void setters, a no-arg or field constructor. Java records, Lombok and builder classes are not used — the code is reference material for Higson customers and stays deliberately explicit. Express immutability with `private final` fields and getter-only access where intended.
 
-*Evidence:* 16 of 16 domain and DTO classes are plain classes; 0 records, 0 builders, 0 Lombok across all 47 Java files; 43 void setters, 0 fluent.
+*Evidence (2026-09-08):* every domain and DTO class is a plain class; 0 records, 0 builders, 0 Lombok across all 107 Java files; setters are void, never fluent.
 
 ### Spring Converter<S,T> for Domain-to-DTO Mapping
 Every mapper implements `org.springframework.core.convert.converter.Converter<Domain, Dto>`, is annotated `@Component`, guards its input with `Objects.requireNonNull` carrying a human-readable message, and builds the DTO with `new` plus setters. Nested collections map through private `toXxxDto` helpers using streams. Mapping frameworks (MapStruct, ModelMapper) are deliberately avoided so the data flow stays readable.

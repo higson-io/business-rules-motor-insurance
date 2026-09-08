@@ -2,7 +2,7 @@
 
 The SPA holds almost no state of its own. The backend keeps the whole quote in a `@SessionScope` bean, so the frontend stays a thin remote-controlled view over it: it fetches, it renders, and it tells the server when something changed.
 
-What little shared state exists lives in one root-provided store, `frontend/src/app/core/quote-store.ts`.
+What little shared state exists lives in **one root-provided store per demo** under `frontend/src/app/core/` — `quote-store.ts` (motor), `life-store.ts`, `property-store.ts` — plus two services that are deliberately shared by all three: `mutation-errors.ts` and `pending-requests.ts`.
 
 ---
 
@@ -39,14 +39,15 @@ When you write a test around a failed resource, assert on a recording `ErrorHand
 
 *Evidence:* proven by a full 2×4 differential over `defaultValue` × reader API and confirmed against the framework source (G5); the resulting fix is in `variants.ts`, `driver.ts` and `driver-history.ts`, each with a comment saying why.
 
-### One Store, Injected — Not an Event Bus
-`QuoteStore` is `@Injectable({ providedIn: 'root' })` and holds exactly three things:
+### One Store Per Demo, Injected — Not an Event Bus
+Each store is `@Injectable({ providedIn: 'root' })`. `QuoteStore` holds two things:
 
 | Member | Kind | Purpose |
 |---|---|---|
 | `quote` | `resource()` | the current quote, reloaded by bumping a private trigger signal |
 | `driver` | `resource()` | loaded **once** and shared by every consumer |
-| `mutationError` | `signal<string \| null>` | written by the mutation-error interceptor, rendered by the error banner |
+
+⛔ **The last mutation error is NOT a field on a store** — it is its own root service, `MutationErrors`. It used to be `QuoteStore.mutationError`, with two consequences: the interceptor called `inject(QuoteStore)` on *every* `PUT`, so the first change in the life or property demo instantiated the motor store and fired its requests; and `LifeStore.mutationError` / `PropertyStore.mutationError` existed but nothing ever wrote to them, so a failed `PUT` in those two demos vanished silently — exactly the defect DR-06 fixed for motor. One store per demo, one error service for all of them.
 
 Components inject the store and call `recalculate()` or `vehicleFieldChanged(field)`. They do not emit events at each other, and there is no client-side quote model — adding one would create a second source of truth alongside the server's session bean.
 
@@ -58,6 +59,6 @@ The shared `driver` resource is not incidental: the AngularJS build fetched the 
 Two behaviours are global and are implemented as functional `HttpInterceptorFn`s under `core/`, not as component logic:
 
 - **Pending-request counter** — increments on send and decrements in `finalize()`, so it returns to zero on success *and* on error. One counter drives the single global spinner and the shell's `aria-busy`.
-- **Mutation errors** — a failed `PUT` writes a message into `QuoteStore.mutationError` and does **not** retry. It prefers the backend's own message from the response body and falls back to `HttpErrorResponse.message` only when the body carries none, so the banner never renders as an empty box.
+- **Mutation errors** — a failed `PUT` writes a message into `MutationErrors.message` and does **not** retry. It prefers the backend's own message from the response body and falls back to `HttpErrorResponse.message` only when the body carries none, so the banner never renders as an empty box.
 
 *Evidence:* `core/pending-requests.interceptor.ts`, `core/mutation-error.interceptor.ts`; DR-06 golden row — 1 request, no retry, banner visible with text.

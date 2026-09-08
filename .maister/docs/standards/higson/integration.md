@@ -3,9 +3,11 @@
 The Java application is a thin shell around the Higson rules engine. These standards define where `io.higson.*` may appear, how domain objects are exposed to rules, and how the engine is configured — the goal being that a domain or rule restructure touches a small, predictable set of classes.
 
 ### Higson Runtime API Confined to adapter / context / service
-`io.higson.*` types may only be referenced from the packages whose job is Higson integration: `adapter`, `context`, `service` (engine lookups) and the `example` orchestrator. The `api`, `dto`, `converter` and `domain` packages must stay entirely Higson-free.
+`io.higson.*` types may only be referenced from the packages whose job is Higson integration: `adapter`, `context`, `service` (engine lookups), the `example` orchestrator, the shared `apk` layer and the Spring configuration class. The `api`, `dto`, `converter` and `domain` packages must stay entirely Higson-free.
 
-*Evidence:* `io.higson.*` imported by 10 of 47 files, all in adapter (6), context (1), service (1), example (1) plus the profiler-only ProfilersApi; 0 of 9 DTOs, 0 of 4 converters and 0 of 7 domain classes reference it; 0 of 5 api classes import adapter or context.
+*Evidence (2026-09-08):* `io.higson.*` imported by **24 of 107** files — adapter 12, context 3, example 3, service 1, `apk` 3 (`ApkAnalysis`, `QuestionCatalogue`, `RegimeReader`), `HigsonIntegrationConfiguration`, plus the profiler-only `ProfilersApi`; no DTO, converter or domain class references it.
+
+⚠️ The `apk` package is on the list because the needs analysis was moved out of Groovy into it (`§14` of both profile documents), and it reads the engine directly rather than through an adapter — it walks the domain tree and asks tables, it does not expose a domain object to rules. That is why it needs no adapter and why it is named here explicitly rather than left as an exception someone has to rediscover.
 
 ### One Adapter Per Domain Class, Exposing Canonical Paths
 Each domain aggregate gets one `Adapter` extending `io.higson.runtime.ext.adapter.Adapter`, holding the domain object in a single-argument constructor and exposing `getMapping()` returning a fluent `Mapping`. Leaf values map directly, child aggregates by nesting a child Adapter, collections via `CollectionAdapter`. Canonical path segments (`quote.driver.gender`, `coverage.limit1`, `option.code`) are defined here and nowhere else — so a domain restructure in Studio touches only the adapters.
@@ -25,7 +27,9 @@ public class QuoteAdapter extends Adapter {
 }
 ```
 
-*Evidence:* 6 of 6 adapters follow this shape; 3 of 6 nest child adapters; 2 of 6 use CollectionAdapter.
+*Evidence (2026-09-08):* 12 of 12 adapters follow this shape — 6 motor, 6 life.
+
+⛔ **The property profile has no adapters at all** and this is deliberate, not an omission: `PropertyContext` builds the context path by path instead of exposing a domain object through a `Mapping`. For PROPERTY, therefore, the canonical paths are defined in `PropertyContext` — the sentence "defined here and nowhere else" holds per profile, not across the application.
 
 ### Wire Only the DataSourceProxy Manually
 The starter auto-configures engine, data source, dialect, dev mode, instance name and diagnostic profiler from `higson.*` properties — do not re-declare them. The single piece still wired by hand is the `DataSourceProxy` wrapping the starter's data source so JDBC profiling keeps reaching `/profilers/jdbc`. Its `BeanPostProcessor` `@Bean` must be declared `static` so it registers before the beans it post-processes.

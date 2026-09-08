@@ -12,10 +12,10 @@ import { PropertyService } from '../../../services/property-service';
  * pokazuje, że reguły nie kończą się na składce: to one mówią, ile oferta jest ważna, do kiedy
  * płatność i **co dokument musi zawierać**.
  *
- * ⛔ Treść oferty jest wersjonowana — pośrednio. `demo.property.offer.terms` kluczuje się KODEM
- * REŻIMU, a reżim idzie z regionu PROPERTY, więc przesunięcie daty polisy przez 1 lipca 2027
- * dokłada do oferty dokument analizy potrzeb i zmienia oświadczenie klienta. Drugi próg w drugim
- * miejscu rozjechałby się przy pierwszej zmianie terminu z uchwały.
+ * ⛔ Treść oferty jest konfiguracją: `demo.property.offer.terms` niesie ważność, termin
+ * płatności, oświadczenie i to, czy dołącza się dokument analizy potrzeb. Tabela kluczuje się
+ * KODEM REŻIMU, więc drugi reżim zmieniłby ofertę bez wdrożenia. ⚠️ Dziś reżim jest jeden
+ * (D-17 odpiął region), więc czynny jest wyłącznie wiersz `KNF_190_2026`.
  */
 @Component({
 	selector: 'app-property-offer',

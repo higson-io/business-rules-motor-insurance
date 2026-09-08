@@ -26,8 +26,8 @@ import { PropertyService } from '../../../services/property-service';
  *
  * ⛔ It does not know a single question. It receives a list, renders a control per `kind`, and
  * sends the answer back under the question's own code. Adding a question in Higson Studio changes
- * this screen without touching this file, and moving the policy date across 1 July 2027 changes it
- * without touching anything at all.
+ * this screen without touching this file — including the answers to offer, which come from the
+ * catalogue and default to yes/no for every question that does not override them.
  *
  * ⛔ Visibility is NOT computed here. `visible` arrives from the server, where
  * `demo.property.apk.question.visibility` decides it. A component that filtered by its own rules
@@ -63,12 +63,11 @@ export class Questionnaire {
 	readonly ready = computed(() => this.loaded() !== null);
 
 	/**
-	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer, a lista sekcji z serwera —
-	 * komponent niczego nie sortuje ani nie uzupełnia. Sekcja niewidoczna regułą i sekcja pusta
-	 * wypadają tak samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
-	 */
-	/**
-	 * Która gałąź drzewa: `QUESTIONS` — analiza potrzeb, `SUBJECT` — przedmiot ubezpieczenia.
+	 * Która gałąź drzewa: `NEEDS` — analiza potrzeb, `SUBJECT` — przedmiot ubezpieczenia.
+	 *
+	 * ⚠️ Kolejność bierze się z `position` policzonego przez serwer — komponent niczego nie
+	 * sortuje ani nie uzupełnia. Pytanie niewidoczne regułą i pytanie nieodsłonięte wypadają tak
+	 * samo, bo dla czytelnika to ta sama sytuacja: nie ma o co pytać.
 	 *
 	 * ⛔ Gałąź decyduje też o UKŁADZIE. Analiza potrzeb to ankieta: jedno pytanie na ekran, po
 	 * kolei, z własną nawigacją. Przedmiot ubezpieczenia to lista, bo tam nic się nie odsłania —

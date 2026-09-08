@@ -35,10 +35,11 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
  * ⛔ NO ROUTER, konsekwentnie z resztą aplikacji (ND-7). Krok jest sygnałem, nie adresem — więc
  * wstecz przeglądarki go nie cofa, dokładnie tak samo jak przy wyborze demo.
  *
- * ⛔ Trzy kroki, w kolejności analizy, a nie w kolejności ekranów: najpierw pytamy (APK), potem
- * pokazujemy, co z odpowiedzi wynika (rekomendacja), a cena jest na końcu. To jest odwrotność
- * kolejności, w jakiej robi się to zwykle w kalkulatorach — i o tę odwrotność chodzi w rek. 8
- * KNF. Ekran, który zaczyna od ceny, przestaje być analizą potrzeb.
+ * ⛔ Cztery kroki, w kolejności analizy, a nie w kolejności ekranów: najpierw pytamy o potrzeby,
+ * potem zbieramy przedmiot ubezpieczenia, dalej pokazujemy, co z odpowiedzi wynika — rekomendację
+ * RAZEM ze składką, bo to jedna decyzja (rek. 8.2.d), a nie dwa ekrany — a na końcu ofertę. To
+ * jest odwrotność kolejności, w jakiej robi się to zwykle w kalkulatorach, i o tę odwrotność
+ * chodzi w rek. 8 KNF. Ekran, który zaczyna od ceny, przestaje być analizą potrzeb.
  */
 @Component({
 	selector: 'app-property',
