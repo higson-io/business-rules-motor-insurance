@@ -1,5 +1,5 @@
 code = "demo.property.apk.question"
-description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. Kolumna \\\"odslania je\\\" buduje ankiete zalezna - pytanie pojawia sie dopiero, gdy wskazane w niej pytanie zostalo rozstrzygniete. Trzy ostatnie kolumny (tresc, rodzaj, sciezka) wypelnia sie TYLKO dla pol przedmiotu ubezpieczenia, ktore nie sa elementami drzewa; pytania APK biora te trzy rzeczy ze swojego elementu domeny."
+description = "Jeden wiersz na pytanie: wszystko, co jest o nim STALE. MOZLIWE ODPOWIEDZI stoja w kolumnach kody/etykiety i dotycza takze pytan tak-nie: wiersz gwiazdkowy niesie true,false z etykietami Tak,Nie, wiec kazde pytanie ma je domyslnie, a kazde moze je nadpisac wlasnymi. Kolumna odslania je buduje ankiete zalezna. Trzy ostatnie kolumny wypelnia sie TYLKO dla pol przedmiotu ubezpieczenia, ktore nie sa elementami drzewa."
 nullable = false
 dictionary = false
 cacheable = true
@@ -36,14 +36,14 @@ array = false
 
 [[outputLevel]]
 code = "options"
-label = "kody odpowiedzi"
+label = "kody mozliwych odpowiedzi"
 type = "string"
 external = false
 array = false
 
 [[outputLevel]]
 code = "labels"
-label = "etykiety odpowiedzi"
+label = "etykiety mozliwych odpowiedzi"
 type = "string"
 external = false
 array = false

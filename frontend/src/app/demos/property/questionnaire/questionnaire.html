@@ -82,8 +82,9 @@
 								[attr.aria-labelledby]="'q-' + question.code"
 								(change)="answer(question, $event.value)"
 							>
-								<mat-button-toggle value="true">Tak</mat-button-toggle>
-								<mat-button-toggle value="false">Nie</mat-button-toggle>
+								@for (option of answersOf(question); track option) {
+									<mat-button-toggle [value]="option">{{ label(question, option) }}</mat-button-toggle>
+								}
 							</mat-button-toggle-group>
 						}
 
@@ -185,8 +186,9 @@
 										[attr.aria-labelledby]="'q-' + question.code"
 										(change)="answer(question, $event.value)"
 									>
-										<mat-button-toggle value="true">Tak</mat-button-toggle>
-										<mat-button-toggle value="false">Nie</mat-button-toggle>
+										@for (option of answersOf(question); track option) {
+											<mat-button-toggle [value]="option">{{ label(question, option) }}</mat-button-toggle>
+										}
 									</mat-button-toggle-group>
 								}
 

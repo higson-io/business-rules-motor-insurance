@@ -14,6 +14,9 @@ import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
 
+/** Ostatnia deska ratunku, gdy katalog nie poda odpowiedzi dla pytania tak/nie. */
+const BOOLEAN_FALLBACK: readonly string[] = ['true', 'false'];
+
 import { PropertyStore } from '../../../core/property-store';
 import { PropertyQuestionDto } from '../../../models/property';
 import { PropertyService } from '../../../services/property-service';
@@ -200,6 +203,19 @@ export class Questionnaire {
 
 	previous(): void {
 		this.cursor.update((value) => Math.max(value - 1, 0));
+	}
+
+	/**
+	 * Możliwe odpowiedzi pytania tak/nie — z konfiguracji, nie z szablonu.
+	 *
+	 * ⛔ Do 8 września 2026 „Tak" i „Nie" były wpisane w HTML, w dwóch miejscach. Katalog pytań
+	 * niesie je teraz jak każdą inną listę odpowiedzi, a wiersz gwiazdkowy daje je domyślnie
+	 * każdemu pytaniu — więc pytanie o zgodę można przemianować na „Zdecydowanie tak / Raczej nie"
+	 * jedną komórką. Zaszyta para zostaje wyłącznie jako ostatnia deska ratunku, gdyby katalog
+	 * milczał: pytanie bez odpowiedzi do wyboru byłoby ślepym zaułkiem ankiety.
+	 */
+	answersOf(question: PropertyQuestionDto): readonly string[] {
+		return question.options.length > 0 ? question.options : BOOLEAN_FALLBACK;
 	}
 
 	label(question: PropertyQuestionDto, option: string): string {
