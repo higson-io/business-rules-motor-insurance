@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Suma ubezpieczenia JEDNEGO pokrycia. Do 7 wrzesnia 2026 ta reguła stała w Javie jako switch po kodzie pokrycia plus trzy przypisania na sztywno (kradziez=ruchomosci, powodz=mury, assistance=0) - czyli ksztalt produktu byl w kodzie, a nie w konfiguracji. Teraz rozstrzyga tabela cover.sumBasis, a to, ile wynosi suma, nadal liczy sum.suggest."
+description = "Suma ubezpieczenia JEDNEGO pokrycia. Rozstrzyga tabela cover.sumBasis: suma wyliczona, pochodna od innego pokrycia, z katalogu wariantu albo zadna. Sume gwarancyjna OC czyta z ATRYBUTU pakietu, bo to wartosc nalezaca do pakietu, a nie odpowiedz tabeli."
 
 [[arguments]]
 name = "ctx"
@@ -40,9 +40,14 @@ if ('DERIVED' == basis) {
 }
 
 // Suma gwarancyjna z katalogu wariantu. OC w zyciu prywatnym nie ma nic wspolnego z metrazem
-// mieszkania - klient wybiera ja razem z wariantem.
+// mieszkania - klient wybiera ja razem z pakietem, wiec jest WARTOSCIA na pakiecie.
 if ('CATALOGUE' == basis) {
-	return higson.getDecimal('demo.property.variant.liabilitySum', ctx)
+	def variant = ctx.getString('variant.code')
+	if (variant == null) {
+		return null
+	}
+	return domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variant + ']')
+			.getAttrDecimal('LIABILITY_SUM', ctx)
 }
 
 // NONE - pokrycie bez sumy, ograniczone samym limitem. Assistance kupuje usluge, nie transfer

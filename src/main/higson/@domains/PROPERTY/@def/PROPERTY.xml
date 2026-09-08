@@ -6,9 +6,8 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na piec pytan zadawanych o kazde pokrycie: czy jest DOSTEPNE w tej lokalizacji, ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kod i opis to sam element, nie atrybuty. To, w ktorym pakiecie pokrycie sie znajduje, tez nie - sklad pakietu wisi pod pakietem.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na piec pytan zadawanych o kazde pokrycie: czy jest DOSTEPNE w tej lokalizacji, ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kolejnosc na ekranie jest WARTOSCIA na elemencie, a nie odczytem z tabeli - tabela kluczowana samym kodem pokrycia byla indirekcja, nie regula.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -79,8 +78,8 @@
                     <name>Kolejnosc na ekranie</name>
                     <order>1</order>
                     <groupOrder>4</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.position</defaultRefName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>999</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>
@@ -449,9 +448,8 @@
             <profile>PROPERTY</profile>
             <code>VARIANT</code>
             <name>Pakiet</name>
-            <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie, jaki ma czynnik ryzyka i jak ta skladka rozklada sie na pokrycia. Sklad pakietu wisi pod nim w kolekcji COVERS.</description>
+            <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie, jaki ma czynnik ryzyka i jak ta skladka rozklada sie na pokrycia. Miejsce w drabince i suma gwarancyjna sa WARTOSCIAMI na elemencie - tabele kluczowane samym kodem pakietu byly indirekcja. Sklad pakietu wisi pod nim jako referencje do pokryc.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>COVERS</code>
@@ -487,8 +485,8 @@
                     <name>Miejsce w drabince</name>
                     <order>3</order>
                     <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.variant.position</defaultRefName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>999</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -496,8 +494,8 @@
                     <name>Suma gwarancyjna OC</name>
                     <order>4</order>
                     <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.variant.liabilitySum</defaultRefName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>0</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>

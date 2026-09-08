@@ -25,14 +25,14 @@ refName = "demo.property.variant.availability [available]"
 [[attr]]
 attributeCode = "LIABILITY_SUM"
 attributeName = "Suma gwarancyjna OC"
-refType = "PARAMETER"
-refName = "demo.property.variant.liabilitySum"
+refType = "LITERAL"
+refName = "200000"
 
 [[attr]]
 attributeCode = "POSITION"
 attributeName = "Miejsce w drabince"
-refType = "PARAMETER"
-refName = "demo.property.variant.position"
+refType = "LITERAL"
+refName = "20"
 
 [[attr]]
 attributeCode = "PREMIUM"

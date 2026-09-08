@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Rek. 9.3 - w ofercie ma stac, czy klient poszedl za rekomendacja, czy od niej odszedl i w ktora strone. Do 7 wrzesnia 2026 rozstrzygala to Java, porownujac pozycje wariantow. Wynik kluczuje tabele demo.property.offer.choice, ktora niesie tresc notatki."
+description = "Rek. 9.3 - w ofercie ma stac, czy klient poszedl za rekomendacja, czy od niej odszedl i w ktora strone. Miejsce w drabince czyta z ATRYBUTU pakietu, a nie z tabeli kluczowanej kodem pakietu - taka tabela byla indirekcja, bo wartosc nalezy do elementu."
 
 [[arguments]]
 name = "ctx"
@@ -25,12 +25,12 @@ if (recommended == chosen) {
 	return 'MATCHES'
 }
 
-// Pozycja w drabince, nie kolejnosc alfabetyczna kodow. Drabinka jest scisla: wyzsza pozycja
-// znaczy szerszy zakres, wiec porownanie pozycji odpowiada na pytanie "szerzej czy wezej".
-def recommendedPosition = higson.getDecimal('demo.property.variant.position',
-		higson.createContext('variant.code', recommended))
-def chosenPosition = higson.getDecimal('demo.property.variant.position',
-		higson.createContext('variant.code', chosen))
+// Pozycja w drabince jest WARTOSCIA na pakiecie. Drabinka jest scisla: wyzsza pozycja znaczy
+// szerszy zakres, wiec porownanie pozycji odpowiada na pytanie "szerzej czy wezej".
+def recommendedPosition = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + recommended + ']')
+		.getAttrDecimal('POSITION', ctx)
+def chosenPosition = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + chosen + ']')
+		.getAttrDecimal('POSITION', ctx)
 
 if (recommendedPosition == null || chosenPosition == null) {
 	return null

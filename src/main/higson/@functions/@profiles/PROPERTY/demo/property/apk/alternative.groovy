@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa - razem z lista tego, czego w nim brakuje. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie, przy remisie tanszy; moze nie byc zadnego i to tez jest odpowiedz. Pokrycia bierze z apk.covers, tak samo jak apk.indicated."
+description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa - razem z lista tego, czego w nim brakuje. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie, przy remisie tanszy; moze nie byc zadnego i to tez jest odpowiedz. Pokrycia bierze z apk.covers, a miejsce w drabince z atrybutu pakietu."
 
 [[arguments]]
 name = "ctx"
@@ -47,8 +47,7 @@ for (def variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')
 			covered = covered + 1
 		}
 	}
-	def position = higson.getDecimal('demo.property.variant.position',
-			higson.createContext('variant.code', code))
+	def position = variant.getAttrDecimal('POSITION', ctx)
 
 	// Przy remisie w pokryciu wygrywa TANSZY szczebel - alternatywa ma byc ustepstwem cenowym,
 	// wiec z dwoch rownie dopasowanych bierzemy nizszy.

@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Serce rekomendacji: najtanszy pakiet, ktory ma wszystkie wymagane pokrycia - sklad pakietow czyta z drzewa. Gdy zaden nie pokrywa wszystkiego, wygrywa pakiet o najwiekszym pokryciu, a przy remisie tanszy; luki nie zamiatamy, nazywa je uzasadnienie. Potrzeby bierze z apk.needs, a nie wyprowadza ich sama. Nie zna ANI JEDNEGO kodu pakietu i ani jednego kodu pytania."
+description = "Serce rekomendacji: najtanszy pakiet, ktory ma wszystkie wymagane pokrycia - sklad pakietow czyta z drzewa, a miejsce w drabince z ATRYBUTU pakietu. Gdy zaden nie pokrywa wszystkiego, wygrywa pakiet o najwiekszym pokryciu, a przy remisie tanszy; luki nie zamiatamy, nazywa je uzasadnienie. Nie zna ANI JEDNEGO kodu pakietu i ani jednego kodu pytania."
 
 [[arguments]]
 name = "ctx"
@@ -41,8 +41,7 @@ for (def variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')
 		covers.add(member.getCode())
 	}
 	ladder.add([code: code,
-	            position: higson.getDecimal('demo.property.variant.position',
-			            higson.createContext('variant.code', code)),
+	            position: variant.getAttrDecimal('POSITION', ctx),
 	            covers: covers])
 }
 if (ladder.isEmpty()) {

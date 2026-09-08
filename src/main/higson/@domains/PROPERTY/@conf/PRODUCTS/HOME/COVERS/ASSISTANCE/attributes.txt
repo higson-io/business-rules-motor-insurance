@@ -19,8 +19,8 @@ refName = "demo.property.cover.limitRule [label]"
 [[attr]]
 attributeCode = "POSITION"
 attributeName = "Kolejnosc na ekranie"
-refType = "PARAMETER"
-refName = "demo.property.cover.position"
+refType = "LITERAL"
+refName = "70"
 
 [[attr]]
 attributeCode = "PREMIUM"
