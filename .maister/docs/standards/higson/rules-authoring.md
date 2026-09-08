@@ -58,6 +58,29 @@ return math.round((100000 + limit1) / 1000 * factor, 2)
 
 *Evidence:* 0 of 36 Groovy functions contain an import; 0 of 36 reference `pl.decerto.higson.demo` classes.
 
+### Flows Use Only DECISION_TABLE, FUNCTION and FLOW — Never EXPRESSION
+
+⛔ **`EXPRESSION` is forbidden.** The MCP `create_flow`/`update_flow` description still lists
+`FUNCTION|DECISION_TABLE|FLOW|DOMAIN|EXPRESSION` as action types, but that documentation is stale:
+newer Higson releases corrected it and removed the capability. Do not reach for it, and do not
+propose it as a way to shorten a flow — a flow that relied on it would be built on something the
+platform is retiring.
+
+**A flow cannot do arithmetic**, and that is the constraint to design around, not to fight. It
+fetches values into variables and branches on conditions; anything computed goes into a function.
+For simple maths, small utilities keep the flow readable rather than pushing the whole calculation
+back into one Groovy blob — `demo.util.multiply` and `demo.util.round4` exist for exactly that.
+
+⚠️ `multiply` treats a **missing value as one, not zero**. Factor tables without a wildcard row
+(`factor.buildingAge`, `factor.claims`) legitimately return nothing, and the neutral element lets
+the chain skip them without a branch per factor.
+
+⚠️ **A `FLOW` action returns a `FlowResult`, not a scalar.** Assigning it to a numeric variable
+fails later with `conversion not supported for: class io.higson.runtime.flow.FlowResult`. A flow
+that needs one number from another flow should take it from the context, where whoever ran that
+flow published it — which usually reveals that the value was being computed more times than it
+had to be.
+
 ### Known Drift: Legacy ParamContext Binding
 New and touched functions should bind `ctx` to `io.higson.runtime.engine.core.context.ParamContext`. 29 of 36 existing functions still bind the legacy `org.smartparam.engine.core.context.ParamContext`. Migrate opportunistically when editing a function; do not open a dedicated sweep.
 
