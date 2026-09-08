@@ -1,0 +1,7 @@
+#matrix for parameter demo.property.cover.theft
+security;rate;basis;available;reason;minDeductible;capRatio;capAbsolute;capLabel;waitingReason
+*;3.20;SUM;true;;0;0.40;50000;Biżuteria i wyroby z metali szlachetnych — 40% sumy, nie więcej niż 50 000 zł;
+ALARM;2.80;SUM;true;;0;0.40;50000;Biżuteria i wyroby z metali szlachetnych — 40% sumy, nie więcej niż 50 000 zł;
+DOOR;3.20;SUM;true;;0;0.40;50000;Biżuteria i wyroby z metali szlachetnych — 40% sumy, nie więcej niż 50 000 zł;
+MONITORED;2.40;SUM;true;;0;0.50;75000;Biżuteria i wyroby z metali szlachetnych — 50% sumy, nie więcej niż 75 000 zł;
+NONE;0;SUM;false;THEFT_NO_SECURITY;0;0;0;;

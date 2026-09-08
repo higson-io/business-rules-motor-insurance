@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Suma ubezpieczenia JEDNEGO pokrycia. Rozstrzyga tabela cover.sumBasis: suma wyliczona, pochodna od innego pokrycia, z katalogu wariantu albo zadna. Sume gwarancyjna OC czyta z ATRYBUTU pakietu, bo to wartosc nalezaca do pakietu, a nie odpowiedz tabeli."
+description = "Suma ubezpieczenia JEDNEGO pokrycia. Bierze kod pokrycia ze sciezki cover.code, bo wisi na pokryciu jako atrybut SUM, a atrybut wola funkcje z samym kontekstem. Skad bierze sie suma, mowi atrybut SUM_BASIS: COMPUTED z metrazu, DERIVED na sumie innego pokrycia, CATALOGUE z pakietu, NONE zadna."
 
 [[arguments]]
 name = "ctx"
@@ -15,32 +15,31 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-def code = ctx.getString('cover.code')
-if (code == null) {
+def coverCode = ctx.getString('cover.code')
+if (coverCode == null) {
 	return null
 }
-
-def row = higson.getValue('demo.property.cover.sumBasis', higson.createContext('cover.code', code))
-def basis = row.get(0, 'basis')
+def cover = domain.get('PROPERTY', '/PRODUCTS[HOME]/COVERS[' + coverCode + ']')
+def basis = cover.getAttrString('SUM_BASIS', ctx)
 
 // Suma wyliczona dla tego pokrycia - mury z metrazu i stawki, elementy stale i ruchomosci
 // jako ulamek murow. Wszystkie trzy stoja juz w kontekscie, policzone przez sum.suggest.
 if ('COMPUTED' == basis) {
-	return ctx.getDecimal('quote.sums.' + code.toLowerCase())
+	return ctx.getDecimal('quote.sums.' + coverCode.toLowerCase())
 }
 
 // Pokrycie ubezpiecza TO SAMO mienie co inne, wiec idzie na jego sumie. Kradziez na sumie
-// ruchomosci, powodz na sumie murow - tak jest w OWU na polskim rynku i tak liczy sie skladka.
+// ruchomosci, powodz na sumie murow - tak jest w OWU na polskim rynku.
 if ('DERIVED' == basis) {
-	def reference = row.get(0, 'reference')
+	def reference = cover.getAttrString('SUM_REFERENCE', ctx)
 	if (reference == null || reference.isEmpty()) {
-		throw new RuntimeException('Pokrycie ' + code + ' ma sume pochodna, ale nie wskazano od czego')
+		throw new RuntimeException('Pokrycie ' + coverCode + ' ma sume pochodna, ale nie wskazano od czego')
 	}
 	return ctx.getDecimal('quote.sums.' + reference.toLowerCase())
 }
 
-// Suma gwarancyjna z katalogu wariantu. OC w zyciu prywatnym nie ma nic wspolnego z metrazem
-// mieszkania - klient wybiera ja razem z pakietem, wiec jest WARTOSCIA na pakiecie.
+// Suma gwarancyjna z katalogu wariantu. OC nie ma nic wspolnego z metrazem mieszkania -
+// klient wybiera je razem z pakietem, wiec suma jest WARTOSCIA na pakiecie.
 if ('CATALOGUE' == basis) {
 	def variant = ctx.getString('variant.code')
 	if (variant == null) {
@@ -50,6 +49,5 @@ if ('CATALOGUE' == basis) {
 			.getAttrDecimal('LIABILITY_SUM', ctx)
 }
 
-// NONE - pokrycie bez sumy, ograniczone samym limitem. Assistance kupuje usluge, nie transfer
-// ryzyka, wiec suma nie ma tu sensu i null jest odpowiedzia, a nie brakiem odpowiedzi.
+// NONE - pokrycie bez sumy, ograniczone samym limitem.
 return null

@@ -1,8 +1,0 @@
-#matrix for parameter demo.property.cover.availability
-cover;zone;available;requiresDeductible;minDeductible;reasonCode;waitingReasonCode
-*;*;true;false;0;;
-FLOOD;*;false;false;0;FLOOD_UNAVAILABLE;
-FLOOD;Z0;true;false;0;;FLOOD_WAITING
-FLOOD;Z1;true;false;0;;FLOOD_WAITING
-FLOOD;Z2;true;true;1000;FLOOD_DEDUCTIBLE;FLOOD_WAITING
-FLOOD;ZX;false;false;0;FLOOD_UNAVAILABLE;

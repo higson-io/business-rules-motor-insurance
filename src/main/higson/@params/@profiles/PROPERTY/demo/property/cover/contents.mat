@@ -1,0 +1,6 @@
+#matrix for parameter demo.property.cover.contents
+finish;rate;basis;available;reason;minDeductible;capRatio;capAbsolute;capLabel;waitingReason
+*;2.60;SUM;true;;0;0.10;10000;Gotówka — 10% sumy ruchomości, nie więcej niż 10 000 zł;
+BASIC;2.10;SUM;true;;0;0.10;10000;Gotówka — 10% sumy ruchomości, nie więcej niż 10 000 zł;
+PREMIUM;3.40;SUM;true;;0;0.10;10000;Gotówka — 10% sumy ruchomości, nie więcej niż 10 000 zł;
+STANDARD;2.60;SUM;true;;0;0.10;10000;Gotówka — 10% sumy ruchomości, nie więcej niż 10 000 zł;

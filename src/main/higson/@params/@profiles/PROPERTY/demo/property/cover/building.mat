@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.cover.building
+kind;rate;basis;available;reason;minDeductible;capRatio;capAbsolute;capLabel;waitingReason
+*;0.85;SUM;true;;0;0;0;;
+FLAT;0.85;SUM;true;;0;0;0;;
+HOUSE;0.95;SUM;true;;0;0;0;;

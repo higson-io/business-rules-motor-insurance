@@ -6,23 +6,33 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na piec pytan zadawanych o kazde pokrycie: czy jest DOSTEPNE w tej lokalizacji, ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kolejnosc na ekranie jest WARTOSCIA na elemencie, a nie odczytem z tabeli - tabela kluczowana samym kodem pokrycia byla indirekcja, nie regula.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. KAZDE POKRYCIE MA WLASNA TABELE demo.property.cover.KOD, kluczowana tym, co dla niego naprawde rozstrzyga: mury rodzajem nieruchomosci, elementy stale i ruchomosci standardem wykonczenia, kradziez zabezpieczeniami, powodz strefa, OC suma gwarancyjna. Atrybuty wskazuja kolumny TEJ tabeli, wiec nowe pokrycie dostaje wlasna tabele i wlasne wskazniki - domyslne prowadza do tabeli murow i trzeba je przestawic.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>IS_AVAILABLE</code>
-                    <name>Czy dostepne w tej lokalizacji</name>
+                    <name>Czy dostepne w tej sytuacji</name>
                     <order>1</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.availability [available]</defaultRefName>
+                    <defaultRefName>demo.property.cover.building [available]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>UNAVAILABLE_REASON</code>
+                    <name>Kod zdania o odmowie</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.building [reason]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>SUM</code>
                     <name>Suma ubezpieczenia</name>
-                    <order>2</order>
+                    <order>3</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.cover.sum</defaultRefName>
@@ -31,7 +41,7 @@
                     <attributeType>business</attributeType>
                     <code>PREMIUM</code>
                     <name>Skladka za to pokrycie</name>
-                    <order>3</order>
+                    <order>4</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.cover.premium</defaultRefName>
@@ -43,7 +53,7 @@
                     <order>1</order>
                     <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.tariff.baseRate [rate]</defaultRefName>
+                    <defaultRefName>demo.property.cover.building [rate]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -52,12 +62,29 @@
                     <order>2</order>
                     <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.tariff.baseRate [basis]</defaultRefName>
+                    <defaultRefName>demo.property.cover.building [basis]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_BASIS</code>
+                    <name>Skad bierze sie suma</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>NONE</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_REFERENCE</code>
+                    <name>Pokrycie odniesienia dla sumy pochodnej</name>
+                    <order>4</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>LIMIT</code>
-                    <name>Limit odpowiedzialnosci</name>
+                    <name>Efektywny limit odpowiedzialnosci</name>
                     <order>1</order>
                     <groupOrder>3</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
@@ -65,12 +92,30 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>LIMIT_LABEL</code>
-                    <name>Opis limitu dla klienta</name>
+                    <code>CAP_RATIO</code>
+                    <name>Limit jako ulamek sumy</name>
                     <order>2</order>
                     <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.limitRule [label]</defaultRefName>
+                    <defaultRefName>demo.property.cover.building [capRatio]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CAP_ABSOLUTE</code>
+                    <name>Limit kwotowy</name>
+                    <order>3</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.building [capAbsolute]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>LIMIT_LABEL</code>
+                    <name>Opis limitu dla klienta</name>
+                    <order>4</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.building [capLabel]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -89,6 +134,7 @@
             <name>Analiza potrzeb klienta</name>
             <description>Analiza potrzeb jako jeden obiekt: pytania wisza pod nim w kolekcji QUESTIONS, a atrybuty to zasady, wedlug ktorych z odpowiedzi powstaje rekomendacja. Czytaja sie jak przebieg rozmowy: co pytamy, kiedy pytanie sie odslania, kiedy odpowiedz przerywa sciezke, czego odpowiedz wymaga - a RECOMMENDATION to caly dobor pakietu jako diagram, razem z rozgalezieniem na przekroczona skladke.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>QUESTIONS</code>
@@ -189,6 +235,7 @@
             <name>Produkt majatkowy</name>
             <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, suma ubezpieczenia z metrazu, CZYNNIK RYZYKA (jeden na wycene, nie na pakiet), warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>APK</code>
@@ -287,6 +334,7 @@
             <name>Pytanie</name>
             <description>Pytanie zadawane klientowi. NAZWA ELEMENTU JEST TRESCIA PYTANIA. Zostaja dwa atrybuty, bo tylko one roznia pytania od siebie: jakiego rodzaju jest odpowiedz i GDZIE ONA LADUJE w kontekscie wyceny - ta druga to jedyne polaczenie miedzy tym, co klient wpisal, a tym, co widza reguly. Kiedy pytanie dotyczy tego klienta, rozstrzyga demo.property.apk.question.visibility, a reszta ustawien to jeden wiersz demo.property.apk.question.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -429,6 +477,7 @@
             <name>Pakiet</name>
             <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie oraz jak ta skladka rozklada sie na pokrycia. Czynnika ryzyka tu NIE MA - jest cecha calej wyceny, nie pakietu, wiec wisi na produkcie. Sklad pakietu to referencje do pokryc.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>COVERS</code>

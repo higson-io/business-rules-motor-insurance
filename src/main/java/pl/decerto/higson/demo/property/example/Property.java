@@ -88,9 +88,8 @@ public class Property {
 	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
 	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
-	private static final String PARAM_COVER_AVAILABILITY = "demo.property.cover.availability";
+	private static final String PARAM_COVER_FLOOD = "demo.property.cover.flood";
 	private static final String PARAM_REASON = "demo.property.apk.reason";
-	private static final String COVER_FLOOD = "FLOOD";
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
 	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
 	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
@@ -106,6 +105,7 @@ public class Property {
 	private static final String PARAM_VISIBILITY = "demo.property.apk.question.visibility";
 	private static final String PARAM_RECALCULATION = "demo.property.quote.recalculation";
 	private static final String PATH_BUDGET = "quote.needs.budget";
+	private static final String PATH_SUM_LIABILITY = "quote.sums.liability";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
 	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
 	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
@@ -448,7 +448,13 @@ public class Property {
 		List<String> priced = new ArrayList<>();
 
 		for (DomainObject definition : product.getChildren(COLLECTION_VARIANTS)) {
+			// ⛔ SUMA GWARANCYJNA MUSI BYĆ W KONTEKŚCIE JUŻ TERAZ. Tabela pokrycia OC kluczuje się
+			// nią, żeby stawka mogła być degresywna — a `quote.sums.liability` ustawiało się
+			// dopiero po wyborze wariantu, więc każdy pakiet trafiał w pierwszy przedział
+			// i degresja po cichu nie działała. Suma należy do pakietu, więc znamy ją tutaj.
 			PropertyContext ctx = new PropertyContext(quote).withVariant(definition.getCode());
+			ctx.withComputed(PATH_SUM_LIABILITY,
+				definition.getAttrDecimal("LIABILITY_SUM", ctx));
 
 			Variant variant = new Variant();
 			variant.setCode(definition.getCode());
@@ -457,7 +463,7 @@ public class Property {
 			variant.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
 			variant.setLiabilitySum(definition.getAttrDecimal("LIABILITY_SUM", ctx));
 
-			applyCovers(definition, variant);
+			applyCovers(definition, variant, ctx);
 
 			Map<String, Object> result = engine.flow(FLOW_QUOTE, ctx).getResult();
 			// ⛔ Boolean, nie „YES". Flow czyta dostępność TABELĄ WPROST, odkąd zniknęła nakładka
@@ -498,9 +504,19 @@ public class Property {
 	 * ani do pokrytych, ani do brakujących. Macierz porównawcza zbudowana na tamtej liście
 	 * pokazywałaby ptaszki wszędzie tam, gdzie klient o nic nie prosił.
 	 */
-	private void applyCovers(DomainObject definition, Variant variant) {
+	private void applyCovers(DomainObject definition, Variant variant, PropertyContext ctx) {
 		variant.getCovers().clear();
 		for (DomainObject member : definition.getChildren(COLLECTION_COVERS)) {
+			// ⛔ POKRYCIE NIEDOSTĘPNE W TEJ SYTUACJI NIE LICZY SIĘ JAKO ZAWARTE. Pakiet zawiera
+			// je w drzewie, ale klient go nie dostanie — kradzież bez żadnych zabezpieczeń,
+			// powódź w strefie najwyższego zagrożenia. Gdyby liczyło się mimo to, rekomendacja
+			// raportowałaby pokrytą potrzebę, której nikt nie pokrywa, i to najczęściej właśnie
+			// tę, na której klientowi najbardziej zależy.
+			DomainObject cover = engine.getDomain(PROFILE, PRODUCT_PATH)
+				.getChild(COLLECTION_COVERS, member.getCode());
+			if (cover == null || !Boolean.TRUE.equals(cover.getAttrBoolean("IS_AVAILABLE", ctx))) {
+				continue;
+			}
 			variant.getCovers().add(member.getCode());
 		}
 	}
@@ -765,17 +781,38 @@ public class Property {
 			}
 		}
 
+		// ⛔ POKRYCIE, KTÓREGO KLIENT POTRZEBUJE, A NIE MOŻE DOSTAĆ, MÓWI DLACZEGO. Każde pokrycie
+		// ma własną tabelę i własny powód odmowy — kradzież bez zabezpieczeń, powódź w strefie
+		// najwyższego zagrożenia. Bez tej pętli pokrycie znikało z pakietu po cichu, a klient
+		// czytał tylko, że czegoś brakuje, nie dowiadując się, czego od niego wymagamy.
+		for (Need need : quote.getNeeds()) {
+			DomainObject cover = product.getChild(COLLECTION_COVERS, need.getCoverCode());
+			if (cover == null) {
+				continue;
+			}
+			PropertyContext coverCtx = new PropertyContext(quote).withCover(need.getCoverCode());
+			if (Boolean.TRUE.equals(cover.getAttrBoolean("IS_AVAILABLE", coverCtx))) {
+				continue;
+			}
+			String refusal = attrString(cover, "UNAVAILABLE_REASON", coverCtx);
+			if (refusal != null && !refusal.isEmpty()) {
+				reasons.add(new ApkAnalysis.Reason(refusal));
+			}
+		}
+
 		// ⛔ TABELA DOSTĘPNOŚCI NAZYWA SWÓJ WŁASNY SKUTEK. Ta sama reguła, która mówi, czy pokrycie
 		// wolno sprzedać, mówi też, co powiedzieć klientowi, gdy nie wolno — kolumna `reasonCode`.
 		// Do 8 września 2026 wybierał to `if` w tej metodzie, a tabela niosła trzecią kopię tekstu
 		// w kolumnie, której nikt nie czytał.
-		ParamValue flood = engine.get(PARAM_COVER_AVAILABILITY,
-			new PropertyContext(quote).withCover(COVER_FLOOD));
-		String floodReason = flood.getString("reasonCode");
+		// ⛔ WŁASNA TABELA POKRYCIA. Powódź ma swoją, bo tylko jej warunki zależą od strefy:
+		// w Z0 i Z1 sprzedajemy normalnie, w Z2 z franszyzą, w ZX wcale. Każde pokrycie ma taką
+		// tabelę, kluczowaną tym, co dla niego naprawdę rozstrzyga.
+		ParamValue flood = engine.get(PARAM_COVER_FLOOD, new PropertyContext(quote));
+		String floodReason = flood.getString("reason");
 		if (floodReason != null && !floodReason.isEmpty()) {
 			reasons.add(new ApkAnalysis.Reason(floodReason, money(flood.getBigDecimal("minDeductible"))));
 		}
-		String waiting = flood.getString("waitingReasonCode");
+		String waiting = flood.getString("waitingReason");
 		if (waiting != null && !waiting.isEmpty()) {
 			reasons.add(new ApkAnalysis.Reason(waiting,
 				engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));

@@ -14,6 +14,7 @@ NEEDS_PARTIAL;Wariant {0} obejmuje {1} z {2} potrzeb wynikających z Twoich odpo
 SUM_COMPUTED;Sumę ubezpieczenia murów wyliczyliśmy jako {0} m² × {1} zł/m² dla Twojej lokalizacji i standardu wykończenia.;20
 SUM_LOWERED;Obniżyłeś sumę poniżej wyliczonej wartości odtworzeniowej. Przy szkodzie całkowitej odszkodowanie nie pokryje odbudowy.;25
 SUM_RAISED;Podniosłeś sumę powyżej wyliczonej — to zwiększa ochronę i składkę.;25
+THEFT_NO_SECURITY;Ochrona od kradzieży z włamaniem wymaga co najmniej drzwi antywłamaniowych — przy braku jakichkolwiek zabezpieczeń nie możemy jej zaproponować.;42
 VALUE_CONSISTENT;Twoje oszacowanie wartości nieruchomości ({0} zł) zgadza się z sumą wyliczoną z metrażu i stawki ({1} zł).;28
 VALUE_OVERSTATED;Szacujesz wartość nieruchomości na {0} zł, a wyliczona wartość odtworzeniowa to {1} zł. Sumę ubezpieczenia opieramy na wyliczeniu, bo odbudowy nie dotyczy cena gruntu.;28
 VALUE_UNDERSTATED;Szacujesz wartość nieruchomości na {0} zł, a z metrażu i stawki dla Twojej lokalizacji wychodzi {1} zł. Sumę ubezpieczenia opieramy na wyliczeniu, nie na oszacowaniu.;28

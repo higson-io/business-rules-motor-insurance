@@ -1,12 +1,24 @@
 [[attr]]
-attributeCode = "IS_AVAILABLE"
-attributeName = "Czy dostepne w tej lokalizacji"
+attributeCode = "CAP_ABSOLUTE"
+attributeName = "Limit kwotowy"
 refType = "PARAMETER"
-refName = "demo.property.cover.availability [available]"
+refName = "demo.property.cover.contents [capAbsolute]"
+
+[[attr]]
+attributeCode = "CAP_RATIO"
+attributeName = "Limit jako ulamek sumy"
+refType = "PARAMETER"
+refName = "demo.property.cover.contents [capRatio]"
+
+[[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy dostepne w tej sytuacji"
+refType = "PARAMETER"
+refName = "demo.property.cover.contents [available]"
 
 [[attr]]
 attributeCode = "LIMIT"
-attributeName = "Limit odpowiedzialnosci"
+attributeName = "Efektywny limit odpowiedzialnosci"
 refType = "FUNCTION"
 refName = "demo.property.limit.effective"
 
@@ -14,7 +26,7 @@ refName = "demo.property.limit.effective"
 attributeCode = "LIMIT_LABEL"
 attributeName = "Opis limitu dla klienta"
 refType = "PARAMETER"
-refName = "demo.property.cover.limitRule [label]"
+refName = "demo.property.cover.contents [capLabel]"
 
 [[attr]]
 attributeCode = "POSITION"
@@ -32,16 +44,28 @@ refName = "demo.property.cover.premium"
 attributeCode = "RATE"
 attributeName = "Stawka taryfowa"
 refType = "PARAMETER"
-refName = "demo.property.tariff.baseRate [rate]"
+refName = "demo.property.cover.contents [rate]"
 
 [[attr]]
 attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
 refType = "PARAMETER"
-refName = "demo.property.tariff.baseRate [basis]"
+refName = "demo.property.cover.contents [basis]"
 
 [[attr]]
 attributeCode = "SUM"
 attributeName = "Suma ubezpieczenia"
 refType = "FUNCTION"
 refName = "demo.property.cover.sum"
+
+[[attr]]
+attributeCode = "SUM_BASIS"
+attributeName = "Skad bierze sie suma"
+refType = "LITERAL"
+refName = "COMPUTED"
+
+[[attr]]
+attributeCode = "UNAVAILABLE_REASON"
+attributeName = "Kod zdania o odmowie"
+refType = "PARAMETER"
+refName = "demo.property.cover.contents [reason]"

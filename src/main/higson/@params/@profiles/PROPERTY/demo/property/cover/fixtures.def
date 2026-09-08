@@ -1,0 +1,84 @@
+code = "demo.property.cover.fixtures"
+description = "Wlasna tabela pokrycia. Stawka zalezy od STANDARDU WYKONCZENIA, bo to on decyduje, co wlasciwie jest elementem stalym: plyta i panele czy kamien i zabudowa na wymiar. Limit 30% sumy dotyczy pomieszczen przynaleznych - piwnicy i komorki."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Elementy stale - warunki pokrycia"
+
+[[inputLevel]]
+code = "finish"
+label = "standard wykonczenia"
+type = "string"
+reverseMatcher = false
+property = "quote.property.finishStandard"
+source = "quote.property.finishStandard"
+union = false
+
+[[outputLevel]]
+code = "rate"
+label = "stawka"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "basis"
+label = "podstawa stawki"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "available"
+label = "dostepne"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reason"
+label = "kod zdania o odmowie"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "minDeductible"
+label = "minimalna franszyza"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capRatio"
+label = "limit jako ulamek sumy"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capAbsolute"
+label = "limit kwotowy"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "capLabel"
+label = "opis limitu dla klienta"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "waitingReason"
+label = "kod zdania o karencji"
+type = "string"
+external = false
+array = false

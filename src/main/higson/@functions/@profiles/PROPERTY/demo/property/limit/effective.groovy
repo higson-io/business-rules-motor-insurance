@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Efektywny limit odpowiedzialnosci pokrycia - nizszy z ulamka sumy i kwoty. Sume bierze z demo.property.cover.sum, czyli z tej samej reguly co reszta systemu; wczesniej siegal wprost do quote.sums.KOD i przez to nie widzial sum pochodnych."
+description = "Efektywny limit odpowiedzialnosci pokrycia. Rodzaj limitu NIE JEST osobna kolumna - wynika z tego, ktore z dwoch wartosci sa podane: sam ulamek daje limit procentowy, sama kwota kwotowy, obie nizsza z dwoch, zadna brak limitu. Ulamek i kwote czyta z atrybutow pokrycia, czyli z jego wlasnej tabeli."
 
 [[arguments]]
 name = "ctx"
@@ -15,30 +15,32 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-// UWAGA: selektor "tabela [kolumna]" dziala TYLKO w atrybutach domeny. W API Groovy wielokolumnowa
-// tabele czyta sie przez getValue i get(0, 'kolumna').
-def row = higson.getValue('demo.property.cover.limitRule', ctx)
-def capKind = row.get(0, 'capKind')
-if (capKind == null || 'NONE' == capKind) {
-	// null, a nie 0 - zero znaczyloby "brak ochrony", a nie "brak limitu".
+def code = ctx.getString('cover.code')
+def cover = domain.get('PROPERTY', '/PRODUCTS[HOME]/COVERS[' + code + ']')
+
+def ratio = cover.getAttrDecimal('CAP_RATIO', ctx)
+def absolute = cover.getAttrDecimal('CAP_ABSOLUTE', ctx)
+def hasRatio = ratio != null && ratio > 0
+def hasAbsolute = absolute != null && absolute > 0
+
+// null, a nie 0 - zero znaczyloby "brak ochrony", a nie "brak limitu".
+if (!hasRatio && !hasAbsolute) {
 	return null
 }
-
-def capRatio = row.get(0, 'capRatio')
-def capAbsolute = row.get(0, 'capAbsolute')
-if ('ABSOLUTE' == capKind) {
-	return capAbsolute
+if (!hasRatio) {
+	return absolute
 }
 
 // ⛔ Suma przez cover.sum, a NIE wprost z quote.sums.KOD. Kradziez i powodz nie maja wlasnej
 // sumy - ida na sumie ruchomosci i murow - wiec odczyt po kodzie pokrycia zwracal dla nich null
-// i limit kradziezy (40% sumy, max 50 000 zl) po cichu znikal z oferty.
+// i limit kradziezy po cichu znikal z oferty.
 def base = higson.call('demo.property.cover.sum', ctx)
 if (base == null) {
-	return null
+	return hasAbsolute ? absolute : null
 }
-def fromRatio = math.round(base * capRatio, 0)
-if ('RATIO' == capKind) {
+
+def fromRatio = math.round(base * ratio, 0)
+if (!hasAbsolute) {
 	return fromRatio
 }
-return fromRatio < capAbsolute ? fromRatio : capAbsolute
+return fromRatio < absolute ? fromRatio : absolute
