@@ -12,7 +12,6 @@ public class PropertyQuoteDto {
 	private LocalDate startDate;
 	private BigDecimal deductible;
 
-	private PropertyRegimeDto regime;
 	private List<PropertyQuestionDto> questions;
 
 	private String floodZone;
@@ -34,6 +33,7 @@ public class PropertyQuoteDto {
 
 	/** Odpowiedź, po której nie ma czego dalej analizować — treść komunikatu podaje reguła. */
 	private boolean blocked;
+	private String blockedBy;
 	private String blockMessage;
 
 	public PropertyPolicyholderDto getPolicyholder() {
@@ -60,21 +60,12 @@ public class PropertyQuoteDto {
 		this.startDate = startDate;
 	}
 
-
 	public BigDecimal getDeductible() {
 		return deductible;
 	}
 
 	public void setDeductible(BigDecimal deductible) {
 		this.deductible = deductible;
-	}
-
-	public PropertyRegimeDto getRegime() {
-		return regime;
-	}
-
-	public void setRegime(PropertyRegimeDto regime) {
-		this.regime = regime;
 	}
 
 	public List<PropertyQuestionDto> getQuestions() {
@@ -165,8 +156,6 @@ public class PropertyQuoteDto {
 		this.variants = variants;
 	}
 
-
-
 	public RecommendationDto getRecommendation() {
 		return recommendation;
 	}
@@ -189,6 +178,14 @@ public class PropertyQuoteDto {
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+
+	public String getBlockedBy() {
+		return blockedBy;
+	}
+
+	public void setBlockedBy(String blockedBy) {
+		this.blockedBy = blockedBy;
 	}
 
 	public String getBlockMessage() {

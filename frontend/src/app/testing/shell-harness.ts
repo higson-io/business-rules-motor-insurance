@@ -69,9 +69,7 @@ export const APK_STATUTORY = {
 	name: 'APK — minimum ustawowe',
 	legalBasis: 'art. 8 ustawy o dystrybucji ubezpieczeń',
 	requiresBudget: false,
-	requiresExclusionCheck: false,
 	requiresJustification: false,
-	requiresVariantDifferences: false,
 };
 
 /**

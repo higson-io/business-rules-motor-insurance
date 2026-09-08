@@ -152,22 +152,10 @@ export interface PropertyPolicyholderDto {
 	readonly source: string;
 }
 
-/** The APK regime in force for the chosen policy date. Versioned by the region, not by the clock. */
-export interface PropertyRegimeDto {
-	readonly code: string | null;
-	readonly name: string | null;
-	readonly legalBasis: string | null;
-	readonly requiresBudget: boolean;
-	readonly requiresExclusionCheck: boolean;
-	readonly requiresJustification: boolean;
-	readonly requiresVariantDifferences: boolean;
-}
-
 export interface PropertyQuoteDto {
 	readonly startDate: string;
 	readonly deductible: number;
 
-	readonly regime: PropertyRegimeDto;
 	readonly questions: readonly PropertyQuestionDto[];
 
 	readonly floodZone: string | null;
@@ -204,4 +192,6 @@ export interface PropertyQuoteDto {
 	 */
 	readonly blocked: boolean;
 	readonly blockMessage: string | null;
+	/** Kod pytania, którego odpowiedź zatrzymała analizę — ankieta zostaje przy nim. */
+	readonly blockedBy: string | null;
 }

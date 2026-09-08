@@ -1,5 +1,5 @@
 code = "demo.property.apk.regime"
-description = "Rezim APK jako parametr, wersjonowany regionem PROPERTY. Druga polowa D-5 - domena mowi co istnieje, ten parametr mowi co wolno z tym zrobic."
+description = "Ktory rezim APK obowiazuje dla tego produktu. Do 8 wrzesnia 2026 tabela niosla jeszcze podstawe prawna i cztery przelaczniki (budzet, wylaczenia, uzasadnienie, roznice miedzy wariantami) - zaden nie byl przez nikogo czytany, odkad wylaczenia zeszly z ekranu (par. 25), a podstawa prawna z notatki (par. 27). Zostaje kod, ktorym kluczuje sie warunki oferty, i nazwa dla czytajacego konfiguracje."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,11 +9,11 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "APK regime"
+label = "Rezim analizy potrzeb"
 
 [[inputLevel]]
 code = "kind"
-label = "property kind"
+label = "rodzaj nieruchomosci"
 type = "string"
 reverseMatcher = false
 property = "quote.property.kind"
@@ -22,49 +22,14 @@ union = false
 
 [[outputLevel]]
 code = "code"
-label = "regime code"
+label = "kod rezimu"
 type = "string"
 external = false
 array = false
 
 [[outputLevel]]
 code = "name"
-label = "regime name"
+label = "nazwa rezimu"
 type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "legalBasis"
-label = "legal basis"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "requiresBudget"
-label = "requires budget"
-type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "requiresExclusionCheck"
-label = "requires exclusion check"
-type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "requiresJustification"
-label = "requires justification"
-type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "requiresVariantDifferences"
-label = "requires variant differences"
-type = "boolean"
 external = false
 array = false

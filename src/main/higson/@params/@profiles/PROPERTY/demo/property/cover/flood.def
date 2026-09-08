@@ -1,5 +1,5 @@
 code = "demo.property.cover.flood"
-description = "Wlasna tabela pokrycia, jedyna z trzema roznymi odpowiedziami na te sama sytuacje: w strefie Z0 i Z1 sprzedajemy normalnie, w Z2 tylko z franszyza redukcyjna, w ZX nie sprzedajemy wcale. Karencja pada tylko tam, gdzie ochrona istnieje - klientowi w ZX nie mowi sie, po ilu dniach zaczyna dzialac cos, czego nie moze kupic."
+description = "Wlasna tabela pokrycia, jedyna z trzema roznymi odpowiedziami na te sama sytuacje: w strefie Z0 i Z1 sprzedajemy normalnie, w Z2 tylko z franszyza redukcyjna, w ZX nie sprzedajemy wcale. O KARENCJI ta tabela nie mowi nic - cala karencje, razem ze zdaniem dla klienta, trzyma demo.property.flood.waitingPeriod, bo to ona wie, ile dni wychodzi. Kolumna waitingReason byla tu trzecia kopia tego samego."
 nullable = false
 dictionary = false
 cacheable = true
@@ -72,13 +72,6 @@ array = false
 [[outputLevel]]
 code = "capLabel"
 label = "opis limitu dla klienta"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "waitingReason"
-label = "kod zdania o karencji"
 type = "string"
 external = false
 array = false

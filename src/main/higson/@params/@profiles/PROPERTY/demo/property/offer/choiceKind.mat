@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.offer.choiceKind
+delta;kind
+* - -1;POORER
+0 - 0;MATCHES
+1 - *;RICHER

@@ -1,5 +1,5 @@
 code = "demo.property.apk.answer"
-description = "Jedno miejsce, w ktorym biznes czyta i zmienia analize potrzeb: z odpowiedzi wynika POTRZEBA (co klient zglasza) i POKRYCIE, ktore ja zaspokaja. Tabela NIE wskazuje pakietu - ktory pakiet wystarczy, wynika ze skladu pakietow w drzewie (VARIANTS[..]/COVERS), wiec dolozenie albo przebudowa pakietu nie wymaga poprawiania ani jednego wiersza tutaj. Waga rozstrzyga, ktora tresc potrzeby wygrywa, gdy dwie odpowiedzi wskazuja to samo pokrycie."
+description = "Jedno miejsce, w ktorym biznes czyta i zmienia analize potrzeb: z odpowiedzi wynika POTRZEBA (co klient zglasza) i POKRYCIE, ktore ja zaspokaja. Tabela NIE wskazuje pakietu - ktory pakiet wystarczy, wynika ze skladu pakietow w drzewie (VARIANTS[..]/COVERS), wiec dolozenie albo przebudowa pakietu nie wymaga poprawiania ani jednego wiersza tutaj. WAGA rozstrzyga, ktora tresc potrzeby wygrywa, gdy dwie odpowiedzi wskazuja to samo pokrycie, i jest trzystopniowa: 3 - potrzeba, ktora klient zadeklarowal wprost; 2 - potrzeba wynikajaca z glownej cechy przedmiotu; 1 - potrzeba wynikajaca z cechy dodatkowej. Wagi sa ROZLACZNE w obrebie jednego pokrycia, bo przy remisie wygrywalaby kolejnosc pytan - czyli o tresc zdania dla klienta decydowalaby pozycja w ankiecie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -45,7 +45,7 @@ array = false
 
 [[outputLevel]]
 code = "weight"
-label = "waga"
+label = "waga (3 zadeklarowana / 2 cecha glowna / 1 cecha dodatkowa)"
 type = "integer"
 external = false
 array = false

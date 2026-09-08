@@ -14,6 +14,7 @@ NEED_PORTABLE;230;true;true,false;Tak,Nie;;;NEED_FLOOD;;;
 NEED_THEFT;210;true;true,false;Tak,Nie;;;NEEDS_PROPERTY;;;
 OCCUPANCY;90;true;PERMANENT,SEASONAL,RENTED;Mieszkam na stałe,Korzystam sezonowo,Wynajmuję;;PERMANENT;;Jak korzystasz z nieruchomości?;CHOICE;quote.property.occupancy
 POSTCODE;80;true;;;Adres z poprzedniej polisy;00-950;;Kod pocztowy miejsca ubezpieczenia;TEXT;quote.property.postcode
+PRIOR_FLOOD_COVER;115;true;;;Zakres poprzedniej polisy;false;;Czy poprzednia polisa obejmowała powódź?;BOOLEAN;quote.property.priorFloodCover
 PROPERTY_KIND;10;true;HOUSE,FLAT;Dom jednorodzinny,Mieszkanie;;FLAT;;Co chcesz ubezpieczyć?;CHOICE;quote.property.kind
 PROPERTY_VALUE;270;false;;;;;BUDGET;;;
 RENOVATED;60;false;true,false;Tak,Nie;;true;;Czy budynek przeszedł remont?;BOOLEAN;quote.property.renovated

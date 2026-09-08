@@ -6,9 +6,8 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. KAZDE POKRYCIE MA WLASNA TABELE demo.property.cover.KOD, kluczowana tym, co dla niego naprawde rozstrzyga: mury rodzajem nieruchomosci, elementy stale i ruchomosci standardem wykonczenia, kradziez zabezpieczeniami, powodz strefa, OC suma gwarancyjna. Atrybuty wskazuja kolumny TEJ tabeli, wiec nowe pokrycie dostaje wlasna tabele i wlasne wskazniki - domyslne prowadza do tabeli murow i trzeba je przestawic.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. KAZDE POKRYCIE MA WLASNA TABELE demo.property.cover.KOD, kluczowana tym, co dla niego naprawde rozstrzyga: mury rodzajem nieruchomosci, elementy stale i ruchomosci standardem wykonczenia, kradziez zabezpieczeniami, powodz strefa. Atrybuty wskazujace kolumny TEJ tabeli nie maja wartosci domyslnej i to jest celowe: domyslne prowadzily do tabeli murow, wiec nowe pokrycie startowalo z cudza taryfa i wygladalo, jakby dzialalo.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -17,7 +16,6 @@
                     <order>1</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [available]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -26,7 +24,6 @@
                     <order>2</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [reason]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -53,7 +50,6 @@
                     <order>1</order>
                     <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [rate]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -62,7 +58,6 @@
                     <order>2</order>
                     <groupOrder>2</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [basis]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -97,7 +92,6 @@
                     <order>2</order>
                     <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [capRatio]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -106,7 +100,6 @@
                     <order>3</order>
                     <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [capAbsolute]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -115,7 +108,6 @@
                     <order>4</order>
                     <groupOrder>3</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.cover.building [capLabel]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -233,9 +225,8 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, suma ubezpieczenia z metrazu, CZYNNIK RYZYKA (jeden na wycene, nie na pakiet), warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja.</description>
+            <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, suma ubezpieczenia z metrazu, CZYNNIK RYZYKA (jeden na wycene, nie na pakiet), warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja. Dwie ostatnie wartosci sa STALYMI produktu wpisanymi wprost w atrybut (D-23), a nie tabela o jednym wierszu.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>APK</code>
@@ -305,8 +296,8 @@
                     <name>Czy wybor klienta zgadza sie z rekomendacja</name>
                     <order>2</order>
                     <groupOrder>2</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.offer.choiceKind</defaultRefName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.offer.choiceKind [kind]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -319,12 +310,21 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>RECALCULATION</code>
-                    <name>Co wolno przeliczyc ponownie</name>
+                    <code>OVERWRITE_MANUAL_SUM</code>
+                    <name>Czy wyliczenie nadpisuje sume podana recznie</name>
                     <order>4</order>
                     <groupOrder>2</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.quote.recalculation [freezeIssuedOffer]</defaultRefName>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>false</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>FREEZE_ISSUED_OFFER</code>
+                    <name>Czy wystawiona oferta jest niezmienna</name>
+                    <order>5</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>LITERAL</defaultRefType>
+                    <defaultRefName>true</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>

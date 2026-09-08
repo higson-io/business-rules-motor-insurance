@@ -1,0 +1,29 @@
+code = "demo.property.apk.budget"
+description = "Stosunek skladki proponowanego pakietu do skladki oczekiwanej przez klienta. Rowno 1 to nadal MIESCI SIE - stad matcher (a,b], ktory domyka przedzial z prawej i zostawia 1 w wierszu FIT. ZERO ZNACZY 'NIE MA CZEGO POROWNYWAC': klient nie podal oczekiwanej skladki albo nie ma jeszcze propozycji. Stosunek nigdy nie wychodzi zerowy inaczej, bo skladka istniejacego pakietu nie jest zerem. ⛔ Wiersz z samym * jest w tej tabeli ZAKAZANY - sprawdzone 8 wrzesnia 2026: zakres z niedomknietym koncem (* - 1) lapie takze NULL i wygrywa z wierszem gwiazdkowym, wiec brak budzetu wychodzil jako BUDGET_FIT. Stad sztywna zerowa granica zamiast nulla."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Czy propozycja miesci sie w oczekiwanej skladce"
+
+[[inputLevel]]
+code = "ratio"
+label = "skladka propozycji / oczekiwana skladka (0 = nie ma czego porownywac)"
+type = "number"
+matcher = "between/ei"
+reverseMatcher = false
+property = "quote.needs.budgetRatio"
+source = "quote.needs.budgetRatio"
+union = false
+
+[[outputLevel]]
+code = "outcome"
+label = "wynik porownania"
+type = "string"
+external = false
+array = false

@@ -95,17 +95,16 @@ what was built afterwards, and the two are close but not identical.
 >
 > ⛔ **STAN NA 2026-09-08 — czytaj go zamiast akapitu poniżej.** Dokument jest pisany
 > chronologicznie i akapit otwierający opisuje projekt z sierpnia, nie dzisiejszą konfigurację.
-> Dziś w profilu `PROPERTY` jest: **32 tabele decyzyjne, 19 funkcji Groovy, 3 flow**, a drzewo
-> domeny to `/PRODUCTS[HOME]` z trzema gałęziami — `APK[NEEDS]` (9 atrybutów reguł + **7 pytań**
-> jako elementy), `COVERS` (7 pokryć, każde z własnym kompletem tabel) i `VARIANTS`
+> Dziś w profilu `PROPERTY` jest: **33 tabele decyzyjne, 19 funkcji Groovy, 3 flow, ZERO regionów**,
+> a drzewo domeny to `/PRODUCTS[HOME]` z trzema gałęziami — `APK[NEEDS]` (9 atrybutów reguł +
+> **7 pytań** jako elementy), `COVERS` (7 pokryć, każde z własnym kompletem tabel) i `VARIANTS`
 > (BASIC/STANDARD/COMPLETE, a skład pakietu to **referencje** do pokryć, nie wiersze tabeli).
-> **Dwanaście pól przedmiotu ubezpieczenia nie jest już elementami domeny** — siedzą na sztywno
+> **Trzynaście pól przedmiotu ubezpieczenia nie jest elementami domeny** — siedzą na sztywno
 > w `Property.SUBJECT_FIELDS`, świadomie, bo to nie jest analiza potrzeb. Gałęzie `SECTIONS`,
 > `SUBJECT`, `FACTORS`, `ZONES` i `USES` **nie istnieją**; tabele czynników i stref żyją dalej
-> i są używane w taryfikacji, tyle że nie są punktem startu w drzewie. Region `PROPERTY` nadal
-> istnieje z dwiema wersjami, ale **nic do niego nie jest podpięte** — wersjonowanie datą polisy
-> w tym profilu niczego nie zmienia (demonstrują je MOTOR i LIFE). §16…§31 opisują drogę tutaj;
-> §2/§4/§6/§7/§8/§9 są nieaktualne.
+> i są używane w taryfikacji, tyle że nie są punktem startu w drzewie. Region `PROPERTY`
+> **został usunięty 8 września 2026** (§33.1) — wersjonowanie datą polisy demonstrują MOTOR i LIFE.
+> §16…§33 opisują drogę tutaj; §2/§4/§6/§7/§8/§9 są nieaktualne.
 
 Trzecie demo aplikacji: **ubezpieczenie domu i mieszkania (detal)**, w którym osią nie jest taryfa,
 tylko **analiza potrzeb klienta (APK) jako konfiguracja wersjonowana datą polisy**. Zawiera: drzewo
@@ -258,6 +257,28 @@ for a context path Java had renamed, so its sentence could never fire; and the p
 covers the client cannot buy, so "no security" chose COMPLETE and reported the theft it had just
 credited as a gap. ⚠️ Fixing that **deliberately changes one outcome** — no security now proposes
 STANDARD. §32.11 lists nine open items that are decisions, not litter.
+**§33 (2026-09-08)** closes all nine open items from §32.11, three of them differently than the list
+predicted. The **region `PROPERTY` is deleted** — and it was never empty: 17 live parameter rows and
+55 domain-element rows still hung off it in Studio's database, which is trap W-24 armed rather than
+dormant; no MCP tool deletes a region and the UI marks the card `no-permissions`, so it went through
+the product's own `DELETE /studio/api/regions/{code}` (MOTOR and LIFE regions untouched, LIFE's date
+versioning re-verified after). The regime's "three dead columns" turned out to be **two**:
+`requiresBudget` and `requiresJustification` gate real behaviour in MOTO and LIFE, and cutting all
+four — the first attempt — would have broken both demos. And the last hardcoded Polish sentence sat
+in a branch that **cannot execute** (the proposal is by construction the cheapest package covering
+every need, so a cheaper alternative always leaves a gap); it moved to the rules anyway, as a guard.
+Also: a three-step weight ladder replaces three silent ties decided by question order; the flood
+waiting period gains prior cover as a real second axis and a **13th subject field**, with continuity
+producing a *different sentence* rather than "after 0 days"; the two-constant `quote.recalculation`
+table becomes two `LITERAL`s on the product (D-23); `COVER`'s attribute defaults are emptied so a new
+cover has no rule rather than someone else's tariff; and a blocking answer now actually stops the
+questionnaire, with the server naming which question blocked. ⚠️ **W-30**: a range with an open bound
+(`* - 1`) matches **null** and beats the `*` row — a missing budget came back as `BUDGET_FIT`.
+⛔ Twelve rows equal to their `*` row were examined and **deliberately kept**: every one is a real
+dictionary value that happens to be neutral, and deleting them would leave each table an incomplete
+list. §33.9 records the ordering rule this round produced — **decision table → flow → function** —
+now a standard in `higson/rules-authoring.md`, together with using a function as a level `source`
+(`$f` / `$u`) so a null check becomes a column instead of an `if`.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -498,4 +519,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-08 (§32 — the domain tree becomes the way in; five reviews, two defects fixed)
+**Last regenerated**: 2026-09-08 (§33 — nine open items closed, the PROPERTY region deleted, table-first standard added)

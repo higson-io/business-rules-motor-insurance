@@ -7,8 +7,8 @@ refName = "demo.property.apk.regime [name]"
 [[attr]]
 attributeCode = "CHOICE_KIND"
 attributeName = "Czy wybor klienta zgadza sie z rekomendacja"
-refType = "FUNCTION"
-refName = "demo.property.offer.choiceKind"
+refType = "PARAMETER"
+refName = "demo.property.offer.choiceKind [kind]"
 
 [[attr]]
 attributeCode = "CHOICE_NOTE"
@@ -17,16 +17,22 @@ refType = "PARAMETER"
 refName = "demo.property.offer.choice [text]"
 
 [[attr]]
+attributeCode = "FREEZE_ISSUED_OFFER"
+attributeName = "Czy wystawiona oferta jest niezmienna"
+refType = "LITERAL"
+refName = "true"
+
+[[attr]]
 attributeCode = "OFFER_TERMS"
 attributeName = "Warunki oferty"
 refType = "PARAMETER"
 refName = "demo.property.offer.terms"
 
 [[attr]]
-attributeCode = "RECALCULATION"
-attributeName = "Co wolno przeliczyc ponownie"
-refType = "PARAMETER"
-refName = "demo.property.quote.recalculation [freezeIssuedOffer]"
+attributeCode = "OVERWRITE_MANUAL_SUM"
+attributeName = "Czy wyliczenie nadpisuje sume podana recznie"
+refType = "LITERAL"
+refName = "false"
 
 [[attr]]
 attributeCode = "RISK_FACTOR"

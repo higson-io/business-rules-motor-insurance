@@ -1,3 +1,3 @@
 #matrix for parameter demo.property.apk.regime
-kind;code;name;legalBasis;requiresBudget;requiresExclusionCheck;requiresJustification;requiresVariantDifferences
-*;KNF_190_2026;APK wg Rekomendacji KNF;Rekomendacje 8 i 9 — uchwała KNF nr 190/2026 z 26.06.2026 r.;true;true;true;true
+kind;code;name
+*;KNF_190_2026;APK wg Rekomendacji KNF

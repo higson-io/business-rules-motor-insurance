@@ -18,9 +18,7 @@ export interface ApkRegimeDto {
 	readonly name: string;
 	readonly legalBasis: string | null;
 	readonly requiresBudget: boolean;
-	readonly requiresExclusionCheck: boolean;
 	readonly requiresJustification: boolean;
-	readonly requiresVariantDifferences: boolean;
 }
 
 export interface ApkQuestionDto {

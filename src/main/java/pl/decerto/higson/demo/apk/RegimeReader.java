@@ -23,9 +23,7 @@ public final class RegimeReader {
 		regime.setName(value.getString("name"));
 		regime.setLegalBasis(value.getString("legalBasis"));
 		regime.setRequiresBudget(Boolean.TRUE.equals(value.getBoolean("requiresBudget")));
-		regime.setRequiresExclusionCheck(Boolean.TRUE.equals(value.getBoolean("requiresExclusionCheck")));
 		regime.setRequiresJustification(Boolean.TRUE.equals(value.getBoolean("requiresJustification")));
-		regime.setRequiresVariantDifferences(Boolean.TRUE.equals(value.getBoolean("requiresVariantDifferences")));
 		return regime;
 	}
 }

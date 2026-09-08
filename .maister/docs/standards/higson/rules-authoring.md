@@ -42,6 +42,39 @@ BI;BRONZE;yes
 
 *Evidence:* 42 of 43 `.def` files declare `cacheable = true`; 35 of 35 `.mat` files open with the comment; 34 of 35 follow with a header row.
 
+### Reach for a Decision Table First, a Flow Second, a Function Last
+The order is fixed and it is about who can read the rule, not only about speed. A **decision table**
+is the most efficient thing the engine has and the only artifact a business person can change
+unaided. A **flow** comes next: slower, but it draws the decision as a diagram they can follow. A
+**Groovy function** comes last — it is code, and code is where a business reader stops. Functions
+earn their place for arithmetic, for date maths, for set operations, and for small utilities that
+several rules reuse. They do not earn it for branching.
+
+⛔ **A chain of `if`s returning a value is a decision table you have not written yet.** That includes
+the null checks: a level's `source` may be a function (`$f code`) or a util function (`$u code`), so
+"is this value missing" becomes an input column and "what to answer when it is" becomes a row. The
+function shrinks to the one line that computes the number; the table names what the number means.
+
+```
+# level source is a function, not a context path
+source = "$f demo.property.util.choiceDelta"
+
+delta ; kind
+* - -1 ; POORER
+0 - 0  ; MATCHES
+1 - *  ; RICHER
+```
+
+⚠️ **An unbounded range bound also matches `null`, and it beats the wildcard row.** A row `* - 1`
+matches a null input and wins over a plain `*` row, so a "nothing to compare here" default written
+as `*` is silently unreachable. Verified 8 September 2026: a missing budget came back as
+`BUDGET_FIT`. Either bound the ranges on both sides, or have the function pass an impossible
+sentinel value (`0` for a ratio) that a bounded row can catch.
+
+*Evidence:* `demo.property.offer.choiceKind` and `demo.property.apk.budget` replaced two Groovy
+functions on 8 September 2026; `demo.motor.risk.gender.mapper` has been a level source since long
+before that.
+
 ### Groovy Function Header Contract
 Every Groovy function opens with the generated TOML header block containing `#Full code: <code>` matching the file path, `categories = []`, `logLevel`, and an `[[arguments]]` list whose first entry is always `ctx` of type `SPECIFIED_CLASS` bound to a `ParamContext`. Do not hand-edit the header beyond description and extra arguments. Bodies end with an explicit `return`.
 

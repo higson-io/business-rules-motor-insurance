@@ -8,7 +8,14 @@ package pl.decerto.higson.demo.apk;
  * ani życiowych. Ten sam obowiązek, ten sam termin dostosowania z §2 uchwały KNF 190/2026, ten sam
  * kształt. Różni się wyłącznie katalog pytań — a ten jest konfiguracją.
  *
- * Wartości pochodzą z tabeli `demo.<linia>.apk.regime`, wersjonowanej regionem regulacyjnym.
+ * Wartości pochodzą z tabeli `demo.<linia>.apk.regime`. W MOTO i LIFE jest ona wersjonowana
+ * regionem regulacyjnym; w PROPERTY nie — tam obowiązuje jeden reżim (D-17).
+ *
+ * ⚠️ Tabele MOTO i LIFE mają jeszcze kolumny `requiresExclusionCheck`
+ * i `requiresVariantDifferences`, których od 8 września 2026 nikt nie czyta. Zostały tam, bo obie
+ * tabele są wersjonowane regionem, a edycja obu wersji niesie ryzyko nieproporcjonalne do zysku.
+ * W PROPERTY wszystkie cztery kolumny są usunięte — tam reżim jest jeden i niesie już tylko kod,
+ * którym kluczują się warunki oferty.
  */
 public class Regime {
 
@@ -16,9 +23,7 @@ public class Regime {
 	private String name;
 	private String legalBasis;
 	private boolean requiresBudget;
-	private boolean requiresExclusionCheck;
 	private boolean requiresJustification;
-	private boolean requiresVariantDifferences;
 
 	public String getCode() {
 		return code;
@@ -52,27 +57,11 @@ public class Regime {
 		this.requiresBudget = requiresBudget;
 	}
 
-	public boolean isRequiresExclusionCheck() {
-		return requiresExclusionCheck;
-	}
-
-	public void setRequiresExclusionCheck(boolean requiresExclusionCheck) {
-		this.requiresExclusionCheck = requiresExclusionCheck;
-	}
-
 	public boolean isRequiresJustification() {
 		return requiresJustification;
 	}
 
 	public void setRequiresJustification(boolean requiresJustification) {
 		this.requiresJustification = requiresJustification;
-	}
-
-	public boolean isRequiresVariantDifferences() {
-		return requiresVariantDifferences;
-	}
-
-	public void setRequiresVariantDifferences(boolean requiresVariantDifferences) {
-		this.requiresVariantDifferences = requiresVariantDifferences;
 	}
 }

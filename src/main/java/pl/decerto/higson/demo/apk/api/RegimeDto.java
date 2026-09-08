@@ -2,7 +2,13 @@ package pl.decerto.higson.demo.apk.api;
 
 /**
  * Reżim APK na drucie. Wspólny dla wszystkich trzech linii — front nie zna daty progu, dostaje
- * gotowy podpis, podstawę prawną i cztery przełączniki mówiące, czego reżim wymaga.
+ * gotowy podpis i podstawę prawną, którą pokazuje ekran motoryzacyjny i życiowy.
+ *
+ * ⛔ Dwa przełączniki, nie cztery. `requiresExclusionCheck` i `requiresVariantDifferences`
+ * odeszły 8 września 2026: pierwszy stracił czytelnika, gdy §25 zdjął blok wyłączeń ze wszystkich
+ * trzech dem, drugi nie miał go nigdy. Przełącznik, którego nikt nie czyta, to nie konfiguracja
+ * na przyszłość, tylko obietnica bez pokrycia. Zostały te dwa, które BRAMKUJĄ zachowanie:
+ * `requiresBudget` (MOTO, LIFE) i `requiresJustification` (MOTO, LIFE).
  */
 public class RegimeDto {
 
@@ -10,9 +16,7 @@ public class RegimeDto {
 	private String name;
 	private String legalBasis;
 	private boolean requiresBudget;
-	private boolean requiresExclusionCheck;
 	private boolean requiresJustification;
-	private boolean requiresVariantDifferences;
 
 	public String getCode() {
 		return code;
@@ -46,28 +50,12 @@ public class RegimeDto {
 		this.requiresBudget = requiresBudget;
 	}
 
-	public boolean isRequiresExclusionCheck() {
-		return requiresExclusionCheck;
-	}
-
-	public void setRequiresExclusionCheck(boolean requiresExclusionCheck) {
-		this.requiresExclusionCheck = requiresExclusionCheck;
-	}
-
 	public boolean isRequiresJustification() {
 		return requiresJustification;
 	}
 
 	public void setRequiresJustification(boolean requiresJustification) {
 		this.requiresJustification = requiresJustification;
-	}
-
-	public boolean isRequiresVariantDifferences() {
-		return requiresVariantDifferences;
-	}
-
-	public void setRequiresVariantDifferences(boolean requiresVariantDifferences) {
-		this.requiresVariantDifferences = requiresVariantDifferences;
 	}
 
 	/** Jedno miejsce, w którym reżim domenowy staje się reżimem na drucie. */
@@ -77,9 +65,7 @@ public class RegimeDto {
 		dto.setName(regime.getName());
 		dto.setLegalBasis(regime.getLegalBasis());
 		dto.setRequiresBudget(regime.isRequiresBudget());
-		dto.setRequiresExclusionCheck(regime.isRequiresExclusionCheck());
 		dto.setRequiresJustification(regime.isRequiresJustification());
-		dto.setRequiresVariantDifferences(regime.isRequiresVariantDifferences());
 		return dto;
 	}
 }

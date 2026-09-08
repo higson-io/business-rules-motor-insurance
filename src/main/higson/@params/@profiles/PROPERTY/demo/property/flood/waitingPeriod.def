@@ -1,5 +1,5 @@
 code = "demo.property.flood.waitingPeriod"
-description = "30 dni karencji, znoszone przez nieprzerwana kontynuacje - standard rynkowy (PZU, ERGO, Allianz, InterRisk)."
+description = "30 dni karencji, znoszone przez nieprzerwana kontynuacje ochrony - standard rynkowy (PZU, ERGO, Allianz, InterRisk). Tabela NAZYWA TEZ SWOJ SKUTEK: przy karencji zniesionej pada inne zdanie, a nie to samo z zerem w miejscu liczby dni. W strefie ZX powodzi nie sprzedajemy wcale, wiec kolumna zdania jest pusta i o karencji nie ma po co mowic."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,11 +9,20 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Flood waiting period"
+label = "Karencja przy ochronie od powodzi"
+
+[[inputLevel]]
+code = "zone"
+label = "strefa powodziowa"
+type = "string"
+reverseMatcher = false
+property = "quote.zone.flood"
+source = "quote.zone.flood"
+union = false
 
 [[inputLevel]]
 code = "priorCover"
-label = "prior flood cover"
+label = "ciagla ochrona z poprzedniej polisy"
 type = "boolean"
 reverseMatcher = false
 property = "quote.property.priorFloodCover"
@@ -22,7 +31,14 @@ union = false
 
 [[outputLevel]]
 code = "days"
-label = "waiting days"
+label = "dni karencji"
 type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "reasonCode"
+label = "kod zdania o karencji"
+type = "string"
 external = false
 array = false

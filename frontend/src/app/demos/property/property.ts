@@ -132,8 +132,6 @@ export class Property {
 	 * ⚠️ Blokada dotyczy PRZEJŚCIA DALEJ, nie ankiety. Cofnięcie odpowiedzi ma natychmiast
 	 * odblokować ekran, więc pytania zostają aktywne, a pasek kroków — klikalny wstecz.
 	 */
-	readonly blocked = computed(() => this.loaded()?.blocked ?? false);
-	readonly blockMessage = computed(() => this.loaded()?.blockMessage ?? null);
 
 	/** Nazwa i składka tańszej alternatywy, gdy propozycja nie mieści się w oczekiwanej składce. */
 	readonly alternative = computed(() => {

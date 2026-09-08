@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "⛔ OCZEKIWANA SKLADKA NIE JEST FILTREM ZAKRESU (rek. 8.2.d). Ta funkcja NIE wybiera pakietu - ona tylko nazywa, czy propozycja miesci sie w oczekiwaniu klienta. Zwraca gotowy KOD POWODU, ten sam, ktorym kluczuje sie apk.recommendation.reason. Pakiet dostaje ARGUMENTEM, a nie ze sciezki kontekstu, zeby dalo sie ja wywolac z flow zaraz po tym, jak pakiet zostal ustalony."
+description = "⛔ OCZEKIWANA SKLADKA NIE JEST FILTREM ZAKRESU (rek. 8.2.d). Ta funkcja NIE wybiera pakietu - ona tylko nazywa, czy propozycja miesci sie w oczekiwaniu klienta. Sama robi WYLACZNIE dzielenie; co wynik znaczy i gdzie jest prog, mowi tabela demo.property.apk.budget. Pakiet dostaje ARGUMENTEM, bo w chwili wywolania nie ma go jeszcze w kontekscie."
 
 [[arguments]]
 name = "ctx"
@@ -19,24 +19,15 @@ name = "indicated"
 type = "STRING"
 */
 
-// Rezim rozstrzyga, czy o oczekiwana skladke w ogole pytamy. Gdy nie pyta, nie ma czego porownywac.
-def regime = higson.getValue('demo.property.apk.regime', ctx)
-if (!Boolean.TRUE.equals(regime.get(0, 'requiresBudget'))) {
-	return 'BUDGET_ABSENT'
-}
-
 def budget = ctx.getDecimal('quote.needs.budget')
-if (budget == null || budget <= 0) {
-	return 'BUDGET_ABSENT'
-}
+def premium = indicated == null ? null : ctx.getDecimal('quote.premium.' + indicated)
 
-if (indicated == null) {
-	return 'BUDGET_ABSENT'
-}
+// ⛔ ZERO, A NIE NULL, gdy nie ma czego porownywac. Zakres z niedomknietym koncem lapie w tej
+// wersji silnika takze NULL i wygrywa z wierszem gwiazdkowym, wiec null wychodzil jako BUDGET_FIT.
+// Zero jest wartoscia niemozliwa dla prawdziwego stosunku, wiec tabela ma po czym je poznac.
+def comparable = budget != null && budget > 0 && premium != null
+def ratio = comparable ? premium / budget : 0
 
-def premium = ctx.getDecimal('quote.premium.' + indicated)
-if (premium == null) {
-	return 'BUDGET_ABSENT'
-}
-
-return premium <= budget ? 'BUDGET_FIT' : 'BUDGET_EXCEEDED'
+// Ani jednej nazwy wyniku tutaj - prog i slownik powodow mieszkalyby wtedy w dwoch miejscach.
+return higson.getString('demo.property.apk.budget',
+		higson.createContext('quote.needs.budgetRatio', ratio))

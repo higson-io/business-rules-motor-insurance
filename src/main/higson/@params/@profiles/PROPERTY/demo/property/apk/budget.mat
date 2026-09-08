@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.apk.budget
+ratio;outcome
+* - 0;BUDGET_ABSENT
+0 - 1;BUDGET_FIT
+1 - *;BUDGET_EXCEEDED

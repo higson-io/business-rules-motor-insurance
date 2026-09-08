@@ -3065,3 +3065,146 @@ zamierzoną zmianą rekomendacji. 11 testów Javy i 60 frontu przechodzi.
 | 7 | **`quote.recalculation`** | Dwie stałe udające regułę |
 | 8 | **Domyślne wartości atrybutów `COVER`** | Wskazują na tabelę budynku, więc nowe pokrycie startuje z cudzą taryfą |
 | 9 | **`blocked` nie blokuje** | Pytanie oznaczone blokadą jest dalej zadawane |
+
+## §33 Dziewięć otwartych punktów, zamkniętych (2026-09-08)
+
+Lista z §32.11 przeszła w całości. Trzy punkty skończyły się inaczej, niż zakładała lista — i to są
+najciekawsze trzy.
+
+### 33.1 Region `PROPERTY` usunięty (§32.11 poz. 1)
+
+⛔ **Region NIE był pusty.** Zapis „nic do niego nie jest podpięte" brał się z tego, że katalogi
+`@regions` w snapshocie są puste. W bazie Studia siedziało pod nim **17 żywych wierszy parametrów**
+(`apk.regime`, `sum.ratePerSqm`, `tariff.baseRate`) i **55 elementów domeny** — kopie z czasów, gdy
+D-17 odpinał tabele. To jest dokładnie uzbrojona pułapka W-24: pierwsze ponowne podpięcie regionu
+przywróciłoby stawki z wersji 2.
+
+MCP nie ma narzędzia do kasowania regionów, a UI Studia rysuje kartę regionu z klasą
+`no-permissions` dla tego użytkownika. Zadziałało `DELETE /studio/api/regions/PROPERTY?profileCode=PROPERTY`
+— własny endpoint produktu, ten sam, którego używa UI. Regiony MOTOR, APK_MOTOR, LIFE i APK_LIFE
+zostały nietknięte i **wersjonowanie datą w LIFE dalej działa** (1 marca 2026 → taryfa V1,
+1 sierpnia → V2, sprawdzone po usunięciu).
+
+⚠️ Przed operacją: `SCRIPT DROP TO` całej bazy H2 (38 MB spakowane). Snapshot w gicie nie wystarcza,
+bo nie niesie regionów w formie, którą da się wgrać z powrotem.
+
+### 33.2 Reżim schudł, ale nie tak, jak zapowiadała lista (§32.11 poz. 2)
+
+Lista mówiła „trzy martwe kolumny". Sprawdzenie po kodzie pokazało co innego:
+
+| Kolumna | Kto czyta | Los |
+|---|---|---|
+| `requiresBudget` | **MOTO i LIFE** — bramkuje całą ścieżkę budżetu | zostaje w warstwie wspólnej |
+| `requiresJustification` | **MOTO, LIFE i PROPERTY** | zostaje we wspólnej, **znika z PROPERTY** |
+| `requiresExclusionCheck` | nikt od §25 | usunięta |
+| `requiresVariantDifferences` | nikt, nigdy | usunięta |
+| `legalBasis` | MOTO i LIFE (ekran), PROPERTY nie od §27 | zostaje we wspólnej, znika z PROPERTY |
+
+⛔ **Pierwsza wersja tej zmiany wycięła wszystkie cztery i zepsułaby MOTO oraz LIFE.** Wyłapane
+przed kompilacją, bo `grep` z `head -5` uciął dowody — czytelnicy `isRequiresBudget()` byli
+w wierszach 6+. Wniosek: przy dowodzeniu, że coś jest martwe, `head` na wynikach grepa jest wrogiem.
+
+W PROPERTY tabela `demo.property.apk.regime` ma dziś **dwie kolumny** — kod i nazwę — a `PropertyRegimeDto`
+przestał istnieć: żaden ekran majątkowy nie czytał reżimu, odkąd §24 usunął panel ustawień.
+Uzasadnienie powstaje teraz **zawsze**; warunek stał na przełączniku, który tabela zawsze ustawiała
+na `true`.
+
+⚠️ Tabele MOTO i LIFE dalej mają dwie martwe kolumny. Są wersjonowane regionem, a edycja obu wersji
+niesie ryzyko nieproporcjonalne do zysku (W-23). Zapisane, nie zrobione.
+
+### 33.3 Ostatnie polskie zdanie z Javy — w gałęzi, która nie może się wykonać (§32.11 poz. 3)
+
+`"nic — pokrywa te same potrzeby"` stało w `Property.java` jako wypełniacz, gdy tańsza alternatywa
+nie zostawia żadnej luki. **Ta gałąź jest nieosiągalna**: propozycją jest najtańszy pakiet
+pokrywający wszystkie potrzeby (D-19), pakiety są zagnieżdżone, a alternatywa z definicji jest
+tańsza — więc pokrywa ściśle mniej. Dlatego nikt nigdy tego zdania nie zobaczył.
+
+Zdanie odeszło do tabeli mimo to, jako **wiersz-strażnik**: liczba luk jest teraz wejściem
+`demo.property.apk.reason`, zero ma własny kod zdania (`BUDGET_ALTERNATIVE_EQUAL`), a gdyby reguła
+doboru kiedyś się zmieniła, klient dostanie zdanie, a nie kropkę po dwukropku.
+
+### 33.4 Drabinka wag zamiast remisu (§32.11 poz. 6)
+
+`demo.property.apk.answer` ma trzy poziomy wagi, rozłączne w obrębie jednego pokrycia:
+**3 — potrzeba zadeklarowana wprost**, **2 — z głównej cechy przedmiotu**, **1 — z cechy dodatkowej**.
+Remisy były trzy, nie jeden, i wszystkie rozstrzygała kolejność pytań w ankiecie: dom z zadeklarowaną
+potrzebą ochrony murów czytał „Ochrona konstrukcji budynku" (cecha), a nie „Ochrona murów i mienia
+przed pożarem" (własna odpowiedź). Po zmianie wygrywa to, co klient powiedział sam.
+
+### 33.5 Karencja powodziowa jako druga oś (§32.11 poz. 5)
+
+`quote.property.priorFloodCover` nikt nie ustawiał, więc karencja zawsze trafiała w wiersz `*`.
+Doszło **trzynaste pole przedmiotu ubezpieczenia** — „Czy poprzednia polisa obejmowała powódź?",
+z podpowiedzią „Zakres poprzedniej polisy" (rek. 8.3) — i demo dostało moment: przestawienie
+odpowiedzi na „Tak" znosi 30-dniową karencję.
+
+⛔ **Zniesiona karencja to INNE ZDANIE, nie to samo z zerem.** Pierwsze uruchomienie wypisało
+„zaczyna działać po 0 dniach". Kod zdania jechał z tabeli pokrycia, a liczba dni z tabeli karencji —
+dwie tabele na jedną wypowiedź. Teraz `demo.property.flood.waitingPeriod` ma **strefę jako drugie
+wejście** i własną kolumnę `reasonCode`: w ZX pusta (o karencji na coś, czego nie można kupić, się
+nie mówi), przy ciągłości `FLOOD_WAITING_NONE`, inaczej `FLOOD_WAITING`. Kolumna `waitingReason`
+znika z `demo.property.cover.flood`.
+
+### 33.6 Dwie stałe i pusty domyślny (§32.11 poz. 7 i 8)
+
+`demo.property.quote.recalculation` — jedno wejście, jeden wiersz, dwa wyjścia — zniknęła. Wartości
+siedzą jako `LITERAL` na elemencie produktu (`OVERWRITE_MANUAL_SUM`, `FREEZE_ISSUED_OFFER`), zgodnie
+z D-23. Atrybuty typu `COVER`, które wskazywały kolumny tabeli murów, nie mają już wartości
+domyślnej: nowe pokrycie **głośno nie ma reguły**, zamiast cicho mieć cudzą.
+
+⚠️ Pusta wartość domyślna atrybutu typu PARAMETER **nie psuje** odczytu na elementach, które mają
+własną wartość — sprawdzone osobnym uruchomieniem, bo pierwszy pomiar sugerował inaczej i pomiar
+był błędny (sonda czytała `limit` zamiast `effectiveLimit`).
+
+### 33.7 Blokada, która blokuje (§32.11 poz. 9)
+
+Odpowiedź blokująca zatrzymuje ankietę: „Następne pytanie" gaśnie, komunikat stoi pod pytaniem,
+a **pasek kroków zostaje klikalny** — blokada dotyczy ścieżki klienta, nie prowadzącego. Serwer
+podaje teraz `blockedBy`, czyli KOD pytania, które zatrzymało analizę; bez tego łańcuch odsłaniał
+kolejne pytanie, kursor tam skakał i komunikat „nie prowadzimy dalej tej analizy" wypisywał się pod
+pytaniem, na które klient miał właśnie odpowiedzieć.
+
+### 33.8 Czego NIE zrobiono i dlaczego (§32.11 poz. 4)
+
+**Dwanaście wierszy równych swojemu `*` zostaje.** Przegląd wiersz po wierszu pokazał, że wszystkie
+dwanaście to **pełnoprawne wartości słownika**, które akurat niosą wartość neutralną: `DOOR` przy
+zabezpieczeniach, `FLAT` przy rodzaju nieruchomości, `STANDARD` przy wykończeniu, `BRICK` przy
+ścianach, `PERMANENT` przy sposobie korzystania, `12` przy okresie, `0` przy franszyzie, `ZX` przy
+powodzi. Usunięcie ich zrobiłoby z każdej z tych tabel listę niepełną — czytelnik musiałby wiedzieć,
+że brakujące wartości spadają na `*`. To jest dokładnie odwrotność tego, po co te tabele są.
+
+### 33.9 Reguła kolejności: tabela → flow → funkcja
+
+Z tej rundy wyszła zasada, która trafiła do `standards/higson/rules-authoring.md`: **najpierw tabela
+decyzyjna, potem flow, funkcja na końcu** — bo tabela jest najwydajniejsza i jedyna zmienialna przez
+biznes bez pomocy, flow rysuje decyzję jako diagram, a funkcja to kod, na którym czytelnik biznesowy
+się zatrzymuje. Funkcje zostają do arytmetyki, dat, operacji na zbiorach i drobnych utili.
+
+⛔ **Łańcuch `if`-ów zwracający wartość to tabela, której jeszcze nie napisano** — razem
+ze sprawdzeniami `null`, bo źródłem poziomu wejściowego może być funkcja (`$f`, `$u`), a nie tylko
+ścieżka kontekstu. Tak zniknęły dwie funkcje: `offer.choiceKind` (38 linii → tabela 3-wierszowa
+plus 15-liniowy util liczący różnicę pozycji) i połowa `apk.budgetOutcome` (42 → 9 linii plus
+tabela). Wzorzec był w repo od dawna: `demo.motor.risk.gender.mapper` stoi w `source` poziomu MOTO.
+
+⚠️ **W-30: zakres z niedomkniętym końcem łapie także `null` i wygrywa z wierszem `*`.** Wiersz
+`* - 1` złapał brak budżetu i zwrócił `BUDGET_FIT` zamiast `BUDGET_ABSENT`. Albo domykać zakresy
+z obu stron, albo — jak tutaj — kazać funkcji podawać wartość niemożliwą (`0` dla stosunku), którą
+złapie wiersz domknięty.
+
+### 33.10 Stan po rundzie
+
+```
+/PRODUCTS[HOME]                    8 atrybutów (dwa nowe LITERAL)
+   APK[NEEDS]      9 atrybutów  +  QUESTIONS: 7 pytań
+   COVERS          7 pokryć, po 13 atrybutów, każde z własną tabelą
+   VARIANTS        BASIC / STANDARD / COMPLETE, skład jako referencje do COVERS
+```
+
+33 tabele decyzyjne · 19 funkcji Groovy · 3 flow · **zero regionów**.
+13 pól przedmiotu ubezpieczenia (`Property.SUBJECT_FIELDS`), 7 pytań APK.
+
+Zweryfikowane ośmioma scenariuszami zdjętymi przed rundą: **każda składka, suma, limit, strefa,
+czynnik ryzyka i liczba zdań uzasadnienia bez zmian**; jedyna różnica to nowe pytanie o poprzednią
+ochronę powodziową. Do tego siedem sprawdzeń celowanych: blokada i wyjście z niej, karencja w trzech
+strefach, trzy werdykty wyboru wariantu, drabinka wag, alternatywa przy przekroczonym budżecie.
+11 testów Javy i 60 frontu przechodzi.

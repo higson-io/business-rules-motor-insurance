@@ -68,7 +68,8 @@ public class Property {
 	 */
 	private static final List<String> SUBJECT_FIELDS = List.of(
 		"PROPERTY_KIND", "AREA", "CONSTRUCTION_YEAR", "WALL_MATERIAL", "FLOOR", "RENOVATED",
-		"FINISH_STANDARD", "POSTCODE", "OCCUPANCY", "SECURITY", "CLAIMS_3Y", "COVER_PERIOD");
+		"FINISH_STANDARD", "POSTCODE", "OCCUPANCY", "SECURITY", "CLAIMS_3Y", "PRIOR_FLOOD_COVER",
+		"COVER_PERIOD");
 	private static final String APK_ELEMENT = "NEEDS";
 	private static final String COLLECTION_COVERS = "COVERS";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
@@ -92,7 +93,7 @@ public class Property {
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
 	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
 	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
-	private static final String FUNCTION_CHOICE_KIND = "demo.property.offer.choiceKind";
+	private static final String PARAM_CHOICE_KIND = "demo.property.offer.choiceKind";
 	private static final String PARAM_PERIOD = "demo.property.factor.period";
 
 	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
@@ -102,7 +103,8 @@ public class Property {
 
 	private static final String PARAM_REVEAL = "demo.property.apk.question.reveal";
 	private static final String PARAM_VISIBILITY = "demo.property.apk.question.visibility";
-	private static final String PARAM_RECALCULATION = "demo.property.quote.recalculation";
+	private static final String ATTR_OVERWRITE_MANUAL_SUM = "OVERWRITE_MANUAL_SUM";
+	private static final String ATTR_FREEZE_ISSUED_OFFER = "FREEZE_ISSUED_OFFER";
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_SUM_LIABILITY = "quote.sums.liability";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
@@ -155,16 +157,15 @@ public class Property {
 		}
 	}
 
+	/**
+	 * ⛔ Reżim zostaje po stronie serwera. Kluczuje warunki oferty (§15) i tyle — do ekranu nie
+	 * jedzie, odkąd §27 zdjął podstawę prawną z notatki, a D-17 zostawił jeden reżim.
+	 */
 	private void loadRegime(PropertyQuote quote) {
 		ParamValue value = engine.get(PARAM_REGIME, new PropertyContext(quote));
 		Regime regime = new Regime();
 		regime.setCode(value.getString("code"));
 		regime.setName(value.getString("name"));
-		regime.setLegalBasis(value.getString("legalBasis"));
-		regime.setRequiresBudget(Boolean.TRUE.equals(value.getBoolean("requiresBudget")));
-		regime.setRequiresExclusionCheck(Boolean.TRUE.equals(value.getBoolean("requiresExclusionCheck")));
-		regime.setRequiresJustification(Boolean.TRUE.equals(value.getBoolean("requiresJustification")));
-		regime.setRequiresVariantDifferences(Boolean.TRUE.equals(value.getBoolean("requiresVariantDifferences")));
 		quote.setRegime(regime);
 	}
 
@@ -388,8 +389,7 @@ public class Property {
 		quote.getSums().setSuggestedBuilding(building);
 		// ⛔ ROZSTRZYGA REGUŁA. „Suma podana ręcznie przez klienta wygrywa z wyliczeniem" to
 		// decyzja produktowa, nie mechanika — do 7 września 2026 była warunkiem w tej metodzie.
-		boolean overwrite = Boolean.TRUE.equals(engine.get(PARAM_RECALCULATION,
-			new PropertyContext(quote)).getBoolean("overwriteManualSum"));
+		boolean overwrite = productFlag(quote, ATTR_OVERWRITE_MANUAL_SUM);
 		if (overwrite || !quote.isBuildingSumOverridden()) {
 			quote.getSums().setBuilding(building);
 		}
@@ -618,6 +618,7 @@ public class Property {
 	private void applyBlocker(PropertyQuote quote) {
 		quote.setBlocked(false);
 		quote.setBlockMessage(null);
+		quote.setBlockedBy(null);
 		for (Question question : quote.getQuestions()) {
 			Answer answer = quote.getAnswers().get(question.getCode());
 			if (!question.isVisible() || !question.isRevealed() || answer == null || !answer.isAnswered()) {
@@ -628,6 +629,10 @@ public class Property {
 			if (Boolean.TRUE.equals(row.getBoolean("blocks"))) {
 				quote.setBlocked(true);
 				quote.setBlockMessage(row.getString("message"));
+				// ⛔ KTÓRA odpowiedź zatrzymała analizę. Bez tego ekran wypisywał komunikat pod
+				// PYTANIEM NASTĘPNYM — klient czytał „nie prowadzimy dalej", a pod spodem dostawał
+				// kolejne pytanie do odpowiedzenia.
+				quote.setBlockedBy(question.getCode());
 				return;
 			}
 		}
@@ -689,11 +694,13 @@ public class Property {
 		recommendation.setTotalNeeds(score.getTotal());
 		recommendation.setMissingCovers(score.getMissing());
 
-		if (quote.getRegime().isRequiresJustification()) {
-			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
-				reasons(quote, proposed, score, recommendation),
-				reason -> new PropertyContext(quote).withReason(reason)));
-		}
+		// ⛔ Uzasadnienie powstaje ZAWSZE. Stał tu warunek na przełączniku `requiresJustification`,
+		// który tabela ustawiała na `true` i nigdy inaczej — bramka, która nigdy nie zamknęła się
+		// ani razu, a wyglądała, jakby coś rozstrzygała. W tym profilu jest jeden reżim (D-17)
+		// i jest nim KNF, więc rek. 8.7 obowiązuje bez wyjątku.
+		recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+			reasons(quote, proposed, score, recommendation),
+			reason -> new PropertyContext(quote).withReason(reason)));
 		return recommendation;
 	}
 
@@ -746,19 +753,30 @@ public class Property {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED",
 				money(proposed.getAnnualPremium()), money(budget)));
 			Variant alternative = variantByCode(quote, recommendation.getAlternativeVariantCode());
-			String alternativeReason = reasonFor(quote, "BUDGET_ALTERNATIVE", null, alternative != null);
-			if (alternative == null) {
-				reasons.add(new ApkAnalysis.Reason(alternativeReason, money(budget)));
-			} else {
-				List<String> gaps = new ArrayList<>();
+			List<String> gaps = new ArrayList<>();
+			if (alternative != null) {
 				for (String cover : ApkAnalysis.score(quote.getNeeds(),
 						alternative.getCovers()::contains).getMissing()) {
 					gaps.add(nameOf(product, COLLECTION_COVERS, cover));
 				}
+			}
+			// ⛔ ZDANIE WYBIERA TABELA, wraz z tym, ILE LUK znaczy „żadnych". Do 8 września 2026
+			// przypadek bez luk wstawiał w placeholder polski tekst wpisany w tę metodę — jedyne
+			// zdanie dla klienta rodzące się w Javie. Teraz liczba luk jest wejściem tabeli,
+			// a zero ma własny kod zdania, więc i tekst, i próg są konfiguracją.
+			String alternativeReason = reasonFor(quote, "BUDGET_ALTERNATIVE",
+				BigDecimal.valueOf(gaps.size()), alternative != null);
+			if (alternative == null) {
+				reasons.add(new ApkAnalysis.Reason(alternativeReason, money(budget)));
+			} else if (gaps.isEmpty()) {
+				reasons.add(new ApkAnalysis.Reason(alternativeReason,
+					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
+					money(alternative.getAnnualPremium())));
+			} else {
 				reasons.add(new ApkAnalysis.Reason(alternativeReason,
 					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
 					money(alternative.getAnnualPremium()),
-					gaps.isEmpty() ? "nic — pokrywa te same potrzeby" : String.join(", ", gaps)));
+					String.join(", ", gaps)));
 			}
 		} else {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_ABSENT"));
@@ -811,10 +829,14 @@ public class Property {
 		if (floodReason != null && !floodReason.isEmpty()) {
 			reasons.add(new ApkAnalysis.Reason(floodReason, money(flood.getBigDecimal("minDeductible"))));
 		}
-		String waiting = flood.getString("waitingReason");
+		// ⛔ KARENCJĘ NAZYWA TA SAMA TABELA, KTÓRA ZNA LICZBĘ DNI. Do 8 września 2026 kod zdania
+		// jechał z tabeli pokrycia, a liczba dni z tabeli karencji — więc gdy ciągłość ochrony
+		// zniosła karencję, padało zdanie „zaczyna działać po 0 dniach". Zniesiona karencja to
+		// inne zdanie, a nie to samo z zerem, i wie o tym reguła, nie ten kod.
+		ParamValue waitingRow = engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote));
+		String waiting = waitingRow.getString("reasonCode");
 		if (waiting != null && !waiting.isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason(waiting,
-				engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
+			reasons.add(new ApkAnalysis.Reason(waiting, waitingRow.getInteger("days")));
 		}
 
 		// ⛔ Bez podstawy prawnej. Uzasadnienie kończyło się zdaniem „Analizę przeprowadziliśmy
@@ -840,8 +862,7 @@ public class Property {
 		Offer offer = quote.getOffer();
 		// ⛔ ROZSTRZYGA REGUŁA. Wystawiony dokument ma numer i datę — zmiana odpowiedzi nie ma
 		// prawa przestawić mu okresu ani numeru. Czy tak jest, mówi konfiguracja, nie ten `if`.
-		boolean frozen = Boolean.TRUE.equals(engine.get(PARAM_RECALCULATION,
-			new PropertyContext(quote)).getBoolean("freezeIssuedOffer"));
+		boolean frozen = productFlag(quote, ATTR_FREEZE_ISSUED_OFFER);
 		if (offer.isIssued() && frozen) {
 			return;
 		}
@@ -878,8 +899,8 @@ public class Property {
 		// ⛔ ROZSTRZYGA REGUŁA, nie Java. Do 7 września 2026 stało tu porównanie pozycji obu
 		// wariantów — czyli zdanie „klient wybrał szerzej niż rekomendowaliśmy", które trafia do
 		// dokumentu oferty (rek. 9.3), rodziło się w kodzie aplikacji.
-		String kind = asString(engine.call(FUNCTION_CHOICE_KIND,
-			new PropertyContext(quote).withChoiceVariants(recommended, chosen)));
+		String kind = engine.get(PARAM_CHOICE_KIND,
+			new PropertyContext(quote).withChoiceVariants(recommended, chosen)).getString("kind");
 		if (kind == null) {
 			offer.setChoiceKind(null);
 			return;
@@ -1077,6 +1098,19 @@ public class Property {
 	 */
 	private String attrString(DomainObject definition, String code, PropertyContext ctx) {
 		return definition.getAttribute(code) == null ? null : definition.getAttrString(code, ctx);
+	}
+
+	/**
+	 * Przełącznik wpisany wprost w atrybut produktu (D-23).
+	 *
+	 * ⛔ To NIE jest powrót logiki do Javy. Wartość dalej rozstrzyga konfiguracja — tyle że stoi
+	 * na elemencie, którego dotyczy, zamiast w tabeli o jednym wierszu i jednym wejściu, które
+	 * nigdy się nie zmieniało. Tabela zostaje wtedy, gdy ma drugi wymiar.
+	 */
+	private boolean productFlag(PropertyQuote quote, String code) {
+		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		return product != null
+			&& Boolean.parseBoolean(attrString(product, code, new PropertyContext(quote)));
 	}
 
 	private int intOrZero(Integer value) {

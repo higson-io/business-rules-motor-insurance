@@ -40,15 +40,6 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 	return {
 		startDate: '2026-08-21',
 		deductible: 0,
-		regime: {
-			code: 'STATUTORY',
-			name: 'APK — minimum ustawowe',
-			legalBasis: 'art. 8 ustawy o dystrybucji ubezpieczeń',
-			requiresBudget: false,
-			requiresExclusionCheck: false,
-			requiresJustification: false,
-			requiresVariantDifferences: false,
-		},
 		questions,
 		floodZone: 'Z0',
 		theftZone: 'T1',
@@ -106,6 +97,7 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 		selectedVariant: null,
 		blocked: false,
 		blockMessage: null,
+		blockedBy: null,
 	};
 }
 

@@ -1,5 +1,6 @@
 #matrix for parameter demo.property.flood.waitingPeriod
-priorCover;days
-*;30
-false;30
-true;0
+zone;priorCover;days;reasonCode
+*;false;30;FLOOD_WAITING
+*;true;0;FLOOD_WAITING_NONE
+ZX;false;0;
+ZX;true;0;

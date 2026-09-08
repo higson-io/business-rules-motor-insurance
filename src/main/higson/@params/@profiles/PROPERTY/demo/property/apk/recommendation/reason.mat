@@ -3,12 +3,14 @@ reason;text;position
 *;;999
 BUDGET_ABSENT;Nie podałeś oczekiwanej składki, więc proponujemy wariant najpełniej odpowiadający potrzebom.;30
 BUDGET_ALTERNATIVE;W oczekiwanej składce mieści się wariant {0} za {1} zł rocznie. Pokazujemy go jako alternatywę i mówimy, czego w nim brakuje: {2}.;32
+BUDGET_ALTERNATIVE_EQUAL;W oczekiwanej składce mieści się wariant {0} za {1} zł rocznie i pokrywa dokładnie te same potrzeby, co proponowany. Pokazujemy go jako tańszą alternatywę.;32
 BUDGET_EXCEEDED;Wariant najpełniej odpowiadający Twoim potrzebom kosztuje {0} zł rocznie, czyli powyżej oczekiwanej przez Ciebie składki {1} zł. Nie obniżamy z tego powodu zakresu — oczekiwana składka jest Twoim wymaganiem, a nie filtrem propozycji.;30
 BUDGET_FIT;Roczna składka {0} zł mieści się w oczekiwanej przez Ciebie składce {1} zł.;30
 BUDGET_NO_ALTERNATIVE;W oczekiwanej składce {0} zł nie mieści się żaden z dostępnych wariantów. Pokazujemy pełne zestawienie, żebyś mógł wybrać świadomie.;32
 FLOOD_DEDUCTIBLE;Ochrona od powodzi w Twojej lokalizacji wymaga franszyzy redukcyjnej {0} zł.;40
 FLOOD_UNAVAILABLE;W Twojej lokalizacji ochrona od powodzi nie jest dostępna — miejsce leży w strefie o najwyższym zagrożeniu.;40
 FLOOD_WAITING;Ochrona od powodzi zaczyna działać po {0} dniach od zawarcia umowy.;45
+FLOOD_WAITING_NONE;Ochrona od powodzi działa od pierwszego dnia — kontynuujesz ochronę, którą miałeś w poprzedniej polisie, więc nie stosujemy karencji.;45
 NEEDS_MATCHED;Wariant {0} obejmuje wszystkie {1} potrzeby, które wynikają z Twoich odpowiedzi.;10
 NEEDS_PARTIAL;Wariant {0} obejmuje {1} z {2} potrzeb wynikających z Twoich odpowiedzi. Poza zakresem zostaje: {3}.;10
 SUM_COMPUTED;Sumę ubezpieczenia murów wyliczyliśmy jako {0} m² × {1} zł/m² dla Twojej lokalizacji i standardu wykończenia.;20

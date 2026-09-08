@@ -12,7 +12,6 @@ import pl.decerto.higson.demo.apk.api.RecommendationDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyOfferDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyPolicyholderDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyQuoteDto;
-import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
@@ -32,7 +31,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setStartDate(quote.getPolicy().getStartDate());
 		dto.setDeductible(quote.getPolicy().getDeductible());
 
-		dto.setRegime(convertRegime(quote));
 		dto.setQuestions(convertQuestions(quote));
 
 		dto.setFloodZone(quote.getZone().getFlood());
@@ -54,6 +52,7 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setSelectedVariant(quote.getSelectedVariant());
 		dto.setBlocked(quote.isBlocked());
 		dto.setBlockMessage(quote.getBlockMessage());
+		dto.setBlockedBy(quote.getBlockedBy());
 
 		return dto;
 	}
@@ -96,17 +95,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		return dto;
 	}
 
-	private PropertyRegimeDto convertRegime(PropertyQuote quote) {
-		PropertyRegimeDto dto = new PropertyRegimeDto();
-		dto.setCode(quote.getRegime().getCode());
-		dto.setName(quote.getRegime().getName());
-		dto.setLegalBasis(quote.getRegime().getLegalBasis());
-		dto.setRequiresBudget(quote.getRegime().isRequiresBudget());
-		dto.setRequiresExclusionCheck(quote.getRegime().isRequiresExclusionCheck());
-		dto.setRequiresJustification(quote.getRegime().isRequiresJustification());
-		dto.setRequiresVariantDifferences(quote.getRegime().isRequiresVariantDifferences());
-		return dto;
-	}
 
 	private List<PropertyQuestionDto> convertQuestions(PropertyQuote quote) {
 		List<PropertyQuestionDto> result = new ArrayList<>();

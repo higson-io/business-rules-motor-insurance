@@ -79,6 +79,7 @@ public class PropertyQuote {
 	 * cofnąć jedną odpowiedź i pokazać, że ekran wraca do życia.
 	 */
 	private boolean blocked;
+	private String blockedBy;
 	private String blockMessage;
 
 
@@ -200,6 +201,14 @@ public class PropertyQuote {
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+
+	public String getBlockedBy() {
+		return blockedBy;
+	}
+
+	public void setBlockedBy(String blockedBy) {
+		this.blockedBy = blockedBy;
 	}
 
 	public String getBlockMessage() {

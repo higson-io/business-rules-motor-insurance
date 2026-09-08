@@ -111,6 +111,12 @@
 					</div>
 				</div>
 
+				@if (blocked()) {
+					<p class="apk__blocked" role="status" data-testid="property-blocked">
+						{{ blockMessage() }}
+					</p>
+				}
+
 				<nav class="apk__nav">
 					<button
 						type="button"

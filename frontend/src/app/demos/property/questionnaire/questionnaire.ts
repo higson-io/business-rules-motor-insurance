@@ -123,6 +123,16 @@ export class Questionnaire {
 	private readonly cursor = linkedSignal<readonly PropertyQuestionDto[], number>({
 		source: this.reached,
 		computation: (reached, previous) => {
+			// ⛔ Po odpowiedzi blokującej ankieta ZOSTAJE przy niej. Inaczej łańcuch odsłaniał
+			// kolejne pytanie, kursor tam skakał i komunikat „nie prowadzimy dalej tej analizy"
+			// wypisywał się pod pytaniem, na które klient miał właśnie odpowiedzieć.
+			const blocker = this.loaded()?.blockedBy;
+			if (blocker) {
+				const stopped = reached.findIndex((question) => question.code === blocker);
+				if (stopped >= 0) {
+					return stopped;
+				}
+			}
 			const pending = reached.findIndex((question) => !this.settled(question));
 			const fallback = pending >= 0 ? pending : Math.max(reached.length - 1, 0);
 			const kept = previous?.value;
@@ -177,9 +187,25 @@ export class Questionnaire {
 	 * chcę podać"), która domykała pytanie bez odpowiadania; po jej usunięciu bez tej gałęzi
 	 * oczekiwana składka byłaby ślepym zaułkiem.
 	 */
+	/**
+	 * Odpowiedź, po której nie ma czego dalej analizować — mówi ją tabela
+	 * `demo.property.apk.question.blocker`, a nie ten komponent.
+	 *
+	 * ⛔ ZATRZYMUJE ANKIETĘ, a nie tylko wypisuje zdanie. Do 8 września 2026 komunikat pojawiał
+	 * się pod ankietą, a „Dalej" działało jak zwykle — czyli klient, któremu przed chwilą
+	 * powiedzieliśmy, że nie mamy czego mu zaproponować, szedł dalej wypełniać ankietę.
+	 *
+	 * ⛔ Pasek kroków zostaje klikalny. Blokada dotyczy ŚCIEŻKI KLIENTA, nie prowadzącego —
+	 * demo musi dać się cofnąć, zmienić odpowiedź i pokazać, że wszystko wraca.
+	 */
+	readonly blocked = computed(() => this.loaded()?.blocked ?? false);
+
+	readonly blockMessage = computed(() => this.loaded()?.blockMessage ?? null);
+
 	readonly canAdvance = computed(() => {
 		const question = this.current();
-		return question !== null && (this.settled(question) || !question.required);
+		return question !== null && !this.blocked()
+			&& (this.settled(question) || !question.required);
 	});
 
 	/**

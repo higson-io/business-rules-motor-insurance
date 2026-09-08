@@ -37,12 +37,6 @@
 					się o końcu ankiety zdarzeniem.
 				-->
 				<app-property-questionnaire group="NEEDS" (completed)="goTo('subject')" />
-
-				@if (blocked()) {
-					<p class="property__blocked" role="status" data-testid="property-blocked">
-						{{ blockMessage() }}
-					</p>
-				}
 			}
 
 			@case ('subject') {

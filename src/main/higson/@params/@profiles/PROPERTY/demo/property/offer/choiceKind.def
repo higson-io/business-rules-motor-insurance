@@ -1,0 +1,29 @@
+code = "demo.property.offer.choiceKind"
+description = "Rek. 9.3 - w ofercie ma stac, czy klient poszedl za rekomendacja, czy od niej odszedl i w ktora strone. Wejsciem jest ROZNICA pozycji w drabince pakietow, ktora liczy util demo.property.util.choiceDelta; tabela nadaje jej nazwe. Do 8 wrzesnia 2026 calosc byla funkcja Groovy z dwoma sprawdzeniami null i porownaniem - teraz null nie pasuje do zadnego wiersza i tabela zwraca null, bo nie ma jeszcze czego oceniac."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Czy klient poszedl za rekomendacja"
+
+[[inputLevel]]
+code = "delta"
+label = "o ile szerszy wybor niz rekomendacja"
+type = "number"
+matcher = "between/ii"
+reverseMatcher = false
+levelCreator = "$f demo.property.util.choiceDelta"
+source = "$f demo.property.util.choiceDelta"
+union = false
+
+[[outputLevel]]
+code = "kind"
+label = "nazwa zgodnosci wyboru"
+type = "string"
+external = false
+array = false
