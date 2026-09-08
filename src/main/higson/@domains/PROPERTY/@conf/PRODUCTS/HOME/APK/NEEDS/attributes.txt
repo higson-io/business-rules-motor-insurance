@@ -1,10 +1,4 @@
 [[attr]]
-attributeCode = "ALTERNATIVE_PACKAGE"
-attributeName = "Pakiet alternatywny w budzecie"
-refType = "FUNCTION"
-refName = "demo.property.apk.alternative"
-
-[[attr]]
 attributeCode = "ANSWER_MAP"
 attributeName = "Czego wymaga odpowiedz"
 refType = "PARAMETER"
@@ -15,12 +9,6 @@ attributeCode = "BLOCKER"
 attributeName = "Kiedy odpowiedz przerywa sciezke"
 refType = "PARAMETER"
 refName = "demo.property.apk.question.blocker"
-
-[[attr]]
-attributeCode = "BUDGET_OUTCOME"
-attributeName = "Czy propozycja miesci sie w oczekiwanej skladce"
-refType = "FUNCTION"
-refName = "demo.property.apk.budgetOutcome"
 
 [[attr]]
 attributeCode = "JUSTIFICATION"
@@ -47,10 +35,10 @@ refType = "PARAMETER"
 refName = "demo.property.apk.reason"
 
 [[attr]]
-attributeCode = "RECOMMENDED_PACKAGE"
-attributeName = "Ktory pakiet zaspokaja te potrzeby"
-refType = "FUNCTION"
-refName = "demo.property.apk.indicated"
+attributeCode = "RECOMMENDATION"
+attributeName = "Dobor pakietu - diagram"
+refType = "FLOW"
+refName = "demo.property.apk.recommend"
 
 [[attr]]
 attributeCode = "REVEAL"

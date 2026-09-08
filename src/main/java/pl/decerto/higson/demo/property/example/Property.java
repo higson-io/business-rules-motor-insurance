@@ -80,6 +80,7 @@ public class Property {
 	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
 	private static final String FUNCTION_SUMS = "demo.property.sum.suggest";
 	private static final String FLOW_RISK = "demo.property.risk.calculate";
+	private static final String FLOW_RECOMMEND = "demo.property.apk.recommend";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
 	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
@@ -98,7 +99,6 @@ public class Property {
 
 	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
 
-	private static final String OUTCOME_ABSENT = "BUDGET_ABSENT";
 	private static final String OUTCOME_FIT = "BUDGET_FIT";
 	private static final String OUTCOME_EXCEEDED = "BUDGET_EXCEEDED";
 
@@ -107,7 +107,6 @@ public class Property {
 	private static final String PARAM_RECALCULATION = "demo.property.quote.recalculation";
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
-	private static final String PATH_APK_INDICATED = "quote.apk.indicated";
 	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
 	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
 	private static final String PATH_VALUE_RATIO = "quote.sums.valueRatio";
@@ -651,25 +650,22 @@ public class Property {
 			}
 		}
 
-		DomainObject apk = apkElement();
-		Variant proposed = variantByCode(quote, attrString(apk, "RECOMMENDED_PACKAGE", ctx));
+		// ⛔ CAŁY DOBÓR PAKIETU TO JEDEN DIAGRAM — `demo.property.apk.recommend`. Java pyta o niego
+		// raz i dostaje trzy odpowiedzi. Rozgałęzienie na diagramie JEST treścią rek. 8.2.d:
+		// pakiet wynika z potrzeb, oczekiwana składka tylko go nazywa, a alternatywy szukamy
+		// wyłącznie wtedy, gdy propozycja jej nie mieści — obok niej, nigdy zamiast.
+		Map<String, Object> decision = engine.flow(FLOW_RECOMMEND, ctx).getResult();
+
+		Variant proposed = variantByCode(quote, asString(decision.get("indicated")));
 		if (proposed == null) {
 			return recommendation;
 		}
-		ctx.withComputed(PATH_APK_INDICATED, proposed.getCode());
+		recommendation.setBudgetOutcome(asString(decision.get("budgetOutcome")));
 
-		// ⛔ OCZEKIWANA SKŁADKA NIE OBNIŻA ZAKRESU — i to jest teraz zapisane w regule, a nie
-		// w komentarzu nad linijką kodu. `apk.budgetOutcome` NAZYWA, czy propozycja mieści się
-		// w oczekiwaniu klienta; nie ma prawa jej podmienić. Tańszy pakiet jedzie obok jako
-		// alternatywa, razem z listą tego, czego w nim brakuje.
-		String outcome = attrString(apk, "BUDGET_OUTCOME", ctx);
-		recommendation.setBudgetOutcome(outcome);
-		if (OUTCOME_EXCEEDED.equals(outcome)) {
-			Variant alternative = variantByCode(quote, attrString(apk, "ALTERNATIVE_PACKAGE", ctx));
-			if (alternative != null) {
-				recommendation.setAlternativeVariantCode(alternative.getCode());
-				recommendation.setAlternativePremium(alternative.getAnnualPremium());
-			}
+		Variant alternative = variantByCode(quote, asString(decision.get("alternative")));
+		if (alternative != null) {
+			recommendation.setAlternativeVariantCode(alternative.getCode());
+			recommendation.setAlternativePremium(alternative.getAnnualPremium());
 		}
 
 		ApkAnalysis.Score score = ApkAnalysis.score(needs, proposed.getCovers()::contains);

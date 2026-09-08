@@ -87,9 +87,8 @@
             <profile>PROPERTY</profile>
             <code>NEEDS_ANALYSIS</code>
             <name>Analiza potrzeb klienta</name>
-            <description>Analiza potrzeb jako jeden obiekt: pytania wisza pod nim w kolekcji QUESTIONS, a atrybuty to zasady, wedlug ktorych z odpowiedzi powstaje rekomendacja. Czytaja sie jak przebieg rozmowy: co pytamy, kiedy pytanie sie odslania, kiedy odpowiedz przerywa sciezke, czego odpowiedz wymaga, ktory PAKIET to zaspokaja, czy miesci sie w oczekiwanej skladce, jaki pakiet jedzie obok jako alternatywa i jakimi zdaniami sie to uzasadnia.</description>
+            <description>Analiza potrzeb jako jeden obiekt: pytania wisza pod nim w kolekcji QUESTIONS, a atrybuty to zasady, wedlug ktorych z odpowiedzi powstaje rekomendacja. Czytaja sie jak przebieg rozmowy: co pytamy, kiedy pytanie sie odslania, kiedy odpowiedz przerywa sciezke, czego odpowiedz wymaga - a RECOMMENDATION to caly dobor pakietu jako diagram, razem z rozgalezieniem na przekroczona skladke.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>QUESTIONS</code>
@@ -148,30 +147,12 @@
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>RECOMMENDED_PACKAGE</code>
-                    <name>Ktory pakiet zaspokaja te potrzeby</name>
+                    <code>RECOMMENDATION</code>
+                    <name>Dobor pakietu - diagram</name>
                     <order>1</order>
                     <groupOrder>3</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.apk.indicated</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>BUDGET_OUTCOME</code>
-                    <name>Czy propozycja miesci sie w oczekiwanej skladce</name>
-                    <order>2</order>
-                    <groupOrder>3</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.apk.budgetOutcome</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>ALTERNATIVE_PACKAGE</code>
-                    <name>Pakiet alternatywny w budzecie</name>
-                    <order>3</order>
-                    <groupOrder>3</groupOrder>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.apk.alternative</defaultRefName>
+                    <defaultRefType>FLOW</defaultRefType>
+                    <defaultRefName>demo.property.apk.recommend</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
