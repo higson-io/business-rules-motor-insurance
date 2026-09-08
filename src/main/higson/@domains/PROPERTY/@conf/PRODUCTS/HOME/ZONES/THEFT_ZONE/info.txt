@@ -1,3 +1,0 @@
-name = "Strefa kradzieżowa"
-description = "Czynnik ceny — mnoży go PRICING[RISK_FACTOR]."
-tags = []

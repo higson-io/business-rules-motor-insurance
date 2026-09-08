@@ -1,4 +1,10 @@
 [[attr]]
+attributeCode = "IS_AVAILABLE"
+attributeName = "Czy dostepne w tej lokalizacji"
+refType = "PARAMETER"
+refName = "demo.property.cover.availability [available]"
+
+[[attr]]
 attributeCode = "LIMIT"
 attributeName = "Limit odpowiedzialnosci"
 refType = "FUNCTION"

@@ -1,0 +1,47 @@
+code = "demo.property.apk.reason"
+description = "Wyzwalacze zdan uzasadnienia, ktore nie naleza do zadnej innej tabeli. COVERAGE: jaka czesc potrzeb pokrywa propozycja. MANUAL_SUM: stosunek sumy podanej recznie do wyliczonej - pasmo 0.99-1.01 jest CELOWE, roznica ponizej procenta nie jest warta zdania w dokumencie. BUDGET_ALTERNATIVE: czy w oczekiwanej skladce cokolwiek sie miesci. Do 7 wrzesnia 2026 wszystkie trzy byly warunkami w Javie, wiec proga tolerancji nie dalo sie zmienic bez wdrozenia."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Ktore zdanie uzasadnienia pada"
+
+[[inputLevel]]
+code = "family"
+label = "czego dotyczy"
+type = "string"
+reverseMatcher = false
+property = "reason.family"
+source = "reason.family"
+union = false
+
+[[inputLevel]]
+code = "ratio"
+label = "stosunek"
+type = "number"
+matcher = "between/ii"
+reverseMatcher = false
+property = "reason.ratio"
+source = "reason.ratio"
+union = false
+
+[[inputLevel]]
+code = "flag"
+label = "warunek logiczny"
+type = "boolean"
+reverseMatcher = false
+property = "reason.flag"
+source = "reason.flag"
+union = false
+
+[[outputLevel]]
+code = "reasonCode"
+label = "kod zdania w uzasadnieniu"
+type = "string"
+external = false
+array = false

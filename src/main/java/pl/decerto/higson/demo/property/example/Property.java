@@ -87,7 +87,9 @@ public class Property {
 	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
 	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
-	private static final String PARAM_FLOOD_AVAILABILITY = "demo.property.flood.availability";
+	private static final String PARAM_COVER_AVAILABILITY = "demo.property.cover.availability";
+	private static final String PARAM_REASON = "demo.property.apk.reason";
+	private static final String COVER_FLOOD = "FLOOD";
 	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
 	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
 	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
@@ -99,8 +101,6 @@ public class Property {
 	private static final String OUTCOME_ABSENT = "BUDGET_ABSENT";
 	private static final String OUTCOME_FIT = "BUDGET_FIT";
 	private static final String OUTCOME_EXCEEDED = "BUDGET_EXCEEDED";
-	private static final String REASON_ALTERNATIVE = "BUDGET_ALTERNATIVE";
-	private static final String REASON_NO_ALTERNATIVE = "BUDGET_NO_ALTERNATIVE";
 
 	private static final String PARAM_REVEAL = "demo.property.apk.question.reveal";
 	private static final String PARAM_VISIBILITY = "demo.property.apk.question.visibility";
@@ -678,17 +678,19 @@ public class Property {
 		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
 		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
 
-		if (score.getMissing().isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason("NEEDS_MATCHED",
-				nameOf(product, COLLECTION_VARIANTS, proposed.getCode()), score.getCovered()));
-		} else {
-			List<String> names = new ArrayList<>();
-			for (String cover : score.getMissing()) {
-				names.add(nameOf(product, COLLECTION_COVERS, cover));
-			}
-			reasons.add(new ApkAnalysis.Reason("NEEDS_PARTIAL",
+		// ⛔ KTÓRE ZDANIE PADA, ROZSTRZYGA TABELA. Java liczy stosunek pokrytych potrzeb do
+		// wszystkich — to arytmetyka — i pyta `demo.property.apk.reason`, co z niego wynika.
+		// Do 8 września 2026 stał tu `if (missing.isEmpty())`, więc próg „pokrywa wszystko"
+		// nie dał się poluzować bez wdrożenia.
+		List<String> missingNames = new ArrayList<>();
+		for (String cover : score.getMissing()) {
+			missingNames.add(nameOf(product, COLLECTION_COVERS, cover));
+		}
+		String coverage = reasonFor(quote, "COVERAGE", ratio(score.getCovered(), score.getTotal()), null);
+		if (coverage != null) {
+			reasons.add(new ApkAnalysis.Reason(coverage,
 				nameOf(product, COLLECTION_VARIANTS, proposed.getCode()),
-				score.getCovered(), score.getTotal(), String.join(", ", names)));
+				score.getCovered(), score.getTotal(), String.join(", ", missingNames)));
 		}
 
 		PropertyContext ctx = new PropertyContext(quote);
@@ -696,12 +698,13 @@ public class Property {
 			engine.get(PARAM_RATE_PER_SQM, new PropertyContext(quote)).getBigDecimal("rate")));
 
 		// Suma podniesiona albo obniżona ręcznie — klient ma wiedzieć, że odszedł od wyliczenia.
+		// ⚠️ Tabela ma pasmo tolerancji 0,99–1,01: różnica poniżej procenta nie jest warta zdania
+		// w dokumencie. Warunek w Javie mówił „jakakolwiek różnica" i nie dało się tego zmienić.
 		BigDecimal chosen = decimalAt(quote, PATH_SUM_BUILDING);
 		BigDecimal suggested = decimalAt(quote, PATH_SUM_SUGGESTED);
-		if (chosen != null && suggested != null && chosen.compareTo(suggested) > 0) {
-			reasons.add(new ApkAnalysis.Reason("SUM_RAISED"));
-		} else if (chosen != null && suggested != null && chosen.compareTo(suggested) < 0) {
-			reasons.add(new ApkAnalysis.Reason("SUM_LOWERED"));
+		String manualSum = reasonFor(quote, "MANUAL_SUM", ratio(chosen, suggested), null);
+		if (manualSum != null) {
+			reasons.add(new ApkAnalysis.Reason(manualSum));
 		}
 
 		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
@@ -714,15 +717,16 @@ public class Property {
 			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED",
 				money(proposed.getAnnualPremium()), money(budget)));
 			Variant alternative = variantByCode(quote, recommendation.getAlternativeVariantCode());
+			String alternativeReason = reasonFor(quote, "BUDGET_ALTERNATIVE", null, alternative != null);
 			if (alternative == null) {
-				reasons.add(new ApkAnalysis.Reason(REASON_NO_ALTERNATIVE, money(budget)));
+				reasons.add(new ApkAnalysis.Reason(alternativeReason, money(budget)));
 			} else {
 				List<String> gaps = new ArrayList<>();
 				for (String cover : ApkAnalysis.score(quote.getNeeds(),
 						alternative.getCovers()::contains).getMissing()) {
 					gaps.add(nameOf(product, COLLECTION_COVERS, cover));
 				}
-				reasons.add(new ApkAnalysis.Reason(REASON_ALTERNATIVE,
+				reasons.add(new ApkAnalysis.Reason(alternativeReason,
 					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
 					money(alternative.getAnnualPremium()),
 					gaps.isEmpty() ? "nic — pokrywa te same potrzeby" : String.join(", ", gaps)));
@@ -736,20 +740,32 @@ public class Property {
 		BigDecimal declared = decimalAt(quote, PATH_PROPERTY_VALUE);
 		BigDecimal computed = decimalAt(quote, PATH_SUM_SUGGESTED);
 		if (declared != null && declared.signum() > 0 && computed != null && computed.signum() > 0) {
-			String gap = engine.get(PARAM_VALUE_GAP, new PropertyContext(quote)
+			// ⛔ KOD ZDANIA CZYTAMY, a nie sklejamy. Do 8 września 2026 stało tu `"VALUE_" + gap`,
+			// co wiązało dwa niezależne słowniki konkatenacją: zmiana słowa w kolumnie `outcome`
+			// dawała kod bez wiersza w tabeli zdań, czyli puste zdanie i żadnego błędu.
+			String valueGap = engine.get(PARAM_VALUE_GAP, new PropertyContext(quote)
 				.withComputed(PATH_VALUE_RATIO, declared.divide(computed, 4, RoundingMode.HALF_UP)))
-				.getString("outcome");
-			reasons.add(new ApkAnalysis.Reason("VALUE_" + gap, money(declared), money(computed)));
+				.getString("reasonCode");
+			if (valueGap != null && !valueGap.isEmpty()) {
+				reasons.add(new ApkAnalysis.Reason(valueGap, money(declared), money(computed)));
+			}
 		}
 
-		ParamValue flood = engine.get(PARAM_FLOOD_AVAILABILITY, new PropertyContext(quote));
-		if (!Boolean.TRUE.equals(flood.getBoolean("available"))) {
-			reasons.add(new ApkAnalysis.Reason("FLOOD_UNAVAILABLE"));
-		} else if (Boolean.TRUE.equals(flood.getBoolean("requiresDeductible"))) {
-			reasons.add(new ApkAnalysis.Reason("FLOOD_DEDUCTIBLE", money(flood.getBigDecimal("minDeductible"))));
+		// ⛔ TABELA DOSTĘPNOŚCI NAZYWA SWÓJ WŁASNY SKUTEK. Ta sama reguła, która mówi, czy pokrycie
+		// wolno sprzedać, mówi też, co powiedzieć klientowi, gdy nie wolno — kolumna `reasonCode`.
+		// Do 8 września 2026 wybierał to `if` w tej metodzie, a tabela niosła trzecią kopię tekstu
+		// w kolumnie, której nikt nie czytał.
+		ParamValue flood = engine.get(PARAM_COVER_AVAILABILITY,
+			new PropertyContext(quote).withCover(COVER_FLOOD));
+		String floodReason = flood.getString("reasonCode");
+		if (floodReason != null && !floodReason.isEmpty()) {
+			reasons.add(new ApkAnalysis.Reason(floodReason, money(flood.getBigDecimal("minDeductible"))));
 		}
-		reasons.add(new ApkAnalysis.Reason("FLOOD_WAITING",
-			engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
+		String waiting = flood.getString("waitingReasonCode");
+		if (waiting != null && !waiting.isEmpty()) {
+			reasons.add(new ApkAnalysis.Reason(waiting,
+				engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote)).getInteger("days")));
+		}
 
 		// ⛔ Bez podstawy prawnej. Uzasadnienie kończyło się zdaniem „Analizę przeprowadziliśmy
 		// zgodnie z: Rekomendacje 8 i 9 — uchwała KNF nr 190/2026" — powołaniem się na przepis
@@ -907,6 +923,31 @@ public class Property {
 	 * w polskim dokumencie dawało „2912.65 zł" z kropką — w zdaniu, które klient dostaje
 	 * na piśmie. Język jest cechą ekranu, więc i separator dziesiętny jest.
 	 */
+	/**
+	 * Kod zdania, które ma paść — pyta `demo.property.apk.reason`.
+	 *
+	 * ⛔ Java podaje FAKTY: czego dotyczy pytanie, jaki wyszedł stosunek i czy warunek logiczny
+	 * jest spełniony. Nie wie, jaki próg oddziela jedno zdanie od drugiego ani czy w ogóle jakieś
+	 * ma paść — pusta odpowiedź znaczy „milczymy" i jest równie dobrą odpowiedzią jak każda inna.
+	 */
+	private String reasonFor(PropertyQuote quote, String family, BigDecimal ratio, Boolean flag) {
+		String code = engine.get(PARAM_REASON,
+			new PropertyContext(quote).withReasonTrigger(family, ratio, flag)).getString("reasonCode");
+		return code == null || code.isEmpty() ? null : code;
+	}
+
+	/** Stosunek dwóch liczb, albo `null`, gdy pytanie nie ma sensu. Sama arytmetyka. */
+	private BigDecimal ratio(BigDecimal value, BigDecimal base) {
+		if (value == null || base == null || base.signum() == 0) {
+			return null;
+		}
+		return value.divide(base, 4, RoundingMode.HALF_UP);
+	}
+
+	private BigDecimal ratio(int value, int base) {
+		return base == 0 ? null : ratio(BigDecimal.valueOf(value), BigDecimal.valueOf(base));
+	}
+
 	private String money(BigDecimal value) {
 		if (value == null) {
 			return "—";

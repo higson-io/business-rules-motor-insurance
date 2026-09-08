@@ -1,3 +1,0 @@
-name = "Strefa powodziowa"
-description = "Przełącznik dostępności ochrony, nie czynnik ceny."
-tags = []

@@ -6,15 +6,24 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na cztery pytania, ktore zadaje sie o kazde pokrycie na polskim rynku majatkowym: ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kod i opis pokrycia to sam element, nie atrybuty. To, w ktorym pakiecie pokrycie sie znajduje, tez nie - sklad pakietu wisi pod pakietem.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. Atrybuty odpowiadaja na piec pytan zadawanych o kazde pokrycie: czy jest DOSTEPNE w tej lokalizacji, ile wynosi SUMA UBEZPIECZENIA, ile kosztuje SKLADKA, wedlug jakiej STAWKI jest liczona i jaki LIMIT odpowiedzialnosci ja ogranicza. Kod i opis to sam element, nie atrybuty. To, w ktorym pakiecie pokrycie sie znajduje, tez nie - sklad pakietu wisi pod pakietem.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
+                    <code>IS_AVAILABLE</code>
+                    <name>Czy dostepne w tej lokalizacji</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.cover.availability [available]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
                     <code>SUM</code>
                     <name>Suma ubezpieczenia</name>
-                    <order>1</order>
+                    <order>2</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.cover.sum</defaultRefName>
@@ -23,7 +32,7 @@
                     <attributeType>business</attributeType>
                     <code>PREMIUM</code>
                     <name>Skladka za to pokrycie</name>
-                    <order>2</order>
+                    <order>3</order>
                     <groupOrder>1</groupOrder>
                     <defaultRefType>FUNCTION</defaultRefType>
                     <defaultRefName>demo.property.cover.premium</defaultRefName>
@@ -113,7 +122,7 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu konfiguracji. Sa tu tylko rzeczy, od ktorych warto zaczac czytanie produktu: APK to analiza potrzeb, COVERS i VARIANTS to co sprzedajemy, SUMS, ZONES, PRICING i OFFER to reguly sumy, stref, wyceny i oferty. Czynnikow taryfowych tu NIE MA - sa czescia taryfy, nie punktem wyjscia, siedza w tabelach demo.property.factor.* i wola je PRICING. Pol przedmiotu ubezpieczenia tez nie: to formularz, opisuje go katalog demo.property.apk.question.</description>
+            <description>Punkt startu konfiguracji. Sa tu tylko rzeczy, od ktorych warto zaczac czytanie produktu: APK to analiza potrzeb, COVERS i VARIANTS to co sprzedajemy, SUMS, PRICING i OFFER to reguly sumy, wyceny i oferty. Czynnikow taryfowych i stref tu NIE MA - sa mechanika taryfy, nie punktem wyjscia. Dostepnosc pokrycia jest atrybutem POKRYCIA, a strefa tylko kluczem jego tabeli. Pol przedmiotu ubezpieczenia tez nie: to formularz, opisuje go katalog demo.property.apk.question.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -163,14 +172,6 @@
                     <visible>true</visible>
                     <order>0</order>
                     <collectionTypeCode>VARIANT</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>ZONES</code>
-                    <name>Strefy z kodu pocztowego</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
                 </typeCollection>
             </typeCollections>
             <typeAttributes>

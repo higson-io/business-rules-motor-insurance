@@ -37,6 +37,9 @@ public class PropertyContext extends HigsonContext {
 	private String variantCode;
 	private String reasonCode;
 	private String choiceKind;
+	private String reasonFamily;
+	private BigDecimal reasonRatio;
+	private Boolean reasonFlag;
 	private Boolean revealHasSource;
 	private Boolean revealSourceAnswered;
 	private Boolean revealSourceRefused;
@@ -67,6 +70,14 @@ public class PropertyContext extends HigsonContext {
 
 	public PropertyContext withVariant(String code) {
 		this.variantCode = code;
+		return this;
+	}
+
+	/** Fakty, z których reguła wyprowadza, które zdanie uzasadnienia ma paść. */
+	public PropertyContext withReasonTrigger(String family, BigDecimal ratio, Boolean flag) {
+		this.reasonFamily = family;
+		this.reasonRatio = ratio;
+		this.reasonFlag = flag;
 		return this;
 	}
 
@@ -130,6 +141,15 @@ public class PropertyContext extends HigsonContext {
 		}
 
 		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
+		if ("reason.family".equals(path)) {
+			return reasonFamily;
+		}
+		if ("reason.ratio".equals(path)) {
+			return reasonRatio;
+		}
+		if ("reason.flag".equals(path)) {
+			return reasonFlag;
+		}
 		if ("reveal.hasSource".equals(path)) {
 			return revealHasSource;
 		}

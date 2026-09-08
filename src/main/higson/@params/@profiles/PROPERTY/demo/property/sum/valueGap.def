@@ -1,5 +1,5 @@
 code = "demo.property.sum.valueGap"
-description = "Rek. 8.2.c - suma ubezpieczenia ma odpowiadac potrzebom klienta, wiec zderzamy jego wlasne oszacowanie wartosci nieruchomosci z suma wyliczona z metrazu i stawki. Prog jest TUTAJ, a nie w Javie - to on decyduje, od ktorego rozjazdu warto klienta ostrzec."
+description = "Stosunek wartosci, na ktora klient szacuje nieruchomosc, do sumy wyliczonej z metrazu i stawki. Tabela nazywa nie tylko wynik, ale i SKUTEK: reasonCode to gotowy kod zdania w uzasadnieniu. Do 7 wrzesnia 2026 Java skladala ten kod jako 'VALUE_' plus outcome, wiec zmiana slowa w tej kolumnie dawala puste zdanie i zadnego bledu. Kolumny severity, warning i remedy usuniete - nikt ich nie czytal, a ich tresc powtarzala zdania z apk.recommendation.reason."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,42 +9,28 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Client value estimate vs computed sum"
+label = "Oszacowanie klienta a suma z wyliczenia"
 
 [[inputLevel]]
 code = "ratio"
-label = "declared value to computed sum"
+label = "oszacowanie do sumy wyliczonej"
 type = "number"
 matcher = "between/ii"
 reverseMatcher = false
-property = "quote.sums.valueRatio"
-source = "quote.sums.valueRatio"
+property = "quote.value.ratio"
+source = "quote.value.ratio"
 union = false
 
 [[outputLevel]]
 code = "outcome"
-label = "outcome code"
+label = "wynik porownania"
 type = "string"
 external = false
 array = false
 
 [[outputLevel]]
-code = "severity"
-label = "severity"
-type = "integer"
-external = false
-array = false
-
-[[outputLevel]]
-code = "warning"
-label = "warning"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "remedy"
-label = "remedy"
+code = "reasonCode"
+label = "kod zdania w uzasadnieniu"
 type = "string"
 external = false
 array = false

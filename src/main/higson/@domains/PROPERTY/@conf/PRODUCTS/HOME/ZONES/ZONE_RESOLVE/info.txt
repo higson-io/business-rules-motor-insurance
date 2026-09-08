@@ -1,3 +1,0 @@
-name = "Strefy z kodu pocztowego"
-description = "Ustala obie strefy naraz. Woła FLOOD_ZONE i THEFT_ZONE."
-tags = []
