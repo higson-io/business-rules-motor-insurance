@@ -1,2 +1,0 @@
-name = "Suma składek pokryć"
-tags = []

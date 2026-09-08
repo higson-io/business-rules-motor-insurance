@@ -3,3 +3,33 @@ attributeCode = "APK_REGIME"
 attributeName = "Rezim analizy potrzeb"
 refType = "PARAMETER"
 refName = "demo.property.apk.regime [name]"
+
+[[attr]]
+attributeCode = "CHOICE_KIND"
+attributeName = "Czy wybor klienta zgadza sie z rekomendacja"
+refType = "FUNCTION"
+refName = "demo.property.offer.choiceKind"
+
+[[attr]]
+attributeCode = "CHOICE_NOTE"
+attributeName = "Tresc notatki o wyborze"
+refType = "PARAMETER"
+refName = "demo.property.offer.choice [text]"
+
+[[attr]]
+attributeCode = "OFFER_TERMS"
+attributeName = "Warunki oferty"
+refType = "PARAMETER"
+refName = "demo.property.offer.terms"
+
+[[attr]]
+attributeCode = "RECALCULATION"
+attributeName = "Co wolno przeliczyc ponownie"
+refType = "PARAMETER"
+refName = "demo.property.quote.recalculation [freezeIssuedOffer]"
+
+[[attr]]
+attributeCode = "SUM_INSURED"
+attributeName = "Suma ubezpieczenia z metrazu i stawki"
+refType = "FUNCTION"
+refName = "demo.property.sum.suggest"

@@ -88,9 +88,8 @@
             <profile>PROPERTY</profile>
             <code>NEEDS_ANALYSIS</code>
             <name>Analiza potrzeb klienta</name>
-            <description>Analiza potrzeb klienta jako jedna dziedzina konfiguracji: pytania, ktore zadajemy, i reguly, ktore z odpowiedzi robia potrzeby, rekomendacje i jej uzasadnienie. Trzymane razem dlatego, ze dotycza tej samej rzeczy - a NIE dlatego, ze wyswietlaja sie na tym samym ekranie. Kolejnosc i podzial ekranow nalezy do aplikacji i moze sie zmienic bez ruszania tego drzewa.</description>
+            <description>Analiza potrzeb jako jeden obiekt: pytania wisza pod nim w kolekcji QUESTIONS, a atrybuty to zasady, wedlug ktorych z odpowiedzi powstaje rekomendacja. Czytaja sie jak przebieg rozmowy: co pytamy, kiedy pytanie sie odslania, kiedy odpowiedz przerywa sciezke, czego odpowiedz wymaga, ktory PAKIET to zaspokaja, czy miesci sie w oczekiwanej skladce, jaki pakiet jedzie obok jako alternatywa i jakimi zdaniami sie to uzasadnia.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>QUESTIONS</code>
@@ -100,15 +99,108 @@
                     <order>0</order>
                     <collectionTypeCode>QUESTION</collectionTypeCode>
                 </typeCollection>
-                <typeCollection>
-                    <code>RULES</code>
-                    <name>Co rozstrzyga odpowiedzi</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
             </typeCollections>
+            <typeAttributes>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>QUESTION_CATALOGUE</code>
+                    <name>Katalog pytan</name>
+                    <order>1</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.question</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>REVEAL</code>
+                    <name>Kiedy pytanie sie odslania</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.question.reveal</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BLOCKER</code>
+                    <name>Kiedy odpowiedz przerywa sciezke</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.question.blocker</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>ANSWER_MAP</code>
+                    <name>Czego wymaga odpowiedz</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.answer</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>NEEDS</code>
+                    <name>Potrzeby wynikajace z odpowiedzi</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.apk.needs</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RECOMMENDED_PACKAGE</code>
+                    <name>Ktory pakiet zaspokaja te potrzeby</name>
+                    <order>1</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.apk.indicated</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>BUDGET_OUTCOME</code>
+                    <name>Czy propozycja miesci sie w oczekiwanej skladce</name>
+                    <order>2</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.apk.budgetOutcome</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>ALTERNATIVE_PACKAGE</code>
+                    <name>Pakiet alternatywny w budzecie</name>
+                    <order>3</order>
+                    <groupOrder>3</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.apk.alternative</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>JUSTIFICATION</code>
+                    <name>Zdania uzasadnienia</name>
+                    <order>1</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.recommendation.reason</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>REASON_TRIGGER</code>
+                    <name>Ktore zdanie pada</name>
+                    <order>2</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.reason</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>VALUE_GAP</code>
+                    <name>Oszacowanie klienta a suma z wyliczenia</name>
+                    <order>3</order>
+                    <groupOrder>4</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.sum.valueGap</defaultRefName>
+                </typeAttribute>
+            </typeAttributes>
         </domainType>
         <domainType>
             <profile>PROPERTY</profile>
@@ -122,7 +214,7 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Punkt startu konfiguracji. Sa tu tylko rzeczy, od ktorych warto zaczac czytanie produktu: APK to analiza potrzeb, COVERS i VARIANTS to co sprzedajemy, SUMS, PRICING i OFFER to reguly sumy, wyceny i oferty. Czynnikow taryfowych i stref tu NIE MA - sa mechanika taryfy, nie punktem wyjscia. Dostepnosc pokrycia jest atrybutem POKRYCIA, a strefa tylko kluczem jego tabeli. Pol przedmiotu ubezpieczenia tez nie: to formularz, opisuje go katalog demo.property.apk.question.</description>
+            <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, sposob liczenia sumy ubezpieczenia z metrazu, warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja. Mechanika taryfy - czynniki, strefy, stawki - siedzi w tabelach i nie jest punktem wyjscia.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -142,30 +234,6 @@
                     <collectionTypeCode>COVER</collectionTypeCode>
                 </typeCollection>
                 <typeCollection>
-                    <code>OFFER</code>
-                    <name>Oferta</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>PRICING</code>
-                    <name>Wycena skladki</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
-                    <code>SUMS</code>
-                    <name>Sumy ubezpieczenia</name>
-                    <multiple>true</multiple>
-                    <visible>true</visible>
-                    <order>0</order>
-                    <collectionTypeCode>RULE</collectionTypeCode>
-                </typeCollection>
-                <typeCollection>
                     <code>VARIANTS</code>
                     <name>Pakiety</name>
                     <multiple>true</multiple>
@@ -183,6 +251,51 @@
                     <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.apk.regime [name]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>SUM_INSURED</code>
+                    <name>Suma ubezpieczenia z metrazu i stawki</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.sum.suggest</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>OFFER_TERMS</code>
+                    <name>Warunki oferty</name>
+                    <order>1</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.offer.terms</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CHOICE_KIND</code>
+                    <name>Czy wybor klienta zgadza sie z rekomendacja</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.offer.choiceKind</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>CHOICE_NOTE</code>
+                    <name>Tresc notatki o wyborze</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.offer.choice [text]</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RECALCULATION</code>
+                    <name>Co wolno przeliczyc ponownie</name>
+                    <order>4</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.quote.recalculation [freezeIssuedOffer]</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>
@@ -341,8 +454,8 @@
         <domainType>
             <profile>PROPERTY</profile>
             <code>VARIANT</code>
-            <name>Wariant</name>
-            <description>Pakiet ochrony. Drabinka jest scisla - kazdy wariant zawiera wszystko, co poprzedni. Sklad pakietu wisi POD NIM w drzewie (kolekcja COVERS), zamiast byc para w tabeli dostepnosci: zeby zobaczyc, co jest w pakiecie, otwiera sie pakiet.</description>
+            <name>Pakiet</name>
+            <description>Zakres ochrony, ktory klient kupuje w calosci. Atrybuty to wszystko, o co aplikacja pyta pakiet: czy jest dostepny i dlaczego nie, jakie miejsce zajmuje w drabince, jaka niesie sume gwarancyjna OC, ile kosztuje za caly okres i w racie, jaki ma czynnik ryzyka i jak ta skladka rozklada sie na pokrycia. Sklad pakietu wisi pod nim w kolekcji COVERS.</description>
             <rootType>false</rootType>
             <typeNature>PRODUCT</typeNature>
             <typeCollections>
@@ -358,28 +471,10 @@
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>POSITION</code>
-                    <name>Miejsce w drabince</name>
-                    <order>1</order>
-                    <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.variant.position</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>LIABILITY_SUM</code>
-                    <name>Suma gwarancyjna OC</name>
-                    <order>2</order>
-                    <groupOrder>1</groupOrder>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.variant.liabilitySum</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
                     <code>IS_AVAILABLE</code>
-                    <name>Czy dostepny w tej strefie</name>
+                    <name>Czy dostepny w tej lokalizacji</name>
                     <order>1</order>
-                    <groupOrder>2</groupOrder>
+                    <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.variant.availability [available]</defaultRefName>
                 </typeAttribute>
@@ -388,18 +483,72 @@
                     <code>UNAVAILABLE_REASON</code>
                     <name>Powod niedostepnosci</name>
                     <order>2</order>
-                    <groupOrder>2</groupOrder>
+                    <groupOrder>1</groupOrder>
                     <defaultRefType>PARAMETER</defaultRefType>
                     <defaultRefName>demo.property.variant.availability [reason]</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
+                    <code>POSITION</code>
+                    <name>Miejsce w drabince</name>
+                    <order>3</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.position</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>LIABILITY_SUM</code>
+                    <name>Suma gwarancyjna OC</name>
+                    <order>4</order>
+                    <groupOrder>1</groupOrder>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.variant.liabilitySum</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
                     <code>PREMIUM</code>
-                    <name>Skladka - flow wyceny wariantu</name>
+                    <name>Skladka - flow wyceny pakietu</name>
                     <order>1</order>
-                    <groupOrder>3</groupOrder>
+                    <groupOrder>2</groupOrder>
                     <defaultRefType>FLOW</defaultRefType>
                     <defaultRefName>demo.property.calculateQuote</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>ANNUAL_PREMIUM</code>
+                    <name>Skladka za caly okres ochrony</name>
+                    <order>2</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.tariff.annualPremium</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>INSTALMENT</code>
+                    <name>Rata</name>
+                    <order>3</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.tariff.instalment</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>RISK_FACTOR</code>
+                    <name>Czynnik ryzyka tej wyceny</name>
+                    <order>4</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.risk.factor</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>COVER_PREMIUMS</code>
+                    <name>Rozbicie skladki na pokrycia</name>
+                    <order>5</order>
+                    <groupOrder>2</groupOrder>
+                    <defaultRefType>FUNCTION</defaultRefType>
+                    <defaultRefName>demo.property.tariff.coverPremiums</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>

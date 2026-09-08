@@ -1,3 +1,0 @@
-name = "Stawka odtworzeniowa zł/m²"
-description = "Zależy od lokalizacji i standardu wykończenia."
-tags = []

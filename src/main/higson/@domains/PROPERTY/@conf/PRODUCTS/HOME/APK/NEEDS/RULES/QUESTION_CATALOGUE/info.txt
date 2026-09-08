@@ -1,3 +1,0 @@
-name = "Katalog pytań"
-description = "Kolejność, wymagalność, opcje odpowiedzi, źródło prefill i pytanie, którego rozstrzygnięcie odsłania to pytanie."
-tags = []

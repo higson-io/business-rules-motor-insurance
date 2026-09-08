@@ -1,3 +1,0 @@
-name = "Wycena wariantu"
-description = "Flow spinający całość. Ten sam, który wisi na pakiecie jako VARIANT/PREMIUM. Woła po kolei RISK_FACTOR, COVER_PREMIUMS, SUM_PREMIUMS, ANNUAL_PREMIUM, INSTALMENT."
-tags = []

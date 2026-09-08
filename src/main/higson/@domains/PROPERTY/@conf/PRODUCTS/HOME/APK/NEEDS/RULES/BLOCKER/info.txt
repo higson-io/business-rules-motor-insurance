@@ -1,3 +1,0 @@
-name = "Kiedy odpowiedź przerywa ścieżkę"
-description = "Odpowiedź, po której nie sprzedajemy tego produktu — z komunikatem dla klienta i skierowaniem gdzie indziej."
-tags = []

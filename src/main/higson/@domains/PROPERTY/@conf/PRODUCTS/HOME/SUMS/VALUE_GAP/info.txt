@@ -1,3 +1,0 @@
-name = "Oszacowanie klienta a suma z wyliczenia"
-description = "Zgodne, zawyżone czy zaniżone — wynik jest zdaniem w uzasadnieniu (rek. 8.2.b)."
-tags = []

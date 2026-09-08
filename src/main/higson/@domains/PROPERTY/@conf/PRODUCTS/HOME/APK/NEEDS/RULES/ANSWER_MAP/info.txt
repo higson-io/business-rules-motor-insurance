@@ -1,3 +1,0 @@
-name = "Czego wymaga odpowiedź"
-description = "Odpowiedź wskazuje POTRZEBĘ i POKRYCIE, które ją zaspokaja. Nie wskazuje pakietu — który pakiet wystarczy, wynika ze składu pakietów w VARIANTS."
-tags = []

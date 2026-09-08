@@ -1,3 +1,0 @@
-name = "Czynnik ryzyka"
-description = "Iloczyn czynników z gałęzi FACTORS i czynnika strefy kradzieżowej."
-tags = []

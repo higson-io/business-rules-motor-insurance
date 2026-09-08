@@ -1,6 +1,24 @@
 [[attr]]
+attributeCode = "ANNUAL_PREMIUM"
+attributeName = "Skladka za caly okres ochrony"
+refType = "FUNCTION"
+refName = "demo.property.tariff.annualPremium"
+
+[[attr]]
+attributeCode = "COVER_PREMIUMS"
+attributeName = "Rozbicie skladki na pokrycia"
+refType = "FUNCTION"
+refName = "demo.property.tariff.coverPremiums"
+
+[[attr]]
+attributeCode = "INSTALMENT"
+attributeName = "Rata"
+refType = "FUNCTION"
+refName = "demo.property.tariff.instalment"
+
+[[attr]]
 attributeCode = "IS_AVAILABLE"
-attributeName = "Czy dostepny w tej strefie"
+attributeName = "Czy dostepny w tej lokalizacji"
 refType = "PARAMETER"
 refName = "demo.property.variant.availability [available]"
 
@@ -18,9 +36,15 @@ refName = "demo.property.variant.position"
 
 [[attr]]
 attributeCode = "PREMIUM"
-attributeName = "Skladka - flow wyceny wariantu"
+attributeName = "Skladka - flow wyceny pakietu"
 refType = "FLOW"
 refName = "demo.property.calculateQuote"
+
+[[attr]]
+attributeCode = "RISK_FACTOR"
+attributeName = "Czynnik ryzyka tej wyceny"
+refType = "FUNCTION"
+refName = "demo.property.risk.factor"
 
 [[attr]]
 attributeCode = "UNAVAILABLE_REASON"

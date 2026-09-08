@@ -1,0 +1,65 @@
+[[attr]]
+attributeCode = "ALTERNATIVE_PACKAGE"
+attributeName = "Pakiet alternatywny w budzecie"
+refType = "FUNCTION"
+refName = "demo.property.apk.alternative"
+
+[[attr]]
+attributeCode = "ANSWER_MAP"
+attributeName = "Czego wymaga odpowiedz"
+refType = "PARAMETER"
+refName = "demo.property.apk.answer"
+
+[[attr]]
+attributeCode = "BLOCKER"
+attributeName = "Kiedy odpowiedz przerywa sciezke"
+refType = "PARAMETER"
+refName = "demo.property.apk.question.blocker"
+
+[[attr]]
+attributeCode = "BUDGET_OUTCOME"
+attributeName = "Czy propozycja miesci sie w oczekiwanej skladce"
+refType = "FUNCTION"
+refName = "demo.property.apk.budgetOutcome"
+
+[[attr]]
+attributeCode = "JUSTIFICATION"
+attributeName = "Zdania uzasadnienia"
+refType = "PARAMETER"
+refName = "demo.property.apk.recommendation.reason"
+
+[[attr]]
+attributeCode = "NEEDS"
+attributeName = "Potrzeby wynikajace z odpowiedzi"
+refType = "FUNCTION"
+refName = "demo.property.apk.needs"
+
+[[attr]]
+attributeCode = "QUESTION_CATALOGUE"
+attributeName = "Katalog pytan"
+refType = "PARAMETER"
+refName = "demo.property.apk.question"
+
+[[attr]]
+attributeCode = "REASON_TRIGGER"
+attributeName = "Ktore zdanie pada"
+refType = "PARAMETER"
+refName = "demo.property.apk.reason"
+
+[[attr]]
+attributeCode = "RECOMMENDED_PACKAGE"
+attributeName = "Ktory pakiet zaspokaja te potrzeby"
+refType = "FUNCTION"
+refName = "demo.property.apk.indicated"
+
+[[attr]]
+attributeCode = "REVEAL"
+attributeName = "Kiedy pytanie sie odslania"
+refType = "PARAMETER"
+refName = "demo.property.apk.question.reveal"
+
+[[attr]]
+attributeCode = "VALUE_GAP"
+attributeName = "Oszacowanie klienta a suma z wyliczenia"
+refType = "PARAMETER"
+refName = "demo.property.sum.valueGap"

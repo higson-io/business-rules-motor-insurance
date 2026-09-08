@@ -109,10 +109,6 @@ public class Property {
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
 	private static final String PATH_APK_INDICATED = "quote.apk.indicated";
 	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
-	private static final String FUNCTION_APK_NEEDS = "demo.property.apk.needs";
-	private static final String FUNCTION_APK_INDICATED = "demo.property.apk.indicated";
-	private static final String FUNCTION_APK_BUDGET = "demo.property.apk.budgetOutcome";
-	private static final String FUNCTION_APK_ALTERNATIVE = "demo.property.apk.alternative";
 	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
 	private static final String PATH_VALUE_RATIO = "quote.sums.valueRatio";
 	private static final String PATH_AREA = "quote.property.area";
@@ -515,7 +511,7 @@ public class Property {
 		// co o treści potrzeby decydowała kolejność pytań na ekranie.
 		PropertyContext ctx = new PropertyContext(quote)
 			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(quote.getQuestions(), quote.getAnswers()));
-		List<Need> needs = parseNeeds(asString(engine.call(FUNCTION_APK_NEEDS, ctx)));
+		List<Need> needs = parseNeeds(attrString(apkElement(), "NEEDS", ctx));
 		quote.setNeeds(needs);
 
 		// Jedna tabela, jeden przebieg, jedna lista. Wyłączenia OWU stykające się z sytuacją
@@ -545,6 +541,19 @@ public class Property {
 		loadCovers(quote);
 	}
 
+
+	/**
+	 * Obiekt analizy potrzeb z drzewa — to jego pytamy o rekomendację.
+	 *
+	 * ⛔ APLIKACJA PYTA OBIEKT, a nie woła funkcji po kodzie. Do 8 września 2026 stało tu
+	 * `engine.call("demo.property.apk.indicated", ...)` i trzy podobne — kod funkcji był w Javie,
+	 * więc drzewo mogło o niej nie wiedzieć i nic by się nie stało. Teraz reguła jest atrybutem
+	 * `APK[NEEDS]`: przestawienie wskaźnika w drzewie zmienia to, co liczy aplikacja.
+	 */
+	private DomainObject apkElement() {
+		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		return product == null ? null : product.getChild(COLLECTION_APK, APK_ELEMENT);
+	}
 
 	/**
 	 * Wariant, na który patrzy klient: wybrany, a zanim cokolwiek wybrał — rekomendowany.
@@ -633,7 +642,8 @@ public class Property {
 			}
 		}
 
-		Variant proposed = variantByCode(quote, asString(engine.call(FUNCTION_APK_INDICATED, ctx)));
+		DomainObject apk = apkElement();
+		Variant proposed = variantByCode(quote, attrString(apk, "RECOMMENDED_PACKAGE", ctx));
 		if (proposed == null) {
 			return recommendation;
 		}
@@ -643,11 +653,10 @@ public class Property {
 		// w komentarzu nad linijką kodu. `apk.budgetOutcome` NAZYWA, czy propozycja mieści się
 		// w oczekiwaniu klienta; nie ma prawa jej podmienić. Tańszy pakiet jedzie obok jako
 		// alternatywa, razem z listą tego, czego w nim brakuje.
-		String outcome = asString(engine.call(FUNCTION_APK_BUDGET, ctx));
+		String outcome = attrString(apk, "BUDGET_OUTCOME", ctx);
 		recommendation.setBudgetOutcome(outcome);
 		if (OUTCOME_EXCEEDED.equals(outcome)) {
-			Variant alternative =
-				variantByCode(quote, asString(engine.call(FUNCTION_APK_ALTERNATIVE, ctx)));
+			Variant alternative = variantByCode(quote, attrString(apk, "ALTERNATIVE_PACKAGE", ctx));
 			if (alternative != null) {
 				recommendation.setAlternativeVariantCode(alternative.getCode());
 				recommendation.setAlternativePremium(alternative.getAnnualPremium());

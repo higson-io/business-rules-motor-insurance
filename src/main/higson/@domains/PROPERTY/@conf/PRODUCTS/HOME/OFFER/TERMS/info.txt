@@ -1,3 +1,0 @@
-name = "Warunki oferty"
-description = "Ważność, termin płatności, treść oświadczenia i załącznik z analizą potrzeb — kluczowane kodem reżimu APK."
-tags = []

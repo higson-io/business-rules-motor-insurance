@@ -1,3 +1,0 @@
-name = "Składki poszczególnych pokryć"
-description = "Chodzi po składzie pakietu w drzewie (VARIANTS[..]/COVERS) i czyta stawkę oraz podstawę z COVERS."
-tags = []
