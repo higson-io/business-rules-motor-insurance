@@ -1,5 +1,5 @@
 code = "demo.property.cover.liability"
-description = "Wlasna tabela pokrycia, jedyna kluczowana SUMA GWARANCYJNA, a nie cecha nieruchomosci - bo OC nie ma z nieruchomoscia nic wspolnego poza adresem. Stawka jest degresywna: im wyzsza suma, tym nizsza stawka za promil, bo szkody bardzo duze sa rzadsze niz proporcjonalnie czestsze male."
+description = "Wlasna tabela pokrycia, jedyna kluczowana SUMA GWARANCYJNA, a nie cecha nieruchomosci - bo OC nie ma z nieruchomoscia nic wspolnego poza adresem. Stawka jest degresywna: im wyzsza suma, tym nizsza stawka za promil."
 nullable = false
 dictionary = false
 cacheable = true
@@ -50,13 +50,6 @@ external = false
 array = false
 
 [[outputLevel]]
-code = "minDeductible"
-label = "minimalna franszyza"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
 code = "capRatio"
 label = "limit jako ulamek sumy"
 type = "number"
@@ -73,13 +66,6 @@ array = false
 [[outputLevel]]
 code = "capLabel"
 label = "opis limitu dla klienta"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "waitingReason"
-label = "kod zdania o karencji"
 type = "string"
 external = false
 array = false

@@ -83,7 +83,6 @@ public class Property {
 	private static final String FLOW_RECOMMEND = "demo.property.apk.recommend";
 
 	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
-	private static final String PARAM_APK_ANSWER = "demo.property.apk.answer";
 	private static final String PARAM_APK_BLOCKER = "demo.property.apk.question.blocker";
 	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
 	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
@@ -210,10 +209,10 @@ public class Property {
 	/**
 	 * Pytania z jednej gałęzi. Kod gałęzi jedzie z pytaniem i mówi, DOKĄD ono należy.
 	 *
-	 * ⛔ DWIE GAŁĘZIE, bo to dwie różne rzeczy pod dwoma różnymi reżimami. `APK` to analiza
-	 * potrzeb w rozumieniu rek. 8 — pytania stoją tam RAZEM z regułami, które z odpowiedzi robią
-	 * potrzeby i rekomendację, bo dotyczą tej samej rzeczy. `SUBJECT` to przedmiot ubezpieczenia
-	 * i sytuacja: dane, które zakłady zbierają POZA APK i mają je już zebrane.
+	 * ⛔ Czyta WYŁĄCZNIE gałąź `APK` — pytania analizy potrzeb w rozumieniu rek. 8, stojące
+	 * w drzewie razem z regułami, które z odpowiedzi robią potrzeby i rekomendację. Pola
+	 * przedmiotu ubezpieczenia nie są elementami drzewa i idą osobną drogą, przez
+	 * `readCatalogueQuestion` i listę `SUBJECT_FIELDS`.
 	 *
 	 * ⛔ PODZIAŁ JEST DZIEDZINOWY, NIE EKRANOWY. Przez chwilę 4 września 2026 gałęzie nazywały się
 	 * „Krok 1" i „Krok 2" i wisiały pod kolekcją `STEPS` — czyli drzewo konfiguracji odwzorowywało
@@ -263,7 +262,7 @@ public class Property {
 		// Kod kolekcji: QUESTIONS albo SUBJECT. Ekran po nim rozdziela krok pierwszy od drugiego.
 		question.setSection(branch);
 
-		// Cztery rzeczy z ELEMENTU — te, które przy każdym pytaniu są inne.
+		// Trzy rzeczy z ELEMENTU: nazwa i dwa atrybuty — te, które przy każdym pytaniu są inne.
 		//
 		// ⛔ HELP już nie ma. Podpowiedź pod każdym pytaniem dawała drugi akapit tam, gdzie widz
 		// ma przeczytać jedno zdanie, a przy kilkunastu pytaniach robiła z ankiety ścianę tekstu.
@@ -397,7 +396,7 @@ public class Property {
 		quote.getSums().setFixtures(asDecimal(sums.get(0, "fixtures")));
 		quote.getSums().setContents(asDecimal(sums.get(0, "contents")));
 		// ⛔ Kradzież, powódź i assistance NIE dostają tu sum. Skąd pokrycie bierze sumę,
-		// rozstrzyga `demo.property.cover.sumBasis`, a wylicza `demo.property.cover.sum`.
+		// rozstrzyga atrybut `SUM_BASIS` pokrycia, a wylicza `demo.property.cover.sum`.
 		// Do 7 września 2026 stały tu trzy przypisania na sztywno i to one były prawdziwą
 		// definicją produktu — tabela o tej samej nazwie istniała, ale nikt jej nie czytał.
 
@@ -431,7 +430,7 @@ public class Property {
 			// ⛔ SUMA POKRYCIA JEST ATRYBUTEM, nie switchem po kodzie. Do 7 września 2026 stał
 			// tu `sumFor`, a razem z nim trzy przypisania na sztywno w `computeDerived`:
 			// kradzież = suma ruchomości, powódź = suma murów, assistance = zero. To jest kształt
-			// produktu, a nie mechanika, więc rozstrzyga go teraz `demo.property.cover.sumBasis`.
+			// produktu, a nie mechanika, więc rozstrzyga go teraz `atrybut `SUM_BASIS` na pokryciu.
 			cover.setSum(definition.getAttrDecimal("SUM", ctx));
 			covers.add(cover);
 		}
@@ -864,7 +863,7 @@ public class Property {
 	 * Rek. 9.3 — czy klient wziął wariant, który rekomendowaliśmy, i co to znaczy.
 	 *
 	 * ⛔ Java liczy tylko KIERUNEK, i to arytmetyką: porównuje pozycje w drabince, które i tak
-	 * przyszły z `demo.property.variant.position`. Co ten kierunek znaczy i jakimi słowami się to
+	 * przyszły z atrybutu `POSITION` pakietu. Co ten kierunek znaczy i jakimi słowami się to
 	 * mówi klientowi, rozstrzyga `demo.property.offer.choice` — bo to jest treść dokumentu,
 	 * a nie działanie na liczbach.
 	 */

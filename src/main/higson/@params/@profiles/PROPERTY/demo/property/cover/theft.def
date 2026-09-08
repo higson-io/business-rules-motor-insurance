@@ -1,5 +1,5 @@
 code = "demo.property.cover.theft"
-description = "Wlasna tabela pokrycia i jedyna, w ktorej zabezpieczenia dzialaja jako PROG DOSTEPNOSCI, a nie jako czynnik ceny. Brak jakichkolwiek zabezpieczen to na polskim rynku odmowa, a nie drozsza skladka - i to jest przypadek wart pokazania, bo klient bez zabezpieczen ma najwieksza potrzebe ochrony od kradziezy, a nie moze jej kupic. Sila zabezpieczen obniza stawke; jako czynnik ryzyka wchodzi osobno i to jest celowe, bo tu odpowiada za dostepnosc."
+description = "Wlasna tabela pokrycia i jedyna, w ktorej zabezpieczenia dzialaja jako PROG DOSTEPNOSCI, a nie jako czynnik ceny. Brak jakichkolwiek zabezpieczen to na polskim rynku odmowa, a nie drozsza skladka - i to jest przypadek wart pokazania, bo klient bez zabezpieczen ma najwieksza potrzebe ochrony od kradziezy, a nie moze jej kupic. Sila zabezpieczen obniza stawke i podnosi limit na bizuterie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -49,13 +49,6 @@ external = false
 array = false
 
 [[outputLevel]]
-code = "minDeductible"
-label = "minimalna franszyza"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
 code = "capRatio"
 label = "limit jako ulamek sumy"
 type = "number"
@@ -72,13 +65,6 @@ array = false
 [[outputLevel]]
 code = "capLabel"
 label = "opis limitu dla klienta"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "waitingReason"
-label = "kod zdania o karencji"
 type = "string"
 external = false
 array = false

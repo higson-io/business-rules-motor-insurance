@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa - razem z lista tego, czego w nim brakuje. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie, przy remisie tanszy; moze nie byc zadnego i to tez jest odpowiedz. Pokrycia bierze z apk.covers, a miejsce w drabince z atrybutu pakietu."
+description = "Gdy propozycja przekracza oczekiwana skladke, tanszy pakiet NIE zastepuje jej, tylko jedzie obok jako alternatywa. Wybieramy najlepiej dopasowany sposrod mieszczacych sie w budzecie, przy remisie tanszy. Sklad pakietu liczy przez demo.property.apk.packageCovers, tak samo jak apk.indicated i jak Java - pokrycie niedostepne nie liczy sie jako zawarte."
 
 [[arguments]]
 name = "ctx"
@@ -41,9 +41,10 @@ for (def variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')
 		continue
 	}
 
+	def covers = higson.call('demo.property.apk.packageCovers', ctx, code)
 	def covered = 0
-	for (def member in variant.getAll('COVERS')) {
-		if (required.contains(member.getCode())) {
+	for (def cover in required) {
+		if (covers.contains(cover)) {
 			covered = covered + 1
 		}
 	}

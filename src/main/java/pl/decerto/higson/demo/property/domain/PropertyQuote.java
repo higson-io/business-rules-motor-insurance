@@ -31,7 +31,7 @@ public class PropertyQuote {
 	private final Zone zone = new Zone();
 
 	private Regime regime = new Regime();
-	/** Sekcje ankiety — gałęzie drzewa domeny. Patrz `Section`. */
+	/** Pytania ankiety i pola przedmiotu ubezpieczenia, w kolejności zadawania. */
 	private List<Question> questions = new ArrayList<>();
 
 	/** Klucz to kod pytania — jedyne miejsce, gdzie kod pytania w ogóle występuje po stronie Javy. */

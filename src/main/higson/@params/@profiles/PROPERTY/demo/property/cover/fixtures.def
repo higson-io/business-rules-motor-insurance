@@ -49,13 +49,6 @@ external = false
 array = false
 
 [[outputLevel]]
-code = "minDeductible"
-label = "minimalna franszyza"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
 code = "capRatio"
 label = "limit jako ulamek sumy"
 type = "number"
@@ -72,13 +65,6 @@ array = false
 [[outputLevel]]
 code = "capLabel"
 label = "opis limitu dla klienta"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "waitingReason"
-label = "kod zdania o karencji"
 type = "string"
 external = false
 array = false

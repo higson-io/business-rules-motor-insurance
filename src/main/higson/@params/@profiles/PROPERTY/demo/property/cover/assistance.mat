@@ -1,5 +1,5 @@
 #matrix for parameter demo.property.cover.assistance
-kind;rate;basis;available;reason;minDeductible;capRatio;capAbsolute;capLabel;waitingReason
-*;72;FLAT;true;;0;0;3000;Jednorazowa interwencja — do 3 000 zł;
-FLAT;72;FLAT;true;;0;0;3000;Jednorazowa interwencja — do 3 000 zł;
-HOUSE;96;FLAT;true;;0;0;4500;Jednorazowa interwencja — do 4 500 zł;
+kind;rate;basis;available;reason;capRatio;capAbsolute;capLabel
+*;72;FLAT;true;;0;3000;Jednorazowa interwencja — do 3 000 zł
+FLAT;72;FLAT;true;;0;3000;Jednorazowa interwencja — do 3 000 zł
+HOUSE;96;FLAT;true;;0;4500;Jednorazowa interwencja — do 4 500 zł

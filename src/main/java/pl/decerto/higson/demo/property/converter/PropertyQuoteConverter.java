@@ -16,7 +16,6 @@ import pl.decerto.higson.demo.property.api.dto.PropertyRegimeDto;
 import pl.decerto.higson.demo.property.api.dto.PropertyVariantDto;
 import pl.decerto.higson.demo.apk.Answer;
 import pl.decerto.higson.demo.property.domain.Cover;
-import pl.decerto.higson.demo.apk.Need;
 import pl.decerto.higson.demo.property.domain.Offer;
 import pl.decerto.higson.demo.property.domain.Policyholder;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;

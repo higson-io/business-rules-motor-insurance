@@ -260,8 +260,4 @@ public class PropertyContext extends HigsonContext {
 		}
 		return value;
 	}
-
-	public PropertyQuote getQuote() {
-		return quote;
-	}
 }

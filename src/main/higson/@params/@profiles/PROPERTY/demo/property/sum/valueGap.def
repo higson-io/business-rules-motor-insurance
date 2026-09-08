@@ -1,5 +1,5 @@
 code = "demo.property.sum.valueGap"
-description = "Stosunek wartosci, na ktora klient szacuje nieruchomosc, do sumy wyliczonej z metrazu i stawki. Tabela nazywa nie tylko wynik, ale i SKUTEK: reasonCode to gotowy kod zdania w uzasadnieniu. Do 7 wrzesnia 2026 Java skladala ten kod jako 'VALUE_' plus outcome, wiec zmiana slowa w tej kolumnie dawala puste zdanie i zadnego bledu. Kolumny severity, warning i remedy usuniete - nikt ich nie czytal, a ich tresc powtarzala zdania z apk.recommendation.reason."
+description = "Stosunek wartosci, na ktora klient szacuje nieruchomosc, do sumy wyliczonej z metrazu i stawki. reasonCode to gotowy kod zdania w uzasadnieniu. UWAGA: poziom wejsciowy nazywa sie quote.sums.valueRatio i musi sie zgadzac ze sciezka, pod ktora Java publikuje ten stosunek - do 8 wrzesnia 2026 tabela czekala na quote.value.ratio, ktorego nikt nie ustawial, wiec zawsze trafiala w pierwszy przedzial i zdanie o wartosci nie zalezalo od tego, co klient wpisal. Kolumna outcome usunieta - nikt jej nie czytal, kod zdania niesie reasonCode."
 nullable = false
 dictionary = false
 cacheable = true
@@ -17,16 +17,9 @@ label = "oszacowanie do sumy wyliczonej"
 type = "number"
 matcher = "between/ii"
 reverseMatcher = false
-property = "quote.value.ratio"
-source = "quote.value.ratio"
+property = "quote.sums.valueRatio"
+source = "quote.sums.valueRatio"
 union = false
-
-[[outputLevel]]
-code = "outcome"
-label = "wynik porownania"
-type = "string"
-external = false
-array = false
 
 [[outputLevel]]
 code = "reasonCode"
