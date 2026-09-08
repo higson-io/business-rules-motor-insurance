@@ -1,2 +1,0 @@
-name = "OC w życiu prywatnym"
-tags = []

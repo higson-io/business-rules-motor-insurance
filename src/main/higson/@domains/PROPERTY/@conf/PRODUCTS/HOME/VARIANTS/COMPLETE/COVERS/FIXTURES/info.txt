@@ -1,2 +1,0 @@
-name = "Elementy stałe"
-tags = []

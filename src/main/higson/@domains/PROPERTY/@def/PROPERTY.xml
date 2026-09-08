@@ -90,6 +90,7 @@
             <name>Analiza potrzeb klienta</name>
             <description>Analiza potrzeb jako jeden obiekt: pytania wisza pod nim w kolekcji QUESTIONS, a atrybuty to zasady, wedlug ktorych z odpowiedzi powstaje rekomendacja. Czytaja sie jak przebieg rozmowy: co pytamy, kiedy pytanie sie odslania, kiedy odpowiedz przerywa sciezke, czego odpowiedz wymaga, ktory PAKIET to zaspokaja, czy miesci sie w oczekiwanej skladce, jaki pakiet jedzie obok jako alternatywa i jakimi zdaniami sie to uzasadnia.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>QUESTIONS</code>
@@ -204,18 +205,11 @@
         </domainType>
         <domainType>
             <profile>PROPERTY</profile>
-            <code>PACKAGE_COVER</code>
-            <name>Pokrycie w pakiecie</name>
-            <description>Odwolanie do pokrycia, ktore wchodzi w sklad tego pakietu. KODEM, a nie kopia - element nie ma zadnego atrybutu, bo cala konfiguracja pokrycia (stawka, suma, limit) zostaje w /PRODUCTS[HOME]/COVERS. Gdyby ten typ mial atrybuty, ta sama rzecz dalaby sie ustawic w dwoch miejscach i zaczelaby sie rozjezdzac.</description>
-            <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
-        </domainType>
-        <domainType>
-            <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
             <description>Ubezpieczenie domu i mieszkania. Trzy galezie: APK to analiza potrzeb, COVERS to pokrycia, VARIANTS to pakiety zlozone z pokryc. Atrybuty produktu to rzeczy wspolne dla calej sprzedazy: rezim analizy potrzeb, sposob liczenia sumy ubezpieczenia z metrazu, warunki oferty i zasada nazywania zgodnosci wyboru z rekomendacja. Mechanika taryfy - czynniki, strefy, stawki - siedzi w tabelach i nie jest punktem wyjscia.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>APK</code>
@@ -465,7 +459,7 @@
                     <multiple>true</multiple>
                     <visible>true</visible>
                     <order>0</order>
-                    <collectionTypeCode>PACKAGE_COVER</collectionTypeCode>
+                    <collectionTypeCode>COVER</collectionTypeCode>
                 </typeCollection>
             </typeCollections>
             <typeAttributes>
