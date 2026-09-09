@@ -3213,27 +3213,42 @@ strefach, trzy werdykty wyboru wariantu, drabinka wag, alternatywa przy przekroc
 
 Do wczoraj `standards/testing/rule-tests.md` opisywał pokrycie, którego nie było: katalog `@tests`
 nie istniał, a reguły trzymające całe zachowanie systemu sprawdzało wyłącznie ręczne przejście przez
-demo. Teraz w snapshocie leży **dziesięć przypadków** taryfikacji, a
-`src/main/higson-batch/paczka-skladka-pakietu.xlsx` wczytuje je do Batch Testera jednym kliknięciem.
+demo. Teraz są **dwa artefakty, po jednym na każdy tryb testowania w Higsonie**.
 
-### 34.1 Co testujemy i dlaczego akurat to
+### 34.1 Dwa tryby, dwa pliki
 
-Przedmiotem jest flow **`demo.property.calculateQuote`** — wycena JEDNEGO pakietu. To jest właściwy
-punkt zaczepienia, bo przechodzi przez wszystko, co składa się na cenę: dostępność pakietu (tabela),
-składki pokryć (funkcja wołająca siedem osobnych tabel pokryć), sumę linii, czynnik okresu i ratę.
-Test na pojedynczej tabelce pilnowałby jednej komórki; ten pilnuje drogi.
+| Tryb | Artefakt | Zawartość |
+|---|---|---|
+| **Tester** | `src/main/higson/@tests/PROPERTY - skladka pakietu (...).json` | jeden przypadek — wzorzec |
+| **Batch tester** | `src/main/higson-batch/skladka-pakietu-10-przypadkow.xlsx` | dziesięć wierszy wejść dla tego samego flow |
+
+⛔ **O trybie decyduje arkusz `Mark`**, i to jedyna różnica między oboma plikami: `TEST` to
+pojedynczy przypadek, `BATCH_TESTS` to paczka wsadowa. Pierwsza wersja paczki miała `TEST` i serwer
+odrzucał ją z HTTP 422 (`EXCEL_VALIDATION_INCORRECT_LABEL`, „Niepoprawna nazwa kolumny TEST [arkusz
+Mark, wiersz 2, kolumna 1]") — komunikat wskazuje arkusz, ale nie mówi, czego oczekiwał.
+
+⚠️ **`higson_import_tests` to nie jest droga do paczki.** Wciąga z arkusza CASES **tylko pierwszy
+wiersz**, bo konwertuje plik na jeden przypadek testowy. Paczkę wsadową przyjmuje wyłącznie
+`POST /api/test-packages/convert`, czyli „Load test package" w panelu batch testera.
+
+### 34.2 Co testujemy i dlaczego akurat to
+
+Przedmiotem obu artefaktów jest flow **`demo.property.calculateQuote`** — wycena JEDNEGO pakietu.
+To właściwy punkt zaczepienia, bo przechodzi przez wszystko, co składa się na cenę: dostępność
+pakietu (tabela), składki pokryć (funkcja wołająca siedem osobnych tabel), sumę linii, czynnik
+okresu i ratę. Test na pojedynczej tabelce pilnowałby jednej komórki; ten pilnuje drogi.
 
 ⛔ **Oczekiwany wynik to CAŁA struktura zwracana przez flow**, nie jedna liczba: składka roczna,
 rata i rozbicie na pokrycia. Pierwsza wersja porównywała samo `1014.94` i wychodziła FAILURE mimo
 poprawnego wyniku — flow zwraca komplet zmiennych oznaczonych jako `returned`. Efekt uboczny jest
-korzystny: rozbicie w oczekiwanym wyniku znaczy, że zmiana stawki jednego pokrycia pokazuje się jako
-różnica **w tej linii**, a nie jako rozjazd suma-do-sumy.
+korzystny: zmiana stawki jednego pokrycia pokazuje się jako różnica **w tej linii**, a nie jako
+rozjazd suma-do-sumy.
 
-### 34.2 Dziesięć przypadków
+### 34.3 Dziesięć wierszy paczki
 
 | # | Co pinuje | Wynik |
 |---|---|---|
-| 01 | Przypadek bazowy: STANDARD, mieszkanie 60 m² | 1 014,94 zł |
+| 01 | Przypadek bazowy: STANDARD, mieszkanie 60 m² — ten sam, co w Testerze | 1 014,94 zł |
 | 02 | COMPLETE na tym samym mieszkaniu — siedem pokryć w rozbiciu | 3 082,75 zł |
 | 03 | Dom jednorodzinny — inna stawka murów (0,95 zamiast 0,85) i droższy assistance | 634,58 zł |
 | 04 | **Brak zabezpieczeń**: kradzież kosztuje `THEFT=0` i zostaje w rozbiciu, zamiast zniknąć | 3 180,35 zł |
@@ -3244,23 +3259,27 @@ różnica **w tej linii**, a nie jako rozjazd suma-do-sumy.
 | 09 | Okres 36 miesięcy — składka ×2,76 i **rata ≠ składka** (3 raty) | 2 801,23 / 933,74 zł |
 | 10 | Alarm z monitoringiem — niższa stawka kradzieży i wyższy limit biżuterii | 2 565,81 zł |
 
-Przypadki 04, 05 i 06 są tu najważniejsze, bo pilnują nie liczby, tylko **zachowania**: pokrycie
+Wiersze 04, 05 i 06 są tu najważniejsze, bo pilnują nie liczby, tylko **zachowania**: pokrycie
 niedostępne nie znika po cichu, pakiet niedostępny nie udaje darmowego, a jedna niedostępna ochrona
 nie kładzie całej oferty. Każdy z nich broni decyzji, która w tej konfiguracji już raz się zepsuła.
 
-⚠️ Wszystkie dziesięć wartości zdjęto z DZIAŁAJĄCEJ aplikacji, nie policzono ręcznie: 01, 02, 03,
-04, 06, 07, 08 i 09 zgadzają się co do grosza ze scenariuszami bazowymi z §33.
+⚠️ Wszystkie dziesięć wartości zdjęto z DZIAŁAJĄCEJ konfiguracji, nie policzono ręcznie: każdy
+scenariusz przepuszczono przez flow i przepisano wynik, a osiem z nich zgadza się co do grosza ze
+scenariuszami bazowymi z §33.
 
-### 34.3 Czym paczka NIE jest
+### 34.4 Stan weryfikacji — co sprawdzone, a co nie
 
-Paczka Batch Testera to plik, a nie byt w bazie: przypadki żyją w `src/main/higson/@tests/*.json`
-i to one są wersjonowane. Plik `.xlsx` jest z nich odtwarzalny (okno paczki → dziesięć razy
-„Add test" → „Download package") i leży w repo tylko dlatego, że batch tester przyjmuje plik.
+⚙️ Sprawdzone: pojedynczy test przechodzi w Testerze; paczka przechodzi konwersję po stronie serwera
+(`POST /api/test-packages/convert` → 200, dziesięć przypadków, element `demo.property.calculateQuote`),
+zarówno wywołana wprost, jak i przez „Load test package" w panelu; **paczka jest samodzielna** —
+konwertuje się, choć w Studio stoi tylko jeden zapisany przypadek testowy.
 
-⚠️ Zapisania paczki **pod nazwą po stronie Studia** nie udało się zrobić automatem: pole „Enter test
-name" nie przyjmuje wpisu programowego (kontrolka zostaje `ng-pristine`, `Save package` pozostaje
-wygaszony), a klawiatura Playwrighta do niego nie dociera. Ręcznie to jedno pole i jedno kliknięcie.
+⚠️ **Nie zmierzyłem przebiegu wszystkich dziesięciu wierszy uruchomionych Z PLIKU.** Dziesięć
+zielonych wyników mam z wcześniejszego przebiegu, gdy te same przypadki były zapisane jako osobne
+testy w Studio. Wartości oczekiwane są identyczne, więc wynik powinien być ten sam — ale to wniosek,
+nie pomiar.
 
-⚠️ Import XLSX (`higson_import_tests`) wciąga **tylko pierwszy wiersz** arkusza CASES — format
-eksportu pojedynczego przypadku to nie to samo co paczka. Dziesięć przypadków powstało przez
-`higson_create_test`.
+⚠️ Automatyka przeglądarki nie domyka ostatniego kroku: pole „Enter test name" w oknie paczki nie
+przyjmuje wpisu programowego (kontrolka zostaje `ng-pristine`, `Save package` wygaszony), a natywne
+okno wyboru pliku wymagało wstrzyknięcia pliku przez `DataTransfer`. Ręcznie to cztery kliknięcia:
+Load test package → wskaż plik → Upload → Run.

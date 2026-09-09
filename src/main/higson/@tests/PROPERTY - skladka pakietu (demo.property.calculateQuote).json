@@ -1,8 +1,8 @@
 {
-  "name" : "09 STANDARD na 36 miesiecy - skladka x2,76 i trzy raty",
+  "name" : "PROPERTY - skladka pakietu (demo.property.calculateQuote)",
   "testElements" : [ {
     "id" : "flow@demo.property.calculateQuote",
-    "expectedValue" : "{\"instalment\":\"933.74\",\"breakdown\":\"BUILDING=545.29;FIXTURES=197.59;CONTENTS=250.19;LIABILITY=21.87\",\"available\":\"true\",\"annual\":\"2801.23\"}",
+    "expectedValue" : "{\"instalment\":\"1014.94\",\"breakdown\":\"BUILDING=545.29;FIXTURES=197.59;CONTENTS=250.19;LIABILITY=21.87\",\"available\":\"true\",\"annual\":\"1014.94\"}",
     "functionArguments" : [ ]
   } ],
   "columnDelimiter" : "VERTICAL_BAR",
@@ -53,6 +53,6 @@
   }, {
     "code" : "quote.policy.periodMonths",
     "type" : "number",
-    "value" : "36"
+    "value" : "12"
   } ]
 }

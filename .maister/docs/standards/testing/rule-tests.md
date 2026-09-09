@@ -1,21 +1,22 @@
 ## Testing Higson Rules
 
-> ⚙️ **STAN NA 2026-09-09: `@tests` ISTNIEJE — dziesięć przypadków taryfy majątkowej.**
-> `src/main/higson/@tests/*.json` pokrywa flow `demo.property.calculateQuote`: trzy pakiety, dwa
-> rodzaje nieruchomości, cztery poziomy zabezpieczeń, trzy strefy powodziowe, dwa standardy
-> wykończenia i dwa okresy ochrony. Każdy przypadek pinuje CAŁY wynik flow — składkę roczną, ratę
-> i rozbicie na pokrycia — więc zmiana stawki w tabeli wywala test z konkretną różnicą, a nie
-> z „coś nie gra".
+> ⚙️ **STAN NA 2026-09-09: `@tests` ISTNIEJE — i są DWA artefakty, po jednym na tryb.**
+> Tester: `src/main/higson/@tests/PROPERTY - skladka pakietu (...).json` — jeden przypadek na flow
+> `demo.property.calculateQuote`. Batch tester: `src/main/higson-batch/skladka-pakietu-10-przypadkow.xlsx`
+> — dziesięć wierszy wejść dla tego samego flow (trzy pakiety, dwa rodzaje nieruchomości, cztery
+> poziomy zabezpieczeń, trzy strefy powodziowe, dwa standardy wykończenia, dwa okresy).
+>
+> ⛔ **O trybie pliku decyduje arkusz `Mark`**: `TEST` albo `BATCH_TESTS`. Zły znacznik to HTTP 422
+> `EXCEL_VALIDATION_INCORRECT_LABEL`. Oczekiwanym wynikiem jest CAŁA struktura zwracana przez flow,
+> nie jedna liczba — inaczej poprawny wynik raportuje się jako FAILURE.
 >
 > ⚠️ Dalej NIE MA pokrycia dla: doboru pakietu (`apk.recommend`), treści uzasadnienia, łańcucha
-> odsłaniania pytań i warunków oferty. I dalej nie ma CI, więc te testy uruchamia człowiek —
-> w Studio (Tools → Tester) albo całą paczką (Tools → Batch tester, plik
-> `src/main/higson-batch/paczka-skladka-pakietu.xlsx`).
+> odsłaniania pytań i warunków oferty. I dalej nie ma CI, więc te testy uruchamia człowiek.
 
 The business logic of this application lives in rules, not in Java. Consequently most meaningful test coverage here is rule coverage: the Java layer only prepares the context and reads results back, so testing it proves almost nothing about pricing behaviour. These standards define where rule tests live and how Java-side tests exercise rules without a live Studio database.
 
 ### Business Logic Is Covered by Higson Rule Tests
-Coverage of the pricing logic comes from Higson rule tests in `src/main/higson/@tests` (10 files as of 2026-09-09, run by Studio or the runtime), not from Java unit tests. Java tests cover integration wiring. When you add a new business rule, its test belongs in the snapshot. Note the caveat in `higson/snapshot.md`: the snapshot is committed to git since 2026-09-04, so these tests are not visible in the repository.
+Coverage of the pricing logic comes from Higson rule tests in `src/main/higson/@tests` (one case as of 2026-09-09, plus a ten-row batch package beside the snapshot; run by Studio or the runtime), not from Java unit tests. Java tests cover integration wiring. When you add a new business rule, its test belongs in the snapshot. Note the caveat in `higson/snapshot.md`: the snapshot is committed to git since 2026-09-04, so these tests are not visible in the repository.
 
 *Evidence:* `src/main/higson/@tests` holds 9 test files plus 2 `@testPackages`; the Java side has one integration test.
 

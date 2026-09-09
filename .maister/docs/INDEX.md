@@ -279,19 +279,23 @@ dictionary value that happens to be neutral, and deleting them would leave each 
 list. §33.9 records the ordering rule this round produced — **decision table → flow → function** —
 now a standard in `higson/rules-authoring.md`, together with using a function as a level `source`
 (`$f` / `$u`) so a null check becomes a column instead of an `if`.
-**§34 (2026-09-09)** adds the **first rule tests this repository has ever had**: ten cases over
-`demo.property.calculateQuote`, the flow that prices one package, exported into the snapshot at
-`src/main/higson/@tests/*.json` and loadable into Studio's Batch Tester as
-`src/main/higson-batch/paczka-skladka-pakietu.xlsx`. Each case pins the flow's **whole return
-structure** — annual premium, instalment and the per-cover breakdown — so a changed rate shows up as
-a difference *in its own line*; expecting a single number instead reports FAILURE on a correct
-result, because the flow returns every variable marked `returned`. Three of the ten guard behaviour
-rather than an amount: an unavailable cover costs `THEFT=0` and stays visible in the breakdown, an
-unavailable package comes back with a reason and no price, and BASIC in the same flood zone still
-prices — availability is per package. All ten values were lifted from the running application and
-eight match the §33 baseline to the grosz. ⚠️ `higson_import_tests` reads **only the first row** of a
-CASES sheet, and Studio's package-name field rejects programmatic input, so saving the package under
-a name server-side is one manual step.
+**§34 (2026-09-09)** adds the **first rule tests this repository has ever had**, one artifact per
+Higson testing mode: a single case in the Tester (`src/main/higson/@tests/*.json`) and a ten-row
+batch package for the Batch Tester (`src/main/higson-batch/skladka-pakietu-10-przypadkow.xlsx`), both
+over `demo.property.calculateQuote` — the flow that prices one package and therefore walks
+availability, seven per-cover tables, the period factor and the instalment split. ⛔ **The `Mark`
+sheet carries the mode** and is the only difference between the two files: `TEST` for one case,
+`BATCH_TESTS` for a batch — getting it wrong returns HTTP 422 `EXCEL_VALIDATION_INCORRECT_LABEL`.
+⚠️ `higson_import_tests` is not the way in: it reads **only the first row** of a CASES sheet, because
+it converts the file into one test case; a batch goes through `POST /api/test-packages/convert`
+("Load test package"). Each case pins the flow's **whole return structure** — annual, instalment and
+the per-cover breakdown — so a changed rate shows up as a difference *in its own line*; expecting a
+single number reports FAILURE on a correct result. Three of the ten rows guard behaviour rather than
+an amount: an unavailable cover costs `THEFT=0` and stays visible in the breakdown, an unavailable
+package comes back with a reason and no price, and BASIC in the same flood zone still prices.
+⚠️ §34.4 is explicit about what was measured and what was inferred: the package converts (verified
+twice, and it converts with only one stored test case, so it is self-contained), but the ten rows
+were last seen green when they were ten stored cases, not when run from the file.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -458,7 +462,7 @@ Project-specific, **frontend unit tests** (Vitest through the Angular CLI): ⛔ 
 Project-specific, **end-to-end goldens** (`e2e/`, Playwright): select by test id and accessible role rather than markup; goldens are committed evidence while screenshots are documentation only and never a gate; **a golden is never edited to make a replay pass**.
 
 #### Rule Tests (`standards/testing/rule-tests.md`)
-Testing the part of this system that actually holds the business logic. Three standards: ⚙️ *Business Logic Is Covered by Higson Rule Tests* — **real since 2026-09-09**, though partial: `src/main/higson/@tests` holds ten cases over the property tariff flow, and nothing yet covers package selection, justification text, the reveal chain or offer terms; a new business rule's test belongs in the snapshot, which is committed, so the tests are visible in the repository; *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
+Testing the part of this system that actually holds the business logic. Three standards: ⚙️ *Business Logic Is Covered by Higson Rule Tests* — **real since 2026-09-09**, though partial: `src/main/higson/@tests` holds one case over the property tariff flow and `src/main/higson-batch/` a ten-row batch package for the same flow, and nothing yet covers package selection, justification text, the reveal chain or offer terms; a new business rule's test belongs in the snapshot, which is committed, so the tests are visible in the repository; *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
 
 > ⚠️ A snapshot-booted engine is **not** identical to the live runtime. Enabling function argument validation on a hand-built snapshot engine makes a flow-invoked Groovy function fail to bind its `ParamContext` argument, while the same configuration against a live database works. Do not generalise a snapshot-engine failure into a production configuration change.
 
