@@ -1,0 +1,58 @@
+{
+  "name" : "04 COMPLETE bez zabezpieczen - kradziez kosztuje zero, nie znika",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"instalment\":\"3180.35\",\"breakdown\":\"BUILDING=627.11;FLOOD=1770.66;FIXTURES=227.23;CONTENTS=287.73;LIABILITY=195.62;ASSISTANCE=72.0;THEFT=0\",\"available\":\"true\",\"annual\":\"3180.35\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "COMPLETE"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "FLAT"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "NONE"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "number",
+    "value" : "528000"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "number",
+    "value" : "116160"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "number",
+    "value" : "79200"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "number",
+    "value" : "2000000"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "number",
+    "value" : "1.3973"
+  }, {
+    "code" : "quote.policy.periodMonths",
+    "type" : "number",
+    "value" : "12"
+  } ]
+}

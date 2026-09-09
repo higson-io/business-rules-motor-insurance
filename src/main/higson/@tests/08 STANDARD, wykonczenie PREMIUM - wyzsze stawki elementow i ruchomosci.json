@@ -1,0 +1,58 @@
+{
+  "name" : "08 STANDARD, wykonczenie PREMIUM - wyzsze stawki elementow i ruchomosci",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"instalment\":\"1265.18\",\"breakdown\":\"BUILDING=464.74;FIXTURES=332.42;CONTENTS=446.15;LIABILITY=21.87\",\"available\":\"true\",\"annual\":\"1265.18\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "FLAT"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "PREMIUM"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "number",
+    "value" : "450000"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "number",
+    "value" : "144000"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "number",
+    "value" : "108000"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "number",
+    "value" : "200000"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "number",
+    "value" : "1.215"
+  }, {
+    "code" : "quote.policy.periodMonths",
+    "type" : "number",
+    "value" : "12"
+  } ]
+}

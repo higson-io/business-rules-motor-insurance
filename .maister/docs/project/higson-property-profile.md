@@ -3208,3 +3208,59 @@ czynnik ryzyka i liczba zdań uzasadnienia bez zmian**; jedyna różnica to nowe
 ochronę powodziową. Do tego siedem sprawdzeń celowanych: blokada i wyjście z niej, karencja w trzech
 strefach, trzy werdykty wyboru wariantu, drabinka wag, alternatywa przy przekroczonym budżecie.
 11 testów Javy i 60 frontu przechodzi.
+
+## §34 Pierwsze testy regułowe w tym repozytorium (2026-09-09)
+
+Do wczoraj `standards/testing/rule-tests.md` opisywał pokrycie, którego nie było: katalog `@tests`
+nie istniał, a reguły trzymające całe zachowanie systemu sprawdzało wyłącznie ręczne przejście przez
+demo. Teraz w snapshocie leży **dziesięć przypadków** taryfikacji, a
+`src/main/higson-batch/paczka-skladka-pakietu.xlsx` wczytuje je do Batch Testera jednym kliknięciem.
+
+### 34.1 Co testujemy i dlaczego akurat to
+
+Przedmiotem jest flow **`demo.property.calculateQuote`** — wycena JEDNEGO pakietu. To jest właściwy
+punkt zaczepienia, bo przechodzi przez wszystko, co składa się na cenę: dostępność pakietu (tabela),
+składki pokryć (funkcja wołająca siedem osobnych tabel pokryć), sumę linii, czynnik okresu i ratę.
+Test na pojedynczej tabelce pilnowałby jednej komórki; ten pilnuje drogi.
+
+⛔ **Oczekiwany wynik to CAŁA struktura zwracana przez flow**, nie jedna liczba: składka roczna,
+rata i rozbicie na pokrycia. Pierwsza wersja porównywała samo `1014.94` i wychodziła FAILURE mimo
+poprawnego wyniku — flow zwraca komplet zmiennych oznaczonych jako `returned`. Efekt uboczny jest
+korzystny: rozbicie w oczekiwanym wyniku znaczy, że zmiana stawki jednego pokrycia pokazuje się jako
+różnica **w tej linii**, a nie jako rozjazd suma-do-sumy.
+
+### 34.2 Dziesięć przypadków
+
+| # | Co pinuje | Wynik |
+|---|---|---|
+| 01 | Przypadek bazowy: STANDARD, mieszkanie 60 m² | 1 014,94 zł |
+| 02 | COMPLETE na tym samym mieszkaniu — siedem pokryć w rozbiciu | 3 082,75 zł |
+| 03 | Dom jednorodzinny — inna stawka murów (0,95 zamiast 0,85) i droższy assistance | 634,58 zł |
+| 04 | **Brak zabezpieczeń**: kradzież kosztuje `THEFT=0` i zostaje w rozbiciu, zamiast zniknąć | 3 180,35 zł |
+| 05 | **Strefa ZX**: pakiet niedostępny, wychodzi z powodem i BEZ ceny | `available=false` |
+| 06 | **BASIC w tej samej ZX**: dostępność jest na pakiet, nie globalna | 261,63 zł |
+| 07 | Strefa Z2 — droższa powódź (2,90) i franszyza | 1 878,64 zł |
+| 08 | Wykończenie PREMIUM — wyższe stawki elementów stałych i ruchomości | 1 265,18 zł |
+| 09 | Okres 36 miesięcy — składka ×2,76 i **rata ≠ składka** (3 raty) | 2 801,23 / 933,74 zł |
+| 10 | Alarm z monitoringiem — niższa stawka kradzieży i wyższy limit biżuterii | 2 565,81 zł |
+
+Przypadki 04, 05 i 06 są tu najważniejsze, bo pilnują nie liczby, tylko **zachowania**: pokrycie
+niedostępne nie znika po cichu, pakiet niedostępny nie udaje darmowego, a jedna niedostępna ochrona
+nie kładzie całej oferty. Każdy z nich broni decyzji, która w tej konfiguracji już raz się zepsuła.
+
+⚠️ Wszystkie dziesięć wartości zdjęto z DZIAŁAJĄCEJ aplikacji, nie policzono ręcznie: 01, 02, 03,
+04, 06, 07, 08 i 09 zgadzają się co do grosza ze scenariuszami bazowymi z §33.
+
+### 34.3 Czym paczka NIE jest
+
+Paczka Batch Testera to plik, a nie byt w bazie: przypadki żyją w `src/main/higson/@tests/*.json`
+i to one są wersjonowane. Plik `.xlsx` jest z nich odtwarzalny (okno paczki → dziesięć razy
+„Add test" → „Download package") i leży w repo tylko dlatego, że batch tester przyjmuje plik.
+
+⚠️ Zapisania paczki **pod nazwą po stronie Studia** nie udało się zrobić automatem: pole „Enter test
+name" nie przyjmuje wpisu programowego (kontrolka zostaje `ng-pristine`, `Save package` pozostaje
+wygaszony), a klawiatura Playwrighta do niego nie dociera. Ręcznie to jedno pole i jedno kliknięcie.
+
+⚠️ Import XLSX (`higson_import_tests`) wciąga **tylko pierwszy wiersz** arkusza CASES — format
+eksportu pojedynczego przypadku to nie to samo co paczka. Dziesięć przypadków powstało przez
+`higson_create_test`.

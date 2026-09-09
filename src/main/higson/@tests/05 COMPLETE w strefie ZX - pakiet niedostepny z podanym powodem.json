@@ -1,0 +1,58 @@
+{
+  "name" : "05 COMPLETE w strefie ZX - pakiet niedostepny z podanym powodem",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"reason\":\"Wariant pełny zawiera ochronę od powodzi, która w tej lokalizacji nie jest dostępna.\",\"available\":\"false\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "COMPLETE"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "HOUSE"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "ZX"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "number",
+    "value" : "306000"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "number",
+    "value" : "67320"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "number",
+    "value" : "45900"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "number",
+    "value" : "2000000"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "number",
+    "value" : "0.9"
+  }, {
+    "code" : "quote.policy.periodMonths",
+    "type" : "number",
+    "value" : "12"
+  } ]
+}

@@ -1,0 +1,58 @@
+{
+  "name" : "03 STANDARD, dom jednorodzinny - inna stawka murow",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"instalment\":\"634.58\",\"breakdown\":\"BUILDING=353.2;FIXTURES=114.51;CONTENTS=145.0;LIABILITY=21.87\",\"available\":\"true\",\"annual\":\"634.58\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "HOUSE"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "number",
+    "value" : "306000"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "number",
+    "value" : "67320"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "number",
+    "value" : "45900"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "number",
+    "value" : "200000"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "number",
+    "value" : "1.215"
+  }, {
+    "code" : "quote.policy.periodMonths",
+    "type" : "number",
+    "value" : "12"
+  } ]
+}

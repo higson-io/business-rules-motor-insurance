@@ -279,6 +279,19 @@ dictionary value that happens to be neutral, and deleting them would leave each 
 list. §33.9 records the ordering rule this round produced — **decision table → flow → function** —
 now a standard in `higson/rules-authoring.md`, together with using a function as a level `source`
 (`$f` / `$u`) so a null check becomes a column instead of an `if`.
+**§34 (2026-09-09)** adds the **first rule tests this repository has ever had**: ten cases over
+`demo.property.calculateQuote`, the flow that prices one package, exported into the snapshot at
+`src/main/higson/@tests/*.json` and loadable into Studio's Batch Tester as
+`src/main/higson-batch/paczka-skladka-pakietu.xlsx`. Each case pins the flow's **whole return
+structure** — annual premium, instalment and the per-cover breakdown — so a changed rate shows up as
+a difference *in its own line*; expecting a single number instead reports FAILURE on a correct
+result, because the flow returns every variable marked `returned`. Three of the ten guard behaviour
+rather than an amount: an unavailable cover costs `THEFT=0` and stays visible in the breakdown, an
+unavailable package comes back with a reason and no price, and BASIC in the same flood zone still
+prices — availability is per package. All ten values were lifted from the running application and
+eight match the §33 baseline to the grosz. ⚠️ `higson_import_tests` reads **only the first row** of a
+CASES sheet, and Studio's package-name field rejects programmatic input, so saving the package under
+a name server-side is one manual step.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -431,7 +444,7 @@ Mobile-first approach, standard breakpoints, fluid layouts, relative units, cros
 
 Located in `.maister/docs/standards/testing/`
 
-> ⚠️ **Automated tests are new here and nothing gates them.** All three suites arrived with the August 2026 frontend migration, and **there is still no CI** — no test run has ever blocked a merge. Before the migration, zero test files were tracked in git. Treat "the tests pass" as meaning someone ran them locally.
+> ⚠️ **Automated tests are new here and nothing gates them.** The three code suites arrived with the August 2026 frontend migration, the first ten rule tests on 2026-09-09, and **there is still no CI** — no test run has ever blocked a merge. Before the migration, zero test files were tracked in git. Treat "the tests pass" as meaning someone ran them locally.
 
 **Read before** writing any test, and before making any statement about this repository's test coverage.
 
@@ -445,7 +458,7 @@ Project-specific, **frontend unit tests** (Vitest through the Angular CLI): ⛔ 
 Project-specific, **end-to-end goldens** (`e2e/`, Playwright): select by test id and accessible role rather than markup; goldens are committed evidence while screenshots are documentation only and never a gate; **a golden is never edited to make a replay pass**.
 
 #### Rule Tests (`standards/testing/rule-tests.md`)
-Testing the part of this system that actually holds the business logic. Three standards: ⛔ *Business Logic Is Covered by Higson Rule Tests* — **aspirational, not current**: `src/main/higson/@tests` does not exist, so the rules that hold this system's behaviour have no automated coverage at all; a new business rule's test belongs in the snapshot, and the snapshot is now committed, so such tests would be visible in the repository; *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
+Testing the part of this system that actually holds the business logic. Three standards: ⚙️ *Business Logic Is Covered by Higson Rule Tests* — **real since 2026-09-09**, though partial: `src/main/higson/@tests` holds ten cases over the property tariff flow, and nothing yet covers package selection, justification text, the reveal chain or offer terms; a new business rule's test belongs in the snapshot, which is committed, so the tests are visible in the repository; *Run Rule Tests Off the Snapshot, Not a Live Database* (boot the engine from the snapshot directory via `HigsonSnapshotDataSource` for offline, reproducible runs with no database and no network); *Tests Read the Canonical Snapshot Directory Directly* (consume the same `${higson.snapshot.dir}` the CLI syncs — never copy the snapshot into test resources).
 
 > ⚠️ A snapshot-booted engine is **not** identical to the live runtime. Enabling function argument validation on a hand-built snapshot engine makes a flow-invoked Groovy function fail to bind its `ParamContext` argument, while the same configuration against a live database works. Do not generalise a snapshot-engine failure into a production configuration change.
 
@@ -519,4 +532,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-08 (§33 — nine open items closed, the PROPERTY region deleted, table-first standard added)
+**Last regenerated**: 2026-09-09 (§34 — the first rule tests: ten cases over the property tariff flow)

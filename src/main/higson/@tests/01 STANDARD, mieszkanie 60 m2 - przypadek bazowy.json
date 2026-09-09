@@ -1,0 +1,58 @@
+{
+  "name" : "01 STANDARD, mieszkanie 60 m2 - przypadek bazowy",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"instalment\":\"1014.94\",\"breakdown\":\"BUILDING=545.29;FIXTURES=197.59;CONTENTS=250.19;LIABILITY=21.87\",\"available\":\"true\",\"annual\":\"1014.94\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "COMMA",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "quote.policy.periodMonths",
+    "type" : "string",
+    "value" : "12"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "FLAT"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "string",
+    "value" : "1.215"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "string",
+    "value" : "528000"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "string",
+    "value" : "79200"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "string",
+    "value" : "116160"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "string",
+    "value" : "200000"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "STANDARD"
+  } ]
+}
