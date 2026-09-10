@@ -1,7 +1,7 @@
 #matrix for parameter demo.property.cover.flood
-zone;rate;basis;available;reason;minDeductible;capRatio;capAbsolute;capLabel
-*;0;SUM;false;FLOOD_UNAVAILABLE;0;0;0;
-Z0;2.40;SUM;true;;0;0;0;
-Z1;2.40;SUM;true;;0;0;0;
-Z2;2.90;SUM;true;FLOOD_DEDUCTIBLE;1000;0;0;
-ZX;0;SUM;false;FLOOD_UNAVAILABLE;0;0;0;
+zone;rate;available;reason;minDeductible
+*;0;false;;0
+Z0;2.40;true;;0
+Z1;2.40;true;;0
+Z2;2.90;true;FLOOD_DEDUCTIBLE;1000
+ZX;0;false;;0

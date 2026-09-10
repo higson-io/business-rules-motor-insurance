@@ -21,13 +21,10 @@ type = "STRING"
 
 def budget = ctx.getDecimal('quote.needs.budget')
 def premium = indicated == null ? null : ctx.getDecimal('quote.premium.' + indicated)
-
-// ⛔ ZERO, A NIE NULL, gdy nie ma czego porownywac. Zakres z niedomknietym koncem lapie w tej
-// wersji silnika takze NULL i wygrywa z wierszem gwiazdkowym, wiec null wychodzil jako BUDGET_FIT.
-// Zero jest wartoscia niemozliwa dla prawdziwego stosunku, wiec tabela ma po czym je poznac.
 def comparable = budget != null && budget > 0 && premium != null
+
+// Zero, nie null: otwarty koniec zakresu w tabeli dopasowuje null i wygrywa z wierszem gwiazdkowym.
 def ratio = comparable ? premium / budget : 0
 
-// Ani jednej nazwy wyniku tutaj - prog i slownik powodow mieszkalyby wtedy w dwoch miejscach.
-return higson.getString('demo.property.apk.budget',
-		higson.createContext('quote.needs.budgetRatio', ratio))
+def ratioCtx = higson.createContext('quote.needs.budgetRatio', ratio)
+return higson.getString('demo.property.apk.budget', ratioCtx)

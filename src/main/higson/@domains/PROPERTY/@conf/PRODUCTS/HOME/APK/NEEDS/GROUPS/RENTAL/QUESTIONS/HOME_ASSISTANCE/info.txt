@@ -1,0 +1,3 @@
+name = "Pomoc fachowca"
+description = "Pytanie ZALEZNE od odpowiedzi TAK na pytanie o wynajem. Zaleznosc jest specyficzna: wynajmujacy przy kazdej awarii u najemcy musi jechac sam. Domyka luke w analizie potrzeb - ASSISTANCE bylo jedynym pokryciem, ktorego klient nie mogl zadeklarowac."
+tags = []

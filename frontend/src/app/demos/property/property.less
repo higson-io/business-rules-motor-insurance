@@ -1,18 +1,38 @@
 @import '_variables';
 
+// ⛔ CAŁE DEMO SIEDZI W JEDNEJ BIAŁEJ KARCIE (makieta UX 2026-09-09). Wcześniej tytuł, karta
+// klienta i pasek kroków leżały wprost na tle strony, a białe były tylko panele w środku — przez
+// co ekran czytał się jako kilka niezależnych kafelków. Makieta robi z tego jeden dokument
+// i dopiero w nim wydziela panele.
+//
+// ⚠️ Karta jest tutaj, a nie w `app-shell`: zaprojektowano ją dla tego dema. Moto i życie mają
+// swoje układy i nie są objęte tym redesignem.
 :host {
 	display: block;
+	padding: 1.5rem;
+	background: @color-paper;
+	border-radius: 20px;
+	box-shadow: @shadow-panel;
+}
+
+@media (min-width: 992px) {
+	:host {
+		padding: 2.5rem;
+	}
 }
 
 .property__head {
-	margin: 0 0 16px;
+	margin: 0 0 20px;
 }
 
+// Tytuł dema. W makiecie jest wyraźnie cięższy niż był — to on trzyma górę dokumentu, skoro nie
+// ma już nad nim żadnego paska technicznego.
 .property__title {
 	margin: 0;
-	font-size: 1.5rem;
-	font-weight: 600;
-	line-height: 1.2;
+	font-size: 1.875rem;
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.01em;
 }
 
 // Mobile-first: jedna kolumna, podsumowanie NAD pracą, bo nie ma obok czego go postawić.
@@ -51,20 +71,24 @@
 	gap: 20px;
 }
 
-// Panel portalu: 8px, 1.5rem, bez obrysu — patrz `.apk__section`.
+// ⛔ OBRYS, NIE CIEŃ. Panel stoi teraz na białej karcie dema, a nie na szarym tle — cień na bieli
+// nie odcina niczego, tylko rozmywa krawędź. Makieta rysuje tu delikatną ramkę.
 .property__summary {
 	padding: @space-panel;
 	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
+	border: 1px solid @color-border-block;
+	border-radius: 12px;
 }
 
-// Tytuł panelu — turkus, jak `.panel-title` w portalu.
+// ⛔ Tytuł CIEMNY, nie turkusowy. Turkus w makiecie prowadzi do akcji i do nagłówków sekcji
+// dokumentu; nagłówek szpalty pomocniczej nie jest ani jednym, ani drugim.
 .property__summary-title {
 	margin: 0 0 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid @color-border-block;
 	font-size: @font-lg;
-	font-weight: 600;
-	color: @color-panel-title;
+	font-weight: 700;
+	color: @color-text;
 }
 
 // Liczba, po którą się w tę szpaltę patrzy. Wcześniej stała jako jeden z sześciu wierszy listy
@@ -91,21 +115,51 @@
 	color: @color-text-muted;
 }
 
+// ⛔ Kwoty ZOSTAJĄ (D-5). Makieta wpisywała w tych wierszach „W cenie" zamiast liczb — to jedyne
+// miejsce, w którym świadomie od niej odchodzimy. Sumy elementów stałych i ruchomości wylicza
+// silnik reguł i to jest dokładnie ta rzecz, którą demo ma pokazywać.
 .property__rows {
 	display: grid;
 	grid-template-columns: 1fr auto;
-	gap: 4px 12px;
-	margin: 0;
-	font-size: 0.8125rem;
+	gap: 10px 12px;
+	margin: 16px 0 0;
+	padding-top: 16px;
+	border-top: 1px solid @color-border-block;
+	font-size: 0.875rem;
 }
 
 .property__rows dt {
-	color: @color-text-muted;
+	color: @color-text;
 }
 
 .property__rows dd {
 	margin: 0;
 	text-align: right;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+// Kafelek z nazwą i opisem wariantu proponowanego. Opis niosło `PropertyVariantDto.description`,
+// nieużywane na tym ekranie do 2026-09-09 — makieta znalazła mu miejsce.
+.property__variant {
+	margin-top: 16px;
+	padding: 12px 14px;
+	background: @color-tile-info;
+	border-radius: 10px;
+}
+
+.property__variant-name {
+	margin: 0;
+	font-size: 0.8125rem;
+	font-weight: 700;
+	color: @color-action;
+}
+
+.property__variant-note {
+	margin: 4px 0 0;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	color: @color-text;
 }
 
 .property__price {
@@ -132,11 +186,21 @@
 	color: @color-text-muted;
 }
 
-// Pasek kroków domyka się z panelem pracy: zaokrągla tylko górne rogi, więc treść pod nim musi
-// zaczynać się bez odstępu, inaczej pasek wisi w powietrzu.
+// Pasek kroków w wariancie `plain` sam rysuje kreskę pod sobą, więc treść może zaczynać się
+// zaraz pod nią — panelu, z którym miałby się domykać, już nie ma.
 :host app-step-bar {
 	display: block;
-	margin-top: 16px;
+	margin-top: 4px;
+	margin-bottom: 16px;
+}
+
+// ⛔ Blok rekomendacji jest WSPÓŁDZIELONY z moto i życiem i tam ma zostać panelem na szarym tle.
+// Tutaj stoi w białej karcie, więc dostaje obrys zamiast cienia — przez właściwości
+// niestandardowe, bo enkapsulacja stylów nie pozwala (i słusznie) sięgnąć do klas dziecka.
+:host app-apk-recommendation {
+	--reco-border: 1px solid @color-border-soft;
+	--reco-radius: 12px;
+	--reco-shadow: none;
 }
 
 .property {

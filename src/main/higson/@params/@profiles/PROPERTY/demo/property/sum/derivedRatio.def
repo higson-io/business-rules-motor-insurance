@@ -1,5 +1,5 @@
 code = "demo.property.sum.derivedRatio"
-description = "Sumy elementow stalych i ruchomosci jako ulamek sumy murow - relacja, nie osobny pomiar."
+description = "Sumy elementow stalych i ruchomosci jako ulamek sumy murow - relacja, nie osobny pomiar. Jeden wiersz na standard wykonczenia, dwie kolumny zamiast dwoch wierszy: do 9 wrzesnia 2026 tabela byla kluczowana takze kodem pokrycia, przez co funkcja liczaca sumy musiala budowac sztuczny kontekst z cover.code i pytac dwa razy - a zadne pokrycie w tym miejscu nie jest jeszcze znane, bo sumy licza sie na poziomie calej wyceny."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,20 +9,11 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Derived sum ratio"
-
-[[inputLevel]]
-code = "cover"
-label = "cover code"
-type = "string"
-reverseMatcher = false
-property = "cover.code"
-source = "cover.code"
-union = false
+label = "Sumy pochodne od sumy murow"
 
 [[inputLevel]]
 code = "standard"
-label = "finish standard"
+label = "standard wykonczenia"
 type = "string"
 reverseMatcher = false
 property = "quote.property.finishStandard"
@@ -30,8 +21,15 @@ source = "quote.property.finishStandard"
 union = false
 
 [[outputLevel]]
-code = "ratio"
-label = "ratio"
+code = "fixtures"
+label = "elementy stale - ulamek sumy murow"
+type = "number"
+external = false
+array = false
+
+[[outputLevel]]
+code = "contents"
+label = "ruchomosci - ulamek sumy murow"
 type = "number"
 external = false
 array = false

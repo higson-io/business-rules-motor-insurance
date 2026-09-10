@@ -1,0 +1,3 @@
+name = "Oczekiwania"
+description = "Krok 6 ankiety i JEDYNA grupa o dwoch pytaniach: oczekiwana skladka i szacowana wartosc nieruchomosci. Oba nieobowiazkowe, oba pieniezne, oba o tym samym - czego klient oczekuje. Ekran pokazuje nazwe grupy jako naglowek i oba pytania jako pola."
+tags = []

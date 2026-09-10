@@ -1,5 +1,5 @@
 code = "demo.property.factor.deductible"
-description = "Franszyza w roli obnizki skladki - pierwsza z dwoch rol z D-8."
+description = "Franszyza w roli OBNIZKI SKLADKI - pierwsza z dwoch rol z D-8. Klient wybiera ja w kroku 2 (pole DEDUCTIBLE), a wartosc idzie prosto na sciezke quote.policy.deductible, ktora jest kluczem tej tabeli. Druga rola - franszyza NARZUCONA przez strefe powodziowa - stoi w kolumnie minDeductible tabeli demo.property.cover.flood i nie ma z ta nic wspolnego. Wiersz gwiazdkowy pokrywa brak franszyzy i kazda kwote spoza drabinki."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,11 +9,11 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Deductible factor"
+label = "Znizka za franszyze redukcyjna"
 
 [[inputLevel]]
 code = "deductible"
-label = "deductible"
+label = "wybrana franszyza w zlotych"
 type = "number"
 reverseMatcher = false
 property = "quote.policy.deductible"
@@ -22,7 +22,7 @@ union = false
 
 [[outputLevel]]
 code = "factor"
-label = "factor"
+label = "mnoznik skladki"
 type = "number"
 external = false
 array = false

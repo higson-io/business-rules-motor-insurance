@@ -1,5 +1,5 @@
 code = "demo.property.cover.assistance"
-description = "Wlasna tabela pokrycia i jedyna ze stawka KWOTOWA, nie promilowa: assistance kupuje usluge, a nie transfer ryzyka, wiec suma ubezpieczenia nie ma tu sensu i czynniki ryzyka nie maja na co dzialac. Cena zalezy od rodzaju nieruchomosci, bo do domu fachowiec jedzie dalej i czesciej."
+description = "Jedyne pokrycie ze stawka KWOTOWA - cena jest cala skladka, nie promilem sumy. Rozna dla domu i mieszkania, razem z limitem jednorazowej interwencji i jego opisem, bo te trzy zmieniaja sie razem. Dostepnosc i podstawa stawki sa stale i stoja na elemencie w drzewie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,7 +9,7 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Pomoc w domu - warunki pokrycia"
+label = "Cena i limit pomocy fachowca"
 
 [[inputLevel]]
 code = "kind"
@@ -22,42 +22,14 @@ union = false
 
 [[outputLevel]]
 code = "rate"
-label = "stawka"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "basis"
-label = "podstawa stawki"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "available"
-label = "dostepne"
-type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "reason"
-label = "kod zdania o odmowie"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capRatio"
-label = "limit jako ulamek sumy"
+label = "cena rocznej ochrony"
 type = "number"
 external = false
 array = false
 
 [[outputLevel]]
 code = "capAbsolute"
-label = "limit kwotowy"
+label = "limit jednorazowej interwencji"
 type = "number"
 external = false
 array = false

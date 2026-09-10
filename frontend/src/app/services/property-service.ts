@@ -25,6 +25,16 @@ export class PropertyService {
 	}
 
 	/**
+	 * Nowy proces — serwer porzuca dotychczasowy wniosek i zaczyna od pustego.
+	 *
+	 * ⚠️ Ciało puste, ale `PUT` musi je mieć — `HttpClient.put` bez drugiego argumentu nie
+	 * kompiluje się przy `strict`.
+	 */
+	reset(): Observable<void> {
+		return this.http.put<void>('property/reset', {});
+	}
+
+	/**
 	 * ⛔ Takes a `Date` OBJECT, never a string. `PropertyApi.setStartDate` is `@RequestBody Date`,
 	 * so a `Date` takes the object branch and is serialised to a quoted ISO-8601 string as
 	 * `application/json`. A string would arrive as `text/plain` and Jackson rejects it with 415.

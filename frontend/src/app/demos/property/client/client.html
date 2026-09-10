@@ -9,12 +9,20 @@
 	<div class="client" data-testid="property-client">
 		<span class="client__avatar" aria-hidden="true">{{ initials() }}</span>
 
-		<div class="client__who">
-			<p class="client__name">{{ name() }}</p>
-			<p class="client__source">{{ client.source }}</p>
-		</div>
-
+		<!--
+			⛔ Nazwisko jest KOLUMNĄ, nie preambułą. Do 2026-09-09 stało obok listy faktów jako
+			osobny blok bez etykiety, przez co karta miała jeden element opisany inaczej niż
+			pozostałe trzy. Makieta ustawia cztery równorzędne kolumny i pierwszej daje etykietę
+			„Ubezpieczający" — dzięki temu źródło z CRM ma gdzie usiąść, wewnątrz swojej kolumny.
+		-->
 		<dl class="client__facts">
+			<div class="client__fact client__fact--who">
+				<dt>Ubezpieczający</dt>
+				<dd>
+					<span class="client__name">{{ name() }}</span>
+					<span class="client__source">{{ client.source }}</span>
+				</dd>
+			</div>
 			<div class="client__fact">
 				<dt>PESEL</dt>
 				<dd>{{ client.pesel }}</dd>
@@ -23,9 +31,17 @@
 				<dt>Adres</dt>
 				<dd>{{ address() }}</dd>
 			</div>
+			<!--
+				⛔ E-mail i telefon w DWÓCH liniach. Sklejone przez „·" mieściły się w jednej tylko
+				dopóki adres był krótki; przy dłuższym zawijały się w przypadkowym miejscu, bo
+				łamanie wypadało w środku adresu, a nie na granicy dwóch faktów.
+			-->
 			<div class="client__fact client__fact--wide">
 				<dt>Kontakt</dt>
-				<dd>{{ client.email }} · {{ client.phone }}</dd>
+				<dd>
+					<span class="client__contact">{{ client.email }}</span>
+					<span class="client__contact client__contact--quiet">{{ client.phone }}</span>
+				</dd>
 			</div>
 		</dl>
 	</div>

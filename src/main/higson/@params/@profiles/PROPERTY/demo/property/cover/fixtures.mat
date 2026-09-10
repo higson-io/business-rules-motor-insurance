@@ -1,6 +1,6 @@
 #matrix for parameter demo.property.cover.fixtures
-finish;rate;basis;available;reason;capRatio;capAbsolute;capLabel
-*;1.40;SUM;true;;0.30;0;Elementy stałe w pomieszczeniach przynależnych — 30% sumy
-BASIC;1.10;SUM;true;;0.30;0;Elementy stałe w pomieszczeniach przynależnych — 30% sumy
-PREMIUM;1.90;SUM;true;;0.30;0;Elementy stałe w pomieszczeniach przynależnych — 30% sumy
-STANDARD;1.40;SUM;true;;0.30;0;Elementy stałe w pomieszczeniach przynależnych — 30% sumy
+finish;rate
+*;1.40
+BASIC;1.10
+PREMIUM;1.90
+STANDARD;1.40

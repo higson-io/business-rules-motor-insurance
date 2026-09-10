@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Jedna definicja pojecia \\"co pakiet pokrywa\\". Sklad bierze z drzewa, ale ODRZUCA pokrycia niedostepne w tej sytuacji - kradziez bez zabezpieczen, powodz w strefie najwyzszego zagrozenia. Do 8 wrzesnia 2026 filtr mial tylko Java przy ocenie pakietu, a reguly wybierajace pakiet go nie mialy: rekomendacja wybierala wariant liczac kradziez jako pokryta, po czym ta sama kradziez raportowala sie jako brakujaca. Wybor i ocena szly po dwoch roznych definicjach tego samego."
+description = "Jedna definicja pojecia \\"co pakiet pokrywa\\" - sklad wprost z drzewa. Bez filtrowania po dostepnosci: pakiet, ktory ma choc jedno pokrycie niedostepne, w ogole nie wchodzi do rozwazan, bo odsiewa go wczesniej demo.property.variant.available. Kazdy pakiet, ktory tu trafia, ma wszystkie pokrycia dostepne."
 
 [[arguments]]
 name = "ctx"
@@ -24,11 +24,10 @@ if (variantCode == null) {
 	return covers
 }
 
-for (def member in domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variantCode + ']').getAll('COVERS')) {
-	def code = member.getCode()
-	def cover = domain.get('PROPERTY', '/PRODUCTS[HOME]/COVERS[' + code + ']')
-	if (Boolean.TRUE.equals(cover.getAttrBoolean('IS_AVAILABLE', ctx))) {
-		covers.add(code)
-	}
+def pack = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variantCode + ']')
+def members = pack.getAll('COVERS')
+
+for (def member in members) {
+	covers.add(member.getCode())
 }
 return covers

@@ -12,11 +12,13 @@ public class PropertyQuoteDto {
 	private LocalDate startDate;
 	private BigDecimal deductible;
 
+	/** Franszyza narzucona przez strefę powodziową — warunek jednego pokrycia, nie polisy. */
+	private BigDecimal floodDeductible;
+
 	private List<PropertyQuestionDto> questions;
 
 	private String floodZone;
 	private String theftZone;
-	private Integer buildingAge;
 	private BigDecimal riskFactor;
 
 	private BigDecimal sumBuilding;
@@ -31,10 +33,15 @@ public class PropertyQuoteDto {
 	private PropertyPolicyholderDto policyholder;
 	private String selectedVariant;
 
-	/** Odpowiedź, po której nie ma czego dalej analizować — treść komunikatu podaje reguła. */
-	private boolean blocked;
-	private String blockedBy;
-	private String blockMessage;
+	/**
+	 * Czy wariant wybrał CZŁOWIEK, czy tylko idzie za rekomendacją.
+	 *
+	 * ⛔ Bez tego `selectedVariant` nigdy nie jest puste — serwer podstawia pod nie wariant
+	 * rekomendowany, żeby ekran miał co pokazywać. Ekran, który pyta „czy klient już wybrał",
+	 * dostawał więc zawsze „tak" i krok oferty otwierał się od razu.
+	 */
+	private boolean variantChosen;
+
 
 	public PropertyPolicyholderDto getPolicyholder() {
 		return policyholder;
@@ -68,6 +75,14 @@ public class PropertyQuoteDto {
 		this.deductible = deductible;
 	}
 
+	public BigDecimal getFloodDeductible() {
+		return floodDeductible;
+	}
+
+	public void setFloodDeductible(BigDecimal floodDeductible) {
+		this.floodDeductible = floodDeductible;
+	}
+
 	public List<PropertyQuestionDto> getQuestions() {
 		return questions;
 	}
@@ -92,13 +107,6 @@ public class PropertyQuoteDto {
 		this.theftZone = theftZone;
 	}
 
-	public Integer getBuildingAge() {
-		return buildingAge;
-	}
-
-	public void setBuildingAge(Integer buildingAge) {
-		this.buildingAge = buildingAge;
-	}
 
 	public BigDecimal getRiskFactor() {
 		return riskFactor;
@@ -172,27 +180,11 @@ public class PropertyQuoteDto {
 		this.selectedVariant = selectedVariant;
 	}
 
-	public boolean isBlocked() {
-		return blocked;
+	public boolean isVariantChosen() {
+		return variantChosen;
 	}
 
-	public void setBlocked(boolean blocked) {
-		this.blocked = blocked;
-	}
-
-	public String getBlockedBy() {
-		return blockedBy;
-	}
-
-	public void setBlockedBy(String blockedBy) {
-		this.blockedBy = blockedBy;
-	}
-
-	public String getBlockMessage() {
-		return blockMessage;
-	}
-
-	public void setBlockMessage(String blockMessage) {
-		this.blockMessage = blockMessage;
+	public void setVariantChosen(boolean variantChosen) {
+		this.variantChosen = variantChosen;
 	}
 }

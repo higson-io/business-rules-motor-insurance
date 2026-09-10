@@ -1,22 +1,18 @@
 @import '_variables';
 
+// ⛔ BEZ WŁASNEGO PANELU. Do 2026-09-09 tabela nosiła biel, promień i cień, bo stała na szarym
+// tle strony obok innych kart. Od redesignu cały ekran siedzi w jednej białej karcie — panel
+// w panelu rysowałby drugą krawędź tam, gdzie nic się nie kończy.
 :host {
 	display: block;
-	// Tabela mieszka w panelu portalu, a nie luzem na tle: 8px, 1.5rem, biel, cień, bez obrysu.
-	// Przedtem sama tabela nosiła obrys i promień, przez co jako jedyny obiekt na ekranie nie
-	// wyglądała jak karta obok siebie stojących kart.
-	padding: @space-panel;
-	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
 }
 
-// Tytuł panelu — turkus `--primary-150`, jak `.panel-title` w portalu.
+// Tytuł sekcji — turkus, jak nagłówki sekcji dokumentu w makiecie.
 .compare__title {
 	margin: 0 0 16px;
-	font-size: @font-lg;
-	font-weight: 600;
-	color: @color-panel-title;
+	font-size: @font-xl;
+	font-weight: 700;
+	color: @color-action;
 }
 
 // Szeroka tabela przewija się we własnym kontenerze, a nie stroną.
@@ -32,36 +28,109 @@
 
 .compare__table th,
 .compare__table td {
-	padding: 8px 12px;
+	padding: 14px 16px;
 	text-align: left;
-	border-bottom: 1px solid @color-border-block;
+	border-bottom: 1px solid @color-border-soft;
 }
 
 .compare__table td {
 	text-align: center;
 }
 
+// Nazwa pokrycia jest tym, po co się w ten wiersz patrzy — cięższa od reszty wiersza.
+.compare__table tbody th[scope='row'] {
+	font-weight: 600;
+	color: @color-text;
+}
+
+// ⛔ `top`, nie `bottom`. Nagłówek kolumny proponowanej ma DWIE linie (nazwa + badge), pozostałe
+// jedną — przy wyrównaniu do dołu nazwy wariantów przestawały stać w jednym rzędzie: „Podstawowy"
+// i „Standardowy" schodziły do poziomu badge'u, czyli o linijkę niżej niż „Pełny". Wyrównanie do
+// góry ustawia w rzędzie NAZWY, a badge zwisa pod swoją — dokładnie jak w makiecie.
+.compare__table thead th {
+	font-weight: 600;
+	color: @color-text;
+	white-space: nowrap;
+	vertical-align: top;
+}
+
+.compare__table thead th:not(:first-child) {
+	text-align: center;
+}
+
+// Kolumna proponowana: tint z makiety, przez całą wysokość tabeli.
+.compare__col--proposed {
+	background: @color-surface-muted;
+}
+
+// Kolumna wybrana: obrys w kolorze akcji. ⛔ Nie tło — tło jest już zajęte przez propozycję,
+// a te dwa wyróżnienia muszą dać się zobaczyć naraz (D-6).
 .compare__col--picked {
-	background: @color-gray-light;
+	box-shadow: inset 2px 0 0 @color-action, inset -2px 0 0 @color-action;
+}
+
+.compare__table thead .compare__col--picked {
+	box-shadow: inset 2px 2px 0 @color-action, inset -2px 0 0 @color-action;
+}
+
+.compare__table tbody tr:last-child .compare__col--picked {
+	box-shadow: inset 2px 0 0 @color-action, inset -2px -2px 0 @color-action;
 }
 
 .compare__badge {
 	display: block;
+	margin-top: 2px;
 	font-size: @font-xs;
-	font-weight: 600;
+	font-weight: 700;
+	letter-spacing: 0.04em;
 	color: @color-action;
 	text-transform: uppercase;
 }
 
 .compare__limit {
 	display: block;
+	margin-top: 3px;
 	font-size: @font-xs;
 	font-weight: 400;
+	line-height: 1.4;
 	color: @color-text-muted;
+	white-space: normal;
 }
 
+// Ptaszek niesie kolor akcji, kreska jest cicha — inaczej „nie ma tego pokrycia" waży na ekranie
+// tyle samo co „jest".
+.compare__mark {
+	font-size: @font-md;
+	font-weight: 700;
+	color: @color-action;
+}
+
+.compare__mark--absent {
+	font-weight: 400;
+	color: @color-outline;
+}
+
+// Wiersz składki: cena nad przyciskiem, obie rzeczy w jednej komórce.
 .compare__premium td {
-	font-weight: 600;
+	vertical-align: top;
+}
+
+.compare__price {
+	display: block;
+	margin-bottom: 10px;
+	font-size: @font-lg;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.compare__premium .compare__col--proposed .compare__price {
+	color: @color-action;
+}
+
+.compare__absent {
+	color: @color-text-muted;
+	font-size: @font-sm;
 }
 
 // Przycisk wyboru wariantu — `.second-button` z portalu: przezroczyste tło, obrys i tekst
@@ -88,8 +157,16 @@
 	}
 }
 
-.compare__reason {
-	margin: 10px 0 0;
-	font-size: @font-sm;
-	color: @color-text-muted;
+// W kolumnie proponowanej przycisk jest wypełniony — makieta prowadzi wzrok do jednej akcji,
+// a nie do trzech równorzędnych.
+.compare__col--proposed .compare__pick {
+	background: @color-action;
+	border-color: @color-action;
+	color: @color-white;
+}
+
+// Ostatni wiersz nie potrzebuje kreski — pod nim kończy się tabela.
+.compare__table tbody tr:last-child th,
+.compare__table tbody tr:last-child td {
+	border-bottom: 0;
 }

@@ -7,6 +7,7 @@ import {
 	linkedSignal,
 	output,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField } from '@angular/material/form-field';
@@ -18,6 +19,7 @@ import { firstValueFrom } from 'rxjs';
 const BOOLEAN_FALLBACK: readonly string[] = ['true', 'false'];
 
 import { PropertyStore } from '../../../core/property-store';
+import { isSettled, shownFields } from '../../../core/question-state';
 import { PropertyQuestionDto } from '../../../models/property';
 import { PropertyService } from '../../../services/property-service';
 
@@ -29,13 +31,15 @@ import { PropertyService } from '../../../services/property-service';
  * this screen without touching this file — including the answers to offer, which come from the
  * catalogue and default to yes/no for every question that does not override them.
  *
- * ⛔ Visibility is NOT computed here. `visible` arrives from the server, where
- * `demo.property.apk.question.visibility` decides it. A component that filtered by its own rules
- * would quietly make that table stop being a rule.
+ * ⛔ O tym, czy pytanie się zadaje, NIE rozstrzyga ten komponent. `visible` przychodzi z serwera,
+ * gdzie jedna reguła kluczowana odpowiedziami mówi, o co pytamy tego klienta. Filtr po własnej
+ * regule cicho odebrałby konfiguracji tę decyzję.
  */
 @Component({
 	selector: 'app-property-questionnaire',
 	imports: [
+		// Jeden szablon kontrolki użyty w trzech miejscach — patrz komentarz w szablonie.
+		NgTemplateOutlet,
 		MatButtonToggle,
 		MatButtonToggleGroup,
 		MatCheckbox,
@@ -47,6 +51,11 @@ import { PropertyService } from '../../../services/property-service';
 	templateUrl: './questionnaire.html',
 	styleUrl: './questionnaire.less',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	// Gałąź decyduje o układzie: ankieta ma spis obok pytania, lista przedmiotu nie ma czego
+	// obok siebie postawić. Klasa na gospodarzu, nie druga gałąź w szablonie (`components.md`).
+	host: {
+		'[class.apk--survey]': "group() === 'NEEDS'",
+	},
 })
 export class Questionnaire {
 	private readonly store = inject(PropertyStore);
@@ -83,65 +92,83 @@ export class Questionnaire {
 	readonly completed = output<void>();
 
 	/**
-	 * Wszystkie pytania tej gałęzi, o które w tym kroku wolno zapytać — w kolejności zadawania.
+	 * Wszystkie pytania tej gałęzi — w kolejności zadawania, także te, do których łańcuch jeszcze
+	 * nie doszedł, bo licznik postępu musi znać całość.
 	 *
-	 * ⚠️ Filtr po `visible` to REGUŁA („czy pytanie dotyczy tego klienta"), nie łańcuch. Odsłanianie
-	 * rozstrzyga się niżej, przy wyborze pytania bieżącego, bo licznik postępu musi znać całość.
+	 * ⛔ Nie ma tu drugiego filtra i nie powinno być. Do 10 września 2026 stał tu `visible`,
+	 * osobna reguła „czy pytanie dotyczy tego klienta" — dająca ten sam skutek co łańcuch
+	 * (pytanie na ekranie albo go nie ma), tylko dla innych pytań. Zostało jedno pojęcie.
 	 */
 	readonly asked = computed<readonly PropertyQuestionDto[]>(() => {
 		const quote = this.loaded();
 		if (quote === null) {
 			return [];
 		}
-		return quote.questions.filter(
-			(question) => question.section === this.group() && question.visible,
-		);
+		return quote.questions.filter((question) => question.section === this.group());
 	});
 
-	/** Te, do których łańcuch już doszedł. Ostatnie z nich jest bieżące. */
-	private readonly reached = computed<readonly PropertyQuestionDto[]>(() =>
-		this.asked().filter((question) => question.revealed),
+	/**
+	 * Te, do których łańcuch już doszedł. Ostatnie z nich jest bieżące w ankiecie, a na kroku
+	 * drugim — gdzie pola pokazują się wszystkie naraz — to jest po prostu lista do wyświetlenia.
+	 */
+	readonly reachable = computed<readonly PropertyQuestionDto[]>(() =>
+		this.asked().filter((question) => question.visible),
 	);
 
-	/** Czy klient na to pytanie odpowiedział. Odpowiednik serwerowego `isSettled()`. */
+	/**
+	 * ⛔ Domknięcie pytania liczy `core/question-state`, nie ten komponent. Tę samą regułę
+	 * potrzebuje gospodarz kroków, żeby powiedzieć, czy krok wolno opuścić — a dwie kopie
+	 * rozjechałyby się przy pierwszej zmianie.
+	 */
 	private settled(question: PropertyQuestionDto): boolean {
-		return question.refused || question.values.length > 0 || !!question.value;
+		return isSettled(question);
+	}
+
+	/**
+	 * Pytania grupy, które klient widzi — bez warunkowych, do których łańcuch jeszcze nie doszedł.
+	 *
+	 * ⛔ Filtrowanie należy do `core/question-state`, nie do szablonu: tę samą listę liczy
+	 * domknięcie kroku, a dwie definicje „co widać" rozjechałyby się przy pierwszej zmianie.
+	 */
+	fieldsOf(question: PropertyQuestionDto): readonly PropertyQuestionDto[] {
+		return shownFields(question);
 	}
 
 	/**
 	 * Numer pytania oglądanego teraz.
 	 *
-	 * ⛔ `linkedSignal`, nie `signal`, i to daje DWIE rzeczy naraz. Po odpowiedzi łańcuch odsłania
-	 * kolejne pytanie, więc `reached` się zmienia, kursor się przelicza i ekran sam przechodzi na
-	 * to nowe pytanie — czyli ankieta zachowuje się jak ankieta, bez osobnego mechanizmu
-	 * przewijania. A gdy klient cofnie się i poprawi odpowiedź, która niczego nie odsłania,
-	 * `reached` nie drgnie i kursor zostaje tam, gdzie klient go postawił.
+	 * ⛔ **BEZ SAMOPRZESKOKU PO ODPOWIEDZI** (2026-09-09). Do tej daty kursor liczył się jako
+	 * „pierwsze nieudzielone spośród odsłoniętych", więc odpowiedź na pytanie natychmiast
+	 * przesuwała ekran na następne — w 80 ms, zmierzone. Skutek był taki, że klient PATRZYŁ ZAWSZE
+	 * NA PYTANIE NIEUDZIELONE, a przycisk „Następne pytanie" był przez całą ankietę wyszarzały,
+	 * bo istotnie nie było dokąd iść. Zapalał się wyłącznie na ostatnim pytaniu, i to tylko
+	 * dlatego, że jest nieobowiązkowe. Zgłoszone z testów: „ten przycisk był ciągle wyszarzały".
 	 *
-	 * ⚠️ Pierwsze NIEUDZIELONE, nie ostatnie odsłonięte. Ostatnie odsłonięte przy wejściu na krok
-	 * z częściowo wypełnioną ankietą wrzucałoby klienta na koniec listy zamiast tam, gdzie skończył.
+	 * ⛔ W pliku siedziały przez to DWA SPRZECZNE PROJEKTY: komentarz przy `next()` deklarował
+	 * nawigację jawną („ekran nie może uciec prowadzącemu"), a ten sygnał robił przeskok jako
+	 * efekt uboczny przeliczenia. Osobno każde brzmiało sensownie — stąd nikt tego nie zauważył.
+	 *
+	 * Teraz kursor **zostaje tam, gdzie stoi**, dopóki mieści się w zakresie. Liczy się od nowa
+	 * tylko wtedy, gdy nie ma czego utrzymać: przy pierwszym wejściu na krok i po zmianie, która
+	 * skróciła listę odsłoniętych.
+	 *
+	 * ⚠️ Wtedy „pierwsze NIEUDZIELONE", nie „ostatnie odsłonięte" — wejście na krok z częściowo
+	 * wypełnioną ankietą ma postawić klienta tam, gdzie skończył, a nie na końcu listy.
 	 */
 	private readonly cursor = linkedSignal<readonly PropertyQuestionDto[], number>({
-		source: this.reached,
+		source: this.reachable,
 		computation: (reached, previous) => {
-			// ⛔ Po odpowiedzi blokującej ankieta ZOSTAJE przy niej. Inaczej łańcuch odsłaniał
-			// kolejne pytanie, kursor tam skakał i komunikat „nie prowadzimy dalej tej analizy"
-			// wypisywał się pod pytaniem, na które klient miał właśnie odpowiedzieć.
-			const blocker = this.loaded()?.blockedBy;
-			if (blocker) {
-				const stopped = reached.findIndex((question) => question.code === blocker);
-				if (stopped >= 0) {
-					return stopped;
-				}
+			const kept = previous?.value;
+			if (kept !== undefined && kept < reached.length) {
+				return kept;
 			}
 			const pending = reached.findIndex((question) => !this.settled(question));
-			const fallback = pending >= 0 ? pending : Math.max(reached.length - 1, 0);
-			const kept = previous?.value;
-			return kept !== undefined && kept < reached.length && kept > fallback ? kept : fallback;
+			return pending >= 0 ? pending : Math.max(reached.length - 1, 0);
 		},
 	});
 
 	readonly current = computed<PropertyQuestionDto | null>(
-		() => this.reached()[this.cursor()] ?? null,
+		() => this.reachable()[this.cursor()] ?? null,
 	);
 
 	/**
@@ -166,6 +193,44 @@ export class Questionnaire {
 	readonly stepNumber = computed(() => this.cursor() + 1);
 	readonly stepCount = computed(() => this.asked().length);
 
+	/**
+	 * Spis pytań kroku — lista obok ankiety, z makiety UX.
+	 *
+	 * ⛔ Liczy po `asked()`, czyli po REGULE widoczności, a nie po odsłonięciu. Spis, który rośnie
+	 * w miarę odpowiadania, przestaje być spisem: nie da się z niego odczytać, ile jeszcze zostało,
+	 * a to jest jedyny powód, dla którego stoi na ekranie. Odsłonięcie decyduje wyłącznie o tym,
+	 * czy w daną pozycję wolno kliknąć.
+	 *
+	 * Etykieta pozycji spisu to nazwa grupy pytan.
+	 * Ekran nie ma zapasowej nazwy wpisanej w kod, bo byłaby to nazwa pytania trzymana poza
+	 * regułami, czyli dokładnie to, czego to demo dowodzi, że robić nie trzeba.
+	 */
+	readonly outline = computed(() => {
+		const currentCode = this.current()?.code ?? null;
+		return this.asked().map((question, index) => ({
+			code: question.code,
+			label: question.text,
+			number: index + 1,
+			current: question.code === currentCode,
+			done: question.visible && question.code !== currentCode && this.settled(question),
+			reachable: question.visible,
+		}));
+	});
+
+	/**
+	 * Skok do pytania ze spisu.
+	 *
+	 * ⛔ Tylko do pytania ODSŁONIĘTEGO. Skok do nieodsłoniętego przeskakiwałby łańcuch — a łańcuch
+	 * jest konfiguracją, nie ozdobą: pytanie o wynajem ma sens dopiero po tym, jak wiadomo, że
+	 * klient w ogóle chce ubezpieczać nieruchomość.
+	 */
+	goToQuestion(code: string): void {
+		const index = this.reachable().findIndex((question) => question.code === code);
+		if (index >= 0) {
+			this.cursor.set(index);
+		}
+	}
+
 
 	readonly hasPrevious = computed(() => this.cursor() > 0);
 
@@ -187,25 +252,9 @@ export class Questionnaire {
 	 * chcę podać"), która domykała pytanie bez odpowiadania; po jej usunięciu bez tej gałęzi
 	 * oczekiwana składka byłaby ślepym zaułkiem.
 	 */
-	/**
-	 * Odpowiedź, po której nie ma czego dalej analizować — mówi ją tabela
-	 * `demo.property.apk.question.blocker`, a nie ten komponent.
-	 *
-	 * ⛔ ZATRZYMUJE ANKIETĘ, a nie tylko wypisuje zdanie. Do 8 września 2026 komunikat pojawiał
-	 * się pod ankietą, a „Dalej" działało jak zwykle — czyli klient, któremu przed chwilą
-	 * powiedzieliśmy, że nie mamy czego mu zaproponować, szedł dalej wypełniać ankietę.
-	 *
-	 * ⛔ Pasek kroków zostaje klikalny. Blokada dotyczy ŚCIEŻKI KLIENTA, nie prowadzącego —
-	 * demo musi dać się cofnąć, zmienić odpowiedź i pokazać, że wszystko wraca.
-	 */
-	readonly blocked = computed(() => this.loaded()?.blocked ?? false);
-
-	readonly blockMessage = computed(() => this.loaded()?.blockMessage ?? null);
-
 	readonly canAdvance = computed(() => {
 		const question = this.current();
-		return question !== null && !this.blocked()
-			&& (this.settled(question) || !question.required);
+		return question !== null && (this.settled(question) || !question.required);
 	});
 
 	/**
@@ -219,7 +268,7 @@ export class Questionnaire {
 			return;
 		}
 		// ⚠️ Nie przeskakuj poza to, co odsłonięte — łańcuch może prowadzić inaczej niż kolejność.
-		if (this.cursor() < this.reached().length - 1) {
+		if (this.cursor() < this.reachable().length - 1) {
 			this.cursor.update((value) => value + 1);
 		} else {
 			this.completed.emit();

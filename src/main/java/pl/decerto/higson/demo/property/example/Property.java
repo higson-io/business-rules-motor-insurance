@@ -16,6 +16,7 @@ import java.util.Map;
 
 import io.higson.runtime.core.HigsonEngine;
 import io.higson.runtime.engine.core.output.ParamValue;
+import io.higson.runtime.flow.FlowResult;
 import io.higson.runtime.model.DomainObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,6 @@ import pl.decerto.higson.demo.property.service.DocumentNumbers;
 import pl.decerto.higson.demo.property.domain.PropertyQuote;
 import pl.decerto.higson.demo.apk.Question;
 import pl.decerto.higson.demo.apk.Recommendation;
-import pl.decerto.higson.demo.apk.Regime;
 import pl.decerto.higson.demo.property.domain.Variant;
 
 /**
@@ -53,6 +53,19 @@ public class Property {
 	private static final String PRODUCT_PATH = "/PRODUCTS[HOME]";
 
 	private static final String COLLECTION_APK = "APK";
+	private static final String ATTR_TEXT = "TEXT";
+	private static final String ATTR_KIND = "KIND";
+	private static final String ATTR_CONTEXT_PATH = "CONTEXT_PATH";
+	private static final String ATTR_REQUIRED = "REQUIRED";
+	private static final String ATTR_POSITION = "POSITION";
+
+	private static final String KIND_GROUP = "GROUP";
+	private static final String KIND_BOOLEAN = "BOOLEAN";
+	private static final List<String> BOOLEAN_OPTIONS = List.of("true", "false");
+	private static final List<String> BOOLEAN_LABELS = List.of("Tak", "Nie");
+
+	private static final String COLLECTION_GROUPS = "GROUPS";
+
 	private static final String COLLECTION_QUESTIONS = "QUESTIONS";
 	private static final String BRANCH_SUBJECT = "SUBJECT";
 
@@ -67,44 +80,70 @@ public class Property {
 	 * `demo.property.apk.question`, więc zmiana brzmienia pytania to nadal jedna komórka.
 	 */
 	private static final List<String> SUBJECT_FIELDS = List.of(
-		"PROPERTY_KIND", "AREA", "CONSTRUCTION_YEAR", "WALL_MATERIAL", "FLOOR", "RENOVATED",
+		"PROPERTY_KIND", "AREA", "CONSTRUCTION_YEAR", "WALL_MATERIAL", "FLOOR", "DEDUCTIBLE",
 		"FINISH_STANDARD", "POSTCODE", "OCCUPANCY", "SECURITY", "CLAIMS_3Y", "PRIOR_FLOOD_COVER",
 		"COVER_PERIOD");
 	private static final String APK_ELEMENT = "NEEDS";
 	private static final String COLLECTION_COVERS = "COVERS";
+
+	/**
+	 * ⛔ JEDYNY kod pokrycia w tym pliku i jedyny, jaki musi tu być: franszyza strefowa i karencja
+	 * to warunki JEDNEGO pokrycia, a zdanie o nich pada w uzasadnieniu niezależnie od tego, który
+	 * pakiet oglądamy. Adresem jest element w drzewie — reguły stoją pod jego atrybutami.
+	 */
+	private static final String COVER_FLOOD = "FLOOD";
 	private static final String COLLECTION_VARIANTS = "VARIANTS";
 
-	private static final String PARAM_REGIME = "demo.property.apk.regime";
-	private static final String PARAM_QUESTION = "demo.property.apk.question";
+	/**
+	 * Atrybuty, pod którymi wiszą reguły — jedyne adresy, jakimi ta klasa dysponuje.
+	 *
+	 * ⛔ Do 10 września 2026 stały tu KODY REGUŁ i aplikacja wołała je wprost. Drzewo mogło wtedy
+	 * o regule nie wiedzieć, a przestawienie wskaźnika w Studio nie zmieniało niczego — bo Java
+	 * i tak szła obok. Teraz adresem jest element i atrybut; na co atrybut wskazuje, rozstrzyga
+	 * konfiguracja, a Java nie wie nawet, czy pod spodem jest tabela, funkcja czy flow.
+	 */
+	private static final String ATTR_SUBJECT_FIELDS = "SUBJECT_FIELDS";
+	private static final String ATTR_RECOMMENDATION = "RECOMMENDATION";
+	private static final String ATTR_JUSTIFICATION = "JUSTIFICATION";
+	private static final String ATTR_REASON = "REASON";
+	private static final String ATTR_VALUE_GAP = "VALUE_GAP";
 
-	private static final String FUNCTION_BUILDING_AGE = "demo.property.util.buildingAge";
-	private static final String FUNCTION_ZONE = "demo.property.zone.resolve";
-	private static final String FUNCTION_SUMS = "demo.property.sum.suggest";
-	private static final String FLOW_RISK = "demo.property.risk.calculate";
-	private static final String FLOW_RECOMMEND = "demo.property.apk.recommend";
+	private static final String ATTR_ZONES = "ZONES";
+	private static final String ATTR_SUM_RATE = "SUM_RATE";
+	private static final String ATTR_COVER_PERIOD = "COVER_PERIOD";
+	private static final String ATTR_CHOICE_RELATION = "CHOICE_RELATION";
+	private static final String ATTR_CHOICE_NOTE = "CHOICE_NOTE";
 
-	private static final String FLOW_QUOTE = "demo.property.calculateQuote";
-	private static final String PARAM_APK_BLOCKER = "demo.property.apk.question.blocker";
-	private static final String PARAM_VALUE_GAP = "demo.property.sum.valueGap";
-	private static final String PARAM_APK_REASON = "demo.property.apk.recommendation.reason";
-	private static final String PARAM_RATE_PER_SQM = "demo.property.sum.ratePerSqm";
-	private static final String PARAM_COVER_FLOOD = "demo.property.cover.flood";
-	private static final String PARAM_REASON = "demo.property.apk.reason";
-	private static final String PARAM_FLOOD_WAITING = "demo.property.flood.waitingPeriod";
-	private static final String PARAM_OFFER_TERMS = "demo.property.offer.terms";
-	private static final String PARAM_OFFER_CHOICE = "demo.property.offer.choice";
-	private static final String PARAM_CHOICE_KIND = "demo.property.offer.choiceKind";
-	private static final String PARAM_PERIOD = "demo.property.factor.period";
+	private static final String ATTR_PREMIUM = "PREMIUM";
+	private static final String ATTR_LIABILITY_SUM = "LIABILITY_SUM";
+	private static final String ATTR_DEDUCTIBLE = "DEDUCTIBLE";
+	private static final String ATTR_WAITING_PERIOD = "WAITING_PERIOD";
 
 	private static final String PATH_PERIOD_MONTHS = "quote.policy.periodMonths";
 
 	private static final String OUTCOME_FIT = "BUDGET_FIT";
 	private static final String OUTCOME_EXCEEDED = "BUDGET_EXCEEDED";
 
-	private static final String PARAM_REVEAL = "demo.property.apk.question.reveal";
-	private static final String PARAM_VISIBILITY = "demo.property.apk.question.visibility";
-	private static final String ATTR_OVERWRITE_MANUAL_SUM = "OVERWRITE_MANUAL_SUM";
-	private static final String ATTR_FREEZE_ISSUED_OFFER = "FREEZE_ISSUED_OFFER";
+	/**
+	 * ⛔ WIDOCZNOŚĆ NA PYTANIU, a jego reguła należy do NIEGO. Wartością atrybutu jest `true` —
+	 * pytamy zawsze — albo wskazanie własnej tabeli pytania, kluczowanej odpowiedzią, od której
+	 * zależy. Tabela nie ma wtedy kolumny z kodem pytania: o kogo chodzi, mówi miejsce w drzewie.
+	 *
+	 * ⛔ Pola przedmiotu elementami NIE SĄ, więc ich widoczność stoi przy ich katalogu, na
+	 * produkcie — i tamta tabela kod pola potrzebuje, bo obsługuje je wszystkie.
+	 */
+	private static final String ATTR_IS_VISIBLE = "IS_VISIBLE";
+	private static final String ATTR_FIELD_VISIBILITY = "FIELD_VISIBILITY";
+	private static final String ATTR_RISK_FACTOR = "RISK_FACTOR";
+	private static final String ATTR_SUM_INSURED = "SUM_INSURED";
+	private static final String ATTR_OFFER_VALIDITY_DAYS = "OFFER_VALIDITY_DAYS";
+
+	private static final String ATTR_OFFER_PAYMENT_DAYS = "OFFER_PAYMENT_DAYS";
+
+	private static final String ATTR_OFFER_NEEDS_ANALYSIS = "OFFER_NEEDS_ANALYSIS";
+
+	private static final String ATTR_OFFER_STATEMENT = "OFFER_STATEMENT";
+
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_SUM_LIABILITY = "quote.sums.liability";
 	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
@@ -137,7 +176,6 @@ public class Property {
 			.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		engine.setEffectiveDate(effective);
 		try {
-			loadRegime(quote);
 			loadQuestions(quote);
 			seedDefaults(quote);
 
@@ -158,18 +196,6 @@ public class Property {
 	}
 
 	/**
-	 * ⛔ Reżim zostaje po stronie serwera. Kluczuje warunki oferty (§15) i tyle — do ekranu nie
-	 * jedzie, odkąd §27 zdjął podstawę prawną z notatki, a D-17 zostawił jeden reżim.
-	 */
-	private void loadRegime(PropertyQuote quote) {
-		ParamValue value = engine.get(PARAM_REGIME, new PropertyContext(quote));
-		Regime regime = new Regime();
-		regime.setCode(value.getString("code"));
-		regime.setName(value.getString("name"));
-		quote.setRegime(regime);
-	}
-
-	/**
 	 * Katalog pytań — czytany przez SEKCJE, bo sekcja jest gałęzią drzewa, a nie wartością
 	 * atrybutu na pytaniu.
 	 *
@@ -184,26 +210,25 @@ public class Property {
 	 *    znikało siedem pojedynczych pytań, a sekcje trzeba było wygaszać domyślaniem się z
 	 *    pustej listy.
 	 *
-	 * ⚠️ Widoczność pytania i nieistnienie pytania to DWA RÓŻNE mechanizmy. Pierwszy to reguła
-	 * (`demo.property.apk.question.visibility`), drugi to wersja regionu. Zlanie ich w jedno
-	 * odebrałoby demonstracji połowę sensu.
+	 * ⚠️ Niezadanie pytania i nieistnienie pytania to DWIE RÓŻNE rzeczy. Pierwsze mówi pytanie
+	 * samo o sobie (warunek odsłonięcia), drugie — wersja regionu. Zlanie ich w jedno odebrałoby
+	 * demonstracji połowę sensu.
 	 */
 	private void loadQuestions(PropertyQuote quote) {
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		DomainObject product = productElement();
 		if (product == null) {
 			return;
 		}
 		List<Question> questions = new ArrayList<>();
 		DomainObject apk = product.getChild(COLLECTION_APK, APK_ELEMENT);
 		if (apk != null) {
-			readInto(quote, apk.getChildren(COLLECTION_QUESTIONS), APK_ELEMENT, questions);
+			readGroups(quote, apk.getChildren(COLLECTION_GROUPS), questions);
 		}
 		for (String code : SUBJECT_FIELDS) {
 			questions.add(readCatalogueQuestion(quote, code));
 		}
 
 		questions.sort(Comparator.comparingInt(Question::getPosition));
-		applyReveal(quote, questions);
 		quote.setQuestions(questions);
 	}
 
@@ -221,11 +246,39 @@ public class Property {
 	 * przenosić elementy domeny, choć biznesowo nic się nie stało. Kolejność i podział ekranów
 	 * należą do aplikacji.
 	 */
-	private void readInto(PropertyQuote quote, List<DomainObject> definitions, String branch,
-			List<Question> questions) {
+	private void readGroups(PropertyQuote quote, List<DomainObject> groups, List<Question> questions) {
+		for (DomainObject group : groups) {
+			Question parent = readQuestion(quote, group, APK_ELEMENT);
+			// ⛔ Grupa NIE MA własnej odpowiedzi — `KIND` bierze się stąd, a nie z atrybutu, bo
+			// grupa go nie ma. Ekran rozpoznaje po tym, że ma renderować pola, a nie kontrolkę.
+			parent.setKind(KIND_GROUP);
+			// ⛔ Dla GRUPY treścią jest jej NAZWA, nie atrybut `TEXT` — grupa go nie ma i mieć nie
+			// powinna. Nazwa kroku pracuje w dwóch miejscach: jako pozycja w spisie i jako nagłówek,
+			// gdy grupa pokazuje więcej niż jedno pytanie. Pytanie ma odwrotnie: krótką nazwę
+			// w drzewie i pełne zdanie w atrybucie.
+			parent.setText(group.getName());
+			questions.add(parent);
 
-		for (DomainObject definition : definitions) {
-			questions.add(readQuestion(quote, definition, branch));
+			// ⛔ KROK JEST ZAWSZE NA LIŚCIE. Spis kroków ma być stały — prowadzący widzi, z ilu
+			// etapów składa się rozmowa, zanim padnie pierwsza odpowiedź. Warunkowość działa
+			// WEWNĄTRZ kroku: to pytania pojawiają się i znikają, nie kroki.
+			//
+			// ⛔ Obowiązkowość natomiast BIERZE SIĘ Z PYTAŃ, a nie z własnego atrybutu grupy:
+			// krok trzeba domknąć dokładnie wtedy, gdy któreś z jego pytań jest obowiązkowe,
+			// więc atrybut na grupie byłby tą samą regułą zapisaną drugi raz.
+			parent.setVisible(true);
+			boolean anyRequired = false;
+			for (DomainObject definition : group.getChildren(COLLECTION_QUESTIONS)) {
+				Question question = readQuestion(quote, definition, APK_ELEMENT);
+				anyRequired = anyRequired || question.isRequired();
+				// ⛔ RODZICA MÓWI DRZEWO, nie kolumna. Do 9 września 2026 niosła to kolumna
+				// `partOf` w katalogu — działała, ale przynależność była niewidoczna w Studio:
+				// grupa stała OBOK swoich pytań jako ich rodzeństwo, a nie nad nimi. Teraz
+				// wystarczy rozwinąć gałąź, żeby zobaczyć, o co pyta dany krok.
+				question.setPartOf(group.getCode());
+				questions.add(question);
+			}
+			parent.setRequired(anyRequired);
 		}
 	}
 
@@ -238,7 +291,7 @@ public class Property {
 	 */
 	private Question readCatalogueQuestion(PropertyQuote quote, String code) {
 		PropertyContext ctx = new PropertyContext(quote).withQuestion(code);
-		ParamValue row = engine.get(PARAM_QUESTION, ctx);
+		ParamValue row = ruleOf(productElement(), ATTR_SUBJECT_FIELDS, ctx);
 
 		Question question = new Question();
 		question.setCode(code);
@@ -247,7 +300,7 @@ public class Property {
 		question.setKind(row.getString("kind"));
 		question.setContextPath(row.getString("contextPath"));
 		question.setVisible(Boolean.TRUE.equals(
-			engine.get(PARAM_VISIBILITY, ctx).getBoolean("visible")));
+			ruleOf(productElement(), ATTR_FIELD_VISIBILITY, ctx).getBoolean("visible")));
 		applyCatalogue(question, row);
 		return question;
 	}
@@ -269,85 +322,120 @@ public class Property {
 		// ma przeczytać jedno zdanie, a przy kilkunastu pytaniach robiła z ankiety ścianę tekstu.
 		// Treść pytania musi wystarczyć sama — jeśli nie wystarcza, to jest źle zadane pytanie,
 		// a nie brakujący przypis.
-		// ⛔ TREŚĆ PYTANIA TO NAZWA ELEMENTU, nie osobny atrybut. Do 4 września 2026 stała
-		// w atrybucie `TEXT`, przez co każde pytanie miało dwie wersje siebie — nazwę widoczną
-		// w drzewie i tekst widoczny na ekranie. Cztery z dziewiętnastu zdążyły się rozjechać,
-		// a rozjazd nie objawiał się niczym: konfigurator poprawiał nazwę i ekran się nie zmieniał.
-		question.setText(definition.getName());
+		// ⛔ TREŚĆ PYTANIA WRÓCIŁA DO ATRYBUTU `TEXT` (2026-09-09) — ale to NIE jest powrót do
+		// stanu sprzed D-20 i różnica jest cała w tym, czym stała się nazwa. Tamten układ miał
+		// TĘ SAMĄ treść w dwóch miejscach: nazwa elementu i atrybut mówiły to samo zdanie, cztery
+		// z dziewiętnastu pytań zdążyły się rozjechać, a rozjazd nie objawiał się niczym —
+		// konfigurator poprawiał nazwę i ekran się nie zmieniał.
+		//
+		// Teraz nazwa niesie KRÓTKĄ NAZWĘ PRZEDMIOTOWĄ („Kradzież", „Powódź"), po której czyta się
+		// drzewo, a atrybut pełne zdanie zadawane klientowi. Dwie różne rzeczy, więc nie ma czego
+		// synchronizować.
+		//
+		// ⛔ BEZ ZAPASOWEGO ODCZYTU NAZWY. Pytanie dodane bez `TEXT` pokaże na ekranie pustkę —
+		// widać to natychmiast i natychmiast się poprawia. Cicha zamiana na nazwę elementu
+		// przywróciłaby dokładnie tę niewidoczność, przez którą D-20 usunął atrybut.
+		question.setVisible(Boolean.parseBoolean(attrString(definition, ATTR_IS_VISIBLE, ctx)));
+		question.setText(attrString(definition, ATTR_TEXT, ctx));
 		// ⛔ NOŚNE. `KIND` niesie i rodzaj kontrolki, i typ wartości — `PropertyContext.convert`
 		// konwertuje po nim. Do 3 września 2026 były to dwa atrybuty; rozdzielone dawały cztery
 		// kombinacje, z których sensowne były dwie, a pomyłka kończyła się tym, że „400" nie
 		// stawało się `BigDecimal` i budżet klienta znikał w drodze do rekomendacji.
 		// `NUMBER` rozpadł się na `INTEGER` i `DECIMAL` i to wystarczyło, żeby drugi atrybut
 		// przestał być potrzebny.
-		question.setKind(attrString(definition, "KIND", ctx));
-		question.setContextPath(attrString(definition, "CONTEXT_PATH", ctx));
-		// ⛔ Widoczność czyta się z reguły WPROST, tak samo jak dla pól przedmiotu. Do 8 września
-		// 2026 pytanie APK miało atrybut `IS_VISIBLE`, ale na wszystkich siedmiu był to TEN SAM
-		// wskaźnik na tę samą tabelę — czyli siedem kopii jednej informacji, zasłaniających dwa
-		// atrybuty, które faktycznie różnią pytania od siebie.
-		question.setVisible(Boolean.TRUE.equals(
-			engine.get(PARAM_VISIBILITY, ctx).getBoolean("visible")));
+		question.setKind(attrString(definition, ATTR_KIND, ctx));
+		question.setContextPath(attrString(definition, ATTR_CONTEXT_PATH, ctx));
 
-		// Reszta z KATALOGU — te, które na elemencie były identycznym wskaźnikiem `$p` i tylko
-		// zasłaniały pięć powyższych. Jeden odczyt zamiast sześciu atrybutów i pięciu tabel.
-		applyCatalogue(question, engine.get(PARAM_QUESTION, ctx));
+		// ⛔ RESZTA TEŻ Z ELEMENTU. Do 10 września 2026 sześć poniższych rzeczy stało w katalogu
+		// tabelarycznym, wspólnym dla pytań analizy potrzeb i pól przedmiotu — a katalog robił
+		// wtedy dwie różne robotki pod jedną nazwą: pięć jego kolumn było wypełnionych WYŁĄCZNIE
+		// dla pól przedmiotu, dwie WYŁĄCZNIE dla pytań w drzewie. To są stałe pojedynczego
+		// pytania, więc stoją na pytaniu (D-23); katalog opisuje już tylko pola przedmiotu,
+		// które elementami drzewa nie są i nie mają gdzie tego nieść.
+		question.setRequired(Boolean.parseBoolean(attrString(definition, ATTR_REQUIRED, ctx)));
+		// ⛔ OPCJE WYNIKAJĄ Z RODZAJU ODPOWIEDZI. Pytanie analizy potrzeb jest tak-albo-nie i innego
+		// w tym demie nie ma, więc `BOOLEAN` sam mówi, z czego wybierać — atrybut niósłby przy
+		// każdym pytaniu tę samą parę wartości. Pola przedmiotu mają własne listy i te siedzą
+		// w ich katalogu, bo tam naprawdę różnią się między wierszami.
+		boolean yesNo = KIND_BOOLEAN.equals(question.getKind());
+		question.setOptions(yesNo ? BOOLEAN_OPTIONS : List.of());
+		question.setOptionLabels(yesNo ? BOOLEAN_LABELS : List.of());
+		question.setPosition(intOf(attrString(definition, ATTR_POSITION, ctx)));
 
-		// ⛔ DWIE FLAGI, NIE JEDNA — i nie wolno ich tu sklejać. Reguła `IS_VISIBLE` mówi, czy
-		// pytanie DOTYCZY tego klienta (piętro nie dotyczy domu); łańcuch `revealedBy` — czy już
-		// PORA je zadać. Ekran pokazuje pytania spełniające oba warunki, ale licznik „pytanie 2
-		// z 7" liczy tylko po pierwszym. Sklejone w jedno dawałyby licznik, w którym całkowita
-		// liczba pytań rośnie z każdą odpowiedzią.
-		//
-		// Samo odsłonięcie liczy `applyReveal`, po zbudowaniu całej listy — patrz tam.
 		return question;
 	}
 
-	/**
-	 * Które pytania są już odsłonięte przez łańcuch.
-	 *
-	 * ⛔ Osobny przebieg po CAŁEJ liście, a nie przy czytaniu pojedynczego pytania. Odsłonięcie
-	 * zależy od cudzej odpowiedzi i od cudzej obowiązkowości, więc liczone po jednym elemencie
-	 * musiałoby zgadywać, czy pytanie wskazane w `revealedBy` zostało już wczytane.
-	 *
-	 * ⚠️ Pytanie NIEOBOWIĄZKOWE przepuszcza ankietę dalej także wtedy, gdy klient go pominął.
-	 * Do 4 września 2026 rolę tę pełniła odmowa („nie chcę podać"), która domykała pytanie bez
-	 * odpowiadania na nie; po jej usunięciu z ekranu bez tej gałęzi jedno pominięte pytanie
-	 * o oczekiwaną składkę zatrzymywałoby resztę ankiety na zawsze.
-	 */
-	/** Ustawienia wspólne dla pytania APK i pola przedmiotu — jeden wiersz katalogu. */
+
+	/** Reszta opisu POLA PRZEDMIOTU — z katalogu, bo pola przedmiotu nie są elementami drzewa. */
 	private void applyCatalogue(Question question, ParamValue row) {
 		question.setPosition(intOrZero(row.getInteger("position")));
 		question.setRequired(Boolean.TRUE.equals(row.getBoolean("required")));
 		question.setOptions(split(row.getString("options")));
 		question.setOptionLabels(split(row.getString("labels")));
 		question.setPrefillSource(row.getString("prefill"));
-		question.setRevealedBy(row.getString("revealedBy"));
 	}
 
-	private void applyReveal(PropertyQuote quote, List<Question> questions) {
-		Map<String, Question> byCode = new LinkedHashMap<>();
-		for (Question question : questions) {
-			byCode.put(question.getCode(), question);
+	/** Liczba z atrybutu tekstowego. Brak i „nie liczba" znaczą tu to samo: koniec listy. */
+	private int intOf(String value) {
+		if (value == null || value.isEmpty()) {
+			return 0;
 		}
-		for (Question question : questions) {
-			String revealedBy = question.getRevealedBy();
-			Question source = revealedBy == null || revealedBy.isEmpty() ? null : byCode.get(revealedBy);
-			Answer answer = source == null ? null : quote.getAnswers().get(revealedBy);
-
-			// ⛔ ROZSTRZYGA TABELA `demo.property.apk.question.reveal`. Java podaje jej cztery
-			// fakty o pytaniu odsłaniającym i nie wie, co z nich wynika. Do 7 września 2026 stało
-			// tu wyrażenie, w którym siedziały dwie reguły naraz i obie łatwo było przeoczyć:
-			// odmowa liczy się jak odpowiedź, a pytanie nieobowiązkowe przepuszcza łańcuch dalej.
-			PropertyContext ctx = new PropertyContext(quote).withReveal(
-				source != null,
-				answer != null && answer.isAnswered(),
-				answer != null && answer.isRefused(),
-				source != null && source.isRequired());
-
-			question.setRevealed(
-				Boolean.TRUE.equals(engine.get(PARAM_REVEAL, ctx).getBoolean("revealed")));
+		try {
+			return Integer.parseInt(value.trim());
+		} catch (NumberFormatException e) {
+			return 0;
 		}
+	}
+
+
+	/**
+	 * Pytania, które klient WIDZI — jedyne, których odpowiedzi wolno karmić reguły.
+	 *
+	 * ⛔ Pytanie warunkowe można odsłonić, odpowiedzieć i cofnąć odpowiedź, która je odsłoniła.
+	 * Znika wtedy z ekranu, ale jego odpowiedź zostaje zapisana — świadomie, bo prowadzący wraca
+	 * i nie chce jej wpisywać drugi raz. Bez tego filtra wracała do rekomendacji: „wynajem: nie"
+	 * zostawiało potrzebę assistance i pakiet stał na Pełnym z powodu pytania, którego na ekranie
+	 * już nie ma. Ta sama zasada, którą po stronie ekranu trzyma `shownFields`.
+	 */
+	private List<Question> asked(PropertyQuote quote) {
+		List<Question> shown = new ArrayList<>();
+		for (Question question : quote.getQuestions()) {
+			if (question.isVisible()) {
+				shown.add(question);
+			}
+		}
+		return shown;
+	}
+
+
+	/**
+	 * Czy pytanie złożone można uznać za udzielone.
+	 *
+	 * ⚠️ Gdy ŻADNE pole nie jest obowiązkowe, wystarczy jedno udzielone. Warunek „wszystkie"
+	 * zamieniłby pytanie z samych pól nieobowiązkowych w ślepy zaułek — dokładnie ten sam błąd,
+	 * który 4 września 2026 zrobiła oczekiwana składka po usunięciu odmowy z ekranu.
+	 */
+	private boolean allRequiredAnswered(PropertyQuote quote, List<Question> fields) {
+		boolean anyRequired = false;
+		boolean anyAnswered = false;
+		for (Question field : fields) {
+			// ⛔ Pytanie WARUNKOWE, o które tego klienta nie pytamy, nie liczy się do domknięcia
+			// grupy — nie widział go. Bez tego grupa z pytaniem zależnym nigdy by się nie domknęła
+			// i ankieta stanęłaby na niej na zawsze.
+			if (!field.isVisible()) {
+				continue;
+			}
+			Answer answer = quote.getAnswers().get(field.getCode());
+			boolean answered = answer != null && answer.isAnswered();
+			anyAnswered = anyAnswered || answered;
+			if (field.isRequired()) {
+				anyRequired = true;
+				if (!answered) {
+					return false;
+				}
+			}
+		}
+		return anyRequired || anyAnswered;
 	}
 
 	/**
@@ -358,12 +446,18 @@ public class Property {
 	 */
 	private void seedDefaults(PropertyQuote quote) {
 		for (Question question : quote.getQuestions()) {
+			// ⛔ TYLKO PRZEDMIOT UBEZPIECZENIA. Odpowiedź na starcie to dane z poprzedniej polisy,
+			// a nie podpowiedziana analiza potrzeb — §18 wyrzuciło je z ankiety właśnie dlatego,
+			// że wypełniona z góry analiza potrzeb przeczy temu, co ma pokazywać.
+			if (!BRANCH_SUBJECT.equals(question.getSection())) {
+				continue;
+			}
 			Answer answer = quote.getAnswers().get(question.getCode());
 			if (answer != null) {
 				continue;
 			}
 			PropertyContext ctx = new PropertyContext(quote).withQuestion(question.getCode());
-			String value = engine.get(PARAM_QUESTION, ctx).getString("demoAnswer");
+			String value = ruleOf(productElement(), ATTR_SUBJECT_FIELDS, ctx).getString("demoAnswer");
 			if (value == null || value.isEmpty()) {
 				continue;
 			}
@@ -378,23 +472,30 @@ public class Property {
 	}
 
 	private void computeDerived(PropertyQuote quote) {
-		quote.setBuildingAge(asInt(engine.call(FUNCTION_BUILDING_AGE, new PropertyContext(quote))));
 
-		ParamValue zone = (ParamValue) engine.call(FUNCTION_ZONE, new PropertyContext(quote));
-		quote.getZone().setFlood(zone.get(0, "flood"));
-		quote.getZone().setTheft(zone.get(0, "theft"));
+		Map<?, ?> zone = resultOf(productElement(),
+			ATTR_ZONES, new PropertyContext(quote));
+		quote.getZone().setFlood((String) zone.get("flood"));
+		quote.getZone().setTheft((String) zone.get("theft"));
 
-		ParamValue sums = (ParamValue) engine.call(FUNCTION_SUMS, new PropertyContext(quote));
-		BigDecimal building = asDecimal(sums.get(0, "building"));
+		// ⛔ ZWYKŁA MAPA, nie `ParamValue`. Funkcja Groovy może oddać kilka wartości mapą i to
+		// wystarczy — `type.paramValue()` z osobną listą kodów i osobną listą typów opisywał to
+		// samo trzy razy dłużej, a jedynym czytelnikiem jest ten kod.
+		Map<?, ?> sums = resultOf(productElement(),
+			ATTR_SUM_INSURED, new PropertyContext(quote));
+		BigDecimal building = asDecimal(sums.get("building"));
 		quote.getSums().setSuggestedBuilding(building);
-		// ⛔ ROZSTRZYGA REGUŁA. „Suma podana ręcznie przez klienta wygrywa z wyliczeniem" to
-		// decyzja produktowa, nie mechanika — do 7 września 2026 była warunkiem w tej metodzie.
-		boolean overwrite = productFlag(quote, ATTR_OVERWRITE_MANUAL_SUM);
-		if (overwrite || !quote.isBuildingSumOverridden()) {
+		// „Suma podana ręcznie przez klienta wygrywa z wyliczeniem".
+		//
+		// ⚠️ Do 9 września 2026 niósł to atrybut produktu `OVERWRITE_MANUAL_SUM = false` (D-23) —
+		// przeniesiony tam z tabeli, żeby reguła była widoczna w konfiguracji. Zdjęty na decyzję
+		// właściciela: pokrętło, którego nikt nigdy nie przekręcił, zaśmiecało ekran atrybutów.
+		// Wraca tu jako warunek. Gdyby kiedyś miało być przestawialne, wraca atrybutem.
+		if (!quote.isBuildingSumOverridden()) {
 			quote.getSums().setBuilding(building);
 		}
-		quote.getSums().setFixtures(asDecimal(sums.get(0, "fixtures")));
-		quote.getSums().setContents(asDecimal(sums.get(0, "contents")));
+		quote.getSums().setFixtures(asDecimal(sums.get("fixtures")));
+		quote.getSums().setContents(asDecimal(sums.get("contents")));
 		// ⛔ Kradzież, powódź i assistance NIE dostają tu sum. Skąd pokrycie bierze sumę,
 		// rozstrzyga atrybut `SUM_BASIS` pokrycia, a wylicza `demo.property.cover.sum`.
 		// Do 7 września 2026 stały tu trzy przypisania na sztywno i to one były prawdziwą
@@ -403,12 +504,13 @@ public class Property {
 		// ⛔ CZYNNIK RYZYKA JEST FLOW, nie funkcją. Siedem tabel czynnikowych i łańcuch mnożeń
 		// widać na diagramie zamiast czytać z dwudziestu linii Groovy'ego — a że flow nie umie
 		// arytmetyki, mnoży `demo.util.multiply`, dla którego BRAK WARTOŚCI ZNACZY JEDEN.
-		quote.setRiskFactor(asDecimal(
-			engine.flow(FLOW_RISK, new PropertyContext(quote)).getResult().get("factor")));
+		Map<?, ?> risk = resultOf(productElement(),
+			ATTR_RISK_FACTOR, new PropertyContext(quote));
+		quote.setRiskFactor(asDecimal(risk.get("factor")));
 	}
 
 	private void loadCovers(PropertyQuote quote) {
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		DomainObject product = productElement();
 		if (product == null) {
 			return;
 		}
@@ -439,7 +541,7 @@ public class Property {
 	}
 
 	private void priceVariants(PropertyQuote quote) {
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		DomainObject product = productElement();
 		if (product == null) {
 			return;
 		}
@@ -448,23 +550,23 @@ public class Property {
 
 		for (DomainObject definition : product.getChildren(COLLECTION_VARIANTS)) {
 			// ⛔ SUMA GWARANCYJNA MUSI BYĆ W KONTEKŚCIE JUŻ TERAZ. Tabela pokrycia OC kluczuje się
-			// nią, żeby stawka mogła być degresywna — a `quote.sums.liability` ustawiało się
-			// dopiero po wyborze wariantu, więc każdy pakiet trafiał w pierwszy przedział
-			// i degresja po cichu nie działała. Suma należy do pakietu, więc znamy ją tutaj.
+			// nią, żeby stawka mogła być degresywna — inaczej każdy pakiet trafia w pierwszy
+			// przedział i degresja po cichu nie działa. Suma należy do pakietu, więc znamy ją tutaj.
+			//
+			// ⚠️ Pakiet BEZ OC nie ma tego atrybutu wcale i to jest właściwy stan: zero znaczyłoby
+			// „ochrona na zero złotych", a jej po prostu nie ma. Stąd odczyt odporny na brak.
 			PropertyContext ctx = new PropertyContext(quote).withVariant(definition.getCode());
-			ctx.withComputed(PATH_SUM_LIABILITY,
-				definition.getAttrDecimal("LIABILITY_SUM", ctx));
+			ctx.withComputed(PATH_SUM_LIABILITY, attrDecimal(definition, ATTR_LIABILITY_SUM, ctx));
 
 			Variant variant = new Variant();
 			variant.setCode(definition.getCode());
 			variant.setName(definition.getName());
 			variant.setDescription(definition.getDescription());
 			variant.setPosition(intOrZero(definition.getAttrInteger("POSITION", ctx)));
-			variant.setLiabilitySum(definition.getAttrDecimal("LIABILITY_SUM", ctx));
 
 			applyCovers(definition, variant, ctx);
 
-			Map<String, Object> result = engine.flow(FLOW_QUOTE, ctx).getResult();
+			Map<?, ?> result = resultOf(definition, ATTR_PREMIUM, ctx);
 			// ⛔ Boolean, nie „YES". Flow czyta dostępność TABELĄ WPROST, odkąd zniknęła nakładka
 			// `variant.isAvailable`, która nie robiła nic poza odczytem tej samej tabeli i
 			// przepisaniem wyniku na łańcuch. Wartość wraca jako `true`/`false` — porównanie
@@ -477,8 +579,6 @@ public class Property {
 				variant.setInstalment(asDecimal(result.get("instalment")));
 				applyBreakdown(variant, asString(result.get("breakdown")));
 				priced.add(variant.getCode() + "=" + variant.getAnnualPremium());
-			} else {
-				variant.setUnavailableReason(asString(result.get("reason")));
 			}
 			variants.add(variant);
 		}
@@ -511,7 +611,7 @@ public class Property {
 			// powódź w strefie najwyższego zagrożenia. Gdyby liczyło się mimo to, rekomendacja
 			// raportowałaby pokrytą potrzebę, której nikt nie pokrywa, i to najczęściej właśnie
 			// tę, na której klientowi najbardziej zależy.
-			DomainObject cover = engine.getDomain(PROFILE, PRODUCT_PATH)
+			DomainObject cover = productElement()
 				.getChild(COLLECTION_COVERS, member.getCode());
 			if (cover == null || !Boolean.TRUE.equals(cover.getAttrBoolean("IS_AVAILABLE", ctx))) {
 				continue;
@@ -521,8 +621,7 @@ public class Property {
 	}
 
 	/**
-	 * Analiza potrzeb. Ten sam algorytm obsługuje obie wersje regionu — różnicę robią
-	 * przełączniki z apk.regime, a nie drugi kod.
+	 * Analiza potrzeb.
 	 *
 	 * ⛔ Java chodzi po listach, tabele rozstrzygają. Ani jednego kodu pytania, progu ani zdania
 	 * dla klienta nie ma w tym pliku — wszystkie siedzą w `demo.property.apk.*`.
@@ -533,7 +632,7 @@ public class Property {
 		// wygrywa wyższa waga. Ta ostatnia reguła stała do 7 września 2026 w `ApkAnalysis`, przez
 		// co o treści potrzeby decydowała kolejność pytań na ekranie.
 		PropertyContext ctx = new PropertyContext(quote)
-			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(quote.getQuestions(), quote.getAnswers()));
+			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(asked(quote), quote.getAnswers()));
 		List<Need> needs = parseNeeds(attrString(apkElement(), "NEEDS", ctx));
 		quote.setNeeds(needs);
 
@@ -542,7 +641,6 @@ public class Property {
 		// tego wymaga (rek. 8.2.b), miały do 3 września 2026 dwie osobne tabele o identycznym
 		// kształcie wyjścia. Jedna tabela z dwoma kolumnami stref robi obie rzeczy i czyta się
 		// jak lista tego, co trzeba klientowi powiedzieć — bo tym właśnie jest.
-		applyBlocker(quote);
 
 		quote.setRecommendation(propose(quote, needs));
 
@@ -565,17 +663,43 @@ public class Property {
 	}
 
 
-	/**
-	 * Obiekt analizy potrzeb z drzewa — to jego pytamy o rekomendację.
-	 *
-	 * ⛔ APLIKACJA PYTA OBIEKT, a nie woła funkcji po kodzie. Do 8 września 2026 stało tu
-	 * `engine.call("demo.property.apk.indicated", ...)` i trzy podobne — kod funkcji był w Javie,
-	 * więc drzewo mogło o niej nie wiedzieć i nic by się nie stało. Teraz reguła jest atrybutem
-	 * `APK[NEEDS]`: przestawienie wskaźnika w drzewie zmienia to, co liczy aplikacja.
-	 */
+	/** Produkt — korzeń, od którego zaczyna się każde pytanie tej klasy do Higsona. */
+	private DomainObject productElement() {
+		return engine.getDomain(PROFILE, PRODUCT_PATH);
+	}
+
+
+	/** Obiekt analizy potrzeb z drzewa — pod jego atrybutami stoi wszystko, o co pytamy ankietę. */
 	private DomainObject apkElement() {
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		DomainObject product = productElement();
 		return product == null ? null : product.getChild(COLLECTION_APK, APK_ELEMENT);
+	}
+
+	/**
+	 * Reguła stojąca pod atrybutem elementu — CAŁY jej wynik, kolumnę wybiera wołający.
+	 *
+	 * ⛔ To jest JEDYNA droga tej klasy do silnika, poza odczytem samego drzewa. Wołanie reguły po
+	 * kodzie omijało drzewo: adres stał w Javie, więc przestawienie wskaźnika w Studio nie
+	 * zmieniało niczego, a skasowanie elementu nie psuło niczego widocznie. Tutaj adresem jest
+	 * ELEMENT I ATRYBUT, a to, na co atrybut wskazuje, jest konfiguracją.
+	 */
+	private ParamValue ruleOf(DomainObject element, String attribute, PropertyContext ctx) {
+		return element.getAttribute(attribute).getValue(ctx);
+	}
+
+	/**
+	 * Reguła, która oddaje KILKA wartości naraz — mapą.
+	 *
+	 * ⛔ Aplikacja nie wie, czy pod atrybutem stoi funkcja, czy flow, i nie powinna: zamiana
+	 * jednego na drugie jest zmianą konfiguracji, a nie kodu. Flow oddaje `FlowResult`, funkcja
+	 * zwykłą mapę — a odpowiadają na to samo pytanie.
+	 */
+	private Map<?, ?> resultOf(DomainObject element, String attribute, PropertyContext ctx) {
+		Object raw = ruleOf(element, attribute, ctx).get();
+		if (raw instanceof FlowResult flow) {
+			return flow.getResult();
+		}
+		return (Map<?, ?>) raw;
 	}
 
 	/**
@@ -604,39 +728,6 @@ public class Property {
 		return null;
 	}
 
-	/**
-	 * Odpowiedź, po której nie ma czego dalej analizować.
-	 *
-	 * ⛔ Które to odpowiedzi, mówi tabela `demo.property.apk.question.blocker` — dziś jedna:
-	 * brak potrzeby ubezpieczenia nieruchomości. Warunek w Javie związałby bramkę z jednym
-	 * konkretnym pytaniem, a wtedy przeniesienie jej gdzie indziej wymagałoby wdrożenia.
-	 *
-	 * ⚠️ Bramka NIE przerywa wyceny. Ekran ma pokazać komunikat i zablokować przejście dalej,
-	 * ale prowadzący musi móc cofnąć odpowiedź i zobaczyć, że wszystko wraca — a to działa
-	 * tylko wtedy, gdy reszta wyniku i tak jest policzona.
-	 */
-	private void applyBlocker(PropertyQuote quote) {
-		quote.setBlocked(false);
-		quote.setBlockMessage(null);
-		quote.setBlockedBy(null);
-		for (Question question : quote.getQuestions()) {
-			Answer answer = quote.getAnswers().get(question.getCode());
-			if (!question.isVisible() || !question.isRevealed() || answer == null || !answer.isAnswered()) {
-				continue;
-			}
-			ParamValue row = engine.get(PARAM_APK_BLOCKER, new PropertyContext(quote)
-				.withQuestion(question.getCode()).withAnswer(answer.getValue()));
-			if (Boolean.TRUE.equals(row.getBoolean("blocks"))) {
-				quote.setBlocked(true);
-				quote.setBlockMessage(row.getString("message"));
-				// ⛔ KTÓRA odpowiedź zatrzymała analizę. Bez tego ekran wypisywał komunikat pod
-				// PYTANIEM NASTĘPNYM — klient czytał „nie prowadzimy dalej", a pod spodem dostawał
-				// kolejne pytanie do odpowiedzenia.
-				quote.setBlockedBy(question.getCode());
-				return;
-			}
-		}
-	}
 
 	/**
 	 * Rek. 8.2.d — dobór do potrzeb i do oczekiwanej składki, w tej kolejności.
@@ -663,7 +754,7 @@ public class Property {
 		// policzonego pakietu pod własną ścieżką. Reguła nie zna listy pytań ani listy pakietów —
 		// jedno i drugie czyta z tego, co tu dostanie, i z drzewa.
 		PropertyContext ctx = new PropertyContext(quote)
-			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(quote.getQuestions(), quote.getAnswers()));
+			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(asked(quote), quote.getAnswers()));
 		for (Variant variant : quote.getVariants()) {
 			if (variant.isAvailable() && variant.getAnnualPremium() != null) {
 				ctx.withComputed(PATH_PREMIUM_PREFIX + variant.getCode(), variant.getAnnualPremium());
@@ -674,7 +765,7 @@ public class Property {
 		// raz i dostaje trzy odpowiedzi. Rozgałęzienie na diagramie JEST treścią rek. 8.2.d:
 		// pakiet wynika z potrzeb, oczekiwana składka tylko go nazywa, a alternatywy szukamy
 		// wyłącznie wtedy, gdy propozycja jej nie mieści — obok niej, nigdy zamiast.
-		Map<String, Object> decision = engine.flow(FLOW_RECOMMEND, ctx).getResult();
+		Map<?, ?> decision = resultOf(apkElement(), ATTR_RECOMMENDATION, ctx);
 
 		Variant proposed = variantByCode(quote, asString(decision.get("indicated")));
 		if (proposed == null) {
@@ -698,9 +789,10 @@ public class Property {
 		// który tabela ustawiała na `true` i nigdy inaczej — bramka, która nigdy nie zamknęła się
 		// ani razu, a wyglądała, jakby coś rozstrzygała. W tym profilu jest jeden reżim (D-17)
 		// i jest nim KNF, więc rek. 8.7 obowiązuje bez wyjątku.
-		recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+		recommendation.setJustification(ApkAnalysis.justify(
 			reasons(quote, proposed, score, recommendation),
-			reason -> new PropertyContext(quote).withReason(reason)));
+			reason -> ruleOf(apkElement(), ATTR_JUSTIFICATION,
+				new PropertyContext(quote).withReason(reason))));
 		return recommendation;
 	}
 
@@ -711,7 +803,7 @@ public class Property {
 	private List<ApkAnalysis.Reason> reasons(PropertyQuote quote, Variant proposed,
 			ApkAnalysis.Score score, Recommendation recommendation) {
 
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+		DomainObject product = productElement();
 		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
 
 		// ⛔ KTÓRE ZDANIE PADA, ROZSTRZYGA TABELA. Java liczy stosunek pokrytych potrzeb do
@@ -731,7 +823,7 @@ public class Property {
 
 		PropertyContext ctx = new PropertyContext(quote);
 		reasons.add(new ApkAnalysis.Reason("SUM_COMPUTED", ctx.get(PATH_AREA),
-			engine.get(PARAM_RATE_PER_SQM, new PropertyContext(quote)).getBigDecimal("rate")));
+			ruleOf(product, ATTR_SUM_RATE, new PropertyContext(quote)).getBigDecimal("rate")));
 
 		// Suma podniesiona albo obniżona ręcznie — klient ma wiedzieć, że odszedł od wyliczenia.
 		// ⚠️ Tabela ma pasmo tolerancji 0,99–1,01: różnica poniżej procenta nie jest warta zdania
@@ -790,7 +882,7 @@ public class Property {
 			// ⛔ KOD ZDANIA CZYTAMY, a nie sklejamy. Do 8 września 2026 stało tu `"VALUE_" + gap`,
 			// co wiązało dwa niezależne słowniki konkatenacją: zmiana słowa w kolumnie `outcome`
 			// dawała kod bez wiersza w tabeli zdań, czyli puste zdanie i żadnego błędu.
-			String valueGap = engine.get(PARAM_VALUE_GAP, new PropertyContext(quote)
+			String valueGap = ruleOf(apkElement(), ATTR_VALUE_GAP, new PropertyContext(quote)
 				.withComputed(PATH_VALUE_RATIO, declared.divide(computed, 4, RoundingMode.HALF_UP)))
 				.getString("reasonCode");
 			if (valueGap != null && !valueGap.isEmpty()) {
@@ -798,24 +890,6 @@ public class Property {
 			}
 		}
 
-		// ⛔ POKRYCIE, KTÓREGO KLIENT POTRZEBUJE, A NIE MOŻE DOSTAĆ, MÓWI DLACZEGO. Każde pokrycie
-		// ma własną tabelę i własny powód odmowy — kradzież bez zabezpieczeń, powódź w strefie
-		// najwyższego zagrożenia. Bez tej pętli pokrycie znikało z pakietu po cichu, a klient
-		// czytał tylko, że czegoś brakuje, nie dowiadując się, czego od niego wymagamy.
-		for (Need need : quote.getNeeds()) {
-			DomainObject cover = product.getChild(COLLECTION_COVERS, need.getCoverCode());
-			if (cover == null) {
-				continue;
-			}
-			PropertyContext coverCtx = new PropertyContext(quote).withCover(need.getCoverCode());
-			if (Boolean.TRUE.equals(cover.getAttrBoolean("IS_AVAILABLE", coverCtx))) {
-				continue;
-			}
-			String refusal = attrString(cover, "UNAVAILABLE_REASON", coverCtx);
-			if (refusal != null && !refusal.isEmpty()) {
-				reasons.add(new ApkAnalysis.Reason(refusal));
-			}
-		}
 
 		// ⛔ TABELA DOSTĘPNOŚCI NAZYWA SWÓJ WŁASNY SKUTEK. Ta sama reguła, która mówi, czy pokrycie
 		// wolno sprzedać, mówi też, co powiedzieć klientowi, gdy nie wolno — kolumna `reasonCode`.
@@ -824,8 +898,14 @@ public class Property {
 		// ⛔ WŁASNA TABELA POKRYCIA. Powódź ma swoją, bo tylko jej warunki zależą od strefy:
 		// w Z0 i Z1 sprzedajemy normalnie, w Z2 z franszyzą, w ZX wcale. Każde pokrycie ma taką
 		// tabelę, kluczowaną tym, co dla niego naprawdę rozstrzyga.
-		ParamValue flood = engine.get(PARAM_COVER_FLOOD, new PropertyContext(quote));
+		DomainObject floodCover = product.getChild(COLLECTION_COVERS, COVER_FLOOD);
+		ParamValue flood = ruleOf(floodCover, ATTR_DEDUCTIBLE, new PropertyContext(quote));
 		String floodReason = flood.getString("reason");
+		// ⛔ Franszyza strefowa trafia NA WNIOSEK, nie tylko do zdania. Do 9 września 2026 ta sama
+		// liczba szła wyłącznie jako parametr zdania w załączniku, a tabela pokryć w ofercie
+		// pokazywała obok „Franszyza redukcyjna: 0 zł" — bo czytała franszyzę POLISY, której
+		// w tym demie nikt nie ustawia. Jeden ekran mówił dwie sprzeczne rzeczy o tej samej nazwie.
+		quote.setFloodDeductible(flood.getBigDecimal("minDeductible"));
 		if (floodReason != null && !floodReason.isEmpty()) {
 			reasons.add(new ApkAnalysis.Reason(floodReason, money(flood.getBigDecimal("minDeductible"))));
 		}
@@ -833,7 +913,7 @@ public class Property {
 		// jechał z tabeli pokrycia, a liczba dni z tabeli karencji — więc gdy ciągłość ochrony
 		// zniosła karencję, padało zdanie „zaczyna działać po 0 dniach". Zniesiona karencja to
 		// inne zdanie, a nie to samo z zerem, i wie o tym reguła, nie ten kod.
-		ParamValue waitingRow = engine.get(PARAM_FLOOD_WAITING, new PropertyContext(quote));
+		ParamValue waitingRow = ruleOf(floodCover, ATTR_WAITING_PERIOD, new PropertyContext(quote));
 		String waiting = waitingRow.getString("reasonCode");
 		if (waiting != null && !waiting.isEmpty()) {
 			reasons.add(new ApkAnalysis.Reason(waiting, waitingRow.getInteger("days")));
@@ -850,32 +930,53 @@ public class Property {
 	 * Warunki oferty: ważność, termin płatności, treść oświadczenia i to, czy do oferty dołącza
 	 * się dokument analizy potrzeb.
 	 *
-	 * ⛔ Wszystkie cztery przychodzą z `demo.property.offer.terms`, kluczowanej KODEM REŻIMU.
-	 * Reżim jest wersjonowany regionem PROPERTY, więc przesunięcie daty polisy przez 1 lipca 2027
-	 * przestawia treść oferty — bez wersjonowania tabeli ofertowej i bez drugiego progu w kodzie.
+	 * ⛔ Wszystkie cztery to ATRYBUTY PRODUKTU, nie tabela (D-23). Do 9 września 2026 niosła je
+	 * `demo.property.offer.terms` kluczowana kodem reżimu — konstrukcja sensowna, dopóki reżimy
+	 * były dwa i przesunięcie daty polisy przez próg KNF przestawiało treść oferty. D-17 usunął
+	 * region i drugi reżim, więc została tabela z jednym żywym wierszem i wierszem gwiazdkowym,
+	 * do którego nic nie trafiało: zero drugiego wymiaru, czyli dokładnie ten kształt, który
+	 * D-23 każe zapisać na elemencie.
+	 *
+	 * ⚠️ Razem z nią zniknęła `demo.property.apk.regime`. Jej `code` był kluczem WYŁĄCZNIE do
+	 * tamtej tabeli, a `name` nie jechało nawet na drut, odkąd D-17 zabrał ekranowi panel
+	 * ustawień. Gdyby reżimy kiedyś wróciły, wracają obie razem — to jest jedna konstrukcja.
 	 *
 	 * ⚠️ Numer i daty przelicza się przy każdej wycenie, ale TYLKO dopóki polisa nie jest
 	 * wystawiona: po wystawieniu dokument jest już wydany i zmiana odpowiedzi nie ma prawa
 	 * przestawić mu numeru ani okresu ochrony.
 	 */
+	/**
+	 * Czy pakiet o tym kodzie w ogóle istnieje w konfiguracji.
+	 *
+	 * ⛔ Pytanie do DRZEWA, nie do policzonej wyceny. Sprawdzanie po `quote.getVariants()` wygląda
+	 * naturalnie i jest błędne: zaraz po `PUT /reset` ta lista jest pusta, bo wypełnia ją dopiero
+	 * `calculate()` przy najbliższym odczycie — więc poprawny kod dostawał odmowę tylko dlatego,
+	 * że nikt jeszcze nie zdążył zapytać o wycenę.
+	 */
+	public boolean hasVariant(String code) {
+		DomainObject product = productElement();
+		return product != null && product.getChild(COLLECTION_VARIANTS, code) != null;
+	}
+
 	private void prepareOffer(PropertyQuote quote) {
 		Offer offer = quote.getOffer();
-		// ⛔ ROZSTRZYGA REGUŁA. Wystawiony dokument ma numer i datę — zmiana odpowiedzi nie ma
-		// prawa przestawić mu okresu ani numeru. Czy tak jest, mówi konfiguracja, nie ten `if`.
-		boolean frozen = productFlag(quote, ATTR_FREEZE_ISSUED_OFFER);
-		if (offer.isIssued() && frozen) {
+		// Wystawiony dokument ma numer i datę — zmiana odpowiedzi nie ma prawa przestawić mu
+		// okresu ani numeru.
+		//
+		// ⚠️ Do 9 września 2026 niósł to atrybut produktu `FREEZE_ISSUED_OFFER = true` (D-23),
+		// zdjęty razem z `OVERWRITE_MANUAL_SUM` z tego samego powodu — patrz `computeDerived`.
+		if (offer.isIssued()) {
 			return;
 		}
 
-		ParamValue terms = engine.get(PARAM_OFFER_TERMS, new PropertyContext(quote));
 		LocalDate today = LocalDate.now();
 
 		offer.setNumber(offer.getNumber() == null ? numbers.nextOffer(today) : offer.getNumber());
 		offer.setIssuedOn(today);
-		offer.setValidUntil(today.plusDays(terms.getInteger("validityDays")));
-		offer.setPaymentDueOn(today.plusDays(terms.getInteger("paymentDays")));
-		offer.setStatement(terms.getString("statement"));
-		offer.setNeedsAnalysisAttached(Boolean.TRUE.equals(terms.getBoolean("needsAnalysisAttached")));
+		offer.setValidUntil(today.plusDays(productInt(quote, ATTR_OFFER_VALIDITY_DAYS)));
+		offer.setPaymentDueOn(today.plusDays(productInt(quote, ATTR_OFFER_PAYMENT_DAYS)));
+		offer.setStatement(productText(quote, ATTR_OFFER_STATEMENT));
+		offer.setNeedsAnalysisAttached(productFlag(quote, ATTR_OFFER_NEEDS_ANALYSIS));
 
 		describeChoice(quote, offer);
 	}
@@ -899,14 +1000,15 @@ public class Property {
 		// ⛔ ROZSTRZYGA REGUŁA, nie Java. Do 7 września 2026 stało tu porównanie pozycji obu
 		// wariantów — czyli zdanie „klient wybrał szerzej niż rekomendowaliśmy", które trafia do
 		// dokumentu oferty (rek. 9.3), rodziło się w kodzie aplikacji.
-		String kind = engine.get(PARAM_CHOICE_KIND,
+		DomainObject product = productElement();
+		String kind = ruleOf(product, ATTR_CHOICE_RELATION,
 			new PropertyContext(quote).withChoiceVariants(recommended, chosen)).getString("kind");
 		if (kind == null) {
 			offer.setChoiceKind(null);
 			return;
 		}
 
-		ParamValue note = engine.get(PARAM_OFFER_CHOICE, new PropertyContext(quote).withChoice(kind));
+		ParamValue note = ruleOf(product, ATTR_CHOICE_NOTE, new PropertyContext(quote).withChoice(kind));
 		offer.setChoiceKind(kind);
 		offer.setChoiceLabel(note.getString("label"));
 		offer.setChoiceText(note.getString("text"));
@@ -924,7 +1026,7 @@ public class Property {
 			if (!variant.getCode().equals(variantCode)) {
 				continue;
 			}
-			DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
+			DomainObject product = productElement();
 			ApkAnalysis.Score score = ApkAnalysis.score(quote.getNeeds(), variant.getCovers()::contains);
 			for (String cover : score.getMissing()) {
 				names.add(nameOf(product, COLLECTION_COVERS, cover));
@@ -983,7 +1085,8 @@ public class Property {
 		// produktowe w kodzie aplikacji, i to takie, które przy zmianie oferty na półroczną
 		// dawałyby cichy błąd zamiast błędu. Tabela ma wiersz domyślny, więc odpowiedź bez
 		// wartości nadal daje sensowny okres.
-		return intOrZero(engine.get(PARAM_PERIOD, new PropertyContext(quote)).getInteger("coverMonths"));
+		return intOrZero(ruleOf(productElement(),
+			ATTR_COVER_PERIOD, new PropertyContext(quote)).getInteger("coverMonths"));
 	}
 
 	/**
@@ -1002,7 +1105,7 @@ public class Property {
 	 * ma paść — pusta odpowiedź znaczy „milczymy" i jest równie dobrą odpowiedzią jak każda inna.
 	 */
 	private String reasonFor(PropertyQuote quote, String family, BigDecimal ratio, Boolean flag) {
-		String code = engine.get(PARAM_REASON,
+		String code = ruleOf(apkElement(), ATTR_REASON,
 			new PropertyContext(quote).withReasonTrigger(family, ratio, flag)).getString("reasonCode");
 		return code == null || code.isEmpty() ? null : code;
 	}
@@ -1100,6 +1203,11 @@ public class Property {
 		return definition.getAttribute(code) == null ? null : definition.getAttrString(code, ctx);
 	}
 
+	/** Liczba z atrybutu, którego może nie być — pusty atrybut nie powstaje, patrz `attrString`. */
+	private BigDecimal attrDecimal(DomainObject definition, String code, PropertyContext ctx) {
+		return definition.getAttribute(code) == null ? null : definition.getAttrDecimal(code, ctx);
+	}
+
 	/**
 	 * Przełącznik wpisany wprost w atrybut produktu (D-23).
 	 *
@@ -1108,9 +1216,31 @@ public class Property {
 	 * nigdy się nie zmieniało. Tabela zostaje wtedy, gdy ma drugi wymiar.
 	 */
 	private boolean productFlag(PropertyQuote quote, String code) {
-		DomainObject product = engine.getDomain(PROFILE, PRODUCT_PATH);
-		return product != null
-			&& Boolean.parseBoolean(attrString(product, code, new PropertyContext(quote)));
+		return Boolean.parseBoolean(productText(quote, code));
+	}
+
+	/**
+	 * Stała produktu jako tekst — patrz D-23.
+	 *
+	 * ⚠️ Null-safe przez `attrString`: pusty atrybut LITERAL po prostu NIE ISTNIEJE w modelu,
+	 * a `getAttrString` na nieistniejącym rzuca NPE zamiast oddać null.
+	 */
+	private String productText(PropertyQuote quote, String code) {
+		DomainObject product = productElement();
+		return product == null ? null : attrString(product, code, new PropertyContext(quote));
+	}
+
+	/** Stała produktu jako liczba całkowita. Brak i „nie liczba" znaczą tu to samo: zero. */
+	private int productInt(PropertyQuote quote, String code) {
+		String value = productText(quote, code);
+		if (value == null || value.isEmpty()) {
+			return 0;
+		}
+		try {
+			return Integer.parseInt(value.trim());
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 
 	private int intOrZero(Integer value) {

@@ -1,0 +1,3 @@
+name = "Wynajem"
+description = "Pytanie 5 ze specyfikacji."
+tags = []

@@ -1,0 +1,28 @@
+code = "demo.property.question.assistance.visible"
+description = "Regula JEDNEGO pytania i dlatego nie ma kolumny z jego kodem: wisi pod atrybutem IS_VISIBLE tego pytania, wiec o kogo chodzi, mowi miejsce w drzewie. Kluczuje sie ODPOWIEDZIA, od ktorej zalezy - o pomoc fachowca pytamy tylko wynajmujacego, bo to on przy kazdej awarii u najemcy musi jechac sam."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Pomoc fachowca - kiedy o nią pytamy"
+
+[[inputLevel]]
+code = "rentedOut"
+label = "czy na wynajem - odpowiedz RENTED_OUT"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.rentedOut"
+source = "quote.needs.rentedOut"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "czy pytamy"
+type = "boolean"
+external = false
+array = false

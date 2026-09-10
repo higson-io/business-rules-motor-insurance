@@ -185,9 +185,9 @@ public class Motor {
 		recommendation.setBudgetOutcome(outcome);
 
 		if (quote.getApkRegime().isRequiresJustification()) {
-			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+			recommendation.setJustification(ApkAnalysis.justify(
 				reasons(quote, picked, best, score, budget, outcome),
-				reason -> new MotorContext(quote).withReason(reason)));
+				reason -> engine.get(PARAM_APK_REASON, new MotorContext(quote).withReason(reason))));
 		}
 		return recommendation;
 	}

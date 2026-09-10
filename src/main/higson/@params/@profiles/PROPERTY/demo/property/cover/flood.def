@@ -1,5 +1,5 @@
 code = "demo.property.cover.flood"
-description = "Wlasna tabela pokrycia, jedyna z trzema roznymi odpowiedziami na te sama sytuacje: w strefie Z0 i Z1 sprzedajemy normalnie, w Z2 tylko z franszyza redukcyjna, w ZX nie sprzedajemy wcale. O KARENCJI ta tabela nie mowi nic - cala karencje, razem ze zdaniem dla klienta, trzyma demo.property.flood.waitingPeriod, bo to ona wie, ile dni wychodzi. Kolumna waitingReason byla tu trzecia kopia tego samego."
+description = "Jedyne pokrycie, ktorego DOSTEPNOSC zmienia sie z sytuacja klienta: w Z0 i Z1 sprzedajemy normalnie, w Z2 z narzucona franszyza, w ZX wcale. Kolumna reason niesie kod zdania o FRANSZYZIE - demo nie tlumaczy klientowi, dlaczego pokrycia nie ma, wiec przy odmowie zostaje pusta. Podstawa stawki i brak limitu sa stale i stoja na elemencie w drzewie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,7 +9,7 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Powodz - warunki pokrycia"
+label = "Powodz - stawka, dostepnosc i franszyza wedlug strefy"
 
 [[inputLevel]]
 code = "zone"
@@ -22,56 +22,28 @@ union = false
 
 [[outputLevel]]
 code = "rate"
-label = "stawka"
+label = "stawka w promilach sumy"
 type = "number"
 external = false
 array = false
 
 [[outputLevel]]
-code = "basis"
-label = "podstawa stawki"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
 code = "available"
-label = "dostepne"
+label = "czy sprzedajemy w tej strefie"
 type = "boolean"
 external = false
 array = false
 
 [[outputLevel]]
 code = "reason"
-label = "kod zdania o odmowie"
+label = "kod zdania o narzuconej franszyzie"
 type = "string"
 external = false
 array = false
 
 [[outputLevel]]
 code = "minDeductible"
-label = "minimalna franszyza"
+label = "franszyza narzucona przez strefe"
 type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capRatio"
-label = "limit jako ulamek sumy"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capAbsolute"
-label = "limit kwotowy"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capLabel"
-label = "opis limitu dla klienta"
-type = "string"
 external = false
 array = false

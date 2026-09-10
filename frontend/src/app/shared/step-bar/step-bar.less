@@ -35,6 +35,20 @@
 		outline: 2px solid @color-teal;
 		outline-offset: -2px;
 	}
+
+	// Krok jeszcze niedostępny: widoczny, przygaszony, bez reakcji na najechanie.
+	//
+	// ⚠️ BEZ `opacity` — ta sama pułapka co w spisie pytań: przezroczystość na tekście w kolorze
+	// przygaszonym schodzi poniżej progu kontrastu i na rzutniku znika. Wystarczy kursor
+	// i brak podświetlenia.
+	&:disabled {
+		cursor: default;
+		color: @color-text-muted;
+
+		&:hover {
+			background: transparent;
+		}
+	}
 }
 
 .step-bar__step--current {
@@ -73,5 +87,80 @@
 @media (max-width: 720px) {
 	.step-bar__label {
 		display: none;
+	}
+}
+
+// ── Wariant `plain` (makieta UX 2026-09-09, demo majątkowe) ───────────────────────────────────
+//
+// Zakładki na jednej kresce, bez własnego panelu, bo cały ekran siedzi już w białej karcie.
+// Krok bieżący znaczy się kolorem i podkreśleniem pod SOBĄ, a nie tłem — tło wewnątrz białej
+// karty rysowałoby prostokąt, który nic nie ogranicza.
+:host(.step-bar--plain) {
+	.step-bar {
+		background: transparent;
+		border-radius: 0;
+		box-shadow: none;
+		border-bottom: 1px solid @color-border-soft;
+		// Widoczne przepełnienie: podkreślenie kroku bieżącego ma leżeć NA kresce, więc schodzi
+		// o piksel poniżej ramki gospodarza.
+		overflow: visible;
+	}
+
+	.step-bar__step {
+		flex: 0 1 auto;
+		justify-content: flex-start;
+		gap: 6px;
+		padding: 14px 20px;
+		margin-bottom: -1px;
+		font-size: @font-md;
+		font-weight: 600;
+
+		&:hover {
+			background: transparent;
+			color: @color-text;
+		}
+	}
+
+	// Numer stoi w linii tekstu, nie w kółku — „1. Analiza potrzeb", tak jak w makiecie.
+	.step-bar__mark {
+		width: auto;
+		height: auto;
+		border-radius: 0;
+		background: transparent;
+		color: inherit;
+		font-size: inherit;
+	}
+
+	.step-bar__step--current {
+		background: transparent;
+		border-bottom-color: @color-action;
+		color: @color-action;
+	}
+
+	// ⛔ Kropka po numerze jest OZDOBĄ, więc rysuje ją CSS, a nie szablon. W wariancie panelowym
+	// numer siedzi w kółku, gdzie kropka byłaby ciasna i bez sensu.
+	.step-bar__step:not(.step-bar__step--done) .step-bar__mark::after {
+		content: '.';
+	}
+
+	// Krok zamknięty: turkusowy ptaszek zamiast numeru, etykieta ciemna.
+	.step-bar__step--done {
+		color: @color-text;
+
+		.step-bar__mark {
+			background: transparent;
+			color: @color-action;
+			font-weight: 700;
+		}
+	}
+}
+
+// Poniżej 720px etykiety znikają globalnie (wyżej), więc numer musi wrócić do środka zakładki —
+// inaczej trzy cyfry wiszą przy lewych krawędziach nierównych kolumn.
+@media (max-width: 720px) {
+	:host(.step-bar--plain) .step-bar__step {
+		flex: 1;
+		justify-content: center;
+		padding: 14px 8px;
 	}
 }

@@ -3283,3 +3283,1212 @@ nie pomiar.
 przyjmuje wpisu programowego (kontrolka zostaje `ng-pristine`, `Save package` wygaszony), a natywne
 okno wyboru pliku wymagało wstrzyknięcia pliku przez `DataTransfer`. Ręcznie to cztery kliknięcia:
 Load test package → wskaż plik → Upload → Run.
+
+---
+
+## §35 (2026-09-09) — redesign UX: spis pytań, pytania złożone i jedna kolumna, która to wszystko niesie
+
+Makiety od UX-a (`.maister/tasks/development/2026-09-09-ux-redesign-property/`) dołożyły do ekranu
+kroku pierwszego **spis pytań** obok pytania bieżącego, a strony 3–4 makiety pokazały **pytanie
+z kilkoma polami**. Obie rzeczy okazały się jedną zmianą w konfiguracji: dwiema kolumnami katalogu
+`demo.property.apk.question`.
+
+### 35.1 `shortLabel` — druga nazwa pytania, która nie powtarza błędu D-20
+
+Spis potrzebuje krótkiej etykiety („Ochrona przed powodzią"), innej niż treść pytania („Czy chcesz
+ubezpieczyć swój majątek na wypadek powodzi?"). D-20 usunął atrybut `TEXT` właśnie dlatego, że
+element miał wtedy **dwie wersje siebie** i cztery z dziewiętnastu zdążyły się rozjechać
+niewidocznie.
+
+⛔ Tu ryzyko **nie zachodzi i to jest kryterium, a nie wymówka**: treść pytania i pozycja spisu
+stoją na ekranie **naraz**, więc rozjazd rzuca się w oczy. Dwie nazwy tego samego są groźne; nazwa
+i pozycja w spisie to dwie różne rzeczy.
+
+⛔ **Kolumna katalogu, nie atrybut elementu** — odwrotnie, niż zakładał brief. Ta tabela z założenia
+trzyma „wszystko, co jest o pytaniu STAŁE" i §17 przeniósł tam **z** atrybutów siedem takich
+rzeczy. Atrybut na typie `QUESTION` kosztowałby wejście w W-29 po jedną linijkę tekstu.
+
+### 35.2 `partOf` — pytanie złożone bez ruszania drzewa
+
+Wiersz z wypełnioną kolumną `partOf` **nie jest osobnym pytaniem**, tylko polem wskazanego.
+Pierwszy projekt zakładał kolekcję `FIELDS` pod elementem pytania i został odrzucony po zobaczeniu,
+jak katalog jest naprawdę zbudowany: **elementami drzewa są tylko pytania APK**, a trzynaście pól
+przedmiotu ubezpieczenia to same wiersze tabeli. Kolekcja pod elementem obsłużyłaby jedną z dwóch
+gałęzi; kolumna obsługuje obie i korzysta z mechanizmu, który już istniał — „pytanie, które nie
+jest elementem drzewa".
+
+⛔ To **nie** jest grupowanie po ekranie, którego zabrania §31. `partOf` mówi „to pole należy do
+tamtego pytania" — zdanie o przedmiocie rozmowy. Odrzucone pozostaje `SCREEN`/`GROUP`, czyli „te
+pytania pokazują się razem".
+
+Zasady, które z tego wynikają i są zapisane po obu stronach:
+
+- licznik liczy **rodziców**, nie pola
+- `revealedBy` biegnie **między rodzicami**
+- rodzic jest domknięty, gdy odpowiedziano na wszystkie pola **wymagane**; gdy żadne nie jest
+  wymagane — gdy odpowiedziano na choć jedno. ⚠️ Bez tej drugiej gałęzi pytanie z samych pól
+  nieobowiązkowych byłoby ślepym zaułkiem — ten sam błąd, co przy oczekiwanej składce po §22.
+- rodzic **nie ma własnej kontrolki**, bo nie ma `CONTEXT_PATH`; jego `KIND` to `GROUP`
+- model po stronie Javy zostaje **płaski**, zagnieżdżenie robi konwerter — dzięki temu odpowiedzi,
+  wartości demonstracyjne i każde wyszukanie po kodzie działa bez wiedzy o rodzicu
+
+**Zbudowane:** `QUESTIONS[EXPECTATIONS]` — „Twoje oczekiwania wobec ochrony", z polami `BUDGET`
+i `PROPERTY_VALUE`. Ankieta ma **sześć pytań zamiast siedmiu**; cofa się to wyczyszczeniem `partOf`
+w dwóch wierszach.
+
+### 35.3 Dwie usterki, które wyszły przy pierwszym uruchomieniu
+
+⛔ **`PRIOR_FLOOD_COVER` pokazywał klientowi surowe `true` / `false`.** Wiersz miał **puste**
+kolumny odpowiedzi — a pusta wartość we własnym wierszu **nadpisuje** `true,false / Tak,Nie`
+z wiersza gwiazdkowego, nie dziedziczy go. Opis tabeli mówi „każde pytanie ma je domyślnie", co
+jest prawdą tylko dla pytania, które własnego wiersza nie ma albo zostawia te kolumny nietknięte.
+
+⛔ **Etykiety z makiety nie pasują do pytań, które istnieją.** „Rodzaj nieruchomości",
+„Lokalizacja", „Historia szkód", „Data rozpoczęcia ochrony" opisują **przedmiot ubezpieczenia**,
+czyli krok 2 — a spis dotyczy kroku 1, w którym pytamy o potrzeby. Projektant wymyślił
+prawdopodobne tematy zamiast odczytać istniejące i to jest ogólniejsza przestroga wobec makiet do
+tego dema: **rysunek nie zna katalogu pytań**, bo katalog jest w Studio.
+
+### 35.4 Czego ta zmiana NIE dotknęła
+
+Ani jednej tabeli taryfowej, ani jednego flow, ani jednej funkcji. Zmieniły się dwie kolumny
+katalogu pytań, jeden nowy element domeny i wartości w dwudziestu wierszach. Dziesięć testów
+regułowych z §34 pokrywa `demo.property.calculateQuote` i pozostaje aktualne — składka nie ma z tym
+nic wspólnego.
+
+### 35.5 Pytanie zależne — i przeniesienie go tam, gdzie zależność jest prawdziwa
+
+Grupa może mieć pytanie **warunkowe**: takie, które odsłania odpowiedź na inne pytanie tej samej
+grupy. Pierwsza wersja postawiła je w „Potrzebie ubezpieczenia", za pytaniem *„czy potrzebujesz
+ubezpieczyć nieruchomość"* — czyli za odpowiedzią, którą daje każdy, kto tu przyszedł. Zależność
+była pozorna. Pytanie stoi dziś w grupie **„Wynajem"**, za `RENTED_OUT`:
+
+> *Czy chcesz, żeby przy awarii u najemcy fachowiec przyjechał bez Twojego udziału — hydraulik,
+> elektryk, ślusarz?*
+
+⛔ **To jest potrzeba klienta, nie cecha przedmiotu ubezpieczenia.** Odrzucone zostały warianty
+w rodzaju „czy w okolicy zdarzały się podtopienia" — to charakterystyka sytuacji, czyli krok 2.
+
+**Zmierzony efekt:** te same odpowiedzi wszędzie indziej, a `assistance = Tak` przestawia
+proponowany pakiet ze **STANDARD** na **COMPLETE**, bo assistance jest tylko w nim.
+
+### 35.6 Odsłonięcie po ODPOWIEDZI — nowa kolumna `revealedWhen`
+
+Łańcuch z §18 odsłania następne pytanie po **domknięciu** poprzedniego, a domknięciem jest także
+odmowa i pominięcie pytania nieobowiązkowego. Dlatego nie zna wartości odpowiedzi — i dlatego
+`RENTED_OUT = Nie` odsłaniało pytanie o assistance tak samo jak „Tak". *Pytanie zależne od TAK* nie
+było w tej konfiguracji wyrażalne wcale; zostało dołożone 9 września 2026:
+
+| Artefakt | Zmiana |
+|---|---|
+| `demo.property.apk.question` | kolumna **`revealedWhen`** — odpowiedź, która odsłania; **pusta = każda** |
+| `demo.property.apk.question.reveal` | poziom **`matches`** (`reveal.sourceMatches`) i szósty wiersz `true;*;*;*;false → false` |
+| Java | `Question.revealedWhen`, `Property.sourceMatches(...)`, piąty argument `withReveal` |
+
+Podział ról jak przy `revealedBy`: **Java rozwiązuje wskazanie i porównuje napisy, wniosek wyciąga
+tabela.** Drugie pytanie zależne to jedna komórka w Studio, bez wdrożenia.
+
+⚠️ Pusty `revealedWhen` **musi** znaczyć „każda odpowiedź", inaczej dołożenie kolumny zmienia
+zachowanie całego łańcucha zamiast jednego pytania.
+
+⚠️ Warunek postawiony na pytaniu **złożonym** zostawia je ukryte — grupa nie ma własnej odpowiedzi,
+o którą warunek mógłby się oprzeć.
+
+⚠️ **W-27 potwierdzone drugi raz:** dołożenie kolumny przenumerowało wszystkie 28 wierszy katalogu.
+
+### 35.7 Treść pytania wraca do atrybutu domeny — częściowe odwrócenie D-20
+
+Typ `QUESTION` ma znów atrybut **`TEXT`** (grupa *Tresc*; `KIND` i `CONTEXT_PATH` w grupie
+*Zachowanie*). D-20 usunął go, bo treść stała **w dwóch miejscach naraz** — w nazwie elementu
+i w atrybucie — i cztery z dziewiętnastu pytań rozjechały się niewidocznie.
+
+⛔ **Wolno go przywrócić tylko dlatego, że nazwa elementu przestała być tą samą treścią.** Nazwy to
+teraz krótkie etykiety gałęzi („Wynajem", „Powódź"), a Java czyta `TEXT` **bez odwrotu do nazwy
+elementu**: brak atrybutu daje puste pytanie widoczne na ekranie, a nie cichy powrót do drugiego
+źródła prawdy. Odwrót odbudowałby dokładnie to, co D-20 skasował.
+
+Grupa pytań (`QUESTION_GROUP`) atrybutów nie ma — jej `text` bierze się z nazwy elementu, bo nazwa
+grupy jest etykietą gałęzi i drugiego miejsca na nią nie ma.
+
+⚠️ **`higson_delete_domain_element` zapisuje się w sesji jako `UPDATE`, nie `DELETE`.** Eksport
+konfiguracji niósł dalej skasowany element, import go odtworzył i pytanie stanęło w dwóch grupach.
+Sprawdzać `childrenCount` w drzewie, nie samo `status: SUCCESS`.
+
+### 35.8 Odpowiedź na pytanie ukryte przestaje karmić reguły
+
+Pytanie warunkowe można odsłonić, odpowiedzieć i cofnąć odpowiedź, która je odsłoniła. Odpowiedzi
+**nie kasujemy** — prowadzący wraca i nie chce wpisywać jej drugi raz — ale przestaje wchodzić do
+reguł. Bez tego cofnięcie wynajmu na „Nie" zostawiało potrzebę assistance i pakiet stał na Pełnym
+z powodu pytania, którego na ekranie już nie ma.
+
+Filtr po `isRevealed()` stoi w trzech miejscach po stronie majątkowej: `PropertyContext.collectAnswers`
+(ścieżki kontekstu), `Property.revealed(quote)` przed `ApkAnalysis.serialize` (lista dla reguły
+potrzeb) i `applyBlocker` (miał go od początku).
+
+⛔ **Nie wolno przenieść tego filtra do `ApkAnalysis.flatten`**, mimo że to wspólny lej dla wszystkich
+odpowiedzi: `revealed` ustawia wyłącznie profil majątkowy, więc w MOTO i LIFE każde pytanie ma tam
+`false` i wspólny filtr wyciąłby im wszystkie odpowiedzi.
+
+### 35.9 Grupy atrybutów na wszystkich typach — 41 z 41
+
+`COVER` i `VARIANT` miały `groupOrder` bez nazw, czyli bezimienne bloki rozdzielone odstępem.
+Nazwane i przy okazji przełożone tak, żeby czytały się w kolejności procesu, a w każdej grupie
+**pierwszy atrybut był wynikiem**, a kolejne jego składem:
+
+| Typ | Grupy |
+|---|---|
+| `COVER` | Dostepnosc · Suma ubezpieczenia · Skladka · Limit odpowiedzialnosci · Prezentacja |
+| `VARIANT` | Dostepnosc · Suma gwarancyjna · Skladka · Prezentacja |
+| `PRODUCT` | Podstawy wyceny · Warunki oferty · Notatka o wyborze klienta |
+| `NEEDS_ANALYSIS` | Przebieg ankiety · Od odpowiedzi do potrzeb · Dobor pakietu · Uzasadnienie dla klienta |
+| `QUESTION` | Tresc · Zachowanie |
+
+⛔ **`action: NO_CHANGES` na każdym atrybucie** — to jest cała ostrożność w tej operacji (W-29).
+Domyślne `SET_TO_ALL` nadpisuje wartość na KAŻDYM elemencie wartością domyślną typu; przy `COVER`
+skasowałoby siedem kompletów wskazań na tabele pokryć. Sprawdzone po zapisie na `COVERS[THEFT]`
+i `VARIANTS[STANDARD]`: wartości elementów nietknięte, kolekcja `COVERS` pakietu dalej ma 4 dzieci.
+
+⚠️ **Wartości wysyła się BEZ prefiksu `$p`/`$f`/`$w`** — silnik trzyma je bez niego i dokleja przy
+wyświetlaniu (W-25). Odesłanie `$p demo.property.variant.availability [available]` podwoiłoby prefiks.
+
+⚠️ **Puste wartości domyślne `COVER` zachowane** — §32 opróżnił je celowo, żeby nowe pokrycie
+startowało bez reguły, a nie z taryfą murów. Wysłany `defaultValueType` bez `defaultValue`.
+
+⚠️ Opis typu ma **512 znaków** — pierwsza próba z dłuższym opisem `COVER` padła na
+`Value too long for column DESCRIPTION`.
+
+## §36 Element mówi, co robi; jak liczy, stoi w jego tabeli (2026-09-09)
+
+Kryterium właściciela dla tego, co zasługuje na miejsce w drzewie domeny: **atrybut zostaje, gdy
+aplikacja czyta go przez atrybut, albo gdy jest tym jednym, po co biznes wchodzi na ten element.**
+Reszta jest okablowaniem reguły i należy tam, gdzie reguła.
+
+Skan wykazał, że z **41 atrybutów w pięciu typach** Java czyta przez atrybut **16**, sześć czyta
+tylko Groovy, a **19 nie czyta nikt** — Java ma dwadzieścia stałych z kodami tabel i flow i sięga po
+nie wprost, z pominięciem atrybutu obok.
+
+### 36.1 Pierwszy krok: `COVER` 13 → 9
+
+Znikły `RATE`, `RATE_BASIS`, `CAP_RATIO`, `CAP_ABSOLUTE` — cztery **wskaźniki na kolumny własnej
+tabeli pokrycia** (`demo.property.cover.theft [rate]` i tak dalej). Siedem pokryć niosło dwadzieścia
+osiem adresów mówiących to samo, co konwencja nazewnicza. `cover.premium` i `limit.effective`
+wyprowadzają teraz nazwę tabeli tak samo, jak już wcześniej wyprowadzały ścieżkę elementu
+(`/PRODUCTS[HOME]/COVERS[<kod>]`) — to użycie istniejącego założenia po raz drugi, nie nowe.
+
+Zostaje dziewięć: `IS_AVAILABLE` + `UNAVAILABLE_REASON` · `SUM` + `SUM_BASIS` + `SUM_REFERENCE` ·
+`PREMIUM` · `LIMIT` + `LIMIT_LABEL` · `POSITION`.
+
+⛔ **`PREMIUM` miał znikać i to była pomyłka**, wyłapana przez właściciela. Ciąłem tym, co czyta
+Java; właściwa linia biegnie inaczej — **wynik zostaje, składnik znika**. Składka pokrycia nie
+dociera nawet do klienta (DTO pokrycia nie ma pola `premium`, tabela porównania pokazuje składkę
+wariantu), ale „ile kosztuje to pokrycie i jak się je liczy" to pytanie **ubezpieczyciela
+konfigurującego produkt**, a kryterium mówi o dostępie dla biznesu, nie o widoczności dla klienta.
+
+⚠️ `SUM_BASIS` i `SUM_REFERENCE` wyglądają na składniki, ale zostają: to **literały**, nie
+wskaźniki, a wepchnięte do tabeli byłyby kolumną o tej samej wartości w każdym wierszu — czyli tym,
+czemu zapobiega D-23.
+
+⛔ To **zawęża D-16, nie odwraca go**. §23 mówił „usuwamy atrybuty, które nie wskazują na żadną
+regułę"; drzewo dalej jest spisem treści, przestaje tylko wypisywać składniki obok wyników.
+
+### 36.2 Kolejność migracji jest częścią zmiany
+
+**Najpierw reguła przestaje czytać atrybut, dopiero potem atrybut znika.** Funkcje → publikacja →
+weryfikacja, że liczby są identyczne → zmiana typu. Odwrotna kolejność zostawia okno, w którym
+reguła sięga po coś, czego nie ma, a skasowanie atrybutu zabiera jego wartość ze **wszystkich**
+elementów naraz — tu dwadzieścia osiem wartości, odtwarzalnych tylko z eksportu.
+
+Weryfikacja: cztery przebiegi na żywo, **zero różnic** wobec bazy zdjętej przed startem — BASIC
+545,29 / STANDARD 1014,94 / COMPLETE 3082,75, czynnik ryzyka 1,215, siedem sum i trzy etykiety
+limitów. Osobno sprawdzone dwie gałęzie, które ruszyła zmiana: strefa ZX wycina COMPLETE z podanym
+powodem, a assistance trzyma stawkę kwotową i limit per rodzaj nieruchomości (3 000 zł mieszkanie /
+4 500 zł dom).
+
+### 36.3 ⚠️ Pułapka, która wywaliła wycenę w trakcie
+
+**`higson_update_function` wywołane bez pola `arguments` kasuje dodatkowe argumenty funkcji.**
+`cover.premium` przyjmuje `ctx` **i** `coverCode`; po aktualizacji samego ciała deklarowała jeden
+argument, a `calculateQuote` dalej podawała dwa:
+
+```
+InvalidFunctionArgumentsNumberException: Invalid arguments number. Expected: 1, Passed: 2
+```
+
+Ciało reguły było poprawne — odmówił silnik. Schemat narzędzia opisuje `arguments` jako opcjonalne,
+w praktyce pominięcie ich **zeruje istniejące**.
+
+⛔ Potwierdziło się przy okazji ostrzeżenie z analizy: `calculate()` nie ma `catch`, a
+`GlobalExceptionHandler` obsługuje tylko wyjątki profilu komunikacyjnego, więc niezgodność sygnatury
+zwraca **gołe 500 dla całej wyceny**, a nie brakujące pole. Nie ma degradacji częściowej.
+
+### 36.4 Pozostale trzy typy — 37 → 31
+
+Ta sama zasada zastosowana do reszty. Żadna z tych zmian nie wymagała ruszania reguły: wszystkie
+sześć atrybutów było **czystą nawigacją** — Java woła te tabele, funkcje i flow po kodzie ze swoich
+stałych, z pominięciem atrybutu obok.
+
+| Typ | Było | Jest | Znika | Dlaczego |
+|---|---|---|---|---|
+| `VARIANT` | 8 | **5** | `ANNUAL_PREMIUM`, `INSTALMENT`, `COVER_PREMIUMS` | kroki flow `calculateQuote`, nie cechy pakietu |
+| `NEEDS_ANALYSIS` | 9 | **7** | `REASON_TRIGGER`, `VALUE_GAP` | składniki `JUSTIFICATION` — które zdanie pada i jak wypada porównanie |
+| `PRODUCT` | 8 | **7** | `CHOICE_KIND` | składnik `CHOICE_NOTE`: delta → nazwa → zdanie |
+
+**Stan końcowy: 31 atrybutów w pięciu typach** — `COVER` 9, `NEEDS_ANALYSIS` 7, `PRODUCT` 7,
+`VARIANT` 5, `QUESTION` 3.
+
+### 36.5 Jak to sprawdzono
+
+Scenariusz porównawczy uruchamiał w jednym przebiegu wszystko, czego dotykały zdejmowane atrybuty:
+podana wartość nieruchomości (`sum.valueGap`), budżet niższy od składki (`apk.budget` →
+`BUDGET_EXCEEDED`), wybór pakietu **innego niż rekomendowany** (`offer.choiceKind` → `POORER`
+i notatka o odstąpieniu) oraz wystawienie polisy (warunki oferty z atrybutów `PRODUCT`).
+
+Po każdej z trzech zmian: **zero różnic** — te same składki i raty, ten sam rekomendowany pakiet,
+te same sześć zdań uzasadnienia, ta sama notatka o wyborze, te same daty ważności i płatności.
+Jedyne, co się zmienia między przebiegami, to numer oferty, bo jest licznikiem.
+
+Osobno sześć scenariuszy brzegowych: dom i mieszkanie, strefa ZX (COMPLETE niedostępny z powodem),
+brak zabezpieczeń (wyższa składka i luka w potrzebach 1/2), odpowiedź blokująca ankietę, pytanie
+zależne od wynajmu (2/2 potrzeby). Wszystkie zachowują się jak przed zmianą.
+
+## §37 Uproszczenia i dwie usterki (2026-09-09)
+
+### 37.1 `sum.suggest` — 25 linii do 12
+
+Właściciel: *„funkcje tego typu są skomplikowane, za dużo obsługi błędów jak na demo, do tego
+stosujesz skomplikowane konstrukcje jak `createContext` oraz `type.paramValue()`"*. Sprawdzenie
+potwierdziło zarzut trzy razy, przy czym dwa razy problemem nie było „za dużo obsługi", tylko
+**martwy kod udający obsługę**:
+
+⛔ **Drugi `throw` był nieosiągalny.** `sum.ratePerSqm` ma `nullable = false` i wiersz `*;*;*;4700`,
+więc nie może zwrócić nulla. Cztery linie pilnowały sytuacji, która nie zachodzi.
+
+⛔ **Czwarta zwracana wartość nie była czytana.** Funkcja oddawała `building`, `fixtures`,
+`contents` i `rate`; Java czytała trzy pierwsze, a stawkę brała osobno wprost z tabeli, do zdania
+uzasadnienia.
+
+⛔ **`createContext` dało się usunąć razem z wymiarem tabeli.** `sum.derivedRatio` była kluczowana
+`(cover, standard)` — i właśnie dlatego funkcja musiała budować sztuczny kontekst z `cover.code`,
+dwa razy, choć na poziomie całej wyceny **żadne pokrycie nie jest jeszcze znane**. Przekształcona na
+klucz `standard` z dwiema kolumnami: **jedno wywołanie na zwykłym kontekście, 4 wiersze zamiast 7**.
+
+```
+standard;fixtures;contents
+*;0;0
+BASIC;0.15;0.10
+PREMIUM;0.32;0.24
+STANDARD;0.22;0.15
+```
+
+Zostaje jeden guard — na brak metrażu. ⚠️ Ten **nie** zamienia się w „przypisz 0": zerowy metraż
+daje zerową sumę i całą wycenę za zero, podaną jak prawdziwa. Brzydki błąd jest lepszy niż ładna
+zła liczba.
+
+`type.paramValue()` zostaje, bo trzy sumy muszą trafić do kontekstu razem — `cover.sum` czyta je
+stamtąd przy `SUM_BASIS = COMPUTED`. Chudnie z czterech kodów do trzech.
+
+⚠️ Tabela i funkcja zmienione w **jednej sesji i opublikowane raz** — inaczej silnik zobaczyłby stan
+pośredni, w którym jedno nie pasuje do drugiego. To jest wzorzec do powtarzania przy każdej zmianie
+kształtu tabeli razem z jej czytelnikiem.
+
+### 37.2 Usterka: oferta obiecywała franszyzę, której nie stosowała
+
+W strefie Z2 załącznik mówił *„Ochrona od powodzi w Twojej lokalizacji wymaga franszyzy redukcyjnej
+1 000 zł"*, a tabela pokryć tuż obok — *„Franszyza redukcyjna: 0 zł"*. Jeden ekran, dwie sprzeczne
+liczby pod tą samą nazwą.
+
+Przyczyna: to są **dwie różne franszyzy**. `policy.deductible` należy do polisy, nikt jej w tym
+demie nie ustawia (front nie woła `updateDeductible` ani razu), więc zawsze wynosi zero.
+`minDeductible` z `cover.flood` to warunek **jednego pokrycia**, postawiony przez regułę strefy —
+i tylko on jest prawdziwy.
+
+Naprawa: franszyza strefowa trafia na wniosek jako `floodDeductible` i to ją pokazuje oferta,
+**tylko wtedy, gdy wybrany pakiet naprawdę niesie ochronę od powodzi**. W Z0 wiersza nie ma wcale
+zamiast „0 zł". Franszyza polisy zostaje w modelu i w API — znika z ekranu, na którym kłamała zerem.
+
+### 37.3 Usterka: nieznany pakiet zatruwał wniosek
+
+`PUT /property/variant` przyjmował dowolny napis z **HTTP 200**, a padał dopiero NASTĘPNY `GET`:
+reguła sumy OC szuka wtedy `/PRODUCTS[HOME]/VARIANTS[<kod>]` i nie znajduje elementu. Wniosek
+zostawał w tym stanie **na stałe** — każde kolejne żądanie wracało 500 aż do resetu procesu.
+
+Naprawa: walidacja przed zapisem, `UnknownVariantException` → **400** z komunikatem, handler dołożony
+do `GlobalExceptionHandler`.
+
+⛔ **Pierwsza wersja walidacji była błędna i złapała ją dopiero weryfikacja.** Sprawdzała kod po
+`quote.getVariants()`, co wygląda naturalnie — a ta lista jest **pusta zaraz po `PUT /reset`**, bo
+wypełnia ją dopiero `calculate()` przy najbliższym odczycie. Poprawny kod dostawał więc odmowę tylko
+dlatego, że nikt jeszcze nie zapytał o wycenę, i cichy skutek był taki, że wybór pakietu się nie
+zapisywał, a oferta wychodziła „zgodna z rekomendacją" zamiast „węższa". Pytanie idzie teraz do
+**drzewa** (`Property.hasVariant`), nie do policzonej wyceny.
+
+⚠️ Ta regresja nie miała żadnego objawu poza czterema polami notatki o wyborze w scenariuszu
+porównawczym. Bez porównania pole-po-polu wobec bazy przeszłaby niezauważona.
+
+## §38 Review tabel decyzyjnych i ożywienie franszyzy (2026-09-09)
+
+Ten sam przegląd, który przeszedł po funkcjach, przeprowadzony po **31 tabelach**: martwe wyjścia,
+wiersze nieosiągalne, wymiary, które nie różnicują. **Trzydzieści z trzydziestu jeden okazało się
+szczelnych** — cała nadmiarowość siedziała w jednej rodzinie i w czterech drobiazgach.
+
+Warunek właściciela dla tej rundy: *„to, co zostanie i będzie zrobione, trzeba wypełnić realną
+konfiguracją, tak żeby tabele nie były sztucznymi jednowierszowcami"*. Dlatego żadne cięcie nie
+zostawia tu stubu — a jedna tabela, zamiast zniknąć, została **podłączona**.
+
+### 38.1 `shortLabel` — kolumna, której nikt nigdy nie zobaczył
+
+Wypełniona w 13 z 28 wierszy, wyłącznie dla pól przedmiotu ubezpieczenia — i **żadna z tych wartości
+nie trafiała na ekran**. Spis pytań istnieje tylko w kroku 1, a jego pozycjami są **grupy**, które
+nie mają wiersza w katalogu; krok 2 spisu nie ma wcale i renderuje `question.text`.
+
+Kolumna powstała rano dla spisu, a po południu spis przeszedł na nazwy grup, gdy grupy stały się
+poziomem drzewa (§35). Usunięta wraz z polem w `Question`, DTO, modelu frontu i użyciem w komponencie.
+
+### 38.2 Franszyza — zamiast usunąć martwą tabelę, podłączyliśmy ją
+
+`demo.property.factor.deductible` miała pięć wierszy prawdziwej drabinki (200 / 500 / 1000 zł), do
+których **nie dało się dojść**: front nie woła `updateDeductible`, więc wejście zawsze wynosiło zero.
+Wycięcie zostawiłoby `*;1.00` — dokładnie ten sztuczny jednowierszowiec, którego właściciel zakazał.
+
+Zamiast tego franszyza stała się **pytaniem kroku 2**, w miejsce `RENOVATED` — pola, którego
+`quote.property.renovated` nie czytała żadna reguła ani Java. Liczba pól ekranu bez zmian, jedno
+martwe zamienione na jedno żywe.
+
+⚙️ **Zero nowych reguł.** Wiersz katalogu z `kind = MONEY` i `contextPath = quote.policy.deductible`
+wystarczył: `PropertyContext.convert` robi z odpowiedzi `BigDecimal`, a tabela jest kluczowana tą samą
+ścieżką. To jest teza demo w działaniu — nowe pole wyceniające się bez wdrożenia.
+
+| Franszyza | Czynnik ryzyka | BASIC | STANDARD | COMPLETE |
+|---|---|---|---|---|
+| 0 | 1,215 | 545,29 | 1014,94 | 3082,75 |
+| 200 | 1,1543 | 518,05 | 964,24 | 2932,34 |
+| 500 | 1,0935 | 490,76 | 913,44 | 2781,67 |
+| 1000 | 1,0206 | 458,05 | 852,55 | **2601,02** |
+| 750 (spoza drabinki) | 1,215 | 545,29 | 1014,94 | 3082,75 |
+
+**D-8 odzyskało pierwszą rolę.** Druga — franszyza narzucona przez strefę powodziową — dalej stoi
+w `cover.flood [minDeductible]` i jest od tamtej niezależna.
+
+⛔ **Pułapka, w którą wszedłem po drodze.** Odpowiedź i model wniosku leżą pod tą samą ścieżką
+`quote.policy.deductible`, a `collectComputed` nadpisywał odpowiedź zerem. Pierwsza poprawka —
+zamiana kolejności na `collectComputed(); collectAnswers();` — **zepsuła strefy**: `collectComputed`
+liczy prefiks kodu pocztowego **z odpowiedzi**, więc musi biec po nich. Objawiło się spadkiem składki
+BASIC z 545,29 na 270,81. Właściwe rozwiązanie to `putIfAbsent` na tej jednej ścieżce.
+
+### 38.3 Trzy drobiazgi
+
+| Tabela | Co było | Co jest |
+|---|---|---|
+| `apk.question.visibility` | 4 wiersze, 3 wejścia; wiersz `RENOVATED` rządził martwym pytaniem, a wymiar `age` obsługiwał tylko jego | 3 wiersze, **2 wejścia** — każdy wymiar różnicuje |
+| `flood.waitingPeriod` | `ZX;false;0;` i `ZX;true;0;` dawały ten sam wynik | jeden `ZX;*;0;` |
+| `offer.choiceKind` | `* - -1` i `1 - *` | `-999 - -1` i `1 - 999` |
+
+⛔ Wierszy `ZX` **nie wolno usunąć** — pusty `reasonCode` jest strażnikiem ciszy: bez niego ZX spadłoby
+na wiersz `*` i klient w strefie, gdzie powodzi się nie sprzedaje, przeczytałby „ochrona zaczyna
+działać po 30 dniach".
+
+⚠️ Domknięcie zakresów w `choiceKind` to **W-30**: otwarty koniec dopasowuje `null` i bije wiersz
+gwiazdkowy. Opis tabeli twierdził, że „null nie pasuje do żadnego wiersza" — dopiero teraz to prawda.
+Sprawdzone, że ścieżka nullowa i tak była nieosiągalna, bo serwer podstawia rekomendowany wariant.
+
+### 38.4 Czego review NIE ruszyło
+
+Po tej rundzie **żadna tabela poza rodziną `cover.*` nie ma ani jednej kolumny o jednej wartości**.
+
+W `cover.*` kolumna `basis` przyjmuje `SUM` w sześciu tabelach i `FLAT` w siódmej, i **ani razu nie
+zmienia się wewnątrz tabeli** — jest stałą pokrycia, nie wymiarem. Zostaje świadomie: zgodnie
+z zasadą z §36 (*wynik zostaje, składnik znika*) `basis` jest **składnikiem** składki i należy do
+tabeli, a jego stałość jest faktem o pokryciach, nie usterką. Zejście na element odwracałoby tamtą
+zasadę tydzień po jej ustanowieniu.
+
+⛔ Nie rozbito też `capRatio`/`capAbsolute`/`capLabel`: w `theft` zmieniają się **razem**
+(0,40/50 000/„40% sumy" wobec 0,50/75 000/„50% sumy"), a rozdzielenie zerwałoby parę, która jest
+treścią reguły.
+
+## §39 Kontekst niesie fakty, nie wyprowadzenia (2026-09-09)
+
+Zasada właściciela: **jeśli z danych, które i tak są w kontekście, da się wyprowadzić inne — Java ich
+nie dosyła.** Higson liczy je sam, przez funkcję jako źródło poziomu tabeli (`$f`, §33.9).
+
+`PropertyContext.collectComputed` dosyłał **piętnaście** wartości. Zostało **dziewięć**.
+
+### 39.1 Pięć ścieżek, których nie czytał nikt
+
+`quote.zone.theft`, `quote.sums.theft`, `quote.sums.flood`, `quote.sums.assistance` —
+zero czytelników w regułach i zero w Javie. Trzy ostatnie były wręcz **nigdy nieustawiane**: pola
+`Sums.theft/flood/assistance` nie miały ani jednego settera, więc do kontekstu szedł null. Pola
+usunięte z modelu razem z wpisami.
+
+⚠️ `quote.sums.suggestedBuilding` też wyglądało na nieczytane **i to była pułapka**: żadna reguła go
+nie czyta, ale **Java czyta go z powrotem** przez `decimalAt` (`Property.java:867` i `:915`), żeby
+porównać sumę wybraną przez klienta z wyliczoną. Usunięcie dodało do uzasadnienia zdanie „Obniżyłeś
+sumę poniżej wyliczonej wartości odtworzeniowej" — wyszło w porównaniu z bazą, nie w testach.
+Przywrócone z komentarzem, dlaczego zostaje.
+
+⛔ **Wniosek metodyczny: szukając martwej ścieżki kontekstu, trzeba przeszukać reguły ORAZ Javę.**
+Java jest tu jednocześnie piszącym i czytającym.
+
+### 39.2 Wiek budynku — cały łańcuch usunięty
+
+`quote.property.age` czytała jedna tabela, `factor.buildingAge`. Java wołała `util.buildingAge`,
+zapisywała wynik na wniosku i dosyłała go do kontekstu. Teraz **źródłem poziomu tabeli jest ta sama
+funkcja** (`$f demo.property.util.buildingAge`), więc znika: wpis do kontekstu, wywołanie
+`engine.call`, stała `FUNCTION_BUILDING_AGE`, pole `PropertyQuote.buildingAge`, pole DTO i pole
+w modelu frontu — nierenderowane od dawna.
+
+To jest wzorcowy przykład zasady: funkcja liczy wiek z roku budowy i daty początku ochrony, a obie te
+wartości są w kontekście, bo są odpowiedziami klienta.
+
+### 39.3 Strefy po PEŁNYM kodzie pocztowym
+
+Pośrednia warstwa `quote.property.postcodeArea` — dwie pierwsze cyfry kodu — zniknęła w całości.
+Najpierw przeniosłem ją do funkcji `demo.property.util.postcodeArea`, ale właściciel rozstrzygnął
+inaczej i lepiej: **w demie kodów jest kilkanaście, więc tabele kluczują się pełnym kodem wprost
+z odpowiedzi klienta.** Funkcja skasowana, warstwa nie istnieje.
+
+Trzy tabele przeszły na `quote.property.postcode`: `zone.flood`, `zone.theft`, `sum.ratePerSqm`.
+Znika przy okazji `PropertyContext.postcodeArea()` — czterolinijkowa metoda, która była **drugą
+implementacją** tej samej reguły co usunięty wcześniej `substring` w `zone.resolve`.
+
+| Kod | Powódź | Kradzież | Uwaga |
+|---|---|---|---|
+| `00-950` | Z0 | T3 (1,35) | domyślny w demie, własna stawka 8800 zł/m² |
+| `50-000` | **Z2** | T2 (1,18) | strefa z narzuconą franszyzą |
+| `57-000` | **ZX** | T1 | powodzi nie sprzedajemy, COMPLETE wycofany |
+| `99-999` | Z0 | T1 | spoza tabel — wiersz gwiazdkowy |
+
+### 39.4 Co zostało w kontekście i dlaczego
+
+| Ścieżka | Dlaczego zostaje |
+|---|---|
+| `quote.policy.startDate` | fakt, nie wyprowadzenie |
+| `quote.policy.deductible` | `putIfAbsent` — odpowiedź klienta wygrywa z wartością modelu |
+| `quote.zone.flood` | ⚠️ wyprowadzalna, ale czytają ją też wąskie konteksty w `apk.indicated`/`alternative`; wyprowadzanie w miejscu odczytu wymagałoby przekazywania tam kodu pocztowego, rodzaju nieruchomości i piętra — trzy wartości zamiast jednej |
+| `quote.sums.building/fixtures/contents` | wyniki, które aplikacja pokazuje na ekranie i którymi klient może nadpisać sumę murów |
+| `quote.sums.suggestedBuilding` | Java czyta z powrotem (39.1) |
+| `quote.sums.liability` | zależy od WYBRANEGO pakietu, więc ustawiana per wariant |
+| `quote.risk.factor` | wyprowadzalna, ale liczy ją czternastowęzłowy flow; wyprowadzanie w miejscu odczytu uruchamiałoby go 21 razy na wycenę |
+
+⛔ Dwie ostatnie pozycje to **świadome punkty memoizacji**, nie przeoczenie. Zasada mówi „nie dosyłaj
+tego, co da się wyprowadzić" — nie „wyprowadzaj wszystko tyle razy, ile razy jest czytane".
+
+## §40 Dostępność pakietu wynika z pokryć (2026-09-09/10)
+
+Tabela `demo.property.variant.availability` **usunięta**. Dostępność pakietu nie ma już własnej
+konfiguracji: **pakiet wolno sprzedać dokładnie wtedy, gdy wszystkie jego pokrycia są dostępne**,
+a powód odmowy składa się ze zdań tych pokryć, które nie są.
+
+Dwie funkcje zamiast tabeli: `demo.property.variant.available` (idzie po składzie pakietu z drzewa
+i wraca `false` na pierwszym niedostępnym pokryciu) i `demo.property.variant.blocked` (składa
+zdania). Obie czytają skład **z drzewa** (`VARIANTS[...]/COVERS`), więc przebudowa pakietu nie
+wymaga poprawiania żadnej reguły.
+
+⛔ **Powód pakietu jest dosłownie powodem pokrycia.** Pokrycie niesie KOD zdania
+(`UNAVAILABLE_REASON`), a treść stoi w `apk.recommendation.reason` — nie ma osobnego tekstu
+o wariancie, który mógłby się rozjechać z tekstem o pokryciu:
+
+```
+dom, 57-000  → COMPLETE NIEDOSTĘPNY
+   „W Twojej lokalizacji ochrona od powodzi nie jest dostępna — miejsce leży w strefie
+    o najwyższym zagrożeniu."
+bez zabezpieczeń → COMPLETE NIEDOSTĘPNY
+   „Ochrona od kradzieży z włamaniem wymaga co najmniej drzwi antywłamaniowych…"
+```
+
+### 40.1 Pierwsza wersja miała flagę i to był nadmiar
+
+Pośrednia wersja wprowadzała na pokryciu atrybut `BLOCKS_PACKAGE` — „czy bez tego pokrycia wolno
+sprzedać pakiet" — bo dotychczasowe zachowanie było niejednolite: powódź w ZX wycofywała cały
+COMPLETE, a kradzież bez zabezpieczeń zostawiała go w sprzedaży ze składką 0 za kradzież.
+
+⛔ **Właściciel rozstrzygnął prościej: wszystkie pokrycia muszą być dostępne, a przypadki
+demonstracyjne przygotuje sam.** Flaga skasowana, `COVER` wrócił do 13 atrybutów.
+
+⚠️ **To zmienia jedno zachowanie i trzeba o tym wiedzieć przed pokazem:** brak zabezpieczeń
+wycofuje teraz cały pakiet Pełny zamiast wyceniać go z kradzieżą za zero. Rekomendacja i tak
+wskazywała wtedy Standardowy, więc zmiana dotyczy tabeli porównania, nie propozycji.
+
+### 40.2 Wąski kontekst — sprzężenie, które trzeba było naprawić
+
+`apk.indicated` i `apk.alternative` sprawdzają dostępność wariantu w **wąskim kontekście** budowanym
+przez `higson.createContext`, bo `variant.code` musi tam być, a pełnego kontekstu nie da się
+rozszerzyć. Ten kontekst niósł tylko strefę powodziową.
+
+⛔ Po przejściu na „wszystkie pokrycia dostępne" to przestało wystarczać: dostępność kradzieży
+kluczuje się zabezpieczeniami, których w wąskim kontekście nie było, więc tabela spadała na wiersz
+gwiazdkowy i **rekomendacja widziała COMPLETE jako dostępny, podczas gdy ekran pokazywał go jako
+wycofany**. Wąski kontekst niesie teraz `quote.zone.flood` **i** `quote.property.security`.
+
+⚠️ **Zasada na przyszłość: wąski kontekst musi nieść każde pole, po którym kluczuje się dostępność
+któregokolwiek pokrycia.** Nowy wymiar dostępności to nowe pole tutaj — inaczej rozjazd jest cichy.
+
+### 40.3 Pakiet traci atrybuty dostępności
+
+Po przejściu na regułę „wszystkie pokrycia dostępne" na `VARIANT` zostały `IS_AVAILABLE`
+i `UNAVAILABLE_REASON` jako wskaźniki na dwie nowe funkcje. **Usunięte.**
+
+Sprawdzone: **każdy** odczyt tych dwóch atrybutów w całej konfiguracji i w Javie dotyczy
+elementu `COVER`, nigdy `VARIANT` — Java bierze dostępność pakietu z wyniku flow
+(`result.get("available")`), nie z atrybutu. To była czysta nawigacja wskazująca na funkcję,
+która odpowiedzi szuka gdzie indziej.
+
+⛔ **Otwarcie pakietu nie powinno sugerować, że dostępność da się tam ustawić.** Skoro wynika
+z pokryć, to na pokryciach się ją czyta i zmienia.
+
+`VARIANT` ma teraz **trzy** atrybuty: suma gwarancyjna OC, składka i miejsce w drabince.
+
+### 40.4 Bilans dnia w atrybutach domeny
+
+| Typ | Rano | Wieczorem |
+|---|---|---|
+| `COVER` | 13 | **13** (inna zawartość: wartości zamiast adresów) |
+| `NEEDS_ANALYSIS` | 9 | **7** |
+| `PRODUCT` | 8 | **7** |
+| `VARIANT` | 8 | **3** |
+| `QUESTION` | 3 | **3** |
+| **Razem** | **41** | **33** |
+
+### 40.5 Martwy filtr w `packageCovers`
+
+`demo.property.apk.packageCovers` odrzucało pokrycia niedostępne przy budowaniu składu pakietu. Po
+przejściu na regułę „wszystkie pokrycia dostępne" ten filtr **nigdy już nic nie odrzuca**: pakiet
+z choć jednym niedostępnym pokryciem odsiewa wcześniej `variant.available`, więc do `packageCovers`
+trafiają wyłącznie pakiety, w których wszystko jest dostępne.
+
+⚠️ Zanim go usunąłem, sprawdziłem jedyną drogę, którą mógłby jeszcze coś robić: `variant.available`
+liczy się na WĄSKIM kontekście, a `packageCovers` na pełnym — więc mogłyby się rozejść, gdyby wąski
+nie niósł któregoś z pól, po których kluczuje się dostępność. Po poprawce z 40.2 niesie oba (strefa
+i zabezpieczenia), więc odpowiedzi są zgodne.
+
+Funkcja jest teraz tym, czym mówi jej nazwa: listą kodów pokryć pakietu, dziesięć linii bez
+warunków poza sprawdzeniem argumentu.
+
+### 40.6 `UNAVAILABLE_REASON` schodzi z pokrycia do jego tabeli
+
+Atrybut usunięty z typu `COVER`. Był **drugim wskaźnikiem w tę samą tabelę** co `IS_AVAILABLE` —
+ten sam wzorzec, który §36 zdjął ze stawki i limitów.
+
+⚠️ Ma dwóch czytelników i obu trzeba było przepiąć, bo inaczej zniknęłyby dwa zdania na ekranie:
+`variant.blocked` (powód niedostępności pakietu) i Java (zdanie do uzasadnienia, gdy klient zgłasza
+potrzebę pokrycia, którego nie możemy sprzedać). Oba czytają teraz kolumnę `reason` z tabeli
+pokrycia — czyli stamtąd, gdzie zapada decyzja o odmowie, obok kolumny dostępności.
+
+⛔ **To jest ostatni materiał do rek. 8.2.c w tym demie** po usunięciu sekcji wyłączeń w §24/§25.
+Dlatego zdanie zostało; zniknął tylko atrybut, który je adresował.
+
+⚠️ Java czyta tabelę pokrycia po konwencji nazewniczej (`demo.property.cover.` + kod małymi literami)
+— to samo założenie, po którym reguły wyprowadzają ścieżkę elementu w drzewie, ale po stronie Javy
+jest to wywołanie po kodzie, nie przez domenę. Do posprzątania przy przebudowie dostępu Javy.
+
+Tylko `flood` i `theft` mają kolumnę `reason` — i tylko one mogą być niedostępne, więc pozostałe
+pięć pokryć nigdy tam nie zagląda.
+
+## §41 Powód niedostępności znika z demo w całości (2026-09-10)
+
+§40.6 przepiął powód niedostępności z atrybutu do kolumny w tabeli pokrycia — i o jedno §
+za wcześnie, bo decyzja produktowa brzmi: **w demie nie ma przypadku, w którym pokazujemy klientowi,
+dlaczego czegoś nie sprzedajemy**. Warianty muszą być dostępne, a przypadki niedostępności są
+preparowane ręcznie na potrzeby pokazu. Cała maszyneria powodu została więc zdjęta, a nie
+przeniesiona.
+
+### 41.1 Co zniknęło
+
+| Artefakt | Co to było |
+|---|---|
+| `demo.property.variant.blocked` | funkcja składająca powód pakietu z powodów jego pokryć |
+| kolumna `reason` w `demo.property.cover.theft` | kod zdania o odmowie kradzieży |
+| wartości `FLOOD_UNAVAILABLE` w `demo.property.cover.flood` | kod zdania o odmowie powodzi |
+| wiersze `FLOOD_UNAVAILABLE` i `THEFT_NO_SECURITY` w `demo.property.apk.recommendation.reason` | treści tych zdań |
+| `unavailableReason` na `PropertyVariantDto` (Java + TS) | pole drutu |
+| `.compare__reason` w `comparison.less` | styl komunikatu |
+
+Flow `demo.property.calculateQuote` jest po tym **liniowy** — nie ma już rozgałęzienia „policz albo
+wyjaśnij, czemu nie".
+
+⛔ **Kolumna `reason` w `demo.property.cover.flood` ZOSTAJE i to nie jest niedoróbka.** Niesie kod
+`FLOOD_DEDUCTIBLE` — zdanie o **franszyzie narzuconej przez strefę**, czyli warunek sprzedaży,
+a nie odmowę. Sprawdzone na żywo: kod pocztowy 50-000 dalej daje „Ochrona od powodzi w Twojej
+lokalizacji wymaga franszyzy redukcyjnej 1 000 zł." i `floodDeductible: 1000`.
+
+Niedostępność sama w sobie działa dalej — 57-000 (strefa ZX) i brak zabezpieczeń nadal wyłączają
+COMPLETE. Zmieniło się tylko to, że wariant wraca **bez zdania wyjaśniającego**.
+
+### 41.2 W-27 uderzyło po raz trzeci — i tym razem cicho
+
+Wyczyszczenie `FLOOD_UNAVAILABLE` z dwóch wierszy `cover.flood` **nie nadpisało ich, tylko dołożyło
+obok dwa nowe**: po zmianie kolumn identyfikatory wierszy się przenumerowały, a update ze starym id
+zakłada wiersz zamiast podmienić istniejący. Tabela miała 7 wierszy zamiast 5, z parami `*` i `ZX`
+różniącymi się tylko powodem.
+
+⚠️ **Zachowanie było poprawne mimo defektu** — wygrywał pierwszy pasujący wiersz, ten bez powodu —
+więc żaden scenariusz tego nie wykrył. Znalazł to dopiero skan **wszystkich 30 tabel PROPERTY** pod
+kątem zduplikowanego klucza wejściowego; poza `cover.flood` nie było ani jednej. Skan jest tani i
+warto go puszczać po każdej zmianie kolumn:
+
+```python
+cfg = tomllib.load(open(mat[:-4] + ".def", "rb"))
+n_in = len(cfg.get("inputLevel", []))
+keys = Counter(";".join(r.split(";")[:n_in]) for r in rows)
+```
+
+### 41.3 Uszkodzenie pliku regexpem z `DOTALL` — i gorsze ratowanie go
+
+Usuwanie `unavailableReason` z `frontend/src/app/models/property.ts` poszło przez
+`re.sub(..., flags=re.S)`. Niechciwy `.*?` z `DOTALL` **przeskoczył granicę interfejsu**: zjadł
+~30 linii i skleił `PropertyQuestionDto` z `PropertyVariantDto` w jeden byt. Ten sam wzorzec
+zostawił w `comparison.less` osierocony komentarz i wiszący `}` — LESS wywalił się dopiero na
+kompilacji, dwa etapy dalej.
+
+⛔ **Ratunek przez `git checkout HEAD -- <plik>` był błędem większym niż usterka.** Plik niósł
+zmiany z tego samego dnia, których w HEAD nie ma; przywrócenie go cofnęło je wszystkie i zamieniło
+jeden zepsuty interfejs na komplet brakujących pól (`fields`, `variantChosen`). Odtwarzanie ich
+z powrotem zajęło więcej niż zajęłaby ostrożna edycja.
+
+Wniosek do standardów: **nie kasować bloków tekstu regexpem z `DOTALL`**, a przy cofaniu sięgać po
+`git checkout` tylko wtedy, gdy się wie, że plik nie ma niezacommitowanych zmian.
+
+### 41.4 Weryfikacja
+
+Wszystkie trzy dema porównane z bazą `baza-3-dema.json`. MOTO i ŻYCIE różnią się **wyłącznie datą
+polisy** (baza z 9 września, przebieg z 10). W MAJĄTKU każda różnica jest zamierzona przez ten cykl
+prac: znikły `buildingAge` (§39), `shortLabel`, `unavailableReason`; `RENOVATED` ustąpiło miejsca
+żywej franszyzie `DEDUCTIBLE` (§38). **Żadna składka się nie ruszyła.**
+
+Cztery scenariusze na żywo: bazowy, brak zabezpieczeń, strefa ZX (57-000), strefa Z2 (50-000)
+i wynajem z assistance. Testy: 11 Java, 72 front — wszystkie zielone.
+
+⚠️ **W-28 znowu.** Pierwszy przebieg weryfikacji poległ na `UnknownLevelNameException` dla poziomu
+`reason` na `demo.property.cover.theft` — a kolumna była już usunięta i w Studio, i w Javie.
+W WAR-ze siedziała `Property.class` sprzed półgodziny, bo `target/motor-insurance/` nigdy się nie
+czyści. `rm -rf target/motor-insurance target/motor-insurance.war` przed przepakowaniem.
+
+## §42 Java sięga do Higsona wyłącznie przez drzewo (2026-09-10)
+
+§36 policzyło, że aplikacja czyta 16 reguł przez atrybut, a **20 woła po kodzie**, obok stojącego
+tuż obok atrybutu. Ten cykl zamyka lukę w całości dla profilu PROPERTY: po nim w `Property.java`
+nie ma **ani jednego** kodu reguły i **ani jednego** `engine.get` / `engine.call` / `engine.flow`.
+Zostało `engine.getDomain` — wejście w drzewo — i `setEffectiveDate`, które regułą nie jest.
+
+### 42.1 Dlaczego to nie jest kosmetyka
+
+Wołanie po kodzie ma trzy konsekwencje, wszystkie ciche:
+
+- **Przestawienie wskaźnika w Studio nic nie zmienia.** Atrybut `RISK_FACTOR` wskazywał na flow,
+  a Java i tak wołała ten sam flow po nazwie — zmiana atrybutu na inny flow nie miała żadnego
+  skutku, a wyglądała, jakby miała.
+- **Skasowanie elementu nie psuje niczego widocznie.** Reguła żyje dalej, bo adresuje ją Java.
+  Drzewo przestaje opisywać system, ale nikt się o tym nie dowiaduje.
+- **Aplikacja wie, czym reguła JEST.** `engine.flow(...)` wobec `engine.get(...)` to zaszyta w Javie
+  wiedza, że pod spodem jest flow, a nie tabela. Zamiana jednego na drugie stawała się wtedy zmianą
+  w kodzie, choć jest zmianą konfiguracji.
+
+### 42.2 Dwie metody, przez które przechodzi wszystko
+
+```java
+private ParamValue ruleOf(DomainObject element, String attribute, PropertyContext ctx)
+private Map<?, ?> resultOf(DomainObject element, String attribute, PropertyContext ctx)
+```
+
+`ruleOf` oddaje **cały wiersz** — kolumnę wybiera wołający, więc jeden atrybut obsługuje regułę
+o kilku wyjściach i nie trzeba mnożyć wskaźników per kolumna. `resultOf` obsługuje regułę oddającą
+mapę i **nie wie, czy pod atrybutem stoi funkcja, czy flow**: flow oddaje `FlowResult`, funkcja
+zwykłą mapę, a odpowiadają na to samo pytanie.
+
+⚠️ Tu leży pułapka, na której padł pierwszy przebieg: **atrybut typu FLOW czytany przez
+`getBigDecimal("factor")` leci `UnknownLevelNameException`** — nazwana kolumna to poziom tabeli,
+a flow poziomów nie ma. Rozróżnienie musi być w jednym miejscu (`resultOf`), nie u każdego
+wołającego, bo inaczej wraca wiedza o rodzaju reguły.
+
+### 42.3 Dziewięć nowych atrybutów
+
+Dziewięć reguł nie miało gdzie zawisnąć — dla nich powstały atrybuty:
+
+| Element | Atrybut | Reguła |
+|---|---|---|
+| `APK[NEEDS]` | `VISIBILITY` | `apk.question.visibility` |
+| `APK[NEEDS]` | `REASON` | `apk.reason` |
+| `APK[NEEDS]` | `VALUE_GAP` | `sum.valueGap` |
+| `PRODUCTS[HOME]` | `ZONES` | `zone.resolve` |
+| `PRODUCTS[HOME]` | `SUM_RATE` | `sum.ratePerSqm` |
+| `PRODUCTS[HOME]` | `COVER_PERIOD` | `factor.period` |
+| `PRODUCTS[HOME]` | `CHOICE_RELATION` | `offer.choiceKind` |
+| `COVERS[FLOOD]` | `DEDUCTIBLE` | `cover.flood` |
+| `COVERS[FLOOD]` | `WAITING_PERIOD` | `flood.waitingPeriod` |
+
+⛔ **`DEDUCTIBLE` i `IS_AVAILABLE` wskazują na tę samą tabelę i to jest wyjątek, nie przeoczenie.**
+§36 usunęło `RATE` i `CAP_RATIO` właśnie za to — ale tamte były **składnikami** wyniku, obok którego
+stał atrybut z gotową odpowiedzią (`PREMIUM`, `LIMIT`), czyli drugą drogą do tego samego. Franszyza
+narzucona przez strefę jest **osobną odpowiedzią**, której z dostępności nie da się wyczytać.
+Kryterium brzmi „czy ten atrybut prowadzi do innej odpowiedzi", a nie „czy prowadzi do innej tabeli".
+
+⛔ Oba atrybuty pokrycia są **puste na sześciu pozostałych pokryciach** — nowe pokrycie nie
+dziedziczy cudzej karencji (ta sama zasada co §33 dla reszty typu `COVER`).
+
+⚙️ `CHOICE_NOTE` straciło przyrostek `[text]`: Java potrzebuje z tego wiersza trzech kolumn, a wybór
+kolumny w wartości atrybutu dawał tylko jedną. Wybór kolumny należy do wołającego wtedy, gdy kolumn
+jest kilka; `[kolumna]` zostaje tam, gdzie odpowiedź naprawdę jest jedna (`IS_AVAILABLE`, `RATE`).
+
+### 42.4 `ApkAnalysis` przestaje znać adres reguły
+
+`justify` przyjmowało `(engine, kodTabeli, powody, kontekst)` — czyli **wspólna warstwa APK znała
+adres reguły**, wprost wbrew temu, co o niej mówi jej własny nagłówek („TA KLASA NIE ZNA ŻADNEJ
+REGUŁY"). Teraz przyjmuje `(powody, dostarczyciel wiersza)`: PROPERTY podaje odczyt przez atrybut,
+MOTO i ŻYCIE swój dotychczasowy `engine.get`. Cztery parametry zamiast trzech stały się dwoma,
+a każdy profil sięga po zdania tak, jak u siebie ma.
+
+⚠️ `deriveNeeds` ma ten sam kształt i **została nietknięta** — woła ją tylko MOTO i ŻYCIE, których
+ten cykl nie obejmuje. To jest znany dług, nie przeoczenie.
+
+### 42.5 Weryfikacja
+
+Wszystkie trzy dema porównane pole po polu ze stanem sprzed zmiany: **MOTO, ŻYCIE i MAJĄTEK
+identyczne**. Cztery scenariusze (bazowy, brak zabezpieczeń, strefa ZX, strefa Z2 z franszyzą,
+wynajem z assistance) bez różnicy w składkach, dostępności i zdaniach. Ścieżka oferty i polisy
+przeszła osobno — numer, termin płatności, notatka o wyborze `POORER`, zamrożona składka i okres
+ochrony liczony przez `COVER_PERIOD`. Testy: 11 Java, 72 front.
+
+⚠️ Jedyna różnica w porównaniu to **permutacja listy `covers` w pakiecie** — kolejność referencji
+z drzewa nie jest stabilna między odczytami. Zbiory są równe, a ekran i tak porządkuje pokrycia po
+`POSITION` z globalnej listy, więc to nie jest widoczne; odnotowane, bo w porównaniu wygląda
+na zmianę, a nią nie jest.
+
+### 42.6 Co to daje demonstracji
+
+Drzewo domeny przestało być mapą, a stało się **jedyną drogą**. Można pokazać, że przestawienie
+wskaźnika `RISK_FACTOR` z flow na funkcję zmienia to, co liczy aplikacja, bez restartu i bez
+kompilacji — czego przed tą zmianą pokazać się nie dało, choć wyglądało, jakby się dało.
+
+## §43 Suma gwarancyjna OC — trzy role, dwa zbędne ślady (2026-09-10)
+
+Prześwietlenie `LIABILITY_SUM` przy okazji pytania „po co to jest na wariancie". Odpowiedź: bo
+pokrycie OC jest **jedno** (`COVERS[LIABILITY]`), a suma różni się per pakiet — na pokryciu nie
+miałaby gdzie się rozdwoić. Atrybut robi trzy rzeczy naraz:
+
+1. **Jest sumą ubezpieczenia OC.** `COVERS[LIABILITY]` ma `SUM_BASIS = CATALOGUE`, a `cover.sum`
+   w tej gałęzi idzie po nią do wariantu. Trzy wartości `SUM_BASIS` to trzy odpowiedzi na „skąd
+   bierze się suma": `COMPUTED` (z metrażu), `DERIVED` (ułamek innej sumy), `CATALOGUE` (z pakietu).
+2. **Jest kluczem taryfy i to on niesie degresję.** `cover.liability` kluczuje się
+   `quote.sums.liability`: do 500 tys. 0,09‰, powyżej 0,07‰. STANDARD płaci 21,87 zł przy 200 tys.,
+   COMPLETE 170,10 zł przy 2 mln — bez degresji byłoby 218,70 zł.
+3. **Idzie na dokument**, żeby oferta pokazała dwa miliony, a nie kreskę.
+
+### 43.1 Zero na pakiecie bez OC
+
+BASIC miał `LIABILITY_SUM = 0`, a **nie ma OC w składzie** (`BASIC: BUILDING`). Wartość nie robiła
+nic — `cover.sum` woła się tylko dla pokryć pakietu — ale mówiła nieprawdę: zero czyta się jako
+„ochrona na zero złotych", a jej po prostu nie ma.
+
+⛔ To **nie jest** przypadek z §33.8, gdzie dwanaście wierszy równych wierszowi `*` zostało
+świadomie: tam zero było jedną z możliwych odpowiedzi w słowniku. Tutaj pytanie w ogóle nie ma
+zastosowania. Atrybut jest teraz **pusty na BASIC**, a odczyt w Javie odporny na brak (`attrDecimal`
+obok istniejącego `attrString` — pusty atrybut LITERAL **nie powstaje** i `getAttrDecimal` rzuca
+wtedy NPE bez nazwy atrybutu w komunikacie).
+
+⚙️ Default na typie `VARIANT` też jest pusty — nowy pakiet nie dziedziczy cudzej sumy gwarancyjnej.
+To ta sama zasada, którą §33 zastosowało do `COVER`.
+
+### 43.2 `liabilitySum` na drucie nie miało czytelnika
+
+Pole jechało przez `PropertyVariantDto` do modelu frontu i **żaden szablon go nie renderował**.
+Suma OC dociera na ekran inną drogą: backend wypełnia `sum` na samym pokryciu, odkąd wiadomo, który
+wariant jest pokazywany. Pole zostało po poprzedniej konstrukcji, w której front musiał wiedzieć,
+że OC jest inne. Usunięte z DTO, z modelu domenowego `Variant`, z konwertera i z `property.ts`.
+
+### 43.3 Trzeci ślad, znaleziony przy okazji
+
+`Sums.setLiability(...)` **nie było wołane nigdzie**, a `PropertyContext.collectComputed` wstawiało
+`quote.sums.liability` z tego pola — czyli `null` przy każdym wywołaniu. Dokładnie ten wzorzec, który
+§39 usunął ("trzy ścieżki oparte na polu modelu bez settera"); przeoczony wtedy, bo w wycenie
+pakietów wartość i tak jest **nadpisywana** przez `withComputed`. Pole i wstawka usunięte —
+`quote.sums.liability` ma teraz jedno źródło, atrybut pakietu, i nikt go nie zasłania nullem.
+
+### 43.4 Pułapka narzędzia
+
+⚠️ **`higson_update_domain_type` z pominiętym `defaultValue` KASUJE default**, nawet przy
+`action: NO_CHANGES` — wartości na elementach zostają, ale definicja typu traci domyślną. Ta sama
+rodzina co `higson_update_function` bez `arguments`. Wyczyszczenie jednego defaultu skasowało przy
+okazji dwa inne (`PREMIUM`, `POSITION`); wykryte odczytem elementu zaraz po zapisie i przywrócone.
+**Podawaj `defaultValue` dla KAŻDEGO atrybutu, który wymieniasz**, także tego, którego nie ruszasz.
+
+### 43.5 Weryfikacja
+
+Trzy dema porównane pole po polu: MOTO i ŻYCIE identyczne, w MAJĄTKU **jedyną różnicą jest zniknięcie
+`liabilitySum`** z trzech wariantów. Pięć scenariuszy bez zmiany składek. Degresja OC sprawdzona
+osobno (21,87 / 170,10). Ścieżka polisy: COMPLETE, suma OC 2 000 000 w ofercie, okres 12 miesięcy.
+Testy: 11 Java, 72 front.
+
+## §44 Pytanie opisuje samo siebie (2026-09-10)
+
+Ekran `APK[NEEDS]` niósł 10 atrybutów i większość z nich brzmiała jak własność pojedynczego
+pytania, nie całej analizy. Analiza wykazała, że rzecz jest o jeden poziom głębiej: **katalog
+`demo.property.apk.question` robił dwie różne robotki pod jedną nazwą.**
+
+### 44.1 Liczba, która to rozstrzygnęła
+
+Wypełnienie 11 kolumn katalogu, w podziale na to, czy wiersz ma odpowiednik w drzewie:
+
+| kolumna | wypełnionych | z tego elementy drzewa |
+|---|---|---|
+| `text`, `kind`, `contextPath`, `demoAnswer` | 13 | **0** |
+| `prefill` | 4 | **0** |
+| `revealedBy` | 6 | **6** |
+| `revealedWhen` | 1 | **1** |
+| `position`, `required` | 27 | 14 |
+| `options`, `labels` | 13 | 6 |
+
+Pięć kolumn obsługiwało **wyłącznie pola przedmiotu**, dwie **wyłącznie pytania w drzewie**. To nie
+jest jedna tabela z wyjątkami, tylko dwie tabele w jednym pliku — a wisiała pod analizą potrzeb,
+choć w 13 z 27 wierszy opisywała krok drugi, który §29 świadomie z analizy wyprowadziło.
+
+### 44.2 Co zrobiono
+
+**Pytania i grupy opisują się same.** `QUESTION` idzie z 3 atrybutów na **9** (dochodzą `REQUIRED`,
+`OPTIONS`, `OPTION_LABELS`, `POSITION`, `REVEALED_BY`, `REVEALED_WHEN`), `QUESTION_GROUP` z zera na
+**3** (`REQUIRED`, `POSITION`, `REVEALED_BY`). Czternaście elementów dostało wartości; `revealedBy`
+i `revealedWhen` były wypełnione **wyłącznie** dla nich, więc w tabeli nie zostało po nich nic.
+To jest czysty D-23, a nie wyjątek z §35: tam argumentem było „katalog już istnieje i owns this
+kind" — tu katalog przestaje być katalogiem pytań, więc argument znika.
+
+**Katalog nazywa się tym, czym jest.** `demo.property.apk.question` → **`demo.property.subject.field`**,
+28 wierszy → 14, 11 kolumn wyjściowych → 9, i przenosi się spod `APK[NEEDS]` na produkt jako
+`SUBJECT_FIELDS`, w nowej grupie „Przedmiot ubezpieczenia" stojącej **przed** podstawami wyceny —
+bo tak biegnie proces.
+
+⚙️ Przy okazji `seedDefaults` przestaje pytać katalog o pytania analizy potrzeb. Odpowiedź na
+starcie to dane z poprzedniej polisy; §18 wyrzuciło je z ankiety właśnie dlatego, że wypełniona
+z góry analiza potrzeb przeczy temu, co ma pokazywać. Kolumna `demoAnswer` była pusta dla wszystkich
+14 pytań w drzewie, więc pętla i tak nic nie robiła — teraz nie udaje, że mogłaby.
+
+### 44.3 Czego NIE przeniesiono i dlaczego
+
+Ekran `NEEDS` ma **9 atrybutów, nie 6** — analiza obiecywała 6 i to była w niej pomyłka w arytmetyce
+własnych ustaleń. Odszedł jeden atrybut, bo tylko jeden dało się odesłać:
+
+- **`VISIBILITY`** ma 2 realne wiersze — `FLOOR` i `WALL_MATERIAL` — i **oba są polami przedmiotu**,
+  które elementami nie są. Nie ma na czym powiesić.
+- **`ANSWER_MAP`** ma 12 wierszy rozłożonych po obu światach i drugi wymiar (`answer`). D-23 mówi
+  wprost: tabela z drugim wymiarem zostaje tabelą.
+- **`BLOCKER`** ma jeden realny wiersz i niesie treść komunikatu — przeniesienie kosztowałoby dwa
+  atrybuty puste na 7 z 8 pytań.
+- **`REVEAL`** nie ma nawet kolumny `question`: kluczuje się stanem łańcucha
+  (`hasSource, answered, refused, required, matches`). To jedna zasada dla wszystkich pytań.
+
+⛔ Granica przebiega tam, gdzie **kończą się elementy drzewa**. Domknąć ją do końca da się tylko
+wprowadzając 13 pól przedmiotu jako elementy — co odwraca §29/§32 i nie zostało zrobione, bo to
+naprawdę jest formularz, a nie konfiguracja produktu.
+
+### 44.4 Dowód, że rozstrzyga atrybut
+
+Sama zgodność wyników niczego nie dowodzi — dane są te same, więc równie dobrze mogłyby dalej iść
+z tabeli. Dowód wykonano wprost: `POSITION` na `BUDGET` przestawione w Studio z 251 na **205**,
+publikacja, i po odczekaniu na watcher (10 s) ankieta wróciła z `BUDGET` na pozycji 205 — **bez
+restartu aplikacji**, przy niezmienionej wartości 251 w tabeli. Potem cofnięte.
+
+### 44.5 Weryfikacja
+
+Trzy dema porównane pole po polu po każdym z dwóch kroków: **identyczne za każdym razem**. Osobno
+sprawdzone mechanizmy, które ta zmiana przenosi: łańcuch odsłaniania (`HOME_ASSISTANCE` odsłania się
+przy `RENTED_OUT=true` i nie odsłania przy `false`), bramka ankiety (`NEEDS_PROPERTY=false` blokuje
+i nazywa pytanie), kolejność i podpowiedzi kroku drugiego. Testy: 11 Java, 72 front.
+
+⚙️ Wartości na 14 elementach weszły **jednym importem XML**, nie 47 wywołaniami MCP. ⚠️ Import
+zaraportował „Deleted: 5" — sprawdzone diffem eksportu przed/po: usunięte były wyłącznie atrybuty
+o pustej wartości, żaden element ani wypełniony atrybut nie ucierpiał. Raport importu nie wystarcza,
+diff wystarcza.
+
+## §45 Pytanie jako obiekt: widoczność i bramka schodzą na element (2026-09-10)
+
+§44 zdjęło na pytanie to, co było o nim **stałe**. Ten krok idzie dalej, za uwagą właściciela:
+pytanie ma samo wiedzieć, **jak się zachowuje** — a wartością atrybutu może być i jedno, i drugie:
+`true` wpisane wprost tam, gdzie odpowiedź jest zawsze ta sama, albo wskaźnik na regułę tam, gdzie
+zależy od sytuacji. **To jest ta sama komórka**, więc zamiana jednego w drugie nie rusza niczego
+poza nią, a patrząc na pytanie widać, czy w ogóle ma o czym rozstrzygać.
+
+`QUESTION` idzie z 9 atrybutów na **12**, `QUESTION_GROUP` z 3 na **4**.
+
+### 45.1 `IS_VISIBLE` — wartość albo reguła w jednym miejscu
+
+Czternaście pytań i grup ma `IS_VISIBLE = true` wprost. Do tej pory każde z nich pytało tabelę,
+która dla wszystkich zwracała wiersz `*` — czternaście zapytań o nic.
+
+⛔ **To NIE jest powrót do stanu sprzed §17.** Tamten `IS_VISIBLE` był na wszystkich pytaniach
+**tym samym wskaźnikiem na tę samą tabelę** — czternaście kopii jednej informacji, która o pytaniu
+nie mówiła nic. `true` obok `$p reguła` mówi: to pytanie dotyczy każdego, a tamto ma warunek.
+Kryterium nie brzmi „ile jest wskaźników", tylko „czy wartość niesie treść o tym elemencie".
+
+### 45.2 `BLOCKS_WHEN` / `BLOCK_MESSAGE` — tabela znika
+
+`demo.property.apk.question.blocker` miała **jeden realny wiersz** (`NEEDS_PROPERTY` + `false`)
+i wiersz `*`. Jest usunięta; pytanie niesie odpowiedź, która kończy ścieżkę, i zdanie, które wtedy
+pada. Pusty `BLOCKS_WHEN` znaczy „to pytanie niczego nie kończy" i tak wygląda na 7 z 8 pytań.
+
+⚙️ Java przestaje pytać o bramkę **pola przedmiotu** — nie mają elementu, a i nie powinny kończyć
+analizy: rek. 8 mówi, kiedy nie ma czego dalej badać, a rekomendacja dotyczy potrzeb, nie metrażu.
+Nowa metoda `questionElement(Question)` zwraca `null` dla pola przedmiotu i wołający **musi to
+znieść** — trzynaście pól elementami nie jest i to jest właściwy stan (§29).
+
+### 45.3 Czego nie przeniesiono i dlaczego — decyzja właściciela
+
+Właściciel wybrał wariant **bez** wprowadzania 13 pól przedmiotu do drzewa, świadom ceny: zasada
+obowiązuje w jednej gałęzi z dwóch. Co z tego wynika:
+
+- **`VISIBILITY` zostaje na `NEEDS_ANALYSIS`**, bo jej dwa realne wiersze to `FLOOR`
+  i `WALL_MATERIAL` — **oba są polami przedmiotu**, więc nie ma elementu, na którym mogłyby zawisnąć.
+  Atrybut zmienia nazwę na „Czy POLE PRZEDMIOTU dotyczy tego klienta", żeby nie udawał ogólnego.
+- **`ANSWER_MAP` zostaje tabelą i wskaźnik zostaje na analizie.** ⛔ Przeniesienie go na pytanie
+  wymagałoby, żeby czytała go funkcja `demo.property.apk.needs` — a ta iteruje po odpowiedziach
+  i musiałaby rozgałęziać się na „element albo tabela" dla każdej z nich. To komplikacja funkcji
+  zamiast uproszczenia konfiguracji, dokładnie tego rodzaju, który §37 z funkcji usuwał.
+- **`REVEAL` zostaje**, bo nie ma nawet kolumny `question`: kluczuje się stanem łańcucha
+  (`hasSource, answered, refused, required, matches`). To jedna zasada dla wszystkich pytań,
+  a nie cecha żadnego z nich.
+
+⛔ Granica przebiega tam, gdzie kończą się elementy drzewa, i przebiega **w poprzek głównej zasady**,
+a nie na jej marginesie. Domknięcie wymaga wprowadzenia pól przedmiotu jako elementów — co odwraca
+§29/§32 i zostało **odłożone, nie odrzucone**. Warto przy tym odnotować, że argument §29 („pola
+przedmiotu to formularz, nie konfiguracja produktu") już się nie broni: pytania APK też są
+formularzem, a §31 mówi wprost, że kryterium podziału to przedmiot sprawy, nigdy ekran.
+
+⛔ **45.1 i 45.3 zostały tego samego dnia unieważnione przez §46 — czytaj je jako opis drogi, nie
+stanu.** `IS_VISIBLE` już nie istnieje: właściciel wskazał, że widoczność i odsłanianie dają ten sam
+skutek, i miał rację.
+
+### 45.4 Weryfikacja
+
+Trzy dema identyczne. Bramka sprawdzona w obie strony (`NEEDS_PROPERTY=false` blokuje i nazywa
+pytanie, `true` nie blokuje). Widoczność pól przedmiotu dalej działa z reguły: `PROPERTY_KIND=FLAT`
+ukrywa `WALL_MATERIAL`, `HOUSE` ukrywa `FLOOR`. Sześć grup widocznych z sześciu. Testy: 11 Java,
+72 front. Tabel w profilu: 30 → **29**.
+
+## §46 Jedno pojęcie zamiast dwóch: pytanie się zadaje albo nie (2026-09-10)
+
+§45 dołożyło pytaniu `IS_VISIBLE` obok istniejącego łańcucha `REVEALED_BY`. Właściciel wskazał, że
+to jest jedna rzecz w dwóch przebraniach — **efekt obu jest ten sam: pytanie na ekranie albo go nie
+ma** — i miał rację. Sprawdzenie potwierdziło to twardo: **część wspólna jest pusta.**
+
+| mechanizm | używają go | krok |
+|---|---|---|
+| reguła widoczności | `FLOOR`, `WALL_MATERIAL` | drugi (przedmiot) |
+| łańcuch `revealedBy` | 6 grup i pytań APK | pierwszy (ankieta) |
+
+Żadne pytanie nie używało obu. To były **dwa mechanizmy w rozłącznych światach**, robiące jedno.
+
+### 46.1 Warunek widoczności to po prostu warunek odsłonięcia
+
+„Piętro nie dotyczy domu" wyraża się bez własnego pojęcia:
+
+```
+FLOOR         revealedBy = PROPERTY_KIND   revealedWhen = FLAT
+WALL_MATERIAL revealedBy = PROPERTY_KIND   revealedWhen = HOUSE
+```
+
+⚙️ Kolumny `revealedBy` / `revealedWhen`, które §44 usunęło z katalogu jako **puste dla wszystkich
+pól przedmiotu**, wracają — tym razem z treścią. To jest niezamierzone potwierdzenie, że katalog
+i drzewo opisują ten sam byt: mechanizm okazał się potrzebny po obu stronach.
+
+### 46.2 Co zniknęło
+
+- atrybut `IS_VISIBLE` z `QUESTION` i `QUESTION_GROUP` (**dodany tego samego dnia w §45**)
+- atrybut `VISIBILITY` z `NEEDS_ANALYSIS` — typ schodzi z 9 atrybutów na **8**
+- tabela `demo.property.subject.field.visibility` (przemianowana w tym samym przebiegu
+  z `apk.question.visibility`, zanim okazała się zbędna) — profil ma **28** tabel
+- pole `visible` z `PropertyQuestionDto`, z modelu TS i z dwóch filtrów we froncie
+
+⛔ `Question.visible` **zostaje we wspólnej warstwie APK** — MOTO i ŻYCIE czytają je z własnych
+tabel widoczności i tam rozróżnienie może mieć sens; ten cykl ich nie obejmuje.
+
+### 46.3 Co się zmieniło na ekranie i dlaczego to jest w porządku
+
+Rozróżnienie miało jedno realne następstwo: **licznik postępu liczył po `visible`, a odsłonięcie
+decydowało o pokazaniu**. Pytanie niewidoczne nie istniało w spisie, nieodsłonięte było w spisie
+jako nieklikalne. Po scaleniu jest tylko to drugie.
+
+⚠️ Dla kroku 1 nie zmienia się nic, bo żadne pytanie APK nie miało `visible = false`. Dla kroku 2
+zmienia się mechanizm, nie skutek: pola pokazują się wszystkie naraz, więc lista renderuje teraz
+`reachable()` zamiast `asked()`, a `subjectComplete` liczy pola odsłonięte zamiast widocznych —
+**pole nieodsłonięte nie może blokować kroku**, tak samo jak wcześniej niewidoczne.
+
+⚠️ Dwa testy frontu kodowały właśnie to rozróżnienie (`visible: false` obok `revealed: false`)
+i zostały przepisane na to, co zostało. To jest właściwa reakcja: test, który przestał mieć co
+sprawdzać, znika razem z pojęciem — nie zostaje przerobiony tak, żeby przechodził.
+
+### 46.4 Weryfikacja
+
+Trzy dema porównane pole po polu: MOTO i ŻYCIE identyczne. W MAJĄTKU **wszystkie różnice
+są zamierzone**: `visible` znika z 19 pytań i 8 pól złożonych, a `WALL_MATERIAL` zmienia
+`revealed` z `true` na `false` — bo wcześniej niósł tę informację w drugim polu. Sprawdzone
+w obie strony: `PROPERTY_KIND=FLAT` odsłania piętro i chowa materiał ścian, `HOUSE` odwrotnie.
+Testy: 11 Java, 72 front.
+
+## §47 Konfiguruje się to, czego nie da się wywnioskować (2026-09-10)
+
+Uwaga właściciela na §45/§46: *„niepotrzebnie komplikujesz i dajesz nadmiarowe konfiguracje dla
+rzeczy, które można wywnioskować z obecnych"*. Sprawdzenie pokazało, że `revealedBy` pełniło
+**dwie różne role**, a jedna z nich była przepisaniem czegoś, co już stoi obok:
+
+| rola | gdzie | czy wynika z czegoś |
+|---|---|---|
+| „następne po poprzednim" | 5 grup: THEFT←PROPERTY_NEED, FLOOD←THEFT, PORTABLE←FLOOD, RENTAL←PORTABLE, EXPECTATIONS←RENTAL | **tak — z `POSITION` 200…250** |
+| warunek na odpowiedzi | HOME_ASSISTANCE←RENTED_OUT=true, FLOOR←PROPERTY_KIND=FLAT, WALL_MATERIAL←PROPERTY_KIND=HOUSE | nie |
+
+Pięć z ośmiu wpisów niosło kolejność, którą pozycja już mówi. **Kolejność pytań wynika z `POSITION`,
+a koniec ankiety to brak następnej pozycji** — jednego i drugiego nie konfiguruje się drugi raz.
+
+### 47.1 Co zniknęło
+
+- `REVEALED_BY` z typu `QUESTION_GROUP` — kroki idą po pozycji; typ schodzi z 4 atrybutów na **3**
+- `BLOCKS_WHEN` i `BLOCK_MESSAGE` z `QUESTION` (**dodane tego samego dnia w §45**) — typ z 11 na **9**
+- cała ścieżka bramki: `applyBlocker`, `questionElement`, pola `blocked` / `blockedBy` /
+  `blockMessage` w modelu, DTO, konwerterze, modelu TS, dwa sygnały, blok szablonu i reguła `.apk__blocked`
+
+⛔ **Bramka nie jest przenoszona ani zastępowana — po prostu jej nie ma.** Nie będzie pokazywana
+na demie, a mechanizm, którego się nie pokazuje, jest konfiguracją do utrzymywania bez powodu.
+
+⚙️ `REVEALED_BY`/`REVEALED_WHEN` **zostają na trzech pytaniach**, gdzie niosą realny warunek,
+i nazywają się teraz „Pytanie warunkujące — TYLKO dla pytań warunkowych". Puste znaczy „pytamy
+na swoim miejscu w kolejności".
+
+### 47.2 Co się zmieniło w ankiecie
+
+Pięć grup jest teraz odsłoniętych **od razu**, zamiast czekać na odpowiedź w poprzedniej. Nawigacja
+nie potrzebowała ani jednej zmiany: kursor już szedł po liście posortowanej pozycją, a `canAdvance`
+i tak nie puszczał dalej bez odpowiedzi na pytanie obowiązkowe. Koniec ankiety to nadal „kursor na
+ostatniej pozycji" — tylko że teraz jest to jedyny mechanizm, a nie drugi obok łańcucha.
+
+⚠️ Spis pytań pokazuje wszystkie kroki jako klikalne od początku. To jest skutek zamierzony:
+prowadzący może wejść w dowolny krok, a pytanie warunkowe nadal pojawia się dopiero po swojej
+odpowiedzi.
+
+### 47.3 Weryfikacja
+
+MOTO i ŻYCIE identyczne. W MAJĄTKU wszystkie różnice zamierzone: znikły trzy pola bramki, a pięć
+grup zmieniło `revealed` z `false` na `true`. Warunek sprawdzony w obie strony — `RENTED_OUT=true`
+odsłania pomoc fachowca, `false` chowa; `PROPERTY_KIND` dalej rozstrzyga o piętrze i materiale ścian.
+Testy: 11 Java, 72 front.
+
+### 47.4 Wniosek, który wraca trzeci raz tego dnia
+
+§46 scaliło dwa pojęcia o jednym skutku. §47 usuwa konfigurację powtarzającą to, co już stoi obok.
+Oba wynikają z tego samego pytania, które trzeba zadawać **przed** dodaniem atrybutu, a nie po:
+**czy tę wartość da się wyprowadzić z tego, co element już niesie?** Kolejność odsłaniania dawała
+się wyprowadzić z pozycji; widoczność — z warunku odsłonięcia. Trzy atrybuty i jedna tabela powstały
+tego dnia po to, żeby jeszcze tego samego dnia zniknąć.
+
+## §48 Zależność między pytaniami to zależność od odpowiedzi (2026-09-10)
+
+Uwaga właściciela, po §45–§47: *„skoro w kontekście przyjdzie ci odpowiedź z pytania, to uzależnij
+od niej to, czy kolejne pytanie może być visible — i już masz zależność zrobioną, a nie dokładasz
+jakiejś dodatkowej logiki"*. To jest sedno pracy z tym silnikiem i przez trzy poprzednie sekcje
+robiłem obok niego własny mechanizm.
+
+### 48.1 Co zastąpiła jedna tabela
+
+`demo.property.apk.question.visible` — trzy wejścia, pięć wierszy:
+
+```
+question;propertyKind;rentedOut;visible
+*;*;*;true
+FLOOR;HOUSE;*;false
+HOME_ASSISTANCE;*;*;false
+HOME_ASSISTANCE;*;true;true
+WALL_MATERIAL;FLAT;*;false
+```
+
+Wejścia to `question.code` i **ścieżki kontekstu odpowiedzi** (`quote.property.kind`,
+`quote.needs.rentedOut`) — te same, pod którymi odpowiedzi i tak już leżą. Warunek „pomoc fachowca
+tylko przy wynajmie" jest wierszem tabeli i niczym więcej.
+
+⚙️ Silnik rozstrzyga po **specyficzności wiersza**, nie po kolejności: brak odpowiedzi trafia
+w `HOME_ASSISTANCE;*;*;false`, a `true` w bardziej szczegółowy `HOME_ASSISTANCE;*;true;true`.
+Sprawdzone na trzech stanach (brak / false / true).
+
+### 48.2 Co zniknęło
+
+| artefakt | rozmiar |
+|---|---|
+| tabela `demo.property.apk.question.reveal` | **5 wejść**, 6 wierszy |
+| `applyReveal` w Javie | 45 linii |
+| `sourceMatches` | 10 linii |
+| `withReveal` + 5 pól kontekstu | 20 linii |
+| atrybuty `REVEALED_BY`, `REVEALED_WHEN` | typ `QUESTION` 9 → **7** |
+| kolumny `revealedBy`, `revealedWhen` w katalogu pól | — |
+| `Question.revealed` / `revealedBy` / `revealedWhen` | z warstwy WSPÓLNEJ — używał ich tylko PROPERTY |
+
+Pole na drucie nazywa się znowu `visible`, bo tym jest. Profil ma **28 tabel** (jedna usunięta,
+jedna dodana).
+
+### 48.3 Dlaczego to była pomyłka warta zapisania
+
+Łańcuch wyliczał w Javie **stan pytania źródłowego** — odpowiedziane, odmówione, obowiązkowe,
+pasujące — podawał go pięcioma polami kontekstu do tabeli o pięciu wejściach i dopiero ta mówiła
+„odsłonięte". Cała ta maszyneria istniała po to, żeby wyrazić coś, co silnik potrafi bez niczego:
+**odpowiedzi są w kontekście, więc warunek na odpowiedzi jest zwykłym poziomem wejściowym.**
+
+⛔ Sygnałem ostrzegawczym była tabela, która **nie miała kolumny `question`** — kluczowała się
+wyłącznie stanem, który sama Java przed chwilą policzyła. Reguła, której wejścia pochodzą z obliczeń
+aplikacji, a nie z danych wniosku, opisuje zwykle mechanizm wymyślony obok silnika.
+
+⚠️ §46 i §47 usunęły dwa objawy tego samego błędu (drugą flagę o tym samym skutku, konfigurację
+powtarzającą pozycję), ale zostawiły przyczynę. Dopiero §48 ją usuwa.
+
+### 48.4 Weryfikacja
+
+MOTO i ŻYCIE identyczne. W MAJĄTKU **jedyną różnicą jest nazwa pola** — `revealed` → `visible`,
+z tymi samymi wartościami na wszystkich 19 pytaniach i 8 polach. Warunki sprawdzone na żywo:
+`RENTED_OUT` bez odpowiedzi / `false` / `true` → pomoc fachowca odpowiednio nie / nie / tak;
+`PROPERTY_KIND=FLAT` → piętro tak, materiał ścian nie; `HOUSE` → odwrotnie. Testy: 11 Java, 72 front.
+Zero błędów w logu aplikacji.
+
+## §49 Reguła należy do pytania; reszta wynika z tego, co już jest (2026-09-10)
+
+Trzy poprawki właściciela do §48, każda usuwająca coś, co dołożyłem bez potrzeby.
+
+### 49.1 Reguła widoczności należy do JEDNEGO pytania
+
+§48 zrobiło **jedną wspólną tabelę** z kolumną `question` i wskaźnikiem na `APK[NEEDS]` — czyli
+znowu regułę o pytaniach zamiast reguły pytania, w dodatku mieszającą pola przedmiotu z analizą
+potrzeb w jednym miejscu. Rozdzielone:
+
+- **`demo.property.question.assistance.visible`** — należy do `HOME_ASSISTANCE`, wisi pod jego
+  atrybutem `IS_VISIBLE` i **nie ma kolumny z kodem pytania**: o kogo chodzi, mówi miejsce w drzewie.
+  Dwa wiersze, jedno wejście (`quote.needs.rentedOut`).
+- **`demo.property.subject.field.visible`** — należy do kroku drugiego, wisi na produkcie obok
+  katalogu pól jako `FIELD_VISIBILITY`. Kolumna z kodem pola jest tu **potrzebna**, bo pola
+  przedmiotu elementami nie są i nie mają gdzie nieść własnego wskaźnika.
+
+⛔ To jest ten sam wzorzec co D-21 dla pokryć: **element wskazuje własną tabelę, kluczowaną tym, co
+dla niego rozstrzyga**. Tabela z kolumną „o kim mowa" jest potrzebna tylko tam, gdzie nie ma elementu.
+
+### 49.2 Opcje wynikają z rodzaju odpowiedzi
+
+`OPTIONS` i `OPTION_LABELS` znikają z `QUESTION`. Pytanie analizy potrzeb jest **tak-albo-nie**
+i innego w tym demie nie będzie, więc `KIND = BOOLEAN` sam mówi, z czego wybierać — atrybut niósł
+przy każdym pytaniu tę samą parę wartości. ⚙️ Pola przedmiotu mają własne listy (`CHOICE`
+z czterema zabezpieczeniami, trzema standardami wykończenia) i te zostają w katalogu, bo tam
+naprawdę różnią się między wierszami. `MONEY` i `INTEGER` nie dostają żadnych — sprawdzone
+na wszystkich 21 pytaniach.
+
+### 49.3 Krok bierze się ze swoich pytań
+
+`REQUIRED` znika z `QUESTION_GROUP`: krok trzeba domknąć dokładnie wtedy, gdy **któreś z jego pytań
+jest obowiązkowe**. Sprawdzone przed zmianą — wartość grupy zgadzała się z pytaniami 6 razy na 6,
+czyli była tą samą regułą zapisaną drugi raz, z możliwością cichego rozjazdu.
+
+⛔ **Widoczność kroku to co innego: krok jest ZAWSZE na liście.** Pierwsza wersja liczyła ją tak samo
+jak obowiązkowość („widoczny, gdy któreś pytanie widoczne") i to była pomyłka — spis kroków ma być
+stały, żeby prowadzący widział, z ilu etapów składa się rozmowa, zanim padnie pierwsza odpowiedź.
+Warunkowość działa **wewnątrz** kroku: pojawiają się i znikają pytania, nie kroki.
+
+⚠️ Regresję złapało porównanie z bazą (sześć grup z `visible: false`), nie scenariusz — bo scenariusz
+patrzył na pytania, a nie na kroki.
+
+### 49.4 Stan po tej serii
+
+| typ | atrybutów | jakie |
+|---|---|---|
+| `QUESTION` | **6** | TEXT, KIND, CONTEXT_PATH, REQUIRED, IS_VISIBLE, POSITION |
+| `QUESTION_GROUP` | **1** | POSITION (plus kolekcja pytań) |
+| `NEEDS_ANALYSIS` | **6** | ANSWER_MAP, NEEDS, RECOMMENDATION, JUSTIFICATION, REASON, VALUE_GAP |
+
+`QUESTION_GROUP` niósł 4 atrybuty rano, `QUESTION` 12 w szczycie. Wszystkie trzy dema identyczne,
+testy 11 Java i 72 front.

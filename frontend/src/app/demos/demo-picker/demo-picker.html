@@ -12,10 +12,15 @@
 		also stays industry-neutral: the tiles name the lines of business, this screen does not.
 	-->
 	<h1 id="demo-picker-title" class="demo-picker__title">Wybierz demo</h1>
-	<p class="demo-picker__subtitle">
-		Każde z nich to działająca aplikacja, w której decyzje podejmują reguły biznesowe Higsona.
-		Kolejność jest celowa — każdy kolejny krok oddaje regułom więcej.
-	</p>
+	<!--
+		⛔ BEZ PODPISU POD TYTUŁEM i bez opisów na kafelkach (2026-09-09). Stało tu zdanie o tym,
+		że „decyzje podejmują reguły biznesowe Higsona", a każdy kafelek dopowiadał, z czego demo
+		jest zbudowane. To ta sama rzecz, którą §21 zdjął z ekranu majątkowego i zostawił tutaj
+		jako otwartą pozycję: reklama narzędzia postawiona PRZED produktem, na ekranie, który
+        ogląda też klient. Tezę pokazuje samo demo — przestawieniem wiersza w tabeli.
+
+		Numer i nazwa zostają, bo kolejność jest argumentem (patrz `demo-catalog.ts`).
+	-->
 
 	<ul class="demo-picker__grid">
 		@for (demo of demos; track demo.code) {
@@ -54,7 +59,6 @@
 
 					<span class="demo-picker__step" aria-hidden="true">{{ demo.step }}</span>
 					<span class="demo-picker__name">{{ demo.name }}</span>
-					<span class="demo-picker__summary">{{ demo.summary }}</span>
 				</button>
 			</li>
 		}

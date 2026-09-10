@@ -4,68 +4,234 @@
 	display: block;
 }
 
-// Sekcja jest kartą, nie samym nagłówkiem. Ankieta ma siedem pytań i rośnie wraz z katalogiem w Higsonie,
-// więc granice sekcji muszą być widoczne bez czytania — inaczej „przybyły dwie sekcje" wygląda
-// jak „strona zrobiła się dłuższa".
-// ⛔ Wymiary panelu przepisane z portalu (`common.scss`, `.section-block`): białe tło, promień
-// 8px, wyściółka 1.5rem i BRAK OBRYSU — portal oddziela panel od tła samym cieniem. Obrys plus
-// cień daje kartę o dwa stopnie cięższą niż tam i to jest pierwsza rzecz, po której widać, że
-// ekran nie pochodzi z tej samej rodziny.
+// ── Ankieta: spis pytań obok pytania bieżącego (makieta UX 2026-09-09) ────────────────────────
+//
+// Mobile-first: spis NAD pytaniem. Obok stanie dopiero, gdy jest na to miejsce — przy węższym
+// ekranie dwie kolumny zjadłyby pytanie do trzech słów na wiersz.
+// ⚠️ `stretch`, nie `start`. Kreska rozdzielająca wisi na kolumnie pytania, a przy `start`
+// kolumna kończy się na swojej treści — czyli kreska urywała się w połowie spisu, gdy spis był
+// wyższy od pytania. To widać dopiero przy siedmiu pozycjach i krótkim pytaniu.
+:host(.apk--survey) {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 20px;
+	align-items: stretch;
+}
+
+@media (min-width: 900px) {
+	:host(.apk--survey) {
+		grid-template-columns: 240px minmax(0, 1fr);
+		gap: 40px;
+	}
+
+	// Kreska między spisem a pytaniem — jak w makiecie. Na kolumnie pytania, nie na spisie,
+	// żeby biegła przez całą wysokość treści niezależnie od tego, która kolumna jest wyższa.
+	:host(.apk--survey) .apk__section--single {
+		padding-left: 40px;
+		border-left: 1px solid @color-border-soft;
+	}
+}
+
+// ── Pytanie złożone ───────────────────────────────────────────────────────────────────────────
+//
+// Treść rodzica jest nagłówkiem ekranu, pola stoją pod nim jedno pod drugim. Każde ma własną,
+// drobniejszą etykietę — inaczej dwie etykiety tej samej wagi czytałyby się jak dwa pytania,
+// czyli dokładnie to, czym pytanie złożone NIE jest.
+.apk__fields {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	margin-top: 20px;
+}
+
+// ⚠️ Trzy klasy w selektorze celowo. Układ pojedynczego pytania powiększa `.apk__label` do
+// 1.375rem regułą o tej samej wadze co dwuklasowa — a etykieta POLA ma być drobniejsza od
+// treści pytania, nie równa jej. Bez trzeciej klasy wygrywała reguła stojąca niżej w pliku.
+.apk__fields .apk__field-block .apk__label {
+	margin-bottom: 8px;
+	font-size: @font-sm;
+	font-weight: 500;
+	line-height: 1.4;
+	color: @color-text-muted;
+}
+
+.apk__outline__title {
+	margin: 0 0 12px;
+	font-size: @font-xs;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: @color-text-muted;
+}
+
+.apk__outline__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.apk__outline__item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	padding: 10px 12px;
+	border: 0;
+	border-radius: 10px;
+	background: transparent;
+	color: @color-text-muted;
+	font-family: inherit;
+	font-size: @font-sm;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover:not(:disabled) {
+		background: @color-surface-muted;
+	}
+
+	// ⛔ Pytanie nieodsłonięte jest WIDOCZNE, tylko nieklikalne. Ukryte kazałoby spisowi rosnąć
+	// w trakcie odpowiadania, a wtedy przestałby mówić, ile jeszcze zostało.
+	//
+	// ⚠️ BEZ `opacity`. Stało tu `opacity: 0.55` i to był realny defekt czytelności: tekst w
+	// `@color-text-muted` daje na bieli 5.18:1, ale przepuszczony przez tę przezroczystość schodzi
+	// do około 2.2:1 — poniżej każdego progu, a na rzutniku w jasnej sali po prostu znika. Stan
+	// „jeszcze nie teraz" niosą trzy inne rzeczy naraz: brak wypełnienia kółka, jaśniejszy obrys
+	// i kursor. Przezroczystość nie dokładała informacji, tylko zabierała kontrast.
+	&:disabled {
+		cursor: default;
+		color: @color-text-muted;
+	}
+
+	&:disabled .apk__outline__mark {
+		border-color: @color-outline;
+		color: @color-text-muted;
+	}
+
+	&:focus-visible {
+		outline: 2px solid @color-action;
+		outline-offset: -2px;
+	}
+}
+
+// Numer w kółku — obrys, dopóki pytanie jest przed nami.
+.apk__outline__mark {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border: 1px solid @color-outline;
+	border-radius: 50%;
+	font-size: @font-xs;
+	line-height: 1;
+}
+
+.apk__outline__item--current {
+	background: @color-action-soft;
+	color: @color-text;
+	font-weight: 600;
+
+	.apk__outline__mark {
+		background: @color-action;
+		border-color: @color-action;
+		color: @color-white;
+	}
+}
+
+.apk__outline__item--done {
+	color: @color-text;
+
+	.apk__outline__mark {
+		border-color: @color-action;
+		color: @color-action;
+		font-weight: 700;
+	}
+}
+
+// ⛔ BEZ WŁASNEJ KARTY (2026-09-09). Sekcja była panelem — białe tło, promień, cień — bo stała na
+// szarym tle strony obok innych paneli. Po redesignie cały ekran dema siedzi w jednej białej
+// karcie, więc panel w panelu rysowałby drugą krawędź tam, gdzie nic się nie kończy; przy
+// pojedynczym pytaniu wyglądało to jak ramka wokół pustki.
+//
+// ⚠️ Drugi powód, dla którego panel tu stał — „granice sekcji muszą być widoczne bez czytania" —
+// przestał obowiązywać wcześniej, wraz z §29: sekcji nie ma, pytania wiszą płasko w dwóch
+// kolekcjach pod produktem.
 .apk__section {
 	margin-bottom: @space-gap;
-	padding: @space-panel;
-	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
+	padding: 0;
 }
 
 
 
 
-// ═══ UKŁAD PYTAŃ ═══════════════════════════════════════════════════════════════════════════
+// ═══ UKŁAD LISTY: PRZEDMIOT UBEZPIECZENIA ═════════════════════════════════════════════════════
 //
-// ⛔ JEDNA KOLUMNA o ograniczonej mierze. Ankieta jest serią pytań zadawanych po kolei, a nie
-// formularzem do wypełnienia naraz — i to jest różnica, którą widać dopiero w układzie. Siatka
-// czterokolumnowa kazała czytać zygzakiem, mieszała pytanie o potrzebę z pytaniem o metraż
-// i przy odsłanianiu kolejnych pytań przestawiała całe wiersze.
+// ⛔ SIATKA I DO LEWEJ (2026-09-09). Lista była jedną wąską kolumną na środku — przy trzynastu
+// polach dawało to stronę wysoką na cztery tysiące pikseli. Trzy kolumny mieszczą ją na jednym
+// ekranie rzutnika.
 //
-// ⛔ Zniknął przy okazji `subgrid`. Istniał wyłącznie po to, żeby kontrolki w sąsiednich
-// kolumnach zaczynały się na tej samej wysokości — bez kolumn nie ma czego wyrównywać, więc
-// kilkadziesiąt linii reguł wyrównujących ścieżki przestało być potrzebne.
+// ⚠️ To NIE jest ankieta i dlatego wolno ją złożyć w kolumny. Krok pierwszy zadaje jedno pytanie
+// na ekran, bo prowadzi rozmowę; tutaj klient przegląda dane, które już mamy, i poprawia jedną
+// czy dwie — a przeglądanie idzie szybciej po siatce niż po kolumnie.
 //
-// Miara ~62ch: dłuższy wiersz męczy przy czytaniu, krótszy łamie treść pytania na trzy linijki.
-// ⛔ WYŚRODKOWANA KOLUMNA, tak samo jak pojedyncze pytanie w ankiecie. Oba kroki mają wtedy jeden
-// rytm: treść pośrodku, sterowniki na krawędziach. Wyrównana do lewej zostawiała po prawej pas
-// pustki szerszy od samych pól.
+// ⛔ BEZ KRESEK MIĘDZY WIERSZAMI. Każde pytanie nosiło własną kreskę u góry — w jednej kolumnie
+// dawało to linijkę przez całą szerokość, ale w siatce sąsiadujące komórki mają różne wysokości,
+// więc kreski przestawały się schodzić i powstawała drabinka poszarpanych odcinków. Odstęp
+// rozdziela pytania równie dobrze i nie ma czego nie wyrównać.
 .apk__list {
-	max-width: 34rem;
-	margin: 0 auto;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px 40px;
+	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
+@media (min-width: 768px) {
+	.apk__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+// Trzy kolumny, odkąd krok przedmiotu nie dzieli już szerokości z podsumowaniem. Pola są krótkie
+// (metraż, rok, kod pocztowy), więc trzy kolumny mieszczą trzynaście pytań na jednym ekranie
+// rzutnika zamiast kazać prowadzącemu przewijać w trakcie pokazu.
+@media (min-width: 1200px) {
+	.apk__list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
 .apk__question {
 	display: block;
-	padding: 18px 0;
-	border-top: 1px solid @color-border-block;
-	text-align: center;
+	padding: 0;
+	border-top: 0;
+	text-align: left;
 }
 
-// Kontrolki na środek: `mat-form-field` i grupa przełącznika są blokowe, więc bez automatycznych
-// marginesów zostałyby przy lewej krawędzi wyśrodkowanej kolumny.
+// ⛔ Pole zajmuje CAŁĄ szerokość kolumny, bez `max-width`. Ograniczenie miało sens, gdy pytania
+// stały w jednej szerokiej kolumnie; w siatce robi z niego pole węższe od własnej etykiety, przez
+// co obrysy kontrolek kończą się w różnych miejscach w każdej kolumnie. Szerokość ogranicza teraz
+// kolumna, a kolumn jest tyle, ile mieści ekran.
 .apk__question .apk__field,
 .apk__question .apk__toggle {
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
 }
 
-.apk__question .apk__options,
-.apk__question .apk__foot {
-	justify-content: center;
+// ⛔ Do LEWEJ. Stało tu `center` — resztka po układzie, w którym lista przedmiotu była jedną
+// wyśrodkowaną kolumną. Etykieta, pole i odpowiedzi zaczynają się od tej samej krawędzi.
+.apk__question .apk__options {
+	justify-content: flex-start;
 }
 
 .apk__question:first-child {
-	padding-top: 4px;
+	padding-top: 0;
 	border-top: 0;
 }
 
@@ -142,22 +308,9 @@
 	width: auto;
 }
 
-// ⚠️ Wyrównanie do LEWEJ, bez odpychania czegokolwiek do prawej: podpowiedź i „nie chcę podać"
-// należą do pytania powyżej, więc muszą zaczynać się od tej samej krawędzi co ono. Odstęp między
-// pytaniami daje teraz wyściółka wiersza, a nie margines stopki.
-.apk__foot {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 4px 12px;
-	margin-top: 8px;
-}
-
-.apk__prefill {
-	font-size: 0.6875rem;
-	font-style: italic;
-	color: @color-text-muted;
-}
+// ⛔ `.apk__foot` i `.apk__prefill` USUNIĘTE 2026-09-09 razem z podpisem „Podpowiedziane: …"
+// (patrz komentarz w szablonie). Stopka pytania nie ma już czego nieść: „nie chcę podać" zdjął
+// §22, a źródło podpowiedzi — decyzja właściciela dema.
 
 
 
@@ -198,72 +351,41 @@
 	font-variant-numeric: tabular-nums;
 }
 
-// ⛔ Pasek dzielony na sekcje: jeden segment na sekcję, szeroki proporcjonalnie do liczby jej
-// pytań. Odstęp między segmentami jest tu treścią, a nie ozdobą — to po nim widać, że po progu
-// KNF ankieta rozrasta się o CAŁE OBSZARY, a nie o kilka pytań doklejonych na końcu.
-.apk__step__bar {
-	display: flex;
-	gap: 4px;
-	height: 3px;
-}
-
-.apk__step__seg {
-	flex: 1 1 0;
-	border-radius: 2px;
-	background: @color-border-block;
-	overflow: hidden;
-}
-
-// Segment bieżącej sekcji jest o stopień ciemniejszy w tle — wiadomo, gdzie się jest, nawet
-// zanim wypełnienie do niego dojdzie.
-.apk__step__seg--current {
-	background: @color-border-strong;
-}
-
-.apk__step__fill {
-	display: block;
-	height: 100%;
-	background: @color-action;
-	transition: width 0.25s ease;
-}
+// ⛔ PASEK POSTĘPU USUNIĘTY 2026-09-09. Zastąpił go spis pytań obok ankiety, który mówi to samo
+// („jesteś w 3 z 7") i jeszcze, o co zapytamy dalej. Dwie miary postępu obok siebie były jedną
+// za dużo, a segmentowy pasek stracił swój powód wcześniej: dzielił się na sekcje, a sekcje
+// zniknęły z drzewa w §29.
 
 // ⛔ Pytanie rośnie do wielkości nagłówka. W liście musiało być drobne, bo sąsiadowało
 // z dziesięcioma innymi; tutaj jest jedyną treścią na ekranie i drobny druk wyglądałby jak
 // pomyłka składu.
-// ⛔ WYŚRODKOWANE. Jedno pytanie na ekranie wyrównane do lewej zostawiało po prawej pas pustki
-// szerszy od samego pytania i wyglądało jak treść, która nie doładowała reszty. Wyśrodkowana
-// kolumna czyta się jak decyzja: ekran ma jedną rzecz i ta rzecz stoi pośrodku.
-//
-// ⚠️ Środkuje się KOLUMNA i jej treść, ale NIE nawigacja — „wstecz" i „dalej" zostają rozepchnięte
-// na krawędzie, bo to są sterowniki ekranu, a nie część pytania.
+// ⛔ WYRÓWNANE DO LEWEJ od 2026-09-09. Środkowanie miało sens, dopóki pytanie było jedyną rzeczą
+// na ekranie i wyrównane do lewej zostawiało po prawej pas pustki szerszy od siebie. Odkąd obok
+// stoi spis pytań, pustki nie ma, a wyśrodkowane pytanie rozjeżdżało się z osią spisu — dwa
+// bloki obok siebie, każdy o innym marginesie wewnętrznym.
 .apk__question--single {
 	flex: 1 1 auto;
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: flex-start;
 	padding: 8px 0 0;
 	border: 0;
 	animation: apk-reveal 0.28s ease-out;
 
 	.apk__body {
-		max-width: 46rem;
-		text-align: center;
+		width: 100%;
+		max-width: 38rem;
+		text-align: left;
 	}
 
-	// Kontrolki wracają na środek: `mat-form-field` i grupa przełącznika są blokowe, więc bez
-	// automatycznych marginesów zostałyby przy lewej krawędzi wyśrodkowanej kolumny.
 	.apk__field,
 	.apk__toggle {
-		margin-left: auto;
-		margin-right: auto;
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	.apk__options {
-		justify-content: center;
-	}
-
-	.apk__foot {
-		justify-content: center;
+		justify-content: flex-start;
 	}
 
 	// Miara treści, nie karty — długie pytanie łamie się na czytelnej szerokości, a panel
@@ -335,15 +457,4 @@
 	background: @color-border-block;
 	color: #5a6e83;
 	cursor: not-allowed;
-}
-
-// Zdanie, po którym ankieta się zatrzymuje. Ton ostrzeżenia, nie błędu: to nie jest pomyłka
-// klienta, tylko odpowiedź, po której nie mamy czego zaproponować.
-.apk__blocked {
-	margin: 0 0 @space-gap;
-	padding: 14px @space-panel;
-	background: #fff8e6;
-	border-left: 3px solid #d99e00;
-	border-radius: @radius-panel;
-	color: @color-text;
 }

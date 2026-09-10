@@ -17,19 +17,13 @@
 }
 
 .demo-picker__title {
-	margin: 0 0 0.5rem;
+	// ⚠️ Dolny margines przejął tytuł, bo podpis pod nim zniknął (2026-09-09) — bez tego kafelki
+	// podjeżdżały pod sam nagłówek.
+	margin: 0 0 2.5rem;
 	font-size: 2rem;
 	font-weight: 800;
 	letter-spacing: -0.02em;
 	color: @color-text;
-}
-
-.demo-picker__subtitle {
-	max-width: 60ch;
-	margin: 0 auto 2.5rem;
-	font-size: 1rem;
-	line-height: 1.5;
-	color: @color-text-muted;
 }
 
 // `auto-fit` with a floor rather than a fixed column count: the row simply grows as industries are
@@ -83,8 +77,7 @@
 }
 
 .demo-picker__tile:hover .demo-picker__icon,
-.demo-picker__tile:hover .demo-picker__step,
-.demo-picker__tile:hover .demo-picker__summary {
+.demo-picker__tile:hover .demo-picker__step {
 	color: inherit;
 }
 
@@ -113,11 +106,6 @@
 	font-size: 1.25rem;
 	font-weight: 700;
 	color: @color-text;
-}
-
-.demo-picker__summary {
-	font-size: 0.875rem;
-	line-height: 1.4;
 }
 
 // Position in the story. Large and muted: it has to be legible from the back of a room without

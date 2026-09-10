@@ -54,7 +54,53 @@ Never add logging or trace-collection code to Groovy rule bodies to build an exe
 
 *Evidence:* `ProfilersApi` exposes four `/profilers/*` endpoints over `EngineProfiler.PARAMETER` / `EngineProfiler.FUNCTION` `getInvokeStats()` / `getLoadStats()` and `JdbcProfiler`; the `DataSourceProxy` wired in `HigsonIntegrationConfiguration` keeps JDBC profiling reaching `/profilers/jdbc`; higson-demo-app.properties:21 documents the diagnostic profiler as "per-invocation call-stacks flushed to the database". Confidence 55 — derived from one design review plus the existing `ProfilersApi`, not from a broad code sample.
 
+### Reach a Rule Through the Domain Tree, Not by Its Code
+
+An application asks the tree for an element and reads a rule from its **attribute**. It does not
+name the rule. `engine.get(code)`, `engine.call(code)` and `engine.flow(code)` are the exception now,
+and an exception has to be argued for — the PROPERTY profile has none since 2026-09-10.
+
+```java
+private ParamValue ruleOf(DomainObject element, String attribute, PropertyContext ctx) {
+	return element.getAttribute(attribute).getValue(ctx);
+}
+```
+
+Three things break when Java names the rule, and all three break silently:
+
+- Repointing the attribute in Studio changes nothing, while looking as though it should.
+- Deleting the element breaks nothing visible; the tree quietly stops describing the system.
+- The call site encodes **what kind of rule it is** — `engine.flow` vs. `engine.get` — so swapping
+  a table for a flow becomes a code change instead of a configuration change.
+
+⛔ **Read the whole row, not a value per attribute.** `DomainAttribute.getValue(ctx)` returns a
+`ParamValue`, so one attribute serves a rule with several outputs and there is no need for one
+pointer per column — which is the pattern this repository has already removed twice. Keep the
+`[column]` suffix in the attribute's value only where the answer genuinely is a single one.
+
+⚠️ **An attribute backed by a FLOW has no named levels.** Reading it with `getBigDecimal("factor")`
+throws `UnknownLevelNameException`; a flow returns a `FlowResult`, a Groovy function a plain map.
+Hide that behind ONE helper — the moment each call site branches on it, knowledge of the rule's kind
+is back in the application:
+
+```java
+Object raw = ruleOf(element, attribute, ctx).get();
+return raw instanceof FlowResult flow ? flow.getResult() : (Map<?, ?>) raw;
+```
+
+⛔ **Shared layers take a supplier, never an address.** `ApkAnalysis` used to receive `(engine,
+tableCode, ...)` — an address, in a class whose own header says it knows no rule. It now receives
+`Function<String, ParamValue>`, so each profile reaches for its rows the way it reaches for
+everything else. ⚠️ `deriveNeeds` still takes a table code for the motor and life demos: known debt.
+
+*Evidence:* PROPERTY — 18 of 18 rule invocations go through an attribute; zero rule codes and zero
+`engine.get`/`call`/`flow` remain in `Property.java`. MOTOR and LIFE are not converted.
+
 ### Reference Rule Codes Through Java Constants
+
+> ⚠️ **Applies only where the rule is genuinely not in the tree** (dictionaries, prefetch). For
+> anything an element could carry, the standard above takes precedence.
+
 When Java has to name a Higson parameter, hold the code string in a constant rather than inlining it: a package-private constants holder for dictionaries, an enum for prefetch parameters. Supply context values with the varargs `HigsonContext(path, value, ...)` constructor using the same canonical paths the `.def` files bind to.
 
 ```java

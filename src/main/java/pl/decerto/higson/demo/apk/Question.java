@@ -14,28 +14,40 @@ public class Question {
 
 	private String code;
 	private String text;
+
+	/**
+	 * Krótka nazwa pytania — do listy obok ankiety, nie na ekran pytania.
+	 *
+	 * ⛔ To NIE jest druga wersja treści pytania i dlatego nie powtarza pułapki, przez którą
+	 * zniknął atrybut `TEXT` (D-20). Tamten rozjazd był groźny, bo nazwa i treść udawały TO SAMO
+	 * i rozchodziły się niewidocznie. Tu jedno jest pytaniem („Czy chcesz ubezpieczyć swój majątek
+	 * na wypadek powodzi?"), a drugie pozycją w spisie („Ochrona przed powodzią") — obie widać na
+	 * ekranie naraz, więc rozjazd rzuca się w oczy zamiast się chować.
+	 *
+	 * Puste — lista pokazuje sam numer.
+	 */
+
+	/**
+	 * Kod pytania NADRZĘDNEGO, jeśli to pytanie jest jego polem. Puste — pytanie samodzielne.
+	 *
+	 * ⛔ Pytanie złożone to JEDNO pytanie o kilku polach („Twoje oczekiwania wobec ochrony":
+	 * składka i wartość nieruchomości), a nie kilka pytań pokazanych razem. Różnica jest widoczna
+	 * w liczniku — „pytanie 6 z 7", nie 6 i 7.
+	 *
+	 * ⛔ To NIE jest grupowanie po ekranie. §31 odwrócił dokładnie taki zabieg: konfiguracja nie
+	 * ma odwzorowywać układu aplikacji. „Oczekiwana składka i wartość nieruchomości to jedno
+	 * pytanie" jest zdaniem o przedmiocie rozmowy z klientem, a nie o tym, ile ekranów ma ankieta.
+	 *
+	 * ⚠️ Model zostaje PŁASKI — zagnieżdżenie robi dopiero konwerter, na drucie. Dzięki temu
+	 * odpowiedzi, wartości demonstracyjne i wszystko, co szuka pytania po kodzie, działa bez
+	 * zmian: pole jest zwykłym pytaniem, które ma rodzica.
+	 */
+	private String partOf;
 	private String kind;
 	private String valueType;
 
-	/**
-	 * Kod pytania, którego domknięcie odsłania to pytanie. Puste — widoczne od razu.
-	 *
-	 * ⛔ Łańcuch jest KONFIGURACJĄ (kolumna `revealedBy` w katalogu pytań), nie kolejnością
-	 * w kodzie. Ankieta prowadzona krok po kroku to decyzja o tym, jak rozmawiamy z klientem,
-	 * więc przestawienie jej nie może wymagać wdrożenia.
-	 */
-	private String revealedBy;
 
-	/**
-	 * Czy pytanie zostało już odsłonięte przez łańcuch.
-	 *
-	 * ⛔ OSOBNO od `visible` i to jest nośne. `visible` mówi, czy pytanie DOTYCZY tego klienta
-	 * (piętro nie dotyczy domu) — pytanie odrzucone tą regułą nie istnieje dla niego wcale.
-	 * `revealed` mówi, czy już PORA je zadać. Ekran pyta o pytania spełniające oba warunki, ale
-	 * licznik „pytanie 2 z 7" musi liczyć tylko po pierwszym: gdyby liczył po obu, całkowita
-	 * liczba pytań rosłaby w miarę odpowiadania i pasek postępu nie znaczyłby nic.
-	 */
-	private boolean revealed;
+
 	private String section;
 	private String help;
 	private String contextPath;
@@ -63,28 +75,26 @@ public class Question {
 		this.text = text;
 	}
 
+
+	public String getPartOf() {
+		return partOf;
+	}
+
+	public void setPartOf(String partOf) {
+		this.partOf = partOf;
+	}
+
+	/** Czy to pytanie jest polem innego. */
+	public boolean isField() {
+		return partOf != null && !partOf.isEmpty();
+	}
+
 	public String getKind() {
 		return kind;
 	}
 
 	public void setKind(String kind) {
 		this.kind = kind;
-	}
-
-	public boolean isRevealed() {
-		return revealed;
-	}
-
-	public void setRevealed(boolean revealed) {
-		this.revealed = revealed;
-	}
-
-	public String getRevealedBy() {
-		return revealedBy;
-	}
-
-	public void setRevealedBy(String revealedBy) {
-		this.revealedBy = revealedBy;
 	}
 
 	public String getValueType() {

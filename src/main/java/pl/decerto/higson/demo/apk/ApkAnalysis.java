@@ -93,15 +93,15 @@ public final class ApkAnalysis {
 	/**
 	 * Rek. 8.7 — treść uzasadnienia pochodzi z tabeli, a Java podstawia liczby.
 	 *
-	 * Wołający przekazuje listę powodów: kod plus jego parametry. Czego NIE ma tutaj: ani jednego
-	 * zdania. Zdania są w `*.apk.recommendation.reason` i tam się je zmienia.
+	 * Wołający przekazuje listę powodów (kod plus parametry) i sposób, w jaki dla kodu wyjmuje się
+	 * wiersz. Czego NIE ma tutaj: ani jednego zdania i ANI JEDNEGO ADRESU REGUŁY. Gdzie stoją
+	 * zdania, wie profil — bo każdy z trzech sięga po nie inaczej.
 	 */
-	public static List<String> justify(HigsonEngine engine, String reasonTable,
-			List<Reason> reasons, Function<String, HigsonContext> contextFor) {
+	public static List<String> justify(List<Reason> reasons, Function<String, ParamValue> rowFor) {
 
 		List<String[]> ordered = new ArrayList<>();
 		for (Reason reason : reasons) {
-			ParamValue row = engine.get(reasonTable, contextFor.apply(reason.code));
+			ParamValue row = rowFor.apply(reason.code);
 			String text = row.getString(OUT_TEXT);
 			if (text == null || text.isEmpty()) {
 				continue;

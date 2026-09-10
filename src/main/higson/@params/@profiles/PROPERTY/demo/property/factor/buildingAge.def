@@ -1,5 +1,5 @@
 code = "demo.property.factor.buildingAge"
-description = "Sama kolumna przedzialowa - BEZ wiersza '* - *', matchRequired false, obsluga null w funkcji."
+description = "Sama kolumna przedzialowa - BEZ wiersza gwiazdkowego, matchRequired false: brak dopasowania znaczy brak czynnika, a demo.util.multiply traktuje brak wartosci jak jeden. WIEK LICZY REGULA, nie Java: zrodlem poziomu jest funkcja demo.property.util.buildingAge, ktora wyprowadza go z roku budowy i daty poczatku ochrony - obu juz obecnych w kontekscie. Dzieki temu wiek nie jest dosylany z aplikacji jako osobna wartosc."
 nullable = true
 dictionary = false
 cacheable = true
@@ -9,21 +9,21 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Building age factor"
+label = "Czynnik za wiek budynku"
 
 [[inputLevel]]
 code = "age"
-label = "building age"
+label = "wiek budynku w latach"
 type = "integer"
 matcher = "between/ii"
 reverseMatcher = false
-property = "quote.property.age"
-source = "quote.property.age"
+levelCreator = "$f demo.property.util.buildingAge"
+source = "$f demo.property.util.buildingAge"
 union = false
 
 [[outputLevel]]
 code = "factor"
-label = "factor"
+label = "mnoznik skladki"
 type = "number"
 external = false
 array = false

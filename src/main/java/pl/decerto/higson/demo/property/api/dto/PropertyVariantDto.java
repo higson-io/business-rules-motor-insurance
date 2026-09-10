@@ -11,8 +11,6 @@ public class PropertyVariantDto {
 	private String description;
 	private int position;
 	private boolean available;
-	private String unavailableReason;
-	private BigDecimal liabilitySum;
 	private BigDecimal annualPremium;
 	private BigDecimal instalment;
 	private Map<String, BigDecimal> breakdown;
@@ -58,21 +56,6 @@ public class PropertyVariantDto {
 		this.available = available;
 	}
 
-	public String getUnavailableReason() {
-		return unavailableReason;
-	}
-
-	public void setUnavailableReason(String unavailableReason) {
-		this.unavailableReason = unavailableReason;
-	}
-
-	public BigDecimal getLiabilitySum() {
-		return liabilitySum;
-	}
-
-	public void setLiabilitySum(BigDecimal liabilitySum) {
-		this.liabilitySum = liabilitySum;
-	}
 
 	public BigDecimal getAnnualPremium() {
 		return annualPremium;

@@ -3,11 +3,16 @@
 -->
 <nav class="step-bar" aria-label="Kroki" data-testid="step-bar">
 	@for (step of steps(); track step.key; let i = $index) {
+		<!--
+			⛔ `disabled`, nie ukrycie. Krok niedostępny ma być WIDOCZNY — pasek pokazuje, ile
+			jeszcze zostało, a znikający krok zamieniałby go w licznik, który rośnie w trakcie.
+		-->
 		<button
 			type="button"
 			class="step-bar__step"
 			[class.step-bar__step--current]="step.key === current()"
 			[class.step-bar__step--done]="isDone(step)"
+			[disabled]="step.locked === true"
 			[attr.aria-current]="step.key === current() ? 'step' : null"
 			[attr.data-testid]="'step-' + step.key"
 			(click)="go(step)"

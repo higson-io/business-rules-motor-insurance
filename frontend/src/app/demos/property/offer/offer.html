@@ -25,7 +25,13 @@
 				</div>
 			} @else {
 				<dl class="offer__dates">
-					<dt>Wystawiona</dt>
+					<!--
+						⛔ „Data oferty", nie „Wystawiona". Formalnie oferta JEST wystawiana i to
+						słowo było poprawne, ale w zestawieniu z „Ważna do" i „Płatność do" czytało
+						się jak „polisa już wystawiona" — na demo, na którym klient jeszcze niczego
+						nie zaakceptował. Zgłoszone z testów.
+					-->
+					<dt>Data oferty</dt>
 					<dd>{{ date(offer.issuedOn) }}</dd>
 					<dt>Ważna do</dt>
 					<dd data-testid="offer-valid-until">{{ date(offer.validUntil) }}</dd>
@@ -99,10 +105,12 @@
 								<td>{{ money(cover.amount) }}</td>
 							</tr>
 						}
-						<tr class="offer__covers__deductible">
-							<th scope="row">Franszyza redukcyjna</th>
-							<td>{{ money(deductible()) }}</td>
-						</tr>
+						@if (floodDeductible(); as franszyza) {
+							<tr class="offer__covers__deductible">
+								<th scope="row">Franszyza redukcyjna — powódź</th>
+								<td>{{ money(franszyza) }}</td>
+							</tr>
+						}
 					</tbody>
 				</table>
 
@@ -122,8 +130,17 @@
 			⛔ Rek. 9.3 — odstąpienie klienta od rekomendacji ma być ODNOTOWANE, a nie przemilczane.
 			Notatka jest zawsze, także gdy wybór się zgadza: dokument ma odpowiadać na to pytanie,
 			a nie milczeć, gdy odpowiedź jest korzystna.
+
+			⛔ OD 2026-09-09 STOI W ZAŁĄCZNIKU, nie nad nim. Załącznik to dokument, który zostaje
+			przy kliencie (rek. 8.7) — a informacja „wziąłeś węższy wariant niż rekomendowany"
+			ma się przechować razem z analizą potrzeb, do której się odnosi, a nie obok niej
+			w interfejsie. Zgłoszone z testów.
+
+			⚠️ Tutaj zostaje WYŁĄCZNIE awaryjnie: notatka pokazuje się zawsze, a załącznik tylko
+			wtedy, gdy każą reguły. Gdyby reżim przestał dołączać analizę, bez tej gałęzi
+			odstąpienie zniknęłoby z dokumentu razem z nią.
 		-->
-		@if (choice(); as choice) {
+		@if (!offer.needsAnalysisAttached && choice(); as choice) {
 			<section
 				class="offer__block offer__choice"
 				[class.offer__choice--departs]="choice.acknowledge"
@@ -148,8 +165,45 @@
 			ma i to jest ta sama demonstracja, co brak uzasadnienia na ekranie rekomendacji.
 		-->
 		@if (offer.needsAnalysisAttached) {
-			<section class="offer__block" data-testid="offer-apk">
-				<h3 class="offer__block__title">Załącznik — analiza potrzeb klienta</h3>
+			<!--
+				⛔ `<details>`, nie własny przełącznik na sygnale. Zwijanie to zachowanie, które
+				przeglądarka ma wbudowane razem z obsługą klawiatury, rolą w drzewie dostępności
+				i wyszukiwaniem tekstu w zwiniętej treści (`accessibility.md`: najpierw semantyka).
+
+				⛔ `open` na starcie. Makieta rysuje chevron, ale to jest ZAŁĄCZNIK DOKUMENTU —
+				rek. 8.7 każe go dołączyć, a nie schować. Chevron daje możliwość zwinięcia, gdy
+				oferta jest długa; domyślnie widać treść.
+			-->
+			<details class="offer__block offer__apk-block" data-testid="offer-apk" open>
+				<summary class="offer__block__title offer__apk__summary">
+					Załącznik — analiza potrzeb klienta
+					<span class="offer__apk__chevron" aria-hidden="true"></span>
+				</summary>
+
+				<!--
+					⛔ Notatka o zgodności wyboru z rekomendacją stoi PIERWSZA w załączniku (rek. 9.3).
+					Wcześniej była osobną sekcją NAD nim — czyli informacja „wziąłeś węższy wariant"
+					zostawała w interfejsie, a nie w dokumencie, który klient dostaje. Tutaj przechowa
+					się razem z potrzebami i uzasadnieniem, do których się odnosi.
+				-->
+				@if (choice(); as choice) {
+					<section
+						class="offer__choice offer__apk__choice"
+						[class.offer__choice--departs]="choice.acknowledge"
+						data-testid="offer-choice"
+					>
+						<h4 class="offer__block__title">{{ choice.label }}</h4>
+						<p class="offer__choice__text">{{ choice.text }}</p>
+
+						@if (choice.unmet.length > 0) {
+							<ul class="offer__choice__unmet" data-testid="offer-unmet">
+								@for (need of choice.unmet; track need) {
+									<li>{{ need }}</li>
+								}
+							</ul>
+						}
+					</section>
+				}
 
 				<div class="offer__apk">
 					<div>
@@ -170,7 +224,7 @@
 						</ol>
 					</div>
 				</div>
-			</section>
+			</details>
 		}
 
 		<footer class="offer__foot">

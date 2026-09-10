@@ -1,5 +1,5 @@
 code = "demo.property.cover.theft"
-description = "Wlasna tabela pokrycia i jedyna, w ktorej zabezpieczenia dzialaja jako PROG DOSTEPNOSCI, a nie jako czynnik ceny. Brak jakichkolwiek zabezpieczen to na polskim rynku odmowa, a nie drozsza skladka - i to jest przypadek wart pokazania, bo klient bez zabezpieczen ma najwieksza potrzebe ochrony od kradziezy, a nie moze jej kupic. Sila zabezpieczen obniza stawke i podnosi limit na bizuterie."
+description = "Najbogatsza z tabel pokryc, bo przy kradziezy zabezpieczenia rozstrzygaja o wszystkim naraz: czy w ogole sprzedajemy, po jakiej stawce i do jakiego limitu na bizuterie. Limit ulamkowy, kwotowy i jego opis zmieniaja sie RAZEM, wiec stoja obok siebie w jednym wierszu. Kolumny z kodem zdania o odmowie nie ma - demo nie tlumaczy klientowi, dlaczego pokrycia nie ma. Stala jest tylko podstawa stawki, na elemencie w drzewie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,7 +9,7 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Kradziez z wlamaniem - warunki pokrycia"
+label = "Kradziez - stawka, dostepnosc i limity wedlug zabezpieczen"
 
 [[inputLevel]]
 code = "security"
@@ -22,29 +22,15 @@ union = false
 
 [[outputLevel]]
 code = "rate"
-label = "stawka"
+label = "stawka w promilach sumy"
 type = "number"
 external = false
 array = false
 
 [[outputLevel]]
-code = "basis"
-label = "podstawa stawki"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
 code = "available"
-label = "dostepne"
+label = "czy sprzedajemy przy tych zabezpieczeniach"
 type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "reason"
-label = "kod zdania o odmowie"
-type = "string"
 external = false
 array = false
 

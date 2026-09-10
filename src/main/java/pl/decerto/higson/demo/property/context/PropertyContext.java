@@ -26,7 +26,6 @@ import pl.decerto.higson.demo.apk.Question;
  */
 public class PropertyContext extends HigsonContext {
 
-	private static final String PATH_POSTCODE = "quote.property.postcode";
 
 	private final PropertyQuote quote;
 	private final Map<String, Object> values = new HashMap<>();
@@ -40,15 +39,13 @@ public class PropertyContext extends HigsonContext {
 	private String reasonFamily;
 	private BigDecimal reasonRatio;
 	private Boolean reasonFlag;
-	private Boolean revealHasSource;
-	private Boolean revealSourceAnswered;
-	private Boolean revealSourceRefused;
-	private Boolean revealSourceRequired;
 	private String choiceRecommended;
 	private String choiceSelected;
 
 	public PropertyContext(PropertyQuote quote) {
 		this.quote = quote;
+		// ⛔ ODPOWIEDZI PRZED WYLICZENIAMI i nie wolno tego zamienić: `collectComputed` liczy
+		// prefiks kodu pocztowego z odpowiedzi, która musi już leżeć w mapie.
 		collectAnswers();
 		collectComputed();
 	}
@@ -78,17 +75,6 @@ public class PropertyContext extends HigsonContext {
 		this.reasonFamily = family;
 		this.reasonRatio = ratio;
 		this.reasonFlag = flag;
-		return this;
-	}
-
-	/** Stan pytania odsłaniającego — z niego reguła wyprowadza, czy kolejne pytanie już pora zadać. */
-	public PropertyContext withReveal(boolean hasSource, boolean answered, boolean refused,
-			boolean required) {
-
-		this.revealHasSource = hasSource;
-		this.revealSourceAnswered = answered;
-		this.revealSourceRefused = refused;
-		this.revealSourceRequired = required;
 		return this;
 	}
 
@@ -135,11 +121,6 @@ public class PropertyContext extends HigsonContext {
 		if ("variant.code".equals(path)) {
 			return variantCode;
 		}
-		// Kod reżimu APK — tym kluczują się warunki oferty.
-		if ("regime.code".equals(path)) {
-			return quote.getRegime().getCode();
-		}
-
 		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
 		if ("reason.family".equals(path)) {
 			return reasonFamily;
@@ -149,18 +130,6 @@ public class PropertyContext extends HigsonContext {
 		}
 		if ("reason.flag".equals(path)) {
 			return reasonFlag;
-		}
-		if ("reveal.hasSource".equals(path)) {
-			return revealHasSource;
-		}
-		if ("reveal.sourceAnswered".equals(path)) {
-			return revealSourceAnswered;
-		}
-		if ("reveal.sourceRefused".equals(path)) {
-			return revealSourceRefused;
-		}
-		if ("reveal.sourceRequired".equals(path)) {
-			return revealSourceRequired;
 		}
 		if ("quote.choice.recommended".equals(path)) {
 			return choiceRecommended;
@@ -184,6 +153,14 @@ public class PropertyContext extends HigsonContext {
 	 */
 	private void collectAnswers() {
 		for (Question question : quote.getQuestions()) {
+			// ⛔ Odpowiedź na pytanie NIEODSŁONIĘTE nie wchodzi do kontekstu. Pytanie warunkowe
+			// można odsłonić i odpowiedzieć, a potem cofnąć odpowiedź, która je odsłoniła — wtedy
+			// znika z ekranu, ale jego odpowiedź zostaje zapisana (i słusznie: klient wraca, a my
+			// jej nie kasujemy). Bez tego filtra dalej karmiła reguły i rekomendacja opierała się
+			// na pytaniu, którego klient już nie widzi.
+			if (!question.isVisible()) {
+				continue;
+			}
 			String path = question.getContextPath();
 			if (path == null || path.isEmpty()) {
 				continue;
@@ -198,36 +175,26 @@ public class PropertyContext extends HigsonContext {
 
 	private void collectComputed() {
 		values.put("quote.policy.startDate", quote.getPolicy().getStartDate());
-		values.put("quote.policy.deductible", quote.getPolicy().getDeductible());
+		// ⛔ `putIfAbsent`, nie `put`. Franszyza jest JEDYNĄ ścieżką, pod którą leży i odpowiedź
+		// klienta (pole DEDUCTIBLE kroku 2), i wartość z modelu wniosku — a rozstrzygać ma wybór
+		// klienta. Nadpisanie zerem z modelu wygaszało zniżkę za franszyzę bez śladu.
+		values.putIfAbsent("quote.policy.deductible", quote.getPolicy().getDeductible());
 
-		values.put("quote.property.age", quote.getBuildingAge());
-		values.put("quote.property.postcodeArea", postcodeArea());
 
 		values.put("quote.zone.flood", quote.getZone().getFlood());
-		values.put("quote.zone.theft", quote.getZone().getTheft());
 
 		values.put("quote.sums.building", quote.getSums().getBuilding());
 		values.put("quote.sums.fixtures", quote.getSums().getFixtures());
 		values.put("quote.sums.contents", quote.getSums().getContents());
-		values.put("quote.sums.theft", quote.getSums().getTheft());
-		values.put("quote.sums.flood", quote.getSums().getFlood());
-		values.put("quote.sums.liability", quote.getSums().getLiability());
-		values.put("quote.sums.assistance", quote.getSums().getAssistance());
+		// ⛔ Suma SUGEROWANA zostaje w kontekscie, choc nie czyta jej zadna regula: czyta ja
+		// z powrotem Java, przez decimalAt, zeby porownac ja z suma wybrana przez klienta
+		// (rodzina zdan MANUAL_SUM i porownanie z oszacowaniem klienta).
 		values.put("quote.sums.suggestedBuilding", quote.getSums().getSuggestedBuilding());
 
 		values.put("quote.risk.factor", quote.getRiskFactor());
 
 	}
 
-	/** Dwie pierwsze cyfry kodu pocztowego — klucz obu stref. */
-	private String postcodeArea() {
-		Object postcode = values.get(PATH_POSTCODE);
-		if (postcode == null) {
-			return null;
-		}
-		String digits = postcode.toString().replace("-", "");
-		return digits.length() < 2 ? null : digits.substring(0, 2);
-	}
 
 	/**
 	 * Konwersja po RODZAJU ODPOWIEDZI z konfiguracji, nie po kodzie pytania.

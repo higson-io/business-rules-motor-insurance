@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Serce rekomendacji: najtanszy pakiet, ktory ma wszystkie wymagane pokrycia. Sklad pakietu liczy przez demo.property.apk.packageCovers, czyli TAK SAMO jak Java przy ocenie pakietu - pokrycie niedostepne w tej sytuacji nie liczy sie jako zawarte. Gdy zaden pakiet nie pokrywa wszystkiego, wygrywa ten o najwiekszym pokryciu, przy remisie tanszy."
+description = "Serce rekomendacji: najtanszy pakiet, ktory ma wszystkie wymagane pokrycia. Sklad pakietu liczy przez demo.property.apk.packageCovers, czyli TAK SAMO jak Java przy ocenie pakietu. Gdy zaden pakiet nie pokrywa wszystkiego, wygrywa ten o najwiekszym pokryciu, przy remisie tanszy."
 
 [[arguments]]
 name = "ctx"
@@ -20,26 +20,34 @@ if (required.isEmpty()) {
 	return null
 }
 
-// Drabinka pakietow prosto z drzewa, rosnaco po pozycji. Pozycja jest scisla: wyzsza znaczy
-// szerszy zakres, wiec pierwszy pakiet pokrywajacy wszystko jest zarazem najtanszym takim.
-def zone = ctx.getString('quote.zone.flood')
-def ladder = []
-for (def variant in domain.get('PROPERTY', '/PRODUCTS[HOME]').getAll('VARIANTS')) {
-	def code = variant.getCode()
+def floodZone = ctx.getString('quote.zone.flood')
+def security = ctx.getString('quote.property.security')
+def product = domain.get('PROPERTY', '/PRODUCTS[HOME]')
+def variants = product.getAll('VARIANTS')
 
-	def availability = higson.getValue('demo.property.variant.availability',
-			higson.createContext('variant.code', code, 'quote.zone.flood', zone))
-	if (!Boolean.TRUE.equals(availability.get(0, 'available'))) {
+def ladder = []
+for (def variant in variants) {
+	def code = variant.getCode()
+	// ⛔ Waski kontekst musi niesc KAZDE pole, po ktorym kluczuje sie dostepnosc pokrycia:
+	// strefe dla powodzi i zabezpieczenia dla kradziezy. Bez ktoregokolwiek tabela pokrycia
+	// spada na wiersz gwiazdkowy i pakiet wychodzi dostepny, choc ekran pokaze go inaczej.
+	def availabilityCtx = higson.createContext(
+			'variant.code', code,
+			'quote.zone.flood', floodZone,
+			'quote.property.security', security)
+	def available = higson.call('demo.property.variant.available', availabilityCtx)
+	if (!Boolean.TRUE.equals(available)) {
 		continue
 	}
-
-	ladder.add([code: code,
-	            position: variant.getAttrDecimal('POSITION', ctx),
-	            covers: higson.call('demo.property.apk.packageCovers', ctx, code)])
+	def position = variant.getAttrDecimal('POSITION', ctx)
+	def covers = higson.call('demo.property.apk.packageCovers', ctx, code)
+	ladder.add([code: code, position: position, covers: covers])
 }
 if (ladder.isEmpty()) {
 	return null
 }
+
+// Position rosnie z zakresem pakietu, wiec pierwszy pelny match po posortowaniu jest najtanszy.
 ladder.sort { a, b -> a.position <=> b.position }
 
 def best = null

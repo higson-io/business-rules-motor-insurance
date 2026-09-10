@@ -1,3 +1,0 @@
-name = "Czy nieruchomość jest przeznaczona na wynajem?"
-description = "Pytanie 5 ze specyfikacji."
-tags = []

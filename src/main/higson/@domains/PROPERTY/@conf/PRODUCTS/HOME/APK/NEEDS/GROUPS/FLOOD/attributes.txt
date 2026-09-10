@@ -1,0 +1,5 @@
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc w ankiecie"
+refType = "LITERAL"
+refName = "220"

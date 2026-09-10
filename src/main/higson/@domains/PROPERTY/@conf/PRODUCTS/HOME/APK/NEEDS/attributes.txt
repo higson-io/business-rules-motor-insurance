@@ -5,12 +5,6 @@ refType = "PARAMETER"
 refName = "demo.property.apk.answer"
 
 [[attr]]
-attributeCode = "BLOCKER"
-attributeName = "Kiedy odpowiedz przerywa sciezke"
-refType = "PARAMETER"
-refName = "demo.property.apk.question.blocker"
-
-[[attr]]
 attributeCode = "JUSTIFICATION"
 attributeName = "Zdania uzasadnienia"
 refType = "PARAMETER"
@@ -23,14 +17,8 @@ refType = "FUNCTION"
 refName = "demo.property.apk.needs"
 
 [[attr]]
-attributeCode = "QUESTION_CATALOGUE"
-attributeName = "Katalog pytan"
-refType = "PARAMETER"
-refName = "demo.property.apk.question"
-
-[[attr]]
-attributeCode = "REASON_TRIGGER"
-attributeName = "Ktore zdanie pada"
+attributeCode = "REASON"
+attributeName = "Ktore zdanie uzasadnienia ma padac"
 refType = "PARAMETER"
 refName = "demo.property.apk.reason"
 
@@ -41,13 +29,7 @@ refType = "FLOW"
 refName = "demo.property.apk.recommend"
 
 [[attr]]
-attributeCode = "REVEAL"
-attributeName = "Kiedy pytanie sie odslania"
-refType = "PARAMETER"
-refName = "demo.property.apk.question.reveal"
-
-[[attr]]
 attributeCode = "VALUE_GAP"
-attributeName = "Oszacowanie klienta a suma z wyliczenia"
+attributeName = "Oszacowanie klienta wobec wyliczonej sumy"
 refType = "PARAMETER"
 refName = "demo.property.sum.valueGap"

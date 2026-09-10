@@ -1,5 +1,5 @@
 code = "demo.property.sum.ratePerSqm"
-description = "Stawka odtworzeniowa zl/m2. Wersjonowana regionem PROPERTY. LICZBY DEMONSTRACYJNE (W-2)."
+description = "Stawka odtworzeniowa zl/m2 wedlug lokalizacji, rodzaju nieruchomosci i standardu wykonczenia. LICZBY DEMONSTRACYJNE (W-2). Kluczem jest PELNY kod pocztowy, wprost z odpowiedzi klienta - wiersze gwiazdkowe daja stawke krajowa, a kilka kodow ma wlasna, wyzsza."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,20 +9,20 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Reconstruction rate per square metre"
+label = "Stawka odtworzeniowa za metr kwadratowy"
 
 [[inputLevel]]
-code = "area"
-label = "postcode area"
+code = "postcode"
+label = "kod pocztowy miejsca ubezpieczenia"
 type = "string"
 reverseMatcher = false
-property = "quote.property.postcodeArea"
-source = "quote.property.postcodeArea"
+property = "quote.property.postcode"
+source = "quote.property.postcode"
 union = false
 
 [[inputLevel]]
 code = "kind"
-label = "property kind"
+label = "rodzaj nieruchomosci"
 type = "string"
 reverseMatcher = false
 property = "quote.property.kind"
@@ -31,7 +31,7 @@ union = false
 
 [[inputLevel]]
 code = "standard"
-label = "finish standard"
+label = "standard wykonczenia"
 type = "string"
 reverseMatcher = false
 property = "quote.property.finishStandard"
@@ -40,7 +40,7 @@ union = false
 
 [[outputLevel]]
 code = "rate"
-label = "rate per sqm"
+label = "stawka odtworzeniowa zl/m2"
 type = "number"
 external = false
 array = false

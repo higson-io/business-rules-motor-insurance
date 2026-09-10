@@ -1,0 +1,3 @@
+name = "Ochrona przed kradzieżą"
+description = "Krok 2 ankiety."
+tags = []

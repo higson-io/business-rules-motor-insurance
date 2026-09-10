@@ -21,7 +21,4 @@ type = "BIG_DECIMAL"
 
 def row = higson.getValue('demo.property.factor.period', ctx)
 def installments = row.get(0, 'installments')
-if (installments == null || installments < 1) {
-	installments = 1
-}
 return math.round(annual / installments, 2)

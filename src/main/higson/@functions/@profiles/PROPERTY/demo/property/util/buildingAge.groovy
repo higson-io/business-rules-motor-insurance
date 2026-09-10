@@ -15,8 +15,7 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-// UWAGA: ctx.get zwraca daty jako String, nie java.util.Date - dlatego rok bierzemy z pierwszych
-// czterech znakow, a nie przez Calendar. Ta sama pulapka co przy LIFE.
+// UWAGA: ctx.get zwraca date jako String, nie Date - stad substring(0, 4), a nie Calendar.
 def year = ctx.getInteger('quote.property.constructionYear')
 def start = ctx.get('quote.policy.startDate')
 if (year == null || year <= 0 || start == null) {

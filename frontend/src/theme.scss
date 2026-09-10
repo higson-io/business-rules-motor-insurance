@@ -51,11 +51,19 @@ html {
 	// The SAME value `_variables.less` exposes as `@color-action` — one action colour, one hex,
 	// so a control and the button beside it cannot drift apart.
 	//
-	// ⚠️ NOT the portal's `#3F8797` as published. Measured, that value gives 4.10:1 against white
-	// and 3.76:1 against the page ground — under the 4.5:1 floor `accessibility.md` sets for the
-	// small copy Material puts in field labels. `#317989` is the first darkening step that clears
-	// both (4.97:1 and 4.56:1) and holds the hue; side by side the two are indistinguishable.
-	--mat-sys-primary: #317989;
+	// ⛔ THE DEMO PALETTE IS NO LONGER THE PORTAL'S. Since 2026-09-09 this application follows the
+	// UX mockups for the property demo (`.maister/tasks/development/2026-09-09-ux-redesign-property/`),
+	// and their action colour is `#2AA399` — a greener, brighter teal than the portal's.
+	//
+	// ⚠️ MEASURED, AND IT DOES NOT CLEAR THE FLOOR: 3.09:1 against white, 2.83:1 against the page
+	// ground, where `accessibility.md` asks for 4.5:1 on copy this size. The previous value
+	// `#317989` did clear it (4.97:1 / 4.55:1), and so would `#207A72` (5.14:1 / 4.71:1), which
+	// holds the mockup's hue. Both were offered and the demo's owner chose the mockup as drawn.
+	//
+	// This is therefore a RECORDED DEPARTURE, not an oversight — see D-1 in the task brief and the
+	// departure note in `standards/frontend/css.md`. Do not "fix" it back to a passing value
+	// without that decision being revisited; do not copy it into a screen that is not this demo.
+	--mat-sys-primary: #2aa399;
 
 	// Three radii, all three copied from the portal's tokens rather than guessed:
 	//   `--p-button-border-radius: .5rem`     → 8px, and `.panel-block`'s radius is 8px too

@@ -2,6 +2,7 @@
 question;answer;need;cover;weight
 *;*;;;0
 FINISH_STANDARD;PREMIUM;Ochrona wysokiego standardu wykończenia;FIXTURES;1
+HOME_ASSISTANCE;true;Pomoc fachowca przy awarii w domu;ASSISTANCE;3
 NEEDS_PROPERTY;true;Ochrona murów i mienia przed pożarem oraz innymi zdarzeniami losowymi;BUILDING;3
 NEED_FLOOD;true;Ochrona przed powodzią i zalaniem;FLOOD;3
 NEED_PORTABLE;true;Ochrona sprzętu przenośnego, także poza mieszkaniem;CONTENTS;3

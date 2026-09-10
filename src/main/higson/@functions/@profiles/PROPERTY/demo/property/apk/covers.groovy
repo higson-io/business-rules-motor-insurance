@@ -17,7 +17,7 @@ className = "io.higson.runtime.engine.core.context.ParamContext"
 
 def needs = higson.call('demo.property.apk.needs', ctx)
 def covers = new HashSet()
-if (needs == null || needs.isEmpty()) {
+if (needs.isEmpty()) {
 	return covers
 }
 for (def line in needs.split(';')) {

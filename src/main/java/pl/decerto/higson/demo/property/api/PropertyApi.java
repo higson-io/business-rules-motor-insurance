@@ -53,6 +53,21 @@ public class PropertyApi {
 	}
 
 	/**
+	 * Nowy proces — porzuca dotychczasowy wniosek i zaczyna od pustego.
+	 *
+	 * ⛔ `PUT`, nie `DELETE`: nic nie znika, wniosek jest ZASTĘPOWANY nowym. `DELETE` obiecywałby,
+	 * że po nim nie ma zasobu, a `GET /property` odpowie tak samo jak zawsze — świeżym wnioskiem.
+	 *
+	 * ⚠️ Wołane przy każdym wejściu do dema majątkowego. Bez tego sesja przenosi odpowiedzi między
+	 * pokazami: prowadzący wraca do wyboru dema, wchodzi ponownie i zastaje wypełnioną ankietę
+	 * poprzedniego klienta razem z jego ofertą.
+	 */
+	@PutMapping("/reset")
+	public void reset() {
+		quoteService.reset();
+	}
+
+	/**
 	 * Data początku ochrony. Trafia do engine.setEffectiveDate, więc przesunięcie jej przez
 	 * 1 lipca 2027 zmienia wersję regionu — a z nią zestaw pytań i reżim APK.
 	 *
@@ -136,7 +151,15 @@ public class PropertyApi {
 	/** ⛔ Wybór człowieka. Od tego momentu rekomendacja go nie nadpisuje — patrz `variantChosen`. */
 	@PutMapping("/variant")
 	public void setVariant(@RequestBody String variantCode) {
-		quoteService.getQuote().setSelectedVariant(variantCode);
-		quoteService.getQuote().setVariantChosen(true);
+		PropertyQuote quote = quoteService.getQuote();
+		// ⛔ SPRAWDZAMY, ZANIM ZAPISZEMY. Nieznany kod przyjęty tu z HTTP 200 wywracał dopiero
+		// NASTĘPNY `GET` i zostawiał wniosek zatruty na stałe — reguła sumy OC szuka wtedy
+		// elementu `VARIANTS[<kod>]`, którego nie ma. Odrzucenie z komunikatem kosztuje jedno
+		// przejście po liście, którą i tak mamy w ręku.
+		if (!property.hasVariant(variantCode)) {
+			throw new UnknownVariantException(variantCode);
+		}
+		quote.setSelectedVariant(variantCode);
+		quote.setVariantChosen(true);
 	}
 }

@@ -49,17 +49,21 @@ export interface PropertyQuestionDto {
 	readonly kind: QuestionKind;
 	readonly section: QuestionSection;
 	readonly position: number;
-	/** ⛔ Computed by the rules, never by this application. */
 	/**
-	 * Czy pytanie DOTYCZY tego klienta — sama reguła `IS_VISIBLE`.
+	 * Pola pytania ZŁOŻONEGO — grupa pyta o kilka rzeczy naraz.
 	 *
-	 * ⛔ To NIE jest „pokaż je teraz". Pytanie odrzucone tą regułą nie istnieje dla tego klienta
-	 * wcale; pytanie z `revealed: false` istnieje, tylko jeszcze nie przyszła jego pora. Licznik
-	 * postępu liczy po `visible`, ekran pokazuje `visible && revealed`.
+	 * ⛔ Pusta lista znaczy pytanie zwykłe. Zagnieżdżenie robi konwerter na granicy drutu; po
+	 * stronie Javy lista pytań zostaje PŁASKA, żeby wyszukanie po kodzie nie znało rodzica.
+	 */
+	readonly fields: readonly PropertyQuestionDto[];
+	/**
+	 * Czy o to pytanie pytamy TEGO klienta.
+	 *
+	 * ⛔ Rozstrzyga JEDNA reguła, kluczowana kodem pytania i odpowiedziami — bo zależność między
+	 * pytaniami to zależność od odpowiedzi, a te są w kontekście. „Pomoc fachowca tylko przy
+	 * wynajmie" jest wierszem tabeli, nie łańcuchem w kodzie.
 	 */
 	readonly visible: boolean;
-	/** Czy łańcuch `revealedBy` już do niego doszedł. */
-	readonly revealed: boolean;
 	readonly required: boolean;
 	readonly options: readonly string[];
 	readonly optionLabels: readonly string[];
@@ -88,9 +92,6 @@ export interface PropertyVariantDto {
 	readonly description: string | null;
 	readonly position: number;
 	readonly available: boolean;
-	/** Present exactly when `available` is false — the variant never disappears silently. */
-	readonly unavailableReason: string | null;
-	readonly liabilitySum: number | null;
 	readonly annualPremium: number | null;
 	readonly instalment: number | null;
 	readonly breakdown: Readonly<Record<string, number>>;
@@ -155,12 +156,18 @@ export interface PropertyPolicyholderDto {
 export interface PropertyQuoteDto {
 	readonly startDate: string;
 	readonly deductible: number;
+	/**
+	 * Franszyza narzucona przez strefę powodziową — warunek JEDNEGO pokrycia, nie polisy.
+	 *
+	 * ⛔ `deductible` powyżej to franszyza POLISY, wybrana przez klienta w kroku 2. Ta jest
+	 * narzucona regułą strefy i pokazuje się tylko wtedy, gdy wybrany pakiet niesie powódź.
+	 */
+	readonly floodDeductible: number | null;
 
 	readonly questions: readonly PropertyQuestionDto[];
 
 	readonly floodZone: string | null;
 	readonly theftZone: string | null;
-	readonly buildingAge: number | null;
 	readonly riskFactor: number | null;
 
 	readonly sumBuilding: number | null;
@@ -182,16 +189,11 @@ export interface PropertyQuoteDto {
 	readonly offer: PropertyOfferDto;
 	readonly policyholder: PropertyPolicyholderDto;
 	readonly selectedVariant: string | null;
-
 	/**
-	 * Odpowiedź, po której nie ma czego dalej analizować — dziś brak potrzeby ubezpieczenia
-	 * nieruchomości.
+	 * Czy wariant wybrał CZŁOWIEK.
 	 *
-	 * ⛔ Decyduje o tym tabela `demo.property.apk.question.blocker`, a treść komunikatu też
-	 * przychodzi z niej. Front nie zna ani pytania, ani odpowiedzi, która zamyka ścieżkę.
+	 * ⛔ To nie to samo co `selectedVariant !== null`: serwer podstawia pod `selectedVariant`
+	 * wariant rekomendowany, żeby ekran miał co pokazać, zanim klient cokolwiek kliknie.
 	 */
-	readonly blocked: boolean;
-	readonly blockMessage: string | null;
-	/** Kod pytania, którego odpowiedź zatrzymała analizę — ankieta zostaje przy nim. */
-	readonly blockedBy: string | null;
+	readonly variantChosen: boolean;
 }

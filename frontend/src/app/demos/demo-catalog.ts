@@ -21,33 +21,30 @@ export interface Demo {
 	/** Position in the story. Shown on the tile, because the sequence is the point. */
 	readonly step: string;
 	readonly name: string;
-	/** One line, shown under the name on the tile. Written to be read in sequence. */
-	readonly summary: string;
 }
+
+/*
+ * ⛔ OPISY KAFELKÓW USUNIĘTE 2026-09-09. Każdy kafelek niósł zdanie o tym, z czego demo jest
+ * zbudowane („pochodzą z tabel decyzyjnych, nie z kodu", „ten sam silnik sprzedaje…") — czyli
+ * reklamę narzędzia postawioną przed produktem, tę samą, którą §21 zdjął z ekranu majątkowego
+ * i zostawił tutaj jako otwartą pozycję. Numer i nazwa mówią, co wybierasz; z czego to zbudowane,
+ * pokazuje samo demo.
+ */
 
 export const DEMOS: readonly Demo[] = [
 	{
 		code: 'moto',
 		step: '01',
 		name: 'Ubezpieczenie komunikacyjne',
-		summary:
-			'Cena i zakres każdego wariantu pochodzą z tabel decyzyjnych, nie z kodu. Zmień cokolwiek po lewej — przelicza się na bieżąco.',
 	},
 	{
 		code: 'life',
 		step: '02',
 		name: 'Ubezpieczenie na życie',
-		summary:
-			'Ten sam silnik sprzedaje zupełnie inny produkt — a data polisy wybiera wersję taryfy i to, które świadczenia w ogóle istnieją.',
 	},
 	{
 		code: 'property',
 		step: '03',
-		// ⚠️ Opis mówi, CO klient tu przechodzi, a nie z czego zbudowane jest demo. Pozostałe dwa
-		// kafelki nadal opowiadają o silniku — do ujednolicenia, jeśli ekran wyboru też ma być
-		// pokazywany klientom.
 		name: 'Ubezpieczenie majątkowe',
-		summary:
-			'Analiza potrzeb klienta, dobór zakresu i oferta dla domu albo mieszkania — krok po kroku, tak jak u agenta.',
 	},
 ];

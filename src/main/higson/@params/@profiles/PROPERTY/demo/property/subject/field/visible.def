@@ -1,0 +1,37 @@
+code = "demo.property.subject.field.visible"
+description = "KROK DRUGI, w calosci: pietro nie dotyczy domu, material scian nie dotyczy mieszkania. Kluczuje sie kodem pola i ODPOWIEDZIA na inne pole tego samego kroku, wiec z analiza potrzeb nie ma nic wspolnego. Kolumna z kodem pola jest tu potrzebna, bo pola przedmiotu NIE SA elementami drzewa i nie maja gdzie niesc wskaznika - pytania APK maja wlasny atrybut IS_VISIBLE i wlasne reguly."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "O które pola przedmiotu pytamy przy tym rodzaju nieruchomości"
+
+[[inputLevel]]
+code = "field"
+label = "pole przedmiotu"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[inputLevel]]
+code = "propertyKind"
+label = "rodzaj nieruchomosci - odpowiedz PROPERTY_KIND"
+type = "string"
+reverseMatcher = false
+property = "quote.property.kind"
+source = "quote.property.kind"
+union = false
+
+[[outputLevel]]
+code = "visible"
+label = "czy pytamy"
+type = "boolean"
+external = false
+array = false

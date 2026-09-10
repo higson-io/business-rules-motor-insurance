@@ -7,14 +7,14 @@ refName = "demo.property.cover.assistance [capAbsolute]"
 [[attr]]
 attributeCode = "CAP_RATIO"
 attributeName = "Limit jako ulamek sumy"
-refType = "PARAMETER"
-refName = "demo.property.cover.assistance [capRatio]"
+refType = "LITERAL"
+refName = "0"
 
 [[attr]]
 attributeCode = "IS_AVAILABLE"
 attributeName = "Czy dostepne w tej sytuacji"
-refType = "PARAMETER"
-refName = "demo.property.cover.assistance [available]"
+refType = "LITERAL"
+refName = "true"
 
 [[attr]]
 attributeCode = "LIMIT"
@@ -49,8 +49,8 @@ refName = "demo.property.cover.assistance [rate]"
 [[attr]]
 attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
-refType = "PARAMETER"
-refName = "demo.property.cover.assistance [basis]"
+refType = "LITERAL"
+refName = "FLAT"
 
 [[attr]]
 attributeCode = "SUM"
@@ -63,9 +63,3 @@ attributeCode = "SUM_BASIS"
 attributeName = "Skad bierze sie suma"
 refType = "LITERAL"
 refName = "NONE"
-
-[[attr]]
-attributeCode = "UNAVAILABLE_REASON"
-attributeName = "Kod zdania o odmowie"
-refType = "PARAMETER"
-refName = "demo.property.cover.assistance [reason]"

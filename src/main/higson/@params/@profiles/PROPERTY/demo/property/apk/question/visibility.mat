@@ -1,6 +1,0 @@
-#matrix for parameter demo.property.apk.question.visibility
-question;kind;age;visible
-*;*;* - *;true
-FLOOR;HOUSE;* - *;false
-RENOVATED;*;* - 50;false
-WALL_MATERIAL;FLAT;* - *;false

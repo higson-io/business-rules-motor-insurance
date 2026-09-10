@@ -19,11 +19,14 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 		section: undefined as unknown as PropertyQuestionDto['section'],
 		code: 'Q',
 		text: 'Pytanie',
+		// ⚠️ Domyślnie PUSTE. Krótka etykieta i pola są nieobowiązkowe, a fixture ma odwzorowywać
+		// pytanie zwykłe — test pytania złożonego podaje `fields` jawnie i przez to widać, czego
+		// dotyczy.
+		fields: [],
 		kind: 'TEXT',
 		position: 10,
-		visible: true,
 		// ⚠️ Domyślnie odsłonięte: fixture bada renderowanie, a nie łańcuch odsłaniania.
-		revealed: true,
+		visible: true,
 		required: true,
 		options: [],
 		optionLabels: [],
@@ -36,14 +39,33 @@ function question(overrides: Partial<PropertyQuestionDto>): PropertyQuestionDto 
 	};
 }
 
+/**
+ * Pytanie złożone o jednym polu wymaganym i jednym nie.
+ *
+ * ⚠️ Osobna funkcja, bo dwa testy potrzebują tego samego kształtu z inną wartością pola —
+ * a `render` da się w jednym `it` wywołać tylko RAZ: zasób `PropertyStore` wystawia jedno
+ * żądanie na TestBed, więc drugie `expectOne('property')` nie ma czego dopasować.
+ */
+function compound(budget: string | null): PropertyQuestionDto {
+	return question({
+		code: 'EXPECTATIONS',
+		kind: 'GROUP' as PropertyQuestionDto['kind'],
+		required: true,
+		fields: [
+			question({ code: 'BUDGET', kind: 'MONEY', required: true, value: budget }),
+			question({ code: 'PROPERTY_VALUE', kind: 'MONEY', required: false, position: 20 }),
+		],
+	});
+}
+
 function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 	return {
 		startDate: '2026-08-21',
 		deductible: 0,
+		floodDeductible: null,
 		questions,
 		floodZone: 'Z0',
 		theftZone: 'T1',
-		buildingAge: 20,
 		riskFactor: 1,
 		sumBuilding: 100000,
 		sumFixtures: 20000,
@@ -95,9 +117,7 @@ function quote(questions: readonly PropertyQuestionDto[]): PropertyQuoteDto {
 			unmetNeeds: [],
 		},
 		selectedVariant: null,
-		blocked: false,
-		blockMessage: null,
-		blockedBy: null,
+		variantChosen: false,
 	};
 }
 
@@ -155,7 +175,7 @@ describe('Questionnaire', () => {
 		expect(element.querySelector('[data-question="BUDGET"]')).toBeNull();
 	});
 
-	it('does not render a hidden question at all — visibility is the rules’ answer, not ours', async () => {
+	it('does not render an unrevealed question at all — the chain is the rules’ answer, not ours', async () => {
 		const element = await render([
 			question({ code: 'AREA' }),
 			question({ code: 'WALL_MATERIAL', visible: false }),
@@ -164,7 +184,7 @@ describe('Questionnaire', () => {
 		expect(element.querySelector('[data-question="AREA"]')).not.toBeNull();
 		expect(
 			element.querySelector('[data-question="WALL_MATERIAL"]'),
-			'a hidden question must not reach the DOM — a hidden-but-present control still gets tabbed into',
+			'an unrevealed question must not reach the DOM — a hidden-but-present control still gets tabbed into',
 		).toBeNull();
 	});
 
@@ -189,15 +209,25 @@ describe('Questionnaire', () => {
 		).toBeNull();
 	});
 
-	it('shows the prefill source only where the server supplied one (recommendation 8.3)', async () => {
+	/**
+	 * ⛔ Zastąpił test „pokazuje źródło podpowiedzi tam, gdzie serwer je podał (rek. 8.3)".
+	 * Podpis „Podpowiedziane: …" zszedł z ekranu 2026-09-09 na decyzję właściciela dema.
+	 *
+	 * ⚠️ Test pilnuje teraz DECYZJI, a nie mechanizmu: `prefillSource` nadal przychodzi z serwera
+	 * i nadal jest w katalogu reguł, więc dopisanie podpisu z powrotem jest jedną linijką
+	 * w szablonie — i wyglądałoby jak naprawa brakującej funkcji, a nie cofnięcie decyzji.
+	 */
+	it('does not print the prefill source, even when the server sends one', async () => {
 		const element = await render([
 			question({ code: 'AREA', prefillSource: 'Metraż z poprzedniej polisy' }),
 			question({ code: 'POSTCODE', position: 20 }),
 		]);
 
-		const notes = element.querySelectorAll('[data-testid="property-prefill"]');
-		expect(notes.length, 'an empty prefill source means the client answered, not "unknown"').toBe(1);
-		expect(notes[0].textContent).toContain('Metraż z poprzedniej polisy');
+		expect(element.querySelector('[data-question="AREA"]')).not.toBeNull();
+		expect(
+			element.textContent,
+			'źródło podpowiedzi zdjęte z ekranu — nie przywracać bez decyzji',
+		).not.toContain('Metraż z poprzedniej polisy');
 	});
 
 	/**
@@ -219,6 +249,96 @@ describe('Questionnaire', () => {
 
 		const next = element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement;
 		expect(next.disabled, 'nieobowiązkowe wolno pominąć').toBe(false);
+	});
+
+	/**
+	 * ⛔ Pytanie ZŁOŻONE jest JEDNYM pytaniem o kilku polach. Test pilnuje trzech rzeczy naraz,
+	 * bo każda z nich osobno da się zepsuć tą samą pomyłką — potraktowaniem pól jak pytań:
+	 * licznik ma mówić „1 z 1", pola mają się pojawić w DOM, a rodzic NIE ma mieć własnej
+	 * kontrolki, bo nie ma ścieżki kontekstu, pod którą wylądowałaby odpowiedź.
+	 */
+	it('renders a compound question as one question with several fields', async () => {
+		const element = await render(
+			[
+				question({
+					code: 'EXPECTATIONS',
+					text: 'Twoje oczekiwania wobec ochrony',
+					kind: 'GROUP' as PropertyQuestionDto['kind'],
+					required: false,
+					fields: [
+						question({ code: 'BUDGET', text: 'Oczekiwana składka', kind: 'MONEY', required: false }),
+						question({
+							code: 'PROPERTY_VALUE',
+							text: 'Wartość nieruchomości',
+							kind: 'MONEY',
+							required: false,
+							position: 20,
+						}),
+					],
+				}),
+			],
+			'NEEDS',
+		);
+
+		expect(element.textContent, 'pola nie są osobnymi pytaniami').toContain('Pytanie 1 z 1');
+		expect(element.querySelector('[data-question="BUDGET"]')).not.toBeNull();
+		expect(element.querySelector('[data-question="PROPERTY_VALUE"]')).not.toBeNull();
+		expect(
+			element.querySelectorAll('[data-question="EXPECTATIONS"] > .apk__body > input').length,
+			'rodzic nie ma własnej kontrolki — jego `kind` to GROUP',
+		).toBe(0);
+	});
+
+	/**
+	 * ⛔ Domknięcie pytania złożonego liczy się po POLACH, a nie po odpowiedzi pod kodem rodzica —
+	 * pod tym kodem żadna nigdy nie wyląduje. Ta sama reguła stoi po stronie serwera
+	 * (`Property.allRequiredAnswered`) i prowadzi łańcuch odsłaniania.
+	 *
+	 * ⚠️ Test celuje w mutację, która przechodzi najłatwiej: `settled()` czytające `question.value`
+	 * rodzica zamiast pól. Wtedy „Dalej" byłoby wyłączone także po wypełnieniu pola wymaganego.
+	 */
+	it('will not advance a compound question while its required field is empty', async () => {
+		const element = await render([compound(null)], 'NEEDS');
+
+		expect(
+			(element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement).disabled,
+			'pole wymagane jest puste — nie ma dokąd iść',
+		).toBe(true);
+	});
+
+	it('advances a compound question once its required field is answered', async () => {
+		const element = await render([compound('3000')], 'NEEDS');
+
+		expect(
+			(element.querySelector('[data-testid="apk-next"]') as HTMLButtonElement).disabled,
+			'pole wymagane wypełnione — pytanie domknięte',
+		).toBe(false);
+	});
+
+	/**
+	 * ⛔ Spis pytań liczy po REGULE widoczności, nie po odsłonięciu. Spis, który rośnie w trakcie
+	 * odpowiadania, przestaje mówić, ile jeszcze zostało — a to jego jedyne zadanie.
+	 *
+	 * ⚠️ Etykietą pozycji spisu jest TREŚĆ pytania — czyli dla kroku 1 nazwa grupy, bo to grupy są
+	 * jego pozycjami. Zapasowej nazwy w kodzie nie ma i to jest decyzja, a nie przeoczenie.
+	 */
+	it('lists every question of the step in the outline, revealed or not', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', text: 'Potrzeba ubezpieczenia' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20, visible: false }),
+			],
+			'NEEDS',
+		);
+
+		expect(element.querySelectorAll('.apk__outline__item').length).toBe(2);
+		expect(element.querySelector('[data-testid="apk-outline-NEEDS_PROPERTY"]')?.textContent)
+			.toContain('Potrzeba ubezpieczenia');
+		expect(
+			(element.querySelector('[data-testid="apk-outline-NEED_THEFT"]') as HTMLButtonElement)
+				.disabled,
+			'nieodsłonięte jest widoczne, ale nieklikalne — łańcuch jest konfiguracją',
+		).toBe(true);
 	});
 
 	it('still blocks a required question until it is answered', async () => {
@@ -244,7 +364,7 @@ describe('Questionnaire', () => {
 			[
 				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN' }),
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
-				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, visible: false }),
 			],
 			'NEEDS',
 		);
@@ -268,7 +388,7 @@ describe('Questionnaire', () => {
 			[
 				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', value: 'true' }),
 				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
-				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, revealed: false }),
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', position: 30, visible: false }),
 			],
 			'NEEDS',
 		);

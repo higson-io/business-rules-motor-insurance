@@ -42,4 +42,19 @@ export class PropertyStore {
 	recalculate(): void {
 		this.quote.reload();
 	}
+
+	/**
+	 * Nowy proces: serwer porzuca wniosek, ekran wczytuje pusty.
+	 *
+	 * ⛔ Wołane przy KAŻDYM wejściu do dema, nie z przycisku. Sesja HTTP żyje dłużej niż pokaz —
+	 * prowadzący wraca do wyboru dema, wchodzi ponownie i bez tego zastaje ankietę poprzedniego
+	 * klienta razem z jego ofertą. Na prezentacji resztka po poprzednim przejściu jest myląca
+	 * w sposób, którego nie da się na żywo wytłumaczyć.
+	 *
+	 * ⚠️ `commit`, nie samo `reload()`: kolejność jest tu wszystkim. GET przed zakończeniem PUT-a
+	 * przyniósłby stary wniosek i ekran pokazałby dane, które właśnie kazaliśmy skasować.
+	 */
+	async startNewProcess(): Promise<void> {
+		await this.commit(firstValueFrom(this.propertyService.reset()));
+	}
 }

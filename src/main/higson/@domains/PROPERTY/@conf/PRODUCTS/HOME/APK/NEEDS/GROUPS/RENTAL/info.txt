@@ -1,0 +1,3 @@
+name = "Wynajem"
+description = "Krok 5 ankiety."
+tags = []

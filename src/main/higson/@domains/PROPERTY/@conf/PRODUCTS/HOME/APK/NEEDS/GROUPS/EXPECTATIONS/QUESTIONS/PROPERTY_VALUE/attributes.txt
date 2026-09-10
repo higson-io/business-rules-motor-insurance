@@ -1,0 +1,35 @@
+[[attr]]
+attributeCode = "CONTEXT_PATH"
+attributeName = "Gdzie laduje odpowiedz"
+refType = "LITERAL"
+refName = "quote.needs.propertyValue"
+
+[[attr]]
+attributeCode = "IS_VISIBLE"
+attributeName = "Czy pytamy o to TEGO klienta"
+refType = "LITERAL"
+refName = "true"
+
+[[attr]]
+attributeCode = "KIND"
+attributeName = "Rodzaj odpowiedzi - z niego wynika tez, z czego wybierac"
+refType = "LITERAL"
+refName = "MONEY"
+
+[[attr]]
+attributeCode = "POSITION"
+attributeName = "Kolejnosc w ankiecie"
+refType = "LITERAL"
+refName = "252"
+
+[[attr]]
+attributeCode = "REQUIRED"
+attributeName = "Czy odpowiedz jest obowiazkowa"
+refType = "LITERAL"
+refName = "false"
+
+[[attr]]
+attributeCode = "TEXT"
+attributeName = "Tresc pytania zadawanego klientowi"
+refType = "LITERAL"
+refName = "Na ile szacujesz wartość swojej nieruchomości?"

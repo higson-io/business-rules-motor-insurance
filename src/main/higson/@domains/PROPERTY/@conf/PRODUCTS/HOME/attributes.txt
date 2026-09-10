@@ -1,38 +1,50 @@
 [[attr]]
-attributeCode = "APK_REGIME"
-attributeName = "Rezim analizy potrzeb"
-refType = "PARAMETER"
-refName = "demo.property.apk.regime [name]"
-
-[[attr]]
-attributeCode = "CHOICE_KIND"
-attributeName = "Czy wybor klienta zgadza sie z rekomendacja"
-refType = "PARAMETER"
-refName = "demo.property.offer.choiceKind [kind]"
-
-[[attr]]
 attributeCode = "CHOICE_NOTE"
 attributeName = "Tresc notatki o wyborze"
 refType = "PARAMETER"
-refName = "demo.property.offer.choice [text]"
+refName = "demo.property.offer.choice"
 
 [[attr]]
-attributeCode = "FREEZE_ISSUED_OFFER"
-attributeName = "Czy wystawiona oferta jest niezmienna"
+attributeCode = "CHOICE_RELATION"
+attributeName = "Jak wybor klienta ma sie do rekomendacji"
+refType = "PARAMETER"
+refName = "demo.property.offer.choiceKind"
+
+[[attr]]
+attributeCode = "COVER_PERIOD"
+attributeName = "Dlugosc okresu ochrony w miesiacach"
+refType = "PARAMETER"
+refName = "demo.property.factor.period"
+
+[[attr]]
+attributeCode = "FIELD_VISIBILITY"
+attributeName = "O ktore pola pytamy przy tym rodzaju nieruchomosci"
+refType = "PARAMETER"
+refName = "demo.property.subject.field.visible"
+
+[[attr]]
+attributeCode = "OFFER_NEEDS_ANALYSIS"
+attributeName = "Czy oferta niesie dokument analizy potrzeb"
 refType = "LITERAL"
 refName = "true"
 
 [[attr]]
-attributeCode = "OFFER_TERMS"
-attributeName = "Warunki oferty"
-refType = "PARAMETER"
-refName = "demo.property.offer.terms"
+attributeCode = "OFFER_PAYMENT_DAYS"
+attributeName = "Termin platnosci w dniach od wystawienia"
+refType = "LITERAL"
+refName = "14"
 
 [[attr]]
-attributeCode = "OVERWRITE_MANUAL_SUM"
-attributeName = "Czy wyliczenie nadpisuje sume podana recznie"
+attributeCode = "OFFER_STATEMENT"
+attributeName = "Oswiadczenie klienta przy akceptacji"
 refType = "LITERAL"
-refName = "false"
+refName = "Potwierdzam otrzymanie OWU oraz dokumentu analizy potrzeb wraz z pisemnym uzasadnieniem rekomendacji i akceptuję warunki oferty."
+
+[[attr]]
+attributeCode = "OFFER_VALIDITY_DAYS"
+attributeName = "Waznosc oferty w dniach"
+refType = "LITERAL"
+refName = "30"
 
 [[attr]]
 attributeCode = "RISK_FACTOR"
@@ -41,7 +53,25 @@ refType = "FLOW"
 refName = "demo.property.risk.calculate"
 
 [[attr]]
+attributeCode = "SUBJECT_FIELDS"
+attributeName = "Katalog pol przedmiotu ubezpieczenia"
+refType = "PARAMETER"
+refName = "demo.property.subject.field"
+
+[[attr]]
 attributeCode = "SUM_INSURED"
 attributeName = "Suma ubezpieczenia z metrazu i stawki"
 refType = "FUNCTION"
 refName = "demo.property.sum.suggest"
+
+[[attr]]
+attributeCode = "SUM_RATE"
+attributeName = "Stawka za metr kwadratowy"
+refType = "PARAMETER"
+refName = "demo.property.sum.ratePerSqm"
+
+[[attr]]
+attributeCode = "ZONES"
+attributeName = "Strefy powodziowa i kradziezowa z kodu pocztowego"
+refType = "FUNCTION"
+refName = "demo.property.zone.resolve"

@@ -70,6 +70,18 @@ Two traps this pinning exists to prevent:
 
 *Evidence:* `frontend/package.json` — 8 exact `@angular/*` pins plus `rxjs` and `typescript`; carets only on `jsdom`, `less`, `prettier`, `vitest`.
 
+### The Dev Server Proxy Carries the Context Path and Rewrites the Session Cookie
+
+`ng serve` reaches the API through `frontend/proxy.conf.json`, and two things in it are load-bearing rather than cosmetic. Both were wrong until 2026-09-09, which is why the dev server had not been usable for any demo.
+
+**Every target must include the `/demo` context path.** The application runs under `server.servlet.context-path=/demo`; a target of `http://localhost:48080` returns Tomcat's 404 page, and the SPA renders "Nie udało się wczytać wyceny" — a failure that looks like a broken frontend and is not.
+
+**Every entry needs `"cookiePathRewrite": "/"`.** Tomcat issues `JSESSIONID` with `Path=/demo`, while through the proxy the browser sees URLs under `/`, so it never sends the cookie back and **every request starts a new session**. With a `@SessionScope` quote service that means each answer lands in a fresh quote and vanishes: the questionnaire sits on question one while every `PUT` returns 200.
+
+⚠️ That symptom is indistinguishable from a lost event in the component, and that is where the search starts. Before debugging a control that "does not save", check whether the session cookie is coming back.
+
+**And every controller root must be listed.** The roots are the `@RequestMapping` values on the `*Api` classes; a missing one is silently proxied nowhere. Until 2026-09-09 only the four motor roots were present, so neither the life nor the property demo could run under `ng serve` at all.
+
 ### The Node Range Is Enforced by the Workspace, Not by the Repository
 `frontend/package.json` declares `"engines": { "node": "^22.22.3 || ^24.15.0 || >=26.0.0" }` and `frontend/.npmrc` sets `engine-strict=true`, so `npm ci` fails early with a readable message on an unsupported Node.
 

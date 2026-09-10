@@ -34,4 +34,20 @@ public class PropertyQuoteService {
 	public PropertyQuote getQuote() {
 		return sessionQuote;
 	}
+
+	/**
+	 * Nowy proces — od pustego wniosku.
+	 *
+	 * ⛔ Buduje wniosek OD NOWA, a nie czyści pola po jednym. Wniosek niesie odpowiedzi, sumy,
+	 * wybrany wariant, numer oferty i stan wystawienia; czyszczenie po polu wymagałoby pamiętania
+	 * o każdym nowym, a przeoczone zostawałoby na ekranie następnej prezentacji. To jest dokładnie
+	 * ten rodzaj resztki, o który poszło zgłoszenie: „na demo może to być mylące, jak nam coś
+	 * zostanie".
+	 *
+	 * ⚠️ Sesja HTTP zostaje ta sama — wymieniamy jej zawartość, nie ją samą. Unieważnienie sesji
+	 * wywróciłoby też pozostałe dwa dema, które dzielą tę samą sesję i o niczym nie wiedzą.
+	 */
+	public void reset() {
+		sessionQuote = property.createQuote();
+	}
 }

@@ -1,0 +1,84 @@
+code = "demo.property.subject.field"
+description = "Jeden wiersz na POLE PRZEDMIOTU UBEZPIECZENIA - krok drugi, dane zbierane poza analiza potrzeb. Wszystko, co jest o polu stale: tresc, rodzaj odpowiedzi, gdzie ona laduje, kolejnosc, czy obowiazkowe, z czego wybierac, skad podpowiedz i odpowiedz na starcie demo. Czy pole zadajemy TEMU klientowi, mowi ta sama regula co dla pytan analizy potrzeb - kluczowana odpowiedziami z kontekstu. Pola przedmiotu nie sa elementami drzewa, wiec opisuje je tabela."
+nullable = false
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Katalog pól przedmiotu ubezpieczenia"
+
+[[inputLevel]]
+code = "field"
+label = "pole przedmiotu"
+type = "string"
+reverseMatcher = false
+property = "question.code"
+source = "question.code"
+union = false
+
+[[outputLevel]]
+code = "position"
+label = "kolejnosc"
+type = "integer"
+external = false
+array = false
+
+[[outputLevel]]
+code = "required"
+label = "obowiazkowe"
+type = "boolean"
+external = false
+array = false
+
+[[outputLevel]]
+code = "options"
+label = "kody mozliwych odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "labels"
+label = "etykiety mozliwych odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "prefill"
+label = "zrodlo podpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "demoAnswer"
+label = "odpowiedz na starcie demo"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "text"
+label = "tresc pytania"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "kind"
+label = "rodzaj odpowiedzi"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "contextPath"
+label = "gdzie laduje odpowiedz"
+type = "string"
+external = false
+array = false

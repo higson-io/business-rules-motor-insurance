@@ -9,10 +9,10 @@ import { PropertyQuoteDto } from '../models/property';
 const QUOTE: PropertyQuoteDto = {
 	startDate: '2026-08-21',
 	deductible: 0,
+	floodDeductible: null,
 	questions: [],
 	floodZone: 'Z0',
 	theftZone: 'T1',
-	buildingAge: 20,
 	riskFactor: 1,
 	sumBuilding: 474000,
 	sumFixtures: 104280,
@@ -64,9 +64,7 @@ const QUOTE: PropertyQuoteDto = {
 			unmetNeeds: [],
 	},
 	selectedVariant: null,
-	blocked: false,
-	blockMessage: null,
-	blockedBy: null,
+	variantChosen: false,
 };
 
 describe('PropertyStore', () => {

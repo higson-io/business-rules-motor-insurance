@@ -20,7 +20,12 @@
 -->
 <app-property-client />
 
-<app-step-bar [steps]="steps" [current]="step()" (selected)="goTo($event)" />
+<app-step-bar
+	[steps]="steps()"
+	[current]="step()"
+	appearance="plain"
+	(selected)="goTo($event)"
+/>
 
 <div class="property">
 	<div class="property__work">
@@ -28,7 +33,7 @@
 			@case ('apk') {
 				<!--
 					⛔ ANKIETA, NIE FORMULARZ: jedno pytanie na ekran, kolejne odsłaniane po domknięciu
-					poprzedniego. Łańcuch jest kolumną `revealedBy` w katalogu pytań, a nie kolejnością
+					poprzedniego. Warunek jest wierszem reguły widoczności, a nie kolejnością
 					w tym pliku.
 
 					⛔ Nawigacja NALEŻY DO ANKIETY, nie do gospodarza — „Dalej" przechodzi między
@@ -52,7 +57,18 @@
 					<button type="button" class="step-nav__back" (click)="goTo('apk')">
 						← Wróć do analizy potrzeb
 					</button>
-					<button type="button" class="step-nav__next" data-testid="to-proposal" (click)="goTo('proposal')">
+					<!--
+						⛔ Bramkowany tak samo jak pasek kroków. Przycisk otwarty przy zamkniętej
+						zakładce dawałby dwie odpowiedzi na to samo pytanie — a klient uwierzyłby
+						temu, który jest większy i zielony.
+					-->
+					<button
+						type="button"
+						class="step-nav__next"
+						data-testid="to-proposal"
+						[disabled]="!subjectComplete()"
+						(click)="goTo('proposal')"
+					>
 						Zobacz rekomendację i składkę →
 					</button>
 				</div>
@@ -82,7 +98,19 @@
 					<button type="button" class="step-nav__back" (click)="goTo('subject')">
 						← Wróć do przedmiotu ubezpieczenia
 					</button>
-					<button type="button" class="step-nav__next" data-testid="to-offer" (click)="goTo('offer')">
+					<!--
+						⛔ Otwiera się dopiero po WYBRANIU wariantu, nie po obejrzeniu propozycji.
+						Rekomendacja wskazuje wariant od razu, ale propozycja to nie wybór — i to
+						ta różnica sprawiała, że oferta wyglądała na wystawioną, zanim klient
+						cokolwiek powiedział.
+					-->
+					<button
+						type="button"
+						class="step-nav__next"
+						data-testid="to-offer"
+						[disabled]="!variantChosen()"
+						(click)="goTo('offer')"
+					>
 						Przejdź do oferty →
 					</button>
 				</div>
@@ -111,12 +139,18 @@
 	</div>
 
 	<!--
-		Podsumowanie towarzyszy przedmiotowi ubezpieczenia i propozycji, ale NIE ankiecie: podczas
-		odpowiadania na pytania o potrzeby sumy jeszcze nic nie znaczą, a migotanie liczb odciąga
-		od pytań. Na kroku przedmiotu jest odwrotnie — tam każda zmiana metrażu czy kodu
-		pocztowego ma być widać natychmiast, bo to jest cały sens tego kroku.
+		Podsumowanie stoi WYŁĄCZNIE przy propozycji.
+
+		⛔ Zeszło z kroku przedmiotu ubezpieczenia 2026-09-09. Stało tam z uzasadnieniem, że każda
+		zmiana metrażu czy kodu pocztowego ma być widać natychmiast — argument prawdziwy, ale
+		przegrywa z tym, ile kosztuje: trzynaście pól ściśniętych w dwie wąskie kolumny obok
+		szpalty, na którą przez większość kroku nikt nie patrzy, bo sumy zmieniają się po jednym
+		czy dwóch polach z trzynastu. Bez niej formularz dostaje całą szerokość karty.
+
+		⛔ Przy ANKIECIE go nie ma i nie było: podczas odpowiadania na pytania o potrzeby sumy
+		jeszcze nic nie znaczą, a migotanie liczb odciąga od pytań.
 	-->
-	@if (ready() && (step() === 'subject' || step() === 'proposal')) {
+	@if (ready() && step() === 'proposal') {
 		<aside class="property__summary" data-testid="property-summary">
 			<h2 class="property__summary-title">Podsumowanie</h2>
 
@@ -141,6 +175,24 @@
 				<dt>Strefa powodziowa</dt>
 				<dd data-testid="property-flood-zone">{{ floodZone() }}</dd>
 			</dl>
+
+			<!--
+				Kafelek wariantu proponowanego. Opis niosło `PropertyVariantDto.description` — pole
+				istniało w modelu i nie było czytane przez żaden ekran, dopóki makieta nie dała mu
+				miejsca.
+
+				⛔ „proponowany", nie „rekomendowany". Makieta używa w tym kafelku drugiego słowa,
+				a w badge'u nad kolumną tabeli pierwszego — na jednym ekranie, o tym samym
+				wariancie. Wybrane jest to, którym mówi reszta aplikacji od §30.
+			-->
+			@if (recommendedVariant(); as proposed) {
+				<div class="property__variant" data-testid="property-proposed-variant">
+					<p class="property__variant-name">Wariant {{ proposed.name }} (proponowany)</p>
+					@if (proposed.description) {
+						<p class="property__variant-note">{{ proposed.description }}</p>
+					}
+				</div>
+			}
 
 			<!--
 				⛔ Tylko gdy wybór RÓŻNI SIĘ od propozycji — patrz `choiceDiffers`. Dopóki klient

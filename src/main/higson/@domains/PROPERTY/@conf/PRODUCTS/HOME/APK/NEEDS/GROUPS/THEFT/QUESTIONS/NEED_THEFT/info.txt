@@ -1,0 +1,3 @@
+name = "Kradzież"
+description = "Pytanie 2 ze specyfikacji."
+tags = []

@@ -1,0 +1,5 @@
+#matrix for parameter demo.property.subject.field.visible
+field;propertyKind;visible
+*;*;true
+FLOOR;HOUSE;false
+WALL_MATERIAL;FLAT;false

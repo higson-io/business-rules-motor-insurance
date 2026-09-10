@@ -1,32 +1,26 @@
 [[attr]]
 attributeCode = "CAP_ABSOLUTE"
 attributeName = "Limit kwotowy"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [capAbsolute]"
+refType = "LITERAL"
+refName = "0"
 
 [[attr]]
 attributeCode = "CAP_RATIO"
 attributeName = "Limit jako ulamek sumy"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [capRatio]"
+refType = "LITERAL"
+refName = "0"
 
 [[attr]]
 attributeCode = "IS_AVAILABLE"
 attributeName = "Czy dostepne w tej sytuacji"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [available]"
+refType = "LITERAL"
+refName = "true"
 
 [[attr]]
 attributeCode = "LIMIT"
 attributeName = "Efektywny limit odpowiedzialnosci"
 refType = "FUNCTION"
 refName = "demo.property.limit.effective"
-
-[[attr]]
-attributeCode = "LIMIT_LABEL"
-attributeName = "Opis limitu dla klienta"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [capLabel]"
 
 [[attr]]
 attributeCode = "POSITION"
@@ -49,8 +43,8 @@ refName = "demo.property.cover.building [rate]"
 [[attr]]
 attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [basis]"
+refType = "LITERAL"
+refName = "SUM"
 
 [[attr]]
 attributeCode = "SUM"
@@ -63,9 +57,3 @@ attributeCode = "SUM_BASIS"
 attributeName = "Skad bierze sie suma"
 refType = "LITERAL"
 refName = "COMPUTED"
-
-[[attr]]
-attributeCode = "UNAVAILABLE_REASON"
-attributeName = "Kod zdania o odmowie"
-refType = "PARAMETER"
-refName = "demo.property.cover.building [reason]"

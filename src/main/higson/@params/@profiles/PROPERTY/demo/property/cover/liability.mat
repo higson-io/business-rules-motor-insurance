@@ -1,4 +1,4 @@
 #matrix for parameter demo.property.cover.liability
-sum;rate;basis;available;reason;capRatio;capAbsolute;capLabel
-* - 500000;0.09;SUM;true;;0;0;
-500000 - *;0.07;SUM;true;;0;0;
+sum;rate
+* - 500000;0.09
+500000 - *;0.07

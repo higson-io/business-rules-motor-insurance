@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import pl.decerto.higson.demo.motor.api.dto.ErrorDto;
+import pl.decerto.higson.demo.property.api.UnknownVariantException;
 
 /**
  * C-6 / DR-14. This used to be a plain {@code @ControllerAdvice} returning a {@code String} without
@@ -26,6 +27,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InvalidDriverDataException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public ErrorDto handleInvalidDriverDataException(InvalidDriverDataException e) {
+		return new ErrorDto(e.getMessage());
+	}
+
+	@ExceptionHandler(UnknownVariantException.class)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public ErrorDto handleUnknownVariantException(UnknownVariantException e) {
 		return new ErrorDto(e.getMessage());
 	}
 }

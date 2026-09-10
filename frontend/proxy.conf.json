@@ -1,18 +1,56 @@
 {
+	"//": [
+		"Serwer deweloperski przekazuje wywołania API do aplikacji uruchomionej z WAR-a.",
+		"",
+		"⛔ TARGET MUSI NIEŚĆ KONTEKST /demo. Aplikacja startuje pod ścieżką kontekstu `/demo`",
+		"(patrz `server.servlet.context-path`), więc `http://localhost:48080` bez tego przedrostka",
+		"trafia w 404 — a `ng serve` odpowiada wtedy stroną błędu Tomcata zamiast JSON-em, przez co",
+		"ekran pokazuje baner „Nie udało się wczytać wyceny\" i wygląda na zepsuty front.",
+		"",
+		"⛔ KAŻDY KORZEŃ KONTROLERA MUSI TU BYĆ. Do 2026-09-09 lista obejmowała tylko cztery korzenie",
+		"motoryzacyjne, więc serwera deweloperskiego nie dało się użyć ani do dema życiowego, ani do",
+		"majątkowego. Korzenie są w adnotacjach `@RequestMapping` klas `*Api`.",
+		"",
+		"⛔ cookiePathRewrite JEST OBOWIĄZKOWY, nie kosmetyczny. Tomcat wystawia JSESSIONID ze",
+		"ścieżką /demo, a przez proxy przeglądarka widzi adresy pod / — więc ciasteczka nie odsyła",
+		"i KAŻDE żądanie zakłada nową sesję. QuoteService jest @SessionScope, czyli każda odpowiedź",
+		"lądowała w świeżej wycenie i natychmiast przepadała: ankieta stała na pierwszym pytaniu,",
+		"mimo że PUT wracał z 200. Objaw wygląda jak zgubione zdarzenie w komponencie i tam też",
+		"najpierw się go szuka — a wina jest w tej linijce."
+	],
 	"/driver": {
-		"target": "http://localhost:48080",
-		"secure": false
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
 	},
 	"/vehicle": {
-		"target": "http://localhost:48080",
-		"secure": false
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
 	},
 	"/dictionaries": {
-		"target": "http://localhost:48080",
-		"secure": false
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
 	},
 	"/quote": {
-		"target": "http://localhost:48080",
-		"secure": false
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
+	},
+	"/life": {
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
+	},
+	"/property": {
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
+	},
+	"/profilers": {
+		"target": "http://localhost:48080/demo",
+		"secure": false,
+		"cookiePathRewrite": "/"
 	}
 }

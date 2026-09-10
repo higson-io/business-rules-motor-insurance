@@ -1,5 +1,5 @@
 code = "demo.property.cover.contents"
-description = "Wlasna tabela pokrycia. Stawka zalezy od STANDARDU WYKONCZENIA, bo mieszkanie wykonczone wysoko jest zwykle tez wyposazone wysoko. Limit gotowki - 10% sumy, nie wiecej niz 10 000 zl - to zapis z OWU, ktory klient poznaje zwykle dopiero przy szkodzie."
+description = "Stawka w promilach sumy, rozna wedlug standardu wykonczenia. Tabela trzyma TYLKO to, co zmienia sie z tym standardem - dostepnosc, podstawa stawki i limit gotowki sa stale dla tego pokrycia i stoja na jego elemencie w drzewie."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,7 +9,7 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Ruchomosci domowe - warunki pokrycia"
+label = "Stawka za ruchomosci domowe"
 
 [[inputLevel]]
 code = "finish"
@@ -22,49 +22,7 @@ union = false
 
 [[outputLevel]]
 code = "rate"
-label = "stawka"
+label = "stawka w promilach sumy"
 type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "basis"
-label = "podstawa stawki"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "available"
-label = "dostepne"
-type = "boolean"
-external = false
-array = false
-
-[[outputLevel]]
-code = "reason"
-label = "kod zdania o odmowie"
-type = "string"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capRatio"
-label = "limit jako ulamek sumy"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capAbsolute"
-label = "limit kwotowy"
-type = "number"
-external = false
-array = false
-
-[[outputLevel]]
-code = "capLabel"
-label = "opis limitu dla klienta"
-type = "string"
 external = false
 array = false

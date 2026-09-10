@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Suma murow jako iloczyn metrazu i stawki odtworzeniowej, sumy pochodne jako jej ulamek. Mechanizm rynkowy - OWU Generali par. 27."
+description = "Suma murow jako iloczyn metrazu i stawki odtworzeniowej, sumy pochodne jako jej ulamek. Mechanizm rynkowy - OWU Generali par. 27. Trzy sumy naraz, bo licza sie na poziomie calej wyceny, zanim wiadomo cokolwiek o pokryciach: pokrycie bierze potem swoja z kontekstu przez SUM_BASIS."
 
 [[arguments]]
 name = "ctx"
@@ -20,25 +20,14 @@ if (area == null || area <= 0) {
 	throw new RuntimeException('Brak powierzchni uzytkowej - nie da sie wyliczyc sumy ubezpieczenia')
 }
 
-// getDecimal, nie getNumber: brak stawki ma byc bledem, a nie cicha suma zero.
 def rate = higson.getDecimal('demo.property.sum.ratePerSqm', ctx)
-if (rate == null) {
-	throw new RuntimeException('Brak stawki odtworzeniowej dla tej lokalizacji i standardu')
-}
-
 def building = math.round(area * rate, 0)
-def standard = ctx.getString('quote.property.finishStandard')
 
-def fixturesRatio = higson.getDecimal('demo.property.sum.derivedRatio',
-		higson.createContext('cover.code', 'FIXTURES', 'quote.property.finishStandard', standard))
-def contentsRatio = higson.getDecimal('demo.property.sum.derivedRatio',
-		higson.createContext('cover.code', 'CONTENTS', 'quote.property.finishStandard', standard))
+def ratios = higson.getValue('demo.property.sum.derivedRatio', ctx)
+def fixturesRatio = ratios.get(0, 'fixtures')
+def contentsRatio = ratios.get(0, 'contents')
 
-return type.paramValue()
-		.withCodes('building', 'fixtures', 'contents', 'rate')
-		.withTypes('number', 'number', 'number', 'number')
-		.addValues(building,
-				math.round(building * fixturesRatio, 0),
-				math.round(building * contentsRatio, 0),
-				rate)
-		.create()
+def fixtures = math.round(building * fixturesRatio, 0)
+def contents = math.round(building * contentsRatio, 0)
+
+return [building: building, fixtures: fixtures, contents: contents]

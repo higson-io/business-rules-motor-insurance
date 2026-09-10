@@ -20,18 +20,18 @@ if (answers == null || answers.isEmpty()) {
 	return ''
 }
 
-// Klucz to POKRYCIE, nie pytanie: dwie rozne odpowiedzi moga wolac o to samo pokrycie
-// (brak zabezpieczen i nieruchomosc sezonowo pusta obie wolaja o kradziez).
-def byCover = new LinkedHashMap()
+def strongestByCover = new LinkedHashMap()
 
 for (def pair in answers.split(';')) {
 	def sep = pair.indexOf('=')
 	if (sep < 1) {
 		continue
 	}
-	def row = higson.getValue('demo.property.apk.answer', higson.createContext(
-			'question.code', pair.substring(0, sep),
-			'answer.value', pair.substring(sep + 1)))
+
+	def questionCode = pair.substring(0, sep)
+	def answerValue = pair.substring(sep + 1)
+	def answerCtx = higson.createContext('question.code', questionCode, 'answer.value', answerValue)
+	def row = higson.getValue('demo.property.apk.answer', answerCtx)
 
 	def need = row.get(0, 'need')
 	def cover = row.get(0, 'cover')
@@ -44,18 +44,15 @@ for (def pair in answers.split(';')) {
 		weight = 0
 	}
 
-	// WYGRYWA WYZSZA WAGA. Bez tego o tresci potrzeby decydowalaby kolejnosc odpowiedzi, czyli
-	// kolejnosc pytan na ekranie - a klient przeczytalby raz "pilna potrzeba ochrony przed
-	// kradzieza", raz "ochrona nieruchomosci okresowo pustej", zaleznie od tego, o co zapytano
-	// wczesniej.
-	def current = byCover.get(cover.toString())
+	def coverCode = cover.toString()
+	def current = strongestByCover.get(coverCode)
 	if (current == null || current.weight < weight) {
-		byCover.put(cover.toString(), [need: need.toString(), weight: weight])
+		strongestByCover.put(coverCode, [need: need.toString(), weight: weight])
 	}
 }
 
 def lines = []
-for (def entry in byCover.entrySet()) {
+for (def entry in strongestByCover.entrySet()) {
 	lines.add(entry.key + '|' + entry.value.need + '|' + entry.value.weight)
 }
 return lines.join(';')

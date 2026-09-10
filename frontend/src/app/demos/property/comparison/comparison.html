@@ -8,11 +8,22 @@
 
 		<div class="compare__scroll">
 			<table class="compare__table" data-testid="property-comparison">
+				<!--
+					⛔ DWA WYRÓŻNIENIA, NIE JEDNO (D-6). Kolumna PROPONOWANA dostaje tint z makiety,
+					kolumna WYBRANA — obrys. Makieta rysuje tylko pierwsze, bo w niej klient jeszcze
+					nie odszedł od propozycji i obie to ta sama kolumna; w działającym ekranie
+					rozjeżdżają się w chwili, gdy klient wybierze coś innego, i wtedy jedno
+					wyróżnienie musiałoby wybrać, o czym kłamie.
+				-->
 				<thead>
 					<tr>
 						<th scope="col">Zakres</th>
 						@for (variant of variants(); track variant.code) {
-							<th scope="col" [class.compare__col--picked]="variant.code === selected()">
+							<th
+								scope="col"
+								[class.compare__col--proposed]="variant.code === recommended()"
+								[class.compare__col--picked]="isPicked(variant.code)"
+							>
 								{{ variant.name }}
 								@if (variant.code === recommended()) {
 									<span class="compare__badge">proponowany</span>
@@ -31,32 +42,42 @@
 								}
 							</th>
 							@for (variant of variants(); track variant.code) {
-								<td [class.compare__col--picked]="variant.code === selected()">
-									{{ includes(variant.code, cover.code) ? '✓' : '—' }}
+								<td
+									[class.compare__col--proposed]="variant.code === recommended()"
+									[class.compare__col--picked]="isPicked(variant.code)"
+								>
+									<!--
+										Znacznik w `span`, nie gołym tekstem: ptaszek i kreska mają
+										różny kolor, a `td` nie może mieć dwóch naraz.
+									-->
+									<span
+										class="compare__mark"
+										[class.compare__mark--absent]="!includes(variant.code, cover.code)"
+										>{{ includes(variant.code, cover.code) ? '✓' : '—' }}</span
+									>
 								</td>
 							}
 						</tr>
 					}
+					<!--
+						⛔ Cena i przycisk w JEDNEJ komórce. Były dwoma wierszami tabeli, przez co
+						przy przewijaniu w poziomie przycisk potrafił zostać pod ceną innego
+						wariantu. Makieta trzyma je razem i tak jest bezpieczniej.
+					-->
 					<tr class="compare__premium">
 						<th scope="row">Składka za okres</th>
 						@for (variant of variants(); track variant.code) {
-							<td [class.compare__col--picked]="variant.code === selected()">
+							<td
+								[class.compare__col--proposed]="variant.code === recommended()"
+								[class.compare__col--picked]="isPicked(variant.code)"
+							>
 								@if (variant.available) {
-									{{ premium(variant.annualPremium) }} zł
-								} @else {
-									niedostępny
-								}
-							</td>
-						}
-					</tr>
-					<tr>
-						<th scope="row"></th>
-						@for (variant of variants(); track variant.code) {
-							<td>
-								@if (variant.available) {
+									<span class="compare__price">{{ premium(variant.annualPremium) }} zł</span>
 									<button type="button" class="compare__pick" (click)="choose(variant.code)">
 										Wybieram
 									</button>
+								} @else {
+									<span class="compare__absent">niedostępny</span>
 								}
 							</td>
 						}
@@ -65,13 +86,5 @@
 			</table>
 		</div>
 
-		<!-- Wariant nie znika po cichu — niesie powód, dla którego nie da się go kupić. -->
-		@for (variant of variants(); track variant.code) {
-			@if (!variant.available && variant.unavailableReason) {
-				<p class="compare__reason" data-testid="property-unavailable">
-					<strong>{{ variant.name }}:</strong> {{ variant.unavailableReason }}
-				</p>
-			}
-		}
 	</div>
 }

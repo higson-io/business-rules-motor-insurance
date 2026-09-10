@@ -1,9 +1,6 @@
 #matrix for parameter demo.property.sum.derivedRatio
-cover;standard;ratio
-*;*;0
-CONTENTS;BASIC;0.10
-CONTENTS;PREMIUM;0.24
-CONTENTS;STANDARD;0.15
-FIXTURES;BASIC;0.15
-FIXTURES;PREMIUM;0.32
-FIXTURES;STANDARD;0.22
+standard;fixtures;contents
+*;0;0
+BASIC;0.15;0.10
+PREMIUM;0.32;0.24
+STANDARD;0.22;0.15

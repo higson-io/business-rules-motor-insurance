@@ -1,7 +1,6 @@
 #matrix for parameter demo.property.factor.deductible
 deductible;factor
 *;1.00
-0;1.00
 1000;0.84
 200;0.95
 500;0.90

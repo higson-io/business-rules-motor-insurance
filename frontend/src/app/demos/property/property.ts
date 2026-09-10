@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 
 import { ApkRecommendationCopy } from '../../models/apk';
 import { PropertyStore } from '../../core/property-store';
+import { isBranchComplete } from '../../core/question-state';
 import { ApkRecommendation } from '../../shared/apk/recommendation/recommendation';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { Step, StepBar } from '../../shared/step-bar/step-bar';
@@ -59,6 +60,18 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 export class Property {
 	private readonly store = inject(PropertyStore);
 
+	/**
+	 * ⛔ Wejście do dema ZACZYNA NOWY PROCES. Komponent powstaje przy każdym otwarciu demo
+	 * z ekranu wyboru, a sesja HTTP żyje dłużej — bez tego prowadzący wracał do wyboru dema,
+	 * wchodził ponownie i zastawał ankietę poprzedniego klienta razem z jego ofertą.
+	 *
+	 * ⚠️ „Wszystkie dema" → kafelek JEST tu gestem nowego procesu i nie ma osobnego przycisku.
+	 * Dokładanie drugiego sposobu na to samo kazałoby zgadywać, czym się różnią.
+	 */
+	constructor() {
+		void this.store.startNewProcess();
+	}
+
 	readonly copy = RECOMMENDATION_COPY;
 
 	readonly step = signal<string>('apk');
@@ -73,20 +86,90 @@ export class Property {
 	 * przez przejście dalej, żeby zestawić ją z ceną — a rek. 8.2.d mówi o doborze
 	 * „z uwzględnieniem akceptowalnej wartości składki", czyli o jednej decyzji.
 	 *
-	 * ⛔ Pasek pokazuje POZYCJĘ, nie uprawnienie — każdy krok jest osiągalny zawsze, bo prowadzący
-	 * musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia się propozycja.
+	 * ⛔ Pasek pokazuje pozycję ORAZ dostępność — ale bramkuje wyłącznie ruch W PRZÓD. Wstecz
+	 * wolno zawsze, bo prowadzący musi móc wrócić do jednej odpowiedzi i pokazać, jak przestawia
+	 * się propozycja. Kiedy który krok się otwiera — patrz `steps` niżej.
 	 *
 	 * ⛔ Czwarty krok TYLKO w demie majątkowym. Domyka proces ofertą i polisą, czyli pokazuje, że
 	 * reguły nie kończą się na składce — mówią też, ile oferta jest ważna i co dokument musi
 	 * zawierać. Pozostałe dwa dema zatrzymują się na składce świadomie: to samo domknięcie
 	 * powtórzone trzy razy nie dodałoby ani jednej nowej rzeczy do pokazania.
 	 */
-	readonly steps: readonly Step[] = [
+	private readonly stepLabels: readonly Step[] = [
 		{ key: 'apk', label: 'Analiza potrzeb' },
 		{ key: 'subject', label: 'Przedmiot ubezpieczenia' },
 		{ key: 'proposal', label: 'Rekomendacja i składka' },
 		{ key: 'offer', label: 'Oferta' },
 	];
+
+	/**
+	 * Czy analiza potrzeb jest domknięta.
+	 *
+	 * ⛔ „Wszystkie widoczne odsłonięte i każde obowiązkowe udzielone" — patrz `isBranchComplete`.
+	 * Nieudzielone pytanie obowiązkowe łapie się tu przez łańcuch: dopóki nie ma na nie odpowiedzi,
+	 * następne nie jest odsłonięte, więc warunek „wszystkie odsłonięte" jest fałszywy. Ekran nie
+	 * musi więc znać łańcucha ani go powtarzać.
+	 */
+	readonly apkComplete = computed(() =>
+		isBranchComplete(
+			(this.loaded()?.questions ?? []).filter((q) => q.section === 'NEEDS'),
+		),
+	);
+
+	/**
+	 * Czy przedmiot ubezpieczenia jest wypełniony.
+	 *
+	 * ⚠️ Pola przedmiotu pokazują się wszystkie naraz, ale nie wszystkie zawsze: dwa mają warunek
+	 * (piętro nie dotyczy domu, materiał ścian nie dotyczy mieszkania) i wtedy nie są odsłonięte.
+	 * Nieodsłonięte pole nie może blokować kroku, więc liczą się tylko odsłonięte obowiązkowe.
+	 * Większość przychodzi wypełniona z poprzedniej polisy, co jest treścią tego kroku.
+	 */
+	readonly subjectComplete = computed(() =>
+		isBranchComplete(
+			(this.loaded()?.questions ?? []).filter((q) => q.section === 'SUBJECT' && q.visible),
+		),
+	);
+
+	/**
+	 * Czy klient wybrał wariant.
+	 *
+	 * ⛔ To jest warunek wejścia na OFERTĘ i zarazem odpowiedź na uwagę z testów: „bez wyklikania,
+	 * że chcę tę polisę, już się pokazuje, że jest wystawiona". Oferta powstaje przy wejściu na
+	 * krok czwarty, więc dopóki nikt niczego nie wybrał, nie ma czego ofertować.
+	 *
+	 * ⚠️ Czyta `variantChosen`, NIE `selectedVariant !== null`. Serwer podstawia pod
+	 * `selectedVariant` wariant rekomendowany, żeby tabela miała co podświetlić — więc to pole
+	 * nigdy nie jest puste i bramka na nim otwierała się od razu. Zmierzone: po samej ankiecie
+	 * `selectedVariant` = COMPLETE, choć nikt niczego nie kliknął.
+	 */
+	readonly variantChosen = computed(() => this.loaded()?.variantChosen === true);
+
+	/**
+	 * Kroki z policzoną dostępnością.
+	 *
+	 * ⛔ **BRAMKUJEMY WYŁĄCZNIE RUCH W PRZÓD.** Krok już domknięty zostaje klikalny na zawsze —
+	 * bez tego znika rzecz, dla której to demo istnieje: cofnąć się do jednej odpowiedzi
+	 * i pokazać, jak przestawia się propozycja.
+	 *
+	 * ⚠️ Do 2026-09-09 wszystkie kroki były osiągalne zawsze i było to uzasadnione. Zmienione na
+	 * wyraźne życzenie właściciela: skok w przód pokazywał gotową ofertę, zanim klient cokolwiek
+	 * wybrał, i to czytało się jak „polisa już wystawiona".
+	 */
+	readonly steps = computed<readonly Step[]>(() => {
+		const open = [
+			true,
+			this.apkComplete(),
+			this.apkComplete() && this.subjectComplete(),
+			this.apkComplete() && this.subjectComplete() && this.variantChosen(),
+		];
+		const current = this.stepLabels.findIndex((step) => step.key === this.step());
+		return this.stepLabels.map((step, index) => ({
+			...step,
+			// Krok już odwiedzony albo bieżący zostaje otwarty, choćby warunek przestał być
+			// spełniony — inaczej zmiana odpowiedzi wstecz zatrzaskiwałaby klienta na miejscu.
+			locked: !open[index] && index > current,
+		}));
+	});
 
 	/**
 	 * Składka proponowanego wariantu — rek. 8.2.d, patrz `ApkRecommendationCopy.premiumLabel`.
@@ -122,17 +205,6 @@ export class Property {
 
 	readonly recommendation = computed(() => this.loaded()?.recommendation ?? null);
 
-	/**
-	 * Bramka ankiety — odpowiedź, po której nie ma czego dalej analizować.
-	 *
-	 * ⛔ Front nie wie, KTÓRE to pytanie ani KTÓRA odpowiedź. Pyta serwer o dwie rzeczy:
-	 * czy zablokowane i co powiedzieć — jedno i drugie pochodzi z tabeli
-	 * `demo.property.apk.question.blocker`.
-	 *
-	 * ⚠️ Blokada dotyczy PRZEJŚCIA DALEJ, nie ankiety. Cofnięcie odpowiedzi ma natychmiast
-	 * odblokować ekran, więc pytania zostają aktywne, a pasek kroków — klikalny wstecz.
-	 */
-
 	/** Nazwa i składka tańszej alternatywy, gdy propozycja nie mieści się w oczekiwanej składce. */
 	readonly alternative = computed(() => {
 		const quote = this.loaded();
@@ -157,6 +229,22 @@ export class Property {
 		}
 		const code = quote.recommendation.variantCode;
 		return quote.variants.find((variant) => variant.code === code)?.name ?? code;
+	});
+
+	/**
+	 * Wariant proponowany w całości — kafelek w podsumowaniu pokazuje jego nazwę I opis.
+	 *
+	 * ⚠️ Osobno od `recommendedName()`: tamto oddaje samą nazwę komponentowi rekomendacji, który
+	 * o wariantach nic nie wie i wiedzieć nie ma. Tutaj potrzebny jest cały obiekt, bo `description`
+	 * leżało w modelu nieużywane, dopóki makieta nie znalazła mu miejsca.
+	 */
+	readonly recommendedVariant = computed(() => {
+		const quote = this.loaded();
+		if (quote === null) {
+			return null;
+		}
+		const code = quote.recommendation.variantCode;
+		return quote.variants.find((variant) => variant.code === code) ?? null;
 	});
 
 	readonly missingNames = computed(() => {

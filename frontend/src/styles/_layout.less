@@ -7,8 +7,12 @@
 // ⛔ The 25/75 grid that used to live here moved into the motor demo (`moto.less`), where it
 // belongs: it positions that demo's two panels, not the page. A demo with one panel — the life
 // placeholder — should not have to opt out of a split it never asked for.
+// ⚠️ Dolna wyściółka to 2rem, nie 3rem, i to jest zmierzone, a nie dobrane. Przy 3rem krok
+// „Przedmiot ubezpieczenia" wychodził poza ekran 1920×1080 o **18 pikseli** — czyli strona
+// dostawała pasek przewijania po nic, a na rzutniku „prawie się mieści" czyta się jak usterka
+// układu. Pod kartą i tak jest szare tło; centymetr mniej niczego nie ścieśnia.
 .app-shell {
 	max-width: 1440px;
 	margin: 0 auto;
-	padding: 1.75rem 15px 3rem;
+	padding: 1.75rem 15px 2rem;
 }

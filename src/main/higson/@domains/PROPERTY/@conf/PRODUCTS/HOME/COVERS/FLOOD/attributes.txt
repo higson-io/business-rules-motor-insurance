@@ -1,14 +1,20 @@
 [[attr]]
 attributeCode = "CAP_ABSOLUTE"
 attributeName = "Limit kwotowy"
-refType = "PARAMETER"
-refName = "demo.property.cover.flood [capAbsolute]"
+refType = "LITERAL"
+refName = "0"
 
 [[attr]]
 attributeCode = "CAP_RATIO"
 attributeName = "Limit jako ulamek sumy"
+refType = "LITERAL"
+refName = "0"
+
+[[attr]]
+attributeCode = "DEDUCTIBLE"
+attributeName = "Franszyza narzucona przez regule pokrycia"
 refType = "PARAMETER"
-refName = "demo.property.cover.flood [capRatio]"
+refName = "demo.property.cover.flood"
 
 [[attr]]
 attributeCode = "IS_AVAILABLE"
@@ -21,12 +27,6 @@ attributeCode = "LIMIT"
 attributeName = "Efektywny limit odpowiedzialnosci"
 refType = "FUNCTION"
 refName = "demo.property.limit.effective"
-
-[[attr]]
-attributeCode = "LIMIT_LABEL"
-attributeName = "Opis limitu dla klienta"
-refType = "PARAMETER"
-refName = "demo.property.cover.flood [capLabel]"
 
 [[attr]]
 attributeCode = "POSITION"
@@ -49,8 +49,8 @@ refName = "demo.property.cover.flood [rate]"
 [[attr]]
 attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
-refType = "PARAMETER"
-refName = "demo.property.cover.flood [basis]"
+refType = "LITERAL"
+refName = "SUM"
 
 [[attr]]
 attributeCode = "SUM"
@@ -71,7 +71,7 @@ refType = "LITERAL"
 refName = "BUILDING"
 
 [[attr]]
-attributeCode = "UNAVAILABLE_REASON"
-attributeName = "Kod zdania o odmowie"
+attributeCode = "WAITING_PERIOD"
+attributeName = "Karencja - od kiedy ochrona dziala"
 refType = "PARAMETER"
-refName = "demo.property.cover.flood [reason]"
+refName = "demo.property.flood.waitingPeriod"

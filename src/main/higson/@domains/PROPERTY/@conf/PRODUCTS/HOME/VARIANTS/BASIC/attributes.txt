@@ -1,34 +1,4 @@
 [[attr]]
-attributeCode = "ANNUAL_PREMIUM"
-attributeName = "Skladka za caly okres ochrony"
-refType = "FUNCTION"
-refName = "demo.property.tariff.annualPremium"
-
-[[attr]]
-attributeCode = "COVER_PREMIUMS"
-attributeName = "Rozbicie skladki na pokrycia"
-refType = "FUNCTION"
-refName = "demo.property.tariff.coverPremiums"
-
-[[attr]]
-attributeCode = "INSTALMENT"
-attributeName = "Rata"
-refType = "FUNCTION"
-refName = "demo.property.tariff.instalment"
-
-[[attr]]
-attributeCode = "IS_AVAILABLE"
-attributeName = "Czy dostepny w tej lokalizacji"
-refType = "PARAMETER"
-refName = "demo.property.variant.availability [available]"
-
-[[attr]]
-attributeCode = "LIABILITY_SUM"
-attributeName = "Suma gwarancyjna OC"
-refType = "LITERAL"
-refName = "0"
-
-[[attr]]
 attributeCode = "POSITION"
 attributeName = "Miejsce w drabince"
 refType = "LITERAL"
@@ -39,9 +9,3 @@ attributeCode = "PREMIUM"
 attributeName = "Skladka - flow wyceny pakietu"
 refType = "FLOW"
 refName = "demo.property.calculateQuote"
-
-[[attr]]
-attributeCode = "UNAVAILABLE_REASON"
-attributeName = "Powod niedostepnosci"
-refType = "PARAMETER"
-refName = "demo.property.variant.availability [reason]"

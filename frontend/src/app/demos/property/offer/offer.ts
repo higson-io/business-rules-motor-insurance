@@ -65,11 +65,9 @@ export class Offer {
 	 * pokrycia — tak samo jak w tabeli porównawczej. Sięgamy po niego tylko wtedy, gdy sumy nie ma
 	 * wcale (assistance) i limit JEST całą kwotą ochrony.
 	 *
-	 * ⚠️ OC w życiu prywatnym było tu kiedyś trzecim przypadkiem: jego suma nie bierze się
-	 * z metrażu, tylko z wariantu (`liabilitySum`), więc na pokryciu była pusta i dokument
-	 * pokazywał kreskę zamiast dwóch milionów. Rozstrzygał o tym atrybut `sumBasis` z wartością
-	 * `CATALOGUE`. Teraz backend wypełnia `sum` także dla OC — gdy tylko wiadomo, który wariant
-	 * jest pokazywany — więc front nie musi wiedzieć, że OC jest inne.
+	 * ⛔ OC nie jest tu wyjątkiem i nie wolno go nim robić. Jego suma bierze się z pakietu, a nie
+	 * z metrażu — ale rozstrzyga o tym reguła (`SUM_BASIS = CATALOGUE`) i backend wypełnia `sum`
+	 * tak samo jak dla pozostałych pokryć. Front nie wie, że OC jest inne, i ma nie wiedzieć.
 	 */
 	readonly covers = computed(() => {
 		const quote = this.loaded();
@@ -107,7 +105,23 @@ export class Offer {
 
 	readonly needs = computed(() => this.loaded()?.recommendation.needs ?? []);
 
-	readonly deductible = computed(() => this.loaded()?.deductible ?? null);
+	/**
+	 * Franszyza, która NAPRAWDĘ obowiązuje — narzucona przez strefę powodziową.
+	 *
+	 * ⛔ NIE `deductible` z wniosku. Tamta jest franszyzą POLISY, której w tym demie nikt nie
+	 * ustawia, więc zawsze wynosiła zero — a tabela pokryć wypisywała „Franszyza redukcyjna:
+	 * 0 zł" tuż obok załącznika mówiącego, że powódź wymaga franszyzy 1 000 zł. Jeden ekran,
+	 * dwie sprzeczne liczby pod tą samą nazwą.
+	 *
+	 * Pokazujemy ją tylko wtedy, gdy wybrany wariant naprawdę niesie ochronę od powodzi.
+	 */
+	readonly floodDeductible = computed(() => {
+		const value = this.loaded()?.floodDeductible ?? null;
+		if (value === null || value <= 0) {
+			return null;
+		}
+		return this.covers().some((cover) => cover.code === 'FLOOD') ? value : null;
+	});
 
 	readonly policyholder = computed(() => this.loaded()?.policyholder ?? null);
 

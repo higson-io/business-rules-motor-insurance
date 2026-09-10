@@ -32,6 +32,26 @@ export class Comparison {
 	readonly selected = computed(() => this.loaded()?.selectedVariant ?? null);
 	readonly recommended = computed(() => this.loaded()?.recommendation.variantCode ?? null);
 
+	/**
+	 * Czy kolumnę wybraną trzeba w ogóle wyróżnić.
+	 *
+	 * ⛔ NIE, dopóki wybór pokrywa się z propozycją. Kolumna proponowana ma już swój tint, a obrys
+	 * dołożony do tej samej kolumny robi z niej dwa wyróżnienia naraz i sugeruje dwie różne rzeczy
+	 * w jednym miejscu. Obrys jest po to, żeby powiedzieć „a wziąłeś TAMTEN" — więc odzywa się
+	 * dopiero wtedy, gdy jest jakiś „tamten".
+	 *
+	 * ⚠️ Ta sama zasada, co przy cenie w podsumowaniu (`Property.choiceDiffers`): ekran mówi
+	 * o wyborze wtedy, gdy wybór coś wnosi.
+	 */
+	readonly choiceDiffers = computed(() => {
+		const chosen = this.selected();
+		return chosen !== null && chosen !== this.recommended();
+	});
+
+	isPicked(variantCode: string): boolean {
+		return this.choiceDiffers() && variantCode === this.selected();
+	}
+
 	includes(variantCode: string, coverCode: string): boolean {
 		const variant = this.variants().find((candidate) => candidate.code === variantCode);
 		return variant ? variant.covers.includes(coverCode) : false;

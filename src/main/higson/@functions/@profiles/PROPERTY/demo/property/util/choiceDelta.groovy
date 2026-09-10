@@ -22,8 +22,10 @@ if (recommended == null || chosen == null) {
 }
 
 def positionOf = { code ->
-	domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + code + ']').getAttrDecimal('POSITION', ctx)
+	def variant = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + code + ']')
+	variant.getAttrDecimal('POSITION', ctx)
 }
+
 def recommendedPosition = positionOf(recommended)
 def chosenPosition = positionOf(chosen)
 if (recommendedPosition == null || chosenPosition == null) {

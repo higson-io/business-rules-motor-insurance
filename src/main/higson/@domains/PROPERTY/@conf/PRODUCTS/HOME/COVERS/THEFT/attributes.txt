@@ -49,8 +49,8 @@ refName = "demo.property.cover.theft [rate]"
 [[attr]]
 attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
-refType = "PARAMETER"
-refName = "demo.property.cover.theft [basis]"
+refType = "LITERAL"
+refName = "SUM"
 
 [[attr]]
 attributeCode = "SUM"
@@ -69,9 +69,3 @@ attributeCode = "SUM_REFERENCE"
 attributeName = "Pokrycie odniesienia dla sumy pochodnej"
 refType = "LITERAL"
 refName = "CONTENTS"
-
-[[attr]]
-attributeCode = "UNAVAILABLE_REASON"
-attributeName = "Kod zdania o odmowie"
-refType = "PARAMETER"
-refName = "demo.property.cover.theft [reason]"

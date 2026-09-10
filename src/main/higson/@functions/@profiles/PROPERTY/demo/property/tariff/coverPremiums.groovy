@@ -15,14 +15,14 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-def variant = ctx.getString('variant.code')
+def variantCode = ctx.getString('variant.code')
+def pack = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variantCode + ']')
+def members = pack.getAll('COVERS')
+
 def lines = []
-
-// Sklad pakietu jest POD PAKIETEM w drzewie - petla idzie po tym, co widac po rozwinieciu
-// galezi, a nie po tabeli par (pokrycie, wariant).
-for (def member in domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variant + ']').getAll('COVERS')) {
-	def code = member.getCode()
-	lines.add(code + '=' + higson.call('demo.property.cover.premium', ctx, code))
+for (def member in members) {
+	def coverCode = member.getCode()
+	def premium = higson.call('demo.property.cover.premium', ctx, coverCode)
+	lines.add(coverCode + '=' + premium)
 }
-
 return lines.join(';')

@@ -1,0 +1,16 @@
+#matrix for parameter demo.property.subject.field
+field;position;required;options;labels;prefill;demoAnswer;text;kind;contextPath
+*;999;true;true,false;Tak,Nie;;;;;
+AREA;20;true;;;Metraż z poprzedniej polisy;60;Powierzchnia użytkowa w metrach kwadratowych;DECIMAL;quote.property.area
+CLAIMS_3Y;110;true;;;Historia szkód w bazie UFG;0;Ile szkód zgłaszałeś w ostatnich trzech latach?;INTEGER;quote.property.claims3y
+CONSTRUCTION_YEAR;30;true;;;;2005;Rok budowy;INTEGER;quote.property.constructionYear
+COVER_PERIOD;120;true;12,24,36;Rok,Dwa lata,Trzy lata;;12;Na jaki okres ochrony?;CHOICE;quote.policy.periodMonths
+DEDUCTIBLE;60;true;;;;0;Jaką franszyzę redukcyjną wybierasz (0, 200, 500 lub 1000 zł)?;MONEY;quote.policy.deductible
+FINISH_STANDARD;70;true;BASIC,STANDARD,PREMIUM;Podstawowy,Podwyższony,Wysoki;;STANDARD;Jaki jest standard wykończenia?;CHOICE;quote.property.finishStandard
+FLOOR;50;false;;;;3;Na którym piętrze jest mieszkanie?;INTEGER;quote.property.floor
+OCCUPANCY;90;true;PERMANENT,SEASONAL,RENTED;Mieszkam na stałe,Korzystam sezonowo,Wynajmuję;;PERMANENT;Jak korzystasz z nieruchomości?;CHOICE;quote.property.occupancy
+POSTCODE;80;true;;;Adres z poprzedniej polisy;00-950;Kod pocztowy miejsca ubezpieczenia;TEXT;quote.property.postcode
+PRIOR_FLOOD_COVER;115;true;true,false;Tak,Nie;Zakres poprzedniej polisy;false;Czy poprzednia polisa obejmowała powódź?;BOOLEAN;quote.property.priorFloodCover
+PROPERTY_KIND;10;true;HOUSE,FLAT;Dom jednorodzinny,Mieszkanie;;FLAT;Co chcesz ubezpieczyć?;CHOICE;quote.property.kind
+SECURITY;100;true;NONE,DOOR,ALARM,MONITORED;Brak,Drzwi antywłamaniowe,Alarm,Alarm z monitoringiem;;DOOR;Jakie masz zabezpieczenia?;CHOICE;quote.property.security
+WALL_MATERIAL;40;true;BRICK,WOOD_FRAME;Murowane,Szkieletowe drewniane;;BRICK;Z czego są ściany?;CHOICE;quote.property.wallMaterial

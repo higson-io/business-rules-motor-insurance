@@ -124,6 +124,17 @@ The Angular MCP best-practices served for this workspace say *"do **not** set `c
 
 **Suggested restatement**: *"No component opts **out** of OnPush."* That keeps the guarantee that matters — no component silently falls back to default change detection — without requiring redundant metadata once the framework default is trusted. Settle it before the next component is written, so the workspace stays uniform either way.
 
+### A Shared Component That Must Look Different in One Demo: Input If the Tree Differs, Custom Property If Only the Skin Does
+
+`app-step-bar`, `app-apk-questionnaire` and `app-apk-recommendation` are shared by all three demos. The property redesign (2026-09-09) needed two of them to look different **there and nowhere else**, and the two cases were resolved differently on purpose:
+
+- **`app-step-bar` got an `appearance` input** (`'panel' | 'plain'`, defaulting to the old look, applied through a host class binding). The variants differ in **structure** — a number inside a circle versus a number inline with a trailing dot — so the component has to know which one it is drawing.
+- **`app-apk-recommendation` got CSS custom properties** (`--reco-border`, `--reco-radius`, `--reco-shadow`, read with fallbacks that reproduce the old panel). Only three declarations on one box differ, so the host sets them and the component needs to know nothing.
+
+The criterion is therefore: **does the component's DOM change?** If yes, an input, because a template cannot branch on a value it was never given. If no, custom properties, because style encapsulation deliberately blocks a parent from reaching into a child's classes — and piercing it with `::ng-deep` to avoid an input is how a shared component quietly acquires a second, undeclared API.
+
+⛔ Neither case may be solved by changing the shared component for everybody. A redesign scoped to one demo that silently restyles the other two is not a smaller change, it is an unreviewed one.
+
 ---
 
 ## General Component Guidance

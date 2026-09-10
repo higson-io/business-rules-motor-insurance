@@ -4,118 +4,190 @@
 	⛔ Ani jedno pytanie nie jest tu wypisane. Kontrolka wybiera się po polu `kind`, treść przychodzi
 	z Higsona, a widoczność jest gotową flagą z serwera.
 
-	⛔ DWA UKŁADY, JEDEN BLOK PYTANIA. Analiza potrzeb (`QUESTIONS`) to ankieta: jedno pytanie na
-	ekran, po kolei, z własną nawigacją — kolejne odsłania się dopiero po domknięciu poprzedniego.
-	Przedmiot ubezpieczenia (`SUBJECT`) to lista, bo tam nic się nie odsłania: dane są zebrane
-	wcześniej i klient je najwyżej poprawia.
+	⛔ DWA UKŁADY, JEDEN BLOK PYTANIA. Analiza potrzeb (`NEEDS`) to ankieta: jedno pytanie na
+	ekran, po kolei, ze spisem obok i własną nawigacją — kolejne odsłania się dopiero po domknięciu
+	poprzedniego. Przedmiot ubezpieczenia (`SUBJECT`) to lista, bo tam nic się nie odsłania: dane są
+	zebrane wcześniej i klient je najwyżej poprawia.
 
 	⛔ Bez sekcji i bez ich tytułów. Grupowanie pytań zniknęło razem z poziomem sekcji w drzewie —
 	podział przebiega po gałęzi i tylko po niej.
 
-	⛔ Treść pytania jest NAD kontrolką, a nie w `mat-label`: etykieta Material nie zawija się,
-	a treść przychodzi z reguł i może mieć dowolną długość.
+	⛔ JEDEN SZABLON KONTROLKI, użyty w trzech miejscach. Do 2026-09-09 blok `@switch` stał w tym
+	pliku dwa razy, słowo w słowo; pytania złożone dołożyłyby trzeci. Rozjazd między kopiami nie
+	objawiałby się błędem — po prostu jeden z układów przestałby obsługiwać jakiś rodzaj pytania.
 -->
+<ng-template #control let-question>
+	<!--
+		⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej zawinąć się na własny
+		wiersz pod pytaniem.
+	-->
+	<p class="apk__label" [id]="'q-' + question.code">
+		{{ question.text }}@if (question.required) {<span class="apk__required" aria-hidden="true"
+			>&nbsp;*</span
+		>}
+	</p>
+
+	@switch (question.kind) {
+		@case ('CHOICE') {
+			<mat-form-field appearance="outline" class="apk__field">
+				<mat-select
+					[value]="question.value"
+					[attr.aria-labelledby]="'q-' + question.code"
+					(selectionChange)="answer(question, $event.value)"
+				>
+					@for (option of question.options; track option) {
+						<mat-option [value]="option">{{ label(question, option) }}</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+		}
+
+		@case ('MULTI') {
+			<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
+				@for (option of question.options; track option) {
+					<mat-checkbox
+						[checked]="isChecked(question, option)"
+						(change)="toggle(question, option, $event.checked)"
+					>
+						{{ label(question, option) }}
+					</mat-checkbox>
+				}
+			</div>
+		}
+
+		@case ('BOOLEAN') {
+			<mat-button-toggle-group
+				class="apk__toggle"
+				[value]="question.value"
+				[attr.aria-labelledby]="'q-' + question.code"
+				(change)="answer(question, $event.value)"
+			>
+				@for (option of answersOf(question); track option) {
+					<mat-button-toggle [value]="option">{{ label(question, option) }}</mat-button-toggle>
+				}
+			</mat-button-toggle-group>
+		}
+
+		@default {
+			<mat-form-field appearance="outline" class="apk__field">
+				<input
+					matInput
+					[type]="question.kind === 'TEXT' ? 'text' : 'number'"
+					[value]="question.value"
+					[attr.aria-labelledby]="'q-' + question.code"
+					(change)="answer(question, $any($event.target).value)"
+				/>
+			</mat-form-field>
+		}
+	}
+
+	<!--
+		⛔ BEZ PODPISU „Podpowiedziane: …". Usunięty 2026-09-09 na decyzję właściciela dema.
+
+		⚠️ To była treść z rek. 8.3 — informacja, SKĄD wzięliśmy wartość, której klient nie wpisał
+		— i §21 zostawił ją świadomie, odróżniając od skasowanej wtedy autoreklamy narzędzia.
+		Wypada z demo element, który tę rekomendację pokazywał; przy trzynastu polach przedmiotu
+		ubezpieczenia trzy takie podpisy dokładały wiersza tekstu pod polami, których nikt nie
+		czyta w trakcie pokazu.
+
+		⚠️ `prefillSource` ZOSTAJE na drucie i w katalogu reguł — zniknął tylko podpis. Przywrócenie
+		to ten `@if`, nic więcej. Moto i życie mają ten sam podpis przez komponent wspólny
+		(`shared/apk/questionnaire`) i nie były ruszane.
+	-->
+</ng-template>
+
 @if (ready()) {
 	@if (group() === 'NEEDS') {
+		<!--
+			⛔ SPIS PYTAŃ ZASTĘPUJE PASEK POSTĘPU. Pasek mówił „jesteś w 3/7" i nic poza tym; spis
+			mówi to samo, a przy okazji, o co jeszcze zapytamy — czyli odpowiada na pytanie, które
+			klient zadaje sobie w połowie ankiety. Makieta UX zamienia jedno na drugie i to jest
+			zamiana, a nie dodatek: dwie miary postępu obok siebie są jedną za dużo.
+
+			⛔ Spis liczy po REGULE widoczności, nie po odsłonięciu — patrz `outline` w komponencie.
+		-->
+		<nav class="apk__outline" aria-label="Pytania w tym kroku">
+			<p class="apk__outline__title">Pytania w tym kroku</p>
+			<ol class="apk__outline__list">
+				@for (item of outline(); track item.code) {
+					<li>
+						<button
+							type="button"
+							class="apk__outline__item"
+							[class.apk__outline__item--current]="item.current"
+							[class.apk__outline__item--done]="item.done"
+							[disabled]="!item.reachable"
+							[attr.aria-current]="item.current ? 'step' : null"
+							[attr.data-testid]="'apk-outline-' + item.code"
+							(click)="goToQuestion(item.code)"
+						>
+							<span class="apk__outline__mark" aria-hidden="true">{{
+								item.done ? '✓' : item.number
+							}}</span>
+							<!--
+								Etykieta bywa pusta — wtedy zostaje sam numer. Zapasowej nazwy nie ma
+								w kodzie celowo: byłaby nazwą pytania trzymaną poza regułami.
+							-->
+							@if (item.label) {
+								<span class="apk__outline__label">{{ item.label }}</span>
+							}
+						</button>
+					</li>
+				}
+			</ol>
+		</nav>
+
+		<!--
+			⛔ `@for` po jednoelementowej liście, nie `@if`. NOŚNE: `@if` nie ma klucza, więc Angular
+			utrzymywał ten sam węzeł `mat-button-toggle-group` przy przejściu do następnego pytania
+			i podmieniał mu tylko wartość. Gdy dwa kolejne pytania miały TĘ SAMĄ odpowiedź, Material
+			nie widział zmiany, nie emitował `change` i ankieta stawała w miejscu (W-26).
+		-->
 		@for (question of currentAsList(); track question.code) {
 			<section class="apk__section apk__section--single">
 				<header class="apk__step">
 					<p class="apk__step__where">
 						<span class="apk__step__counter">Pytanie {{ stepNumber() }} z {{ stepCount() }}</span>
 					</p>
-					<span class="apk__step__bar" aria-hidden="true">
-						<span class="apk__step__seg apk__step__seg--current">
-							<span
-								class="apk__step__fill"
-								[style.width.%]="(stepNumber() / stepCount()) * 100"
-							></span>
-						</span>
-					</span>
 				</header>
 
 				<div class="apk__question apk__question--single" [attr.data-question]="question.code">
 					<div class="apk__body">
-					<!--
-						⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
-						zawinąć się na własny wiersz pod pytaniem.
-					-->
-					<p class="apk__label" [id]="'q-' + question.code">
-						{{ question.text }}@if (question.required) {<span
-							class="apk__required"
-							aria-hidden="true"
-							>&nbsp;*</span
-						>}
-					</p>
+						@if (question.fields.length > 0) {
+							<!--
+								GRUPA PYTAŃ: jeden krok ankiety, jedno lub kilka pytań.
 
-					@switch (question.kind) {
-						@case ('CHOICE') {
-							<mat-form-field appearance="outline" class="apk__field">
-								<mat-select
-									[value]="question.value"
-									[attr.aria-labelledby]="'q-' + question.code"
-									(selectionChange)="answer(question, $event.value)"
-								>
-									@for (option of question.options; track option) {
-										<mat-option [value]="option">{{ label(question, option) }}</mat-option>
-									}
-								</mat-select>
-							</mat-form-field>
-						}
+								⛔ Renderują się TYLKO pytania odsłonięte — grupa może mieć pytania
+								WARUNKOWE, które pojawiają się dopiero po odpowiedzi na inne pytanie tej
+								samej grupy. Filtr liczy `core/question-state`, bo tę samą listę liczy
+								domknięcie kroku.
 
-						@case ('MULTI') {
-							<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
-								@for (option of question.options; track option) {
-									<mat-checkbox
-										[checked]="isChecked(question, option)"
-										(change)="toggle(question, option, $event.checked)"
-									>
-										{{ label(question, option) }}
-									</mat-checkbox>
+								⛔ Nagłówek grupy TYLKO przy kilku WIDOCZNYCH pytaniach. Grupa, która
+								pokazuje jedno pytanie, wypisywałaby swoją nazwę („Ochrona przed
+								powodzią") tuż nad pytaniem mówiącym to samo pełnym zdaniem. Nazwa grupy
+								pracuje wtedy w spisie po lewej i tam wystarcza — a gdy pytanie warunkowe
+								się odsłoni, nagłówek pojawia się razem z nim i ekran staje się grupą.
+
+								⛔ Grupa NIE MA własnej kontrolki i nie może mieć — nie ma ścieżki
+								kontekstu, pod którą miałaby wylądować odpowiedź. Jej `kind` to `GROUP`.
+							-->
+							@if (fieldsOf(question).length > 1) {
+								<p class="apk__label apk__label--group">{{ question.text }}</p>
+							}
+							<div class="apk__fields">
+								@for (field of fieldsOf(question); track field.code) {
+									<div class="apk__field-block" [attr.data-question]="field.code">
+										<ng-container
+											*ngTemplateOutlet="control; context: { $implicit: field }"
+										/>
+									</div>
 								}
 							</div>
+						} @else {
+							<ng-container *ngTemplateOutlet="control; context: { $implicit: question }" />
 						}
-
-						@case ('BOOLEAN') {
-							<mat-button-toggle-group
-								class="apk__toggle"
-								[value]="question.value"
-								[attr.aria-labelledby]="'q-' + question.code"
-								(change)="answer(question, $event.value)"
-							>
-								@for (option of answersOf(question); track option) {
-									<mat-button-toggle [value]="option">{{ label(question, option) }}</mat-button-toggle>
-								}
-							</mat-button-toggle-group>
-						}
-
-						@default {
-							<mat-form-field appearance="outline" class="apk__field">
-								<input
-									matInput
-									[type]="question.kind === 'TEXT' ? 'text' : 'number'"
-									[value]="question.value"
-									[attr.aria-labelledby]="'q-' + question.code"
-									(change)="answer(question, $any($event.target).value)"
-								/>
-							</mat-form-field>
-						}
-					}
-
-					@if (question.prefillSource) {
-						<footer class="apk__foot">
-							<span class="apk__prefill" data-testid="property-prefill">
-								Podpowiedziane: {{ question.prefillSource }}
-							</span>
-						</footer>
-					}
 					</div>
 				</div>
-
-				@if (blocked()) {
-					<p class="apk__blocked" role="status" data-testid="property-blocked">
-						{{ blockMessage() }}
-					</p>
-				}
 
 				<nav class="apk__nav">
 					<button
@@ -142,82 +214,25 @@
 		<div class="apk">
 			<section class="apk__section">
 				<ol class="apk__list">
-					@for (question of asked(); track question.code) {
+					@for (question of reachable(); track question.code) {
 						<li class="apk__question" [attr.data-question]="question.code">
 							<div class="apk__body">
-							<!--
-								⛔ Gwiazdka doklejona TWARDĄ SPACJĄ. Zwykła spacja pozwalała jej
-								zawinąć się na własny wiersz pod pytaniem.
-							-->
-							<p class="apk__label" [id]="'q-' + question.code">
-								{{ question.text }}@if (question.required) {<span
-									class="apk__required"
-									aria-hidden="true"
-									>&nbsp;*</span
-								>}
-							</p>
-
-							@switch (question.kind) {
-								@case ('CHOICE') {
-									<mat-form-field appearance="outline" class="apk__field">
-										<mat-select
-											[value]="question.value"
-											[attr.aria-labelledby]="'q-' + question.code"
-											(selectionChange)="answer(question, $event.value)"
-										>
-											@for (option of question.options; track option) {
-												<mat-option [value]="option">{{ label(question, option) }}</mat-option>
-											}
-										</mat-select>
-									</mat-form-field>
-								}
-
-								@case ('MULTI') {
-									<div class="apk__options" role="group" [attr.aria-labelledby]="'q-' + question.code">
-										@for (option of question.options; track option) {
-											<mat-checkbox
-												[checked]="isChecked(question, option)"
-												(change)="toggle(question, option, $event.checked)"
-											>
-												{{ label(question, option) }}
-											</mat-checkbox>
+								@if (question.fields.length > 0) {
+									<p class="apk__label apk__label--group">{{ question.text }}</p>
+									<div class="apk__fields">
+										@for (field of question.fields; track field.code) {
+											<div class="apk__field-block" [attr.data-question]="field.code">
+												<ng-container
+													*ngTemplateOutlet="control; context: { $implicit: field }"
+												/>
+											</div>
 										}
 									</div>
+								} @else {
+									<ng-container
+										*ngTemplateOutlet="control; context: { $implicit: question }"
+									/>
 								}
-
-								@case ('BOOLEAN') {
-									<mat-button-toggle-group
-										class="apk__toggle"
-										[value]="question.value"
-										[attr.aria-labelledby]="'q-' + question.code"
-										(change)="answer(question, $event.value)"
-									>
-										@for (option of answersOf(question); track option) {
-											<mat-button-toggle [value]="option">{{ label(question, option) }}</mat-button-toggle>
-										}
-									</mat-button-toggle-group>
-								}
-
-								@default {
-									<mat-form-field appearance="outline" class="apk__field">
-										<input
-											matInput
-											[type]="question.kind === 'TEXT' ? 'text' : 'number'"
-											[value]="question.value"
-											[attr.aria-labelledby]="'q-' + question.code"
-											(change)="answer(question, $any($event.target).value)"
-										/>
-									</mat-form-field>
-								}
-							}
-
-							@if (question.prefillSource) {
-								<footer class="apk__foot">
-									<span class="apk__prefill" data-testid="property-prefill">
-										Podpowiedziane: {{ question.prefillSource }}
-									</span>
-								</footer>
-							}
 							</div>
 						</li>
 					}

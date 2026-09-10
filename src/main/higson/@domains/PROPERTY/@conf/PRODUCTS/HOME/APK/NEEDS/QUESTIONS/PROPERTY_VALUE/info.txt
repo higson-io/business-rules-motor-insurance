@@ -1,3 +1,0 @@
-name = "Na ile szacujesz wartość swojej nieruchomości?"
-description = "Pytanie 7 ze specyfikacji, rek. 8.2.c. Porownywane z suma wyliczona z metrazu i stawki."
-tags = []

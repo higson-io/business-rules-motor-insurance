@@ -1,0 +1,3 @@
+name = "Sprzęt przenośny"
+description = "Krok 4 ankiety."
+tags = []

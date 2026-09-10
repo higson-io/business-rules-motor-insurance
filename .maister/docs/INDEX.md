@@ -296,6 +296,235 @@ package comes back with a reason and no price, and BASIC in the same flood zone 
 ⚠️ §34.4 is explicit about what was measured and what was inferred: the package converts (verified
 twice, and it converts with only one stored test case, so it is self-contained), but the ten rows
 were last seen green when they were ten stored cases, not when run from the file.
+**§35 (2026-09-09)** implements the UX redesign's two configuration asks with **two columns of one
+table**. `shortLabel` gives the new question outline a short name per question — recorded as a
+deliberate exception to D-23, because `demo.property.apk.question` already owns per-question
+constants (§17 moved seven there) and an attribute would have cost a run-in with W-29 for one line
+of text; it does **not** repeat D-20's deleted `TEXT`, because a table-of-contents entry and the
+question itself are different things and both are on screen at once, so a drift is visible.
+`partOf` makes a row a **field of another question** rather than a question — the first design
+(a `FIELDS` collection under the element) was dropped once it was clear that **only APK questions
+are tree elements** while the thirteen subject fields are table rows, so a collection would have
+served one branch of two. Counters count parents, the reveal chain runs between parents, a parent is
+settled when its required fields are — or, when none is required, when any is, or a question of only
+optional fields dead-ends the survey. ⛔ Still not screen grouping (§31): `partOf` is a statement
+about the subject matter, `SCREEN`/`GROUP` would not be. Built: `QUESTIONS[EXPECTATIONS]`, which
+takes the survey from seven questions to **six**. ⚠️ Two defects surfaced: `PRIOR_FLOOD_COVER`
+showed the client raw `true`/`false`, because **an empty value in a question's own row overrides
+the `*` row rather than inheriting it**; and the mockup's outline labels ("Lokalizacja", "Historia
+szkód") describe step 2 — the designer invented plausible topics instead of reading the catalogue,
+which is the general caution about mockups here: **the drawing does not know the question catalogue**.
+**§35 continued.** Two further mechanisms arrived the same day. **Question groups became a level of
+the domain tree**: a group holds one question or several, and the six groups match the
+outline beside the survey — adding a question or a whole group is a branch in Studio. A group's
+fields nest only at the wire boundary, so Java's question list stays flat. **A field may be
+conditional on an answer**: the `revealedBy` chain fires on *settlement* (a refusal and a skipped
+optional question count, deliberately), so it could never express "show this only after yes"; a
+second catalogue column `revealedWhen` names the answer that reveals — empty meaning any — and the
+reveal table gains one boolean input. ⛔ The condition is configuration, not code: Java resolves the
+reference and compares strings, the table decides. The live dependent question hangs under
+"Wynajem" and moves the proposal from STANDARD to COMPLETE. ⚙️ **`TEXT` returns to the `QUESTION`
+type**, a qualified reversal of D-20 — allowed only because element names stopped carrying the same
+text, and only because the reader has **no fallback** to the element name. Also: two single-row
+tables (`offer.terms`, `apk.regime`) replaced by grouped domain attributes on `PRODUCT`, and
+attribute groups are now **named** rather than merely numbered. ⚠️ W-27 fired again (adding a column
+renumbers every row) and `delete_domain_element` records as `UPDATE`, so an export still carries the
+deleted element — verify the tree, not the status. ⛔ And an answer to a question the client can no
+longer see **must stop feeding the rules** — kept, but filtered out — or a proposal keeps resting on
+a hidden question; the filter belongs to the property profile, never to the shared APK layer, whose
+other two demos never set `revealed`.
+**§36 (2026-09-09)** applies a narrower criterion for what belongs in the domain tree: **an attribute
+stays when the application reads it through the attribute, or when it is the one thing a business
+user opens on that element.** A scan found that of 41 attributes, Java reads 16 through the
+attribute, six are read only by Groovy, and **19 are read by nobody** — Java holds twenty constants
+with rule codes and calls them directly, past the attribute beside them. First pass: `COVER` 13 → 9,
+dropping `RATE` / `RATE_BASIS` / `CAP_RATIO` / `CAP_ABSOLUTE` — four pointers into columns of the
+cover's **own** table, twenty-eight addresses restating the naming convention. The rule of thumb is
+**result stays, ingredient goes**; ⛔ `PREMIUM` was on the first cut list and that was wrong — a
+cover's premium never even reaches the client DTO, but "what does this cover cost and how is it
+priced" is what the *insurer* opens. ⚠️ `SUM_BASIS`/`SUM_REFERENCE` look like ingredients and stay:
+they are literals, and in a table they would be a column with one value per row (D-23).
+⚠️ **Order matters**: the rule must stop reading the attribute *before* the attribute disappears —
+removing one deletes its value on every element at once. ⛔ **`higson_update_function` called without
+`arguments` wipes a function's extra arguments** — it took the whole quote down with HTTP 500
+(`Expected: 1, Passed: 2`), confirming that `calculate()` has no `catch` and offers no partial
+degradation. The other three types followed with no rule changes at all — `VARIANT` 8→5,
+`NEEDS_ANALYSIS` 9→7, `PRODUCT` 8→7, all six being pure navigation past which Java already called the
+rule code directly. **Final state: 41 → 31 attributes** (`COVER` 9, `NEEDS_ANALYSIS` 7, `PRODUCT` 7,
+`VARIANT` 5, `QUESTION` 3), verified by a scenario exercising the value gap, an exceeded budget, a
+package chosen against the recommendation and an issued policy — zero differences after each step.
+**§37 (2026-09-09)** simplifies `sum.suggest` (25 lines → 12) and fixes two defects. Two thirds of
+the "error handling" was **dead code pretending to be error handling**: a `throw` guarding a table
+that has a wildcard row and `nullable = false` (it cannot return null), and a fourth returned value
+nobody read. `createContext` disappeared with a table dimension — `sum.derivedRatio` was keyed by
+`(cover, standard)`, which is why the function had to fabricate a `cover.code` context twice at a
+point where **no cover is known yet**; re-keyed on `standard` with two columns it is one call and
+4 rows instead of 7. ⚠️ The remaining guard does **not** become "assign 0": a zero area yields a zero
+sum and a whole quote priced at zero, presented as real. ⚠️ Table and function changed in **one
+session, published once**, so the engine never saw a half-migrated pair. Defects: the offer promised
+a flood deductible it never applied (two different deductibles sharing one name on one screen), and
+`PUT /variant` accepted any string with 200 then poisoned every later `GET` with a 500. ⛔ The first
+fix for the second defect was itself wrong — validating against `quote.getVariants()`, which is
+**empty right after a reset** — and its only symptom was four fields in the offer's choice note;
+only a field-by-field comparison against a captured baseline caught it.
+**§38 (2026-09-09)** runs the same review over all 31 decision tables: **thirty of thirty-one are
+tight** — no dead output column, no unreachable row. The exceptions: `shortLabel` was filled for 13
+of 28 catalogue rows and **never rendered anywhere** (the outline exists only in step 1, whose items
+are groups, which have no catalogue row), so it is gone from table, model, DTO and frontend; and
+`factor.deductible` held a real 200/500/1000 ladder that nothing could reach. ⚙️ Rather than cut it
+to a `*` row — the "artificial one-liner" the owner forbade — the deductible became a **step-2
+question** replacing `RENOVATED`, a field no rule ever read. Zero new rules: a catalogue row with
+`kind = MONEY` and `contextPath = quote.policy.deductible` was enough, and a 1000 zł deductible now
+takes 481 zł off the COMPLETE premium. ⛔ The trap on the way: answer and model share that one path,
+and reversing `collectAnswers`/`collectComputed` to fix it **broke the zones**, because
+`collectComputed` derives the postcode prefix *from the answers* — `putIfAbsent` on the single path
+is the fix. Also: `apk.question.visibility` loses a whole input dimension (`age` served only the dead
+question), two duplicate `ZX` rows in `flood.waitingPeriod` collapse into one, and `offer.choiceKind`
+closes both open range bounds (W-30 — an open bound matches `null` and beats the wildcard row).
+⛔ `basis` in the seven `cover.*` tables never varies **within** a table but stays: by §36's rule it is
+an *ingredient* of the premium and belongs in the table.
+**§39–§40 (2026-09-09/10)** apply two more owner rules. **The context carries facts, not
+derivations**: `PropertyContext` went from fifteen pushed values to nine — five paths nobody read
+(three backed by model fields with no setter, so the engine received `null` on every call), and the
+building age, whose whole chain collapsed once `factor.buildingAge` took `$f` as its level source.
+The two-digit postcode area is gone entirely: the zone and rate tables key on the **full postcode**,
+the client's own answer, because a demo holds a dozen of them. ⚠️ `quote.sums.suggestedBuilding`
+looked dead among the rules and is read back **by Java** — removing it silently added a sentence to
+the justification, so search the application as well as the rules. The risk factor and the flood zone
+stay as deliberate memoisation points. And **package availability lost its table**: a package is
+sellable exactly when all its covers are, with the reason composed from the covers' own sentences.
+⛔ An intermediate version added a `BLOCKS_PACKAGE` flag per cover; the owner cut it — all covers
+must be available, full stop. ⚠️ That withdraws COMPLETE when there is no security, where it used to
+price with theft at zero. ⛔ The narrow context in `apk.indicated`/`alternative` must carry **every**
+field a cover's availability keys on (zone and security today) or the recommendation and the screen
+disagree silently.
+**§41 (2026-09-10)** removes the unavailability reason from the demo **entirely** rather than moving
+it again: there is no case here where the client is told why something is not for sale, so the
+`variant.blocked` function, the `reason` column on `cover.theft`, the `FLOOD_UNAVAILABLE` values and
+rows, the `unavailableReason` wire field and its stylesheet rule all go, and `calculateQuote` becomes
+linear. ⛔ The `reason` column on `cover.flood` **stays** — `FLOOD_DEDUCTIBLE` is a condition of sale,
+not a refusal. Unavailability itself still works; the variant simply comes back without a sentence.
+⚠️ **W-27 a third time, and silently**: clearing two cells produced two *extra* rows rather than
+editing the existing ones, and the table still behaved correctly because the first matching row won —
+a scan of all 30 tables for duplicate input keys is what found it, and it is cheap enough to run after
+every column change. ⛔ Two self-inflicted lessons: **never delete a block of text with a `DOTALL`
+regex** (a non-greedy `.*?` jumped an interface boundary and ate ~30 lines of `property.ts`, and left
+a dangling `}` in a LESS file that only failed two steps later), and **`git checkout HEAD -- <file>`
+is not a recovery** for a file carrying same-day uncommitted work — it turned one broken interface
+into a set of missing fields.
+**§42 (2026-09-10)** closes the gap §36 measured: after it `Property.java` holds **zero rule codes
+and zero `engine.get`/`call`/`flow`** — everything the application asks Higson for goes through an
+element's attribute, leaving only `getDomain` (the way into the tree) and `setEffectiveDate`. Nine
+rules had nowhere to hang and got attributes; two helpers carry every call, and one of them hides
+whether the rule is a flow or a function, because that is configuration. ⚠️ **An attribute backed by
+a FLOW has no named levels** — `getBigDecimal("factor")` on one throws `UnknownLevelNameException`,
+which is what the first attempt did. ⛔ `COVERS[FLOOD]` now has two attributes on the same table
+(`IS_AVAILABLE`, `DEDUCTIBLE`) and that is a **recorded exception**: §36 removed such pairs where the
+second was an *ingredient* of an answer already on the element, while an imposed deductible is a
+different answer that availability cannot yield. `ApkAnalysis.justify` stops taking a table code and
+takes a row supplier instead, so the shared layer finally knows no rule address (⚠️ `deriveNeeds`
+still does, for the two unconverted demos). All three demos verified field by field: identical.
+**§43 (2026-09-10)** x-rays `LIABILITY_SUM` and removes three traces around it. The attribute earns
+its place on the **variant** because the OC cover is one element while the sum differs per package;
+it is the cover's sum (`SUM_BASIS = CATALOGUE`), the tariff key that makes the rate **degressive**
+(0.09‰ under 500k, 0.07‰ over — COMPLETE pays 170.10 instead of 218.70), and the figure the offer
+prints. What went: the `0` on BASIC, which has no OC at all — ⛔ **not** the §33.8 case of a neutral
+dictionary row, because here the question does not apply, and zero reads as "cover for zero złoty";
+the `liabilitySum` wire field, which **no template ever rendered** (the sum reaches the screen on the
+cover itself); and `Sums.liability`, a model field **with no setter** whose only effect was pushing
+`null` into the context — §39's pattern, missed then because the package pricing overwrote it.
+⚠️ **`higson_update_domain_type` with `defaultValue` omitted DELETES the default**, even under
+`action: NO_CHANGES` — same family as `update_function` without `arguments`; clearing one default
+silently cleared two others. Pass `defaultValue` for every attribute you list.
+**§44 (2026-09-10)** makes a question describe itself. The trigger was an owner's objection to the
+`APK[NEEDS]` screen, and counting the catalogue's columns found the real fault: **five of them were
+filled only for subject fields, two only for tree elements** — one table doing two jobs under one
+name, hanging under the needs analysis while 13 of its 27 rows described step two. So `QUESTION`
+goes 3 → **9** attributes and `QUESTION_GROUP` 0 → **3** (position, required, options, labels and
+the reveal chain move onto the element), and the catalogue becomes
+**`demo.property.subject.field`** — 28 rows → 14, 11 output columns → 9 — moving to the product as
+`SUBJECT_FIELDS`. ⛔ Only ONE attribute left the screen (9 remain, not the 6 the analysis predicted):
+`VISIBILITY`'s two real rows are both **subject fields with no element to hang on**, `ANSWER_MAP` has
+a second dimension, and `REVEAL` has no `question` column at all — it keys on the chain's state. The
+boundary is exactly where the tree's elements end, and closing it fully would mean reversing §29/§32.
+⚙️ Proof that the attribute now decides, not the table: `POSITION` on `BUDGET` changed in Studio from
+251 to 205 moved the survey **without a restart**, with the table still saying 251.
+⚠️ Fourteen elements were filled by **one XML import**, not 47 MCP calls; the import reported
+"Deleted: 5" and only a before/after diff showed those were empty-valued attributes — the import
+report is not evidence, the diff is.
+**§45 (2026-09-10)** takes the next step the owner asked for — a question should know **how it
+behaves**, not just what it says. The mechanism is that an attribute's value can be either: `true`
+written literally where the answer never varies, or a pointer to a rule where it does, **in the same
+cell**. `QUESTION` goes 9 → **12** attributes, `QUESTION_GROUP` 3 → **4**. Fourteen questions and
+groups now carry `IS_VISIBLE = true` instead of each asking a table that returned the wildcard row;
+⛔ this is **not** a return to the pre-§17 state, where `IS_VISIBLE` was the same pointer to the same
+table on every question — the criterion is not "how many pointers" but "does the value say anything
+about this element". `BLOCKS_WHEN`/`BLOCK_MESSAGE` move onto the question and
+**`demo.property.apk.question.blocker` is deleted** (it had one real row); a new
+`questionElement(Question)` returns **null for a subject field** and callers must bear it.
+⛔ The owner chose **not** to make the 13 subject fields elements, so three tables stay for named
+reasons: `VISIBILITY`'s only two rows are subject fields with nothing to hang on, `ANSWER_MAP` is
+read by a Groovy function that would need an element-or-table branch per answer (a complication
+of the kind §37 removed), and `REVEAL` has no `question` column at all. The boundary now runs
+**across** the principle rather than beside it — closing it means reversing §29/§32, which is
+deferred, not rejected.
+**§46 (2026-09-10)** withdraws §45's `IS_VISIBLE` the same day it was added. The owner pointed out
+that visibility and the reveal chain are one thing wearing two names — **both answer "is this
+question asked or not"** — and checking proved it: the **intersection is empty**, visibility was used
+by two subject fields and the chain by six APK questions, never both on one question. "The floor does
+not apply to a house" needs no concept of its own: `revealedBy = PROPERTY_KIND, revealedWhen = FLAT`.
+⚙️ The `revealedBy`/`revealedWhen` columns §44 had dropped from the catalogue as **empty for every
+subject field** come back with content — unplanned confirmation that catalogue and tree describe the
+same kind of thing. Gone: `IS_VISIBLE` from `QUESTION`/`QUESTION_GROUP`, `VISIBILITY` from
+`NEEDS_ANALYSIS` (9 → **8** attributes), the visibility table (**28** tables left), and `visible` from
+the property DTO, the TS model and two frontend filters. ⛔ `Question.visible` **stays in the shared
+APK layer** — motor and life read their own visibility tables. ⚠️ The distinction had one real
+consequence (the progress counter counted by `visible`, the chain decided rendering); step 1 is
+unaffected because no APK question was ever invisible, and step 2 now renders `reachable()` and
+completes on revealed fields. Two frontend tests encoded exactly that distinction and were rewritten
+to what remains — a test whose subject disappears goes with it, rather than being bent to pass.
+**§47 (2026-09-10)** answers the owner's next objection — *"you are adding configuration for things
+that can be derived from what is already there"* — and it was right twice over. `revealedBy` held
+**two roles**: on five groups it merely restated the order `POSITION` already gives (200…250), on
+three questions it carried a real condition. The five go; **question order comes from `POSITION` and
+the end of the survey is the absence of a next position**, neither configured twice. Also gone: the
+whole gate — `BLOCKS_WHEN`/`BLOCK_MESSAGE` (**added the same day in §45**), `applyBlocker`, the
+`blocked`/`blockedBy`/`blockMessage` fields through model, DTO, converter, TS model, two signals, a
+template block and a stylesheet rule. ⛔ The gate is **not** relocated — it is simply not shown in the
+demo, and a mechanism nobody demonstrates is configuration maintained for no reason. Navigation needed
+no change: the cursor already walked a position-sorted list. ⚠️ Five groups are now revealed from the
+start and the outline is clickable throughout — intended. **The lesson, arriving three times in one
+day: ask whether a value can be derived from what the element already carries BEFORE adding an
+attribute** — three attributes and one table were created and removed within the same day.
+**§48 (2026-09-10)** removes the cause the three previous sections had only been treating symptoms
+of. The owner's point: *the answers are already in the context, so make the next question's
+visibility depend on them — the dependency is then done, without any extra logic.* One table with
+three inputs (`question.code` plus the **context paths of two answers**) and five rows replaces: the
+`reveal` table with **five inputs**, `applyReveal` (45 lines), `sourceMatches` (10), `withReveal`
+plus five context fields (20), the `REVEALED_BY`/`REVEALED_WHEN` attributes (`QUESTION` 9 → **7**),
+two catalogue columns, and `revealed`/`revealedBy`/`revealedWhen` in the **shared** APK model, which
+only property ever used. ⚙️ The engine resolves by **row specificity, not order**, so a missing
+answer lands on the general row and `true` on the more specific one — verified across all three
+states. ⛔ The warning sign in hindsight: the old table **had no `question` column at all** — it keyed
+solely on state Java had just computed. **A rule whose inputs come from the application's own
+calculations rather than from the quote usually describes a mechanism invented alongside the engine.**
+The wire field is called `visible` again, because that is what it is; the only diff across the three
+demos is that rename.
+**§49 (2026-09-10)** applies three owner corrections to §48. **A visibility rule belongs to ONE
+question**: §48's single shared table with a `question` column (and a pointer on `APK[NEEDS]`, mixing
+subject fields with the survey) splits into `demo.property.question.assistance.visible` — hanging
+under that question's own `IS_VISIBLE`, **with no question column at all**, because the tree says who
+it is about — and `demo.property.subject.field.visible` on the product, where the code column IS
+needed because subject fields are not elements. Same pattern as D-21 for covers. **Options follow
+from `KIND`**: `OPTIONS`/`OPTION_LABELS` leave `QUESTION` since a survey question is yes-or-no and
+nothing else in this demo, while subject fields keep their own lists in the catalogue where they
+genuinely differ. **A step follows from its questions**: `REQUIRED` leaves `QUESTION_GROUP` — it
+matched the questions 6 times out of 6, i.e. the same rule written twice. ⛔ But **visibility of a
+step is not derived the same way — a step is ALWAYS listed**; the first attempt computed it like
+required and that was wrong, because the outline must be stable while conditionality works *inside*
+a step. ⚠️ The regression showed up in the baseline diff (six groups at `visible: false`), not in the
+scenarios, which watched questions rather than steps. `QUESTION` ends at **6** attributes,
+`QUESTION_GROUP` at **1**.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -362,12 +591,21 @@ Located in `.maister/docs/standards/higson/`
 Five standards: *Snapshot Directory Is the Single Source of Truth* (`src/main/higson` addressed everywhere via `${higson.snapshot.dir}`; never a second copy, zip fixture, or hard-coded path); ***The Snapshot IS Version-Controlled Since 2026-09-04*** — ⛔ **reversed**: it was untracked for nine years and is now committed in full for all three profiles, because the entire configuration existed only inside a local Studio container. **Studio is still where rules are changed**, so the committed tree drifts the moment someone edits without exporting — treat a stale working tree as normal, not as a fault; *Higson CLI Runs On Demand With Safe Defaults* (no `<executions>`, nothing deleted, no auto-commit without explicit opt-in); *Version Business Logic Through the Snapshot, Not SQL Migrations* (no Flyway/Liquibase, ever — subject to the not-committed caveat); *Bump the Higson Runtime and CLI Plugin in Lockstep* (runtime + CLI plugin move together with `Dockerfile`, `docker-compose.yml`, `push-to-docker.sh`, `Readme.md`).
 
 #### Java ↔ Higson Integration Boundary (`standards/higson/integration.md`)
-Five standards: *Higson Runtime API Confined to adapter / context / service* (`io.higson.*` may appear only in `adapter`, `context`, `service`, and the `example` orchestrator — `api`, `dto`, `converter`, `domain` stay Higson-free); *One Adapter Per Domain Class, Exposing Canonical Paths* (each aggregate gets one `Adapter` with a single-argument constructor and a fluent `getMapping()`; child aggregates nest, collections use `CollectionAdapter`; canonical path segments are defined here and nowhere else); *Wire Only the DataSourceProxy Manually* (everything else comes from starter auto-configuration; the `BeanPostProcessor` `@Bean` must be `static`); *Configure the Engine Only Through `higson.*` Properties* (keep `dev-mode-enabled=false`, `function.validate-arguments=true`, `diagnostic.profiler.enabled=false`; never set dialect or schema explicitly); *Reference Rule Codes Through Java Constants* (constants holder or enum, plus the varargs `HigsonContext(path, value, ...)` constructor).
+Six standards (one added 2026-09-10: ⛔ ***Reach a Rule Through the Domain Tree, Not by Its Code*** —
+the application asks the tree for an element and reads the rule from its **attribute**; naming the
+rule breaks three things silently, because repointing the attribute in Studio then changes nothing,
+deleting the element breaks nothing visible, and the call site encodes whether the rule is a table or
+a flow. Read the **whole row** through `DomainAttribute.getValue(ctx)` rather than adding a pointer
+per column, hide the FlowResult-vs-map difference behind one helper — ⚠️ an attribute backed by a
+FLOW has no named levels and `getBigDecimal("name")` on one throws — and give shared layers a **row
+supplier, never an address**. PROPERTY is fully converted; MOTOR and LIFE are not, and the older
+*Reference Rule Codes Through Java Constants* now applies only where a rule genuinely is not in the
+tree). The rest: *Higson Runtime API Confined to adapter / context / service* (`io.higson.*` may appear only in `adapter`, `context`, `service`, and the `example` orchestrator — `api`, `dto`, `converter`, `domain` stay Higson-free); *One Adapter Per Domain Class, Exposing Canonical Paths* (each aggregate gets one `Adapter` with a single-argument constructor and a fluent `getMapping()`; child aggregates nest, collections use `CollectionAdapter`; canonical path segments are defined here and nowhere else); *Wire Only the DataSourceProxy Manually* (everything else comes from starter auto-configuration; the `BeanPostProcessor` `@Bean` must be `static`); *Configure the Engine Only Through `higson.*` Properties* (keep `dev-mode-enabled=false`, `function.validate-arguments=true`, `diagnostic.profiler.enabled=false`; never set dialect or schema explicitly); *Reference Rule Codes Through Java Constants* (constants holder or enum, plus the varargs `HigsonContext(path, value, ...)` constructor).
 
 > ⛔ **The `function.validate-arguments=true` clause is correct — do not "fix" it.** It was challenged during the frontend migration and the challenge was **disproven empirically**: the running application with the property enabled returns a complete quote. The observed failure came from a hand-built test engine reading the snapshot directly, not from the configuration. See `.maister/tasks/migrations/2026-08-06-angularjs-to-angular/implementation/work-log.md` (Group 1) for the full differential.
 
 #### Authoring Rules in the Snapshot (`standards/higson/rules-authoring.md`)
-Eight standards governing `.def`/`.mat` decision tables and Groovy functions: *Pricing Logic Belongs in Higson Rules, Not Java* (a tariff change must never require recompiling); *Parameter Code Mirrors the Snapshot File Path* (path with `/` → `.`, under a `demo.motor.*` business prefix); *Input Levels Bind `property == source` to Canonical Model Paths* (58 of 58 levels; paths always start at an adapter-exposed root); *Decision Tables Are Cacheable With a Wildcard Default Row* (`cacheable = true`, semicolon matrix with `#matrix for parameter` header, `nullable = false` tables open with a `*` row); *Groovy Function Header Contract* (generated TOML header, `#Full code` matching the path, `ctx` always the first argument, explicit `return`); *Rule Bodies Read Only `ctx` and the `higson` Helpers* (zero imports, zero references to application Java classes); ⛔ *Flows Use Only DECISION_TABLE, FUNCTION and FLOW — Never `EXPRESSION`* (the MCP tool description still lists it, but that documentation is stale and the capability is being removed; a flow cannot do arithmetic, so small utilities like `demo.util.multiply` carry it, and a `FLOW` action returns a `FlowResult` rather than a number); *Known Drift: Legacy ParamContext Binding* (29 of 36 functions still on `org.smartparam.*` — migrate opportunistically, no dedicated sweep).
+Eleven standards (three added 2026-09-09: *Group Domain Attributes by NAME, Not by Number* — `group` on the type / `groupName` on the element is what Studio renders as a section header, `groupOrder` alone gives anonymous blocks, `0` means ungrouped, the name is a **label** in the register of the attribute names beside it (*Podstawy wyceny* / *Warunki oferty* / *Notatka o wyborze klienta*, ordered to follow the process) rather than a code like `OFFER`, and ⚠️ the MCP schema omits `group` although it round-trips, while a domain-TYPE change is not session-scoped and cannot be rejected; *A Per-Element Constant Goes on the Element — Unless a Catalogue Table Already Owns Its Kind*, the recorded exception to D-23 with the "is there already a home for facts of this kind" criterion; and *A Question May Be Composed of Fields, and That Is a Column Too*, the `partOf` contract with its counter, reveal-chain and settlement rules) governing `.def`/`.mat` decision tables and Groovy functions: *Pricing Logic Belongs in Higson Rules, Not Java* (a tariff change must never require recompiling); *Parameter Code Mirrors the Snapshot File Path* (path with `/` → `.`, under a `demo.motor.*` business prefix); *Input Levels Bind `property == source` to Canonical Model Paths* (58 of 58 levels; paths always start at an adapter-exposed root); *Decision Tables Are Cacheable With a Wildcard Default Row* (`cacheable = true`, semicolon matrix with `#matrix for parameter` header, `nullable = false` tables open with a `*` row); *Groovy Function Header Contract* (generated TOML header, `#Full code` matching the path, `ctx` always the first argument, explicit `return`); *Rule Bodies Read Only `ctx` and the `higson` Helpers* (zero imports, zero references to application Java classes); ⛔ *Flows Use Only DECISION_TABLE, FUNCTION and FLOW — Never `EXPRESSION`* (the MCP tool description still lists it, but that documentation is stale and the capability is being removed; a flow cannot do arithmetic, so small utilities like `demo.util.multiply` carry it, and a `FLOW` action returns a `FlowResult` rather than a number); *Known Drift: Legacy ParamContext Binding* (29 of 36 functions still on `org.smartparam.*` — migrate opportunistically, no dedicated sweep).
 
 ---
 
@@ -411,6 +649,7 @@ These standards apply to the **Angular 22** SPA under `frontend/` and its build.
 
 #### Components (`standards/frontend/components.md`)
 Standalone components — **never write `standalone: true`**, it is the v22 default; signal inputs via `input()` / `input.required()` and `output()` instead of `@Input`/`@Output`; `inject()` rather than constructor parameters; built-in `@if` / `@for` / `@switch` control flow with a **mandatory stable `track`** and no client-side sort (the backend already orders); `OnPush` on every component and host bindings in the `host` object; co-located same-named files with no `.component` suffix and an `app-root` selector that is never a real HTML tag. ⛔ Contains the load-bearing behavioural rule: **recalculation runs through `QuoteStore`**, and the **vehicle-cascade asymmetry** (only a *model* change reloads the quote) is encoded as an exhaustive `RELOADS_QUOTE` table — losing it is a failed migration. Ends with an open item: `AC-S1`'s explicit-`OnPush` requirement versus current Angular guidance.
+⛔ **A shared component that must look different in one demo** (2026-09-09): an `appearance` **input** when the DOM differs (`app-step-bar`'s circle-vs-inline number), **CSS custom properties** when only the skin does (`app-apk-recommendation`'s panel-vs-border) — never a silent restyle of all three demos, and never `::ng-deep` to dodge the input.
 Since August 2026 the shared demo chrome lives in `frontend/src/app/shared/`: `app-step-bar`,
 `app-apk-questionnaire` and `app-apk-recommendation`. The recommendation component knows no product —
 it renders a proposal with a variant and one without from the same file.
@@ -429,11 +668,11 @@ Signals rather than `BehaviorSubject`; `computed()` for derived state and `linke
 **Read before** writing TypeScript or changing the compiler configuration.
 
 #### Build & Assets (`standards/frontend/build.md`)
-⚠️ ***Ship no HTML `<base>` element and set no `baseHref`*** — the servlet context path is a runtime value, and the CLI's default `<base href="/">` would 404 every asset under `/demo` and `/app`; verified across all three context paths from one WAR. Stylesheet assets live under `frontend/src/styles/`, **not** `public/`, because `url()` resolves relative to the partial that wrote it. The build is `npm ci && ng build` in `frontend/`, wired into Maven `prepare-package` via `exec-maven-plugin` with `<workingDirectory>`, with the output pulled into the WAR by a **deliberately unpinned** `maven-war-plugin` `<webResources>` block (Spring Boot manages it at 3.4.0 and its `pluginManagement` carries an `<archive>` block an explicit version would clobber). Generated assets are never committed; exact pins for every `@angular/*`, `rxjs` and `typescript` (`typescript@latest` is 7.0.2 and breaks the build; `less` must be declared explicitly because `@angular/build` ships `sass`); the Node range is enforced by `engines` + `engine-strict`, and by nothing else.
-**Read before** touching the build, adding a dependency, or moving an asset.
+⚠️ ***Ship no HTML `<base>` element and set no `baseHref`*** — the servlet context path is a runtime value, and the CLI's default `<base href="/">` would 404 every asset under `/demo` and `/app`; verified across all three context paths from one WAR. Stylesheet assets live under `frontend/src/styles/`, **not** `public/`, because `url()` resolves relative to the partial that wrote it. The build is `npm ci && ng build` in `frontend/`, wired into Maven `prepare-package` via `exec-maven-plugin` with `<workingDirectory>`, with the output pulled into the WAR by a **deliberately unpinned** `maven-war-plugin` `<webResources>` block (Spring Boot manages it at 3.4.0 and its `pluginManagement` carries an `<archive>` block an explicit version would clobber). Generated assets are never committed; exact pins for every `@angular/*`, `rxjs` and `typescript` (`typescript@latest` is 7.0.2 and breaks the build; `less` must be declared explicitly because `@angular/build` ships `sass`); the Node range is enforced by `engines` + `engine-strict`, and by nothing else. ⛔ **The `ng serve` proxy** (fixed 2026-09-09, previously unusable for every demo): each target must carry the `/demo` context path, each entry needs `"cookiePathRewrite": "/"` — without it Tomcat's `Path=/demo` cookie never comes back, **every request opens a new session**, and answers vanish while `PUT`s return 200 — and every `*Api` root must be listed.
+**Read before** touching the build, adding a dependency, moving an asset, or debugging a control that "does not save" under `ng serve`.
 
 #### CSS (`standards/frontend/css.md`)
-LESS is the styling language, with `frontend/src/styles.less` as the sole global entry point, compiled by the Angular CLI as part of `ng build` — the Gulp `less` task and the tracked `src/main/webapp/styles/styles.min.css` are gone. **One scoped Sass exception**: `frontend/src/theme.scss`, the only `.scss` file, because Angular Material's `mat.theme()` API is Sass-only and has no LESS equivalent; it is listed **first** in `angular.json` so LESS wins the cascade. Appearance is not a parity gate — the UI moved wholesale to Angular Material by decision, and a visual difference is never on its own a finding. ⛔ **The action colour is the Agent Portal's teal, never red**: `--p-button-primary-background` points at `--p-primary-150` (#3F8797), while `--accent-500` (#FF0000) is an accent used in the brand gradient and nowhere else — reading that backwards is what once put red buttons on every screen. ⚠️ **Contrast is measured on every background**, not just white: two published portal values fall under 4.5:1 and are darkened by the smallest passing step, and muted copy has to clear both the white panel and the grey page ground.
+LESS is the styling language, with `frontend/src/styles.less` as the sole global entry point, compiled by the Angular CLI as part of `ng build` — the Gulp `less` task and the tracked `src/main/webapp/styles/styles.min.css` are gone. **One scoped Sass exception**: `frontend/src/theme.scss`, the only `.scss` file, because Angular Material's `mat.theme()` API is Sass-only and has no LESS equivalent; it is listed **first** in `angular.json` so LESS wins the cascade. Appearance is not a parity gate — the UI moved wholesale to Angular Material by decision, and a visual difference is never on its own a finding. ⛔ **The action colour is teal, never red**: `--accent-500` (#FF0000) is an accent used in the brand gradient and nowhere else — reading that backwards is what once put red buttons on every screen. ⚠️ **Contrast is measured on every background**, not just white: muted copy has to clear both the white panel and the grey page ground. ⛔ **Recorded departure (2026-09-09)**: the palette now follows the property demo's UX mockups rather than the portal, and the action colour `#2AA399` measures **3.09:1** on white — under the 4.5:1 floor, on copy the floor applies to. Two passing alternatives were offered and declined; the owner chose the mockup as drawn. It is **not a bug to fix back**, it covers the action colour **only**, and it is **global** (one token, all three demos).
 **Read before** adding a stylesheet, picking a colour, or changing a design token.
 
 #### Accessibility (`standards/frontend/accessibility.md`)
@@ -536,4 +775,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-09 (§34 — the first rule tests: ten cases over the property tariff flow)
+**Last regenerated**: 2026-09-10 (§49 — a rule belongs to one question; the rest is derived)

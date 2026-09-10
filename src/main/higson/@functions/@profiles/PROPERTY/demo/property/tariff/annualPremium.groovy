@@ -21,7 +21,4 @@ type = "BIG_DECIMAL"
 
 def row = higson.getValue('demo.property.factor.period', ctx)
 def factor = row.get(0, 'factor')
-if (factor == null) {
-	factor = 1
-}
 return math.round(base * factor, 2)

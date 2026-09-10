@@ -1,5 +1,5 @@
 code = "demo.property.offer.choiceKind"
-description = "Rek. 9.3 - w ofercie ma stac, czy klient poszedl za rekomendacja, czy od niej odszedl i w ktora strone. Wejsciem jest ROZNICA pozycji w drabince pakietow, ktora liczy util demo.property.util.choiceDelta; tabela nadaje jej nazwe. Do 8 wrzesnia 2026 calosc byla funkcja Groovy z dwoma sprawdzeniami null i porownaniem - teraz null nie pasuje do zadnego wiersza i tabela zwraca null, bo nie ma jeszcze czego oceniac."
+description = "Rek. 9.3 - w ofercie ma stac, czy klient poszedl za rekomendacja, czy od niej odszedl i w ktora strone. Wejsciem jest ROZNICA pozycji w drabince pakietow, ktora liczy util demo.property.util.choiceDelta; tabela nadaje jej nazwe. Zakresy sa DOMKNIETE z obu stron celowo: otwarty koniec dopasowuje takze null i bije wiersz gwiazdkowy (W-30), a null znaczy tu \"nie ma jeszcze czego oceniac\" i ma nie pasowac do niczego."
 nullable = true
 dictionary = false
 cacheable = true

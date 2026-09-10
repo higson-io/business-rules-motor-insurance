@@ -1,7 +1,9 @@
 package pl.decerto.higson.demo.property.converter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -30,12 +32,12 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 
 		dto.setStartDate(quote.getPolicy().getStartDate());
 		dto.setDeductible(quote.getPolicy().getDeductible());
+		dto.setFloodDeductible(quote.getFloodDeductible());
 
 		dto.setQuestions(convertQuestions(quote));
 
 		dto.setFloodZone(quote.getZone().getFlood());
 		dto.setTheftZone(quote.getZone().getTheft());
-		dto.setBuildingAge(quote.getBuildingAge());
 		dto.setRiskFactor(quote.getRiskFactor());
 
 		dto.setSumBuilding(quote.getSums().getBuilding());
@@ -50,9 +52,7 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 		dto.setOffer(convertOffer(quote.getOffer()));
 		dto.setPolicyholder(convertPolicyholder(quote.getPolicyholder()));
 		dto.setSelectedVariant(quote.getSelectedVariant());
-		dto.setBlocked(quote.isBlocked());
-		dto.setBlockMessage(quote.getBlockMessage());
-		dto.setBlockedBy(quote.getBlockedBy());
+		dto.setVariantChosen(quote.isVariantChosen());
 
 		return dto;
 	}
@@ -96,34 +96,69 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 	}
 
 
+	/**
+	 * Pytania na drut — i JEDYNE miejsce, w którym płaska lista staje się drzewem.
+	 *
+	 * ⛔ Pole pytania złożonego NIE trafia na najwyższy poziom, tylko pod swojego rodzica. Gdyby
+	 * trafiło, ekran policzyłby je jako osobne pytanie („1 z 8" zamiast „1 z 7") i pokazał je
+	 * dwa razy — raz w środku rodzica, raz obok niego.
+	 *
+	 * ⚠️ Pole, którego rodzica nie ma na liście (literówka w kolumnie `partOf`, rodzic odcięty
+	 * regułą widoczności), zostaje pytaniem samodzielnym. Ciche zniknięcie byłoby gorsze:
+	 * konfigurator zobaczyłby brakujące pytanie i nie miałby jak zgadnąć, czym się różni od
+	 * pytania niewidocznego.
+	 */
 	private List<PropertyQuestionDto> convertQuestions(PropertyQuote quote) {
 		List<PropertyQuestionDto> result = new ArrayList<>();
-		for (Question question : quote.getQuestions()) {
-			PropertyQuestionDto dto = new PropertyQuestionDto();
-			dto.setCode(question.getCode());
-			dto.setText(question.getText());
-			dto.setKind(question.getKind());
-			dto.setSection(question.getSection());
-			dto.setPosition(question.getPosition());
-			dto.setVisible(question.isVisible());
-			dto.setRevealed(question.isRevealed());
-			dto.setRequired(question.isRequired());
-			dto.setOptions(question.getOptions());
-			dto.setOptionLabels(question.getOptionLabels());
-			dto.setPrefillSource(question.getPrefillSource());
-			dto.setRefusalMessage(question.getRefusalMessage());
+		Map<String, PropertyQuestionDto> byCode = new LinkedHashMap<>();
+		List<Question> fields = new ArrayList<>();
 
-			Answer answer = quote.getAnswers().get(question.getCode());
-			if (answer != null) {
-				dto.setValue(answer.getValue());
-				dto.setValues(answer.getValues());
-				dto.setRefused(answer.isRefused());
+		for (Question question : quote.getQuestions()) {
+			PropertyQuestionDto dto = convertQuestion(quote, question);
+			byCode.put(question.getCode(), dto);
+			if (question.isField()) {
+				fields.add(question);
 			} else {
-				dto.setValues(new ArrayList<>());
+				result.add(dto);
 			}
-			result.add(dto);
+		}
+
+		for (Question field : fields) {
+			PropertyQuestionDto parent = byCode.get(field.getPartOf());
+			PropertyQuestionDto dto = byCode.get(field.getCode());
+			if (parent == null) {
+				result.add(dto);
+			} else {
+				parent.getFields().add(dto);
+			}
 		}
 		return result;
+	}
+
+	/** Jedno pytanie — bez wiedzy o tym, czy jest polem czy stoi samo. */
+	private PropertyQuestionDto convertQuestion(PropertyQuote quote, Question question) {
+		PropertyQuestionDto dto = new PropertyQuestionDto();
+		dto.setCode(question.getCode());
+		dto.setText(question.getText());
+		dto.setKind(question.getKind());
+		dto.setSection(question.getSection());
+		dto.setPosition(question.getPosition());
+		dto.setVisible(question.isVisible());
+		dto.setRequired(question.isRequired());
+		dto.setOptions(question.getOptions());
+		dto.setOptionLabels(question.getOptionLabels());
+		dto.setPrefillSource(question.getPrefillSource());
+		dto.setRefusalMessage(question.getRefusalMessage());
+
+		Answer answer = quote.getAnswers().get(question.getCode());
+		if (answer != null) {
+			dto.setValue(answer.getValue());
+			dto.setValues(answer.getValues());
+			dto.setRefused(answer.isRefused());
+		} else {
+			dto.setValues(new ArrayList<>());
+		}
+		return dto;
 	}
 
 	private List<PropertyCoverDto> convertCovers(List<Cover> covers) {
@@ -151,8 +186,6 @@ public class PropertyQuoteConverter implements Converter<PropertyQuote, Property
 			dto.setDescription(variant.getDescription());
 			dto.setPosition(variant.getPosition());
 			dto.setAvailable(variant.isAvailable());
-			dto.setUnavailableReason(variant.getUnavailableReason());
-			dto.setLiabilitySum(variant.getLiabilitySum());
 			dto.setAnnualPremium(variant.getAnnualPremium());
 			dto.setInstalment(variant.getInstalment());
 			dto.setBreakdown(variant.getBreakdown());

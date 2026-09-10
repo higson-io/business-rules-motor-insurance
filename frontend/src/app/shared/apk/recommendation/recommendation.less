@@ -17,11 +17,21 @@
 }
 
 // Panel portalu: 8px, 1.5rem, bez obrysu — patrz `.apk__section`.
+//
+// ⛔ Obudowa jest STEROWALNA Z ZEWNĄTRZ, przez właściwości niestandardowe. Demo majątkowe stoi od
+// 2026-09-09 w jednej białej karcie i potrzebuje tam obrysu zamiast cienia; moto i życie stoją
+// dalej na szarym tle i potrzebują panelu. Wartości domyślne to wariant panelowy, więc oba
+// pozostałe dema nie wiedzą, że coś się zmieniło.
+//
+// ⚠️ Właściwość niestandardowa, a nie wejście komponentu — inaczej niż w `step-bar`. Kryterium:
+// tam różni się DRZEWO (numer w kółku kontra numer w linii), więc różnicę musi znać komponent;
+// tutaj różnią się trzy deklaracje na jednym pudełku, więc wystarczy, że gospodarz je poda.
 .reco__pick {
 	padding: @space-panel;
 	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
+	border: var(--reco-border, 0 solid transparent);
+	border-radius: var(--reco-radius, @radius-panel);
+	box-shadow: var(--reco-shadow, @shadow-panel);
 }
 
 .reco__head {
@@ -73,12 +83,12 @@
 	color: @color-text-muted;
 }
 
-// Tytuł panelu — turkus `--primary-150`, tak jak `.panel-title` w portalu.
+// Tytuł panelu — turkus, tak jak nagłówki sekcji dokumentu w makiecie.
 .reco__title {
 	margin: 0;
 	font-size: @font-xl;
-	font-weight: 600;
-	color: @color-panel-title;
+	font-weight: 700;
+	color: @color-action;
 }
 
 .reco__coverage {
@@ -138,9 +148,12 @@
 	margin-bottom: 4px;
 }
 
+// ⛔ Turkus, nie zieleń „sukcesu". Makieta znaczy pokryte potrzeby kolorem akcji, a nie zielenią
+// stanu — i słusznie: to nie jest komunikat o powodzeniu operacji, tylko pozycja na liście
+// zakresu. Znaczenie niesie ✓ kontra —, a nie barwa; barwa niesie markę.
 .reco__need__mark {
 	font-weight: 700;
-	color: @color-success;
+	color: @color-action;
 }
 
 // Potrzeba niepokryta zostaje czytelna, ale przestaje wyglądać na załatwioną.
@@ -154,6 +167,14 @@
 
 .reco__justification li {
 	margin-bottom: 5px;
+}
+
+// Numer punktu w kolorze akcji — makieta prowadzi nim wzrok po uzasadnieniu. `::marker` zamiast
+// własnego licznika: numerację i tak generuje `<ol>`, więc drugi licznik mógłby się z nią
+// rozjechać przy zmianie liczby punktów.
+.reco__justification li::marker {
+	color: @color-action;
+	font-weight: 700;
 }
 
 .reco__missing {

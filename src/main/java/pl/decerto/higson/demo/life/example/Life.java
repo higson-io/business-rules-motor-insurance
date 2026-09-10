@@ -354,9 +354,9 @@ public class Life {
 		recommendation.setMissingCovers(score.getMissing());
 
 		if (quote.getApkRegime().isRequiresJustification()) {
-			recommendation.setJustification(ApkAnalysis.justify(engine, PARAM_APK_REASON,
+			recommendation.setJustification(ApkAnalysis.justify(
 				reasons(quote, group, proposed, best, score, recommendation.getBudgetOutcome()),
-				reason -> new LifeContext(quote).withReason(reason)));
+				reason -> engine.get(PARAM_APK_REASON, new LifeContext(quote).withReason(reason))));
 		}
 		return recommendation;
 	}

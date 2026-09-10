@@ -1,5 +1,6 @@
 package pl.decerto.higson.demo.property.api.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Pytanie ankiety APK w postaci, w jakiej widzi je ekran. Wszystko pochodzi z Higsona. */
@@ -7,11 +8,24 @@ public class PropertyQuestionDto {
 
 	private String code;
 	private String text;
+
+
+
+	/**
+	 * Pola pytania złożonego. Puste dla pytania zwykłego.
+	 *
+	 * ⛔ Zagnieżdżenie istnieje TYLKO na drucie. W modelu lista pytań jest płaska, a pole niesie
+	 * kod rodzica ({@code Question#partOf}) — dzięki temu odpowiedź, wartość demonstracyjna
+	 * i każde inne wyszukanie po kodzie działa bez wiedzy o tym, czy pytanie ma rodzica.
+	 *
+	 * ⚠️ Jeden poziom, bez rekursji w praktyce. Typ pozwala na głębiej, bo jest tym samym typem
+	 * co pytanie — ale nic głębszego nie jest budowane i nie ma po co być.
+	 */
+	private List<PropertyQuestionDto> fields = new ArrayList<>();
 	private String kind;
 	private String section;
 	private int position;
 	private boolean visible;
-	private boolean revealed;
 	private boolean required;
 	private List<String> options;
 	private List<String> optionLabels;
@@ -37,6 +51,15 @@ public class PropertyQuestionDto {
 		this.text = text;
 	}
 
+	public List<PropertyQuestionDto> getFields() {
+		return fields;
+	}
+
+	public void setFields(List<PropertyQuestionDto> fields) {
+		this.fields = fields;
+	}
+
+
 	public String getKind() {
 		return kind;
 	}
@@ -59,14 +82,6 @@ public class PropertyQuestionDto {
 
 	public void setPosition(int position) {
 		this.position = position;
-	}
-
-	public boolean isRevealed() {
-		return revealed;
-	}
-
-	public void setRevealed(boolean revealed) {
-		this.revealed = revealed;
 	}
 
 	public boolean isVisible() {

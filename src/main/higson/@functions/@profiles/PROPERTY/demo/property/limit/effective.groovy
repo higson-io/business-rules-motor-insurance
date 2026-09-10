@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Efektywny limit odpowiedzialnosci pokrycia. Rodzaj limitu NIE JEST osobna kolumna - wynika z tego, ktore z dwoch wartosci sa podane: sam ulamek daje limit procentowy, sama kwota kwotowy, obie nizsza z dwoch, zadna brak limitu. Ulamek i kwote czyta z atrybutow pokrycia, czyli z jego wlasnej tabeli."
+description = "Efektywny limit odpowiedzialnosci pokrycia. Rodzaj limitu NIE JEST osobna kolumna - wynika z tego, ktore z dwoch wartosci sa podane: sam ulamek daje limit procentowy, sama kwota kwotowy, obie nizsza z dwoch, zadna brak limitu. Ulamek i kwote czyta z ATRYBUTOW pokrycia, ktore niosa je wprost albo wskazuja wlasna tabele pokrycia tam, gdzie zmieniaja sie z jej kluczem."
 
 [[arguments]]
 name = "ctx"
@@ -31,9 +31,8 @@ if (!hasRatio) {
 	return absolute
 }
 
-// ⛔ Suma przez cover.sum, a NIE wprost z quote.sums.KOD. Kradziez i powodz nie maja wlasnej
-// sumy - ida na sumie ruchomosci i murow - wiec odczyt po kodzie pokrycia zwracal dla nich null
-// i limit kradziezy po cichu znikal z oferty.
+// Suma przez cover.sum, nie wprost quote.sums.<kod> - kradziez i powodz nie maja wlasnej sumy,
+// ida na sumie ruchomosci/murow.
 def base = higson.call('demo.property.cover.sum', ctx)
 if (base == null) {
 	return hasAbsolute ? absolute : null

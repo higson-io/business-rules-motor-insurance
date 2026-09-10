@@ -11,10 +11,6 @@ public class Sums {
 	private BigDecimal building;
 	private BigDecimal fixtures;
 	private BigDecimal contents;
-	private BigDecimal theft;
-	private BigDecimal flood;
-	private BigDecimal liability;
-	private BigDecimal assistance;
 	private BigDecimal suggestedBuilding;
 
 	public BigDecimal getBuilding() {
@@ -41,37 +37,7 @@ public class Sums {
 		this.contents = contents;
 	}
 
-	public BigDecimal getTheft() {
-		return theft;
-	}
 
-	public void setTheft(BigDecimal theft) {
-		this.theft = theft;
-	}
-
-	public BigDecimal getFlood() {
-		return flood;
-	}
-
-	public void setFlood(BigDecimal flood) {
-		this.flood = flood;
-	}
-
-	public BigDecimal getLiability() {
-		return liability;
-	}
-
-	public void setLiability(BigDecimal liability) {
-		this.liability = liability;
-	}
-
-	public BigDecimal getAssistance() {
-		return assistance;
-	}
-
-	public void setAssistance(BigDecimal assistance) {
-		this.assistance = assistance;
-	}
 
 	public BigDecimal getSuggestedBuilding() {
 		return suggestedBuilding;

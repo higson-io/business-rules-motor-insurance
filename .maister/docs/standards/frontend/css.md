@@ -66,6 +66,29 @@ tinted fill it may land on.
 rows with `rgba(91, 111, 132, 0.04)`, and a probe that treats a translucent colour as opaque reports
 a dark background and a fabricated failure.
 
+### ⛔ Recorded Departure (2026-09-09): the Action Colour Now Fails That Floor, Deliberately
+
+Since 2026-09-09 the palette follows the UX mockups for the property demo rather than the portal,
+and the action colour is **`#2AA399`** — measured **3.09:1** against white and **2.83:1** against the
+page ground, both under the 4.5:1 floor. In the mockups that colour carries the active step-bar tab,
+the justification numbering and white button labels, so it is copy the floor applies to.
+
+Two passing options were offered and declined: `#207A72` (the same hue darkened — 5.14:1 / 4.71:1)
+and the previous `#317989` (4.97:1 / 4.55:1). The demo's owner chose the mockup as drawn. See D-1 in
+`.maister/tasks/development/2026-09-09-ux-redesign-property/brief.md`.
+
+What this means for anyone reading the code:
+
+- **It is not a bug and must not be "fixed" back to a passing value** without that decision being
+  revisited. `_variables.less` and `theme.scss` both carry the measured figures beside the hex.
+- **The departure covers the action colour only.** Every other foreground still has to clear 4.5:1 on
+  every background it lands on — the muted tone, the amber departure block in the offer, and anything
+  new. Measure them; the exception does not spread.
+- **The change is global, not per-demo.** `@color-action` and `--mat-sys-primary` are one token for
+  all three demos, so motor and life took the new teal too. Splitting it three ways would have put
+  three palettes in one application, which is worse than one recorded departure.
+- The page ground moved with it, from `#f5f5f5` to `#f3f5f9`. Re-measure against the new value.
+
 ---
 
 ## General CSS Guidance

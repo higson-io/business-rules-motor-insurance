@@ -1,6 +1,5 @@
 package pl.decerto.higson.demo.property.domain;
 
-import pl.decerto.higson.demo.apk.Regime;
 
 import pl.decerto.higson.demo.apk.Answer;
 
@@ -30,7 +29,6 @@ public class PropertyQuote {
 	private final Sums sums = new Sums();
 	private final Zone zone = new Zone();
 
-	private Regime regime = new Regime();
 	/** Pytania ankiety i pola przedmiotu ubezpieczenia, w kolejności zadawania. */
 	private List<Question> questions = new ArrayList<>();
 
@@ -49,7 +47,17 @@ public class PropertyQuote {
 	private final Policyholder policyholder = new Policyholder();
 
 	private BigDecimal riskFactor;
-	private Integer buildingAge;
+
+	/**
+	 * Franszyza narzucona przez strefę powodziową — NIE jest tym samym co franszyza polisy.
+	 *
+	 * ⛔ Polisa ma własną franszyzę (`policy.deductible`), której w tym demie nikt nie ustawia,
+	 * więc zawsze wynosi zero. Ta tutaj jest warunkiem JEDNEGO pokrycia, postawionym przez regułę
+	 * strefy, i tylko ona jest prawdziwa. Trzymanie obu pod jedną nazwą na jednym ekranie dawało
+	 * ofertę, w której załącznik mówił „powódź wymaga franszyzy 1 000 zł", a tabela obok
+	 * „Franszyza redukcyjna: 0 zł".
+	 */
+	private BigDecimal floodDeductible;
 	private String selectedVariant;
 
 	/**
@@ -70,17 +78,6 @@ public class PropertyQuote {
 	 */
 	private boolean buildingSumOverridden;
 
-	/**
-	 * Czy któraś odpowiedź zamknęła tę ścieżkę.
-	 *
-	 * ⛔ Rozstrzyga o tym TABELA `demo.property.apk.question.blocker`, a nie warunek w kodzie.
-	 * Dzięki temu bramką może się stać dowolne pytanie bez wdrożenia — a dziś jest nią brak
-	 * potrzeby ubezpieczenia nieruchomości. Wycena leci dalej mimo bramki: prowadzący ma móc
-	 * cofnąć jedną odpowiedź i pokazać, że ekran wraca do życia.
-	 */
-	private boolean blocked;
-	private String blockedBy;
-	private String blockMessage;
 
 
 	public Policy getPolicy() {
@@ -95,13 +92,6 @@ public class PropertyQuote {
 		return zone;
 	}
 
-	public Regime getRegime() {
-		return regime;
-	}
-
-	public void setRegime(Regime regime) {
-		this.regime = regime;
-	}
 
 	public List<Question> getQuestions() {
 		return questions;
@@ -167,17 +157,18 @@ public class PropertyQuote {
 		return riskFactor;
 	}
 
+	public BigDecimal getFloodDeductible() {
+		return floodDeductible;
+	}
+
+	public void setFloodDeductible(BigDecimal floodDeductible) {
+		this.floodDeductible = floodDeductible;
+	}
+
 	public void setRiskFactor(BigDecimal riskFactor) {
 		this.riskFactor = riskFactor;
 	}
 
-	public Integer getBuildingAge() {
-		return buildingAge;
-	}
-
-	public void setBuildingAge(Integer buildingAge) {
-		this.buildingAge = buildingAge;
-	}
 
 	public String getSelectedVariant() {
 		return selectedVariant;
@@ -193,30 +184,6 @@ public class PropertyQuote {
 
 	public void setVariantChosen(boolean variantChosen) {
 		this.variantChosen = variantChosen;
-	}
-
-	public boolean isBlocked() {
-		return blocked;
-	}
-
-	public void setBlocked(boolean blocked) {
-		this.blocked = blocked;
-	}
-
-	public String getBlockedBy() {
-		return blockedBy;
-	}
-
-	public void setBlockedBy(String blockedBy) {
-		this.blockedBy = blockedBy;
-	}
-
-	public String getBlockMessage() {
-		return blockMessage;
-	}
-
-	public void setBlockMessage(String blockMessage) {
-		this.blockMessage = blockMessage;
 	}
 
 	public boolean isBuildingSumOverridden() {

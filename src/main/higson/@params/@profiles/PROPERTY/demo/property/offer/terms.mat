@@ -1,4 +1,0 @@
-#matrix for parameter demo.property.offer.terms
-code;validityDays;paymentDays;needsAnalysisAttached;statement
-*;30;14;false;Potwierdzam otrzymanie OWU i akceptuję warunki oferty.
-KNF_190_2026;30;14;true;Potwierdzam otrzymanie OWU oraz dokumentu analizy potrzeb wraz z pisemnym uzasadnieniem rekomendacji i akceptuję warunki oferty.

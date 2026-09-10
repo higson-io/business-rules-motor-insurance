@@ -1,5 +1,5 @@
 code = "demo.property.zone.theft"
-description = "Druga strefa z tego samego adresu - czynnik skladki, nie dostepnosc (D-3)."
+description = "Druga strefa z tego samego adresu - czynnik skladki, nie dostepnosc (D-3). Kluczem jest PELNY kod pocztowy, wprost z odpowiedzi klienta, bez posredniej warstwy dwucyfrowego obszaru. Wiersz gwiazdkowy to strefa najnizsza, bez podwyzki."
 nullable = false
 dictionary = false
 cacheable = true
@@ -9,27 +9,27 @@ eagerReload = false
 hotswapReload = false
 sort = ""
 slave = false
-label = "Theft zone by postcode area"
+label = "Strefa kradziezowa wedlug kodu pocztowego"
 
 [[inputLevel]]
-code = "area"
-label = "postcode area"
+code = "postcode"
+label = "kod pocztowy miejsca ubezpieczenia"
 type = "string"
 reverseMatcher = false
-property = "quote.property.postcodeArea"
-source = "quote.property.postcodeArea"
+property = "quote.property.postcode"
+source = "quote.property.postcode"
 union = false
 
 [[outputLevel]]
 code = "zone"
-label = "theft zone"
+label = "strefa kradziezowa"
 type = "string"
 external = false
 array = false
 
 [[outputLevel]]
 code = "factor"
-label = "factor"
+label = "mnoznik skladki"
 type = "number"
 external = false
 array = false

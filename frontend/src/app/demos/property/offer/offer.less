@@ -7,11 +7,13 @@
 // Panel portalu, jak każdy inny na tych ekranach. Wystawiona polisa dostaje miętową krechę
 // u góry — ten sam kolor, którym pasek kroków oznacza krok ukończony, więc znaczenie jest już
 // na ekranie nauczone.
+// ⛔ OBRYS, nie cień — dokument stoi od 2026-09-09 w białej karcie dema, a cień na bieli tylko
+// rozmywa krawędź, zamiast ją narysować.
 .offer {
 	padding: @space-panel;
 	background: @color-paper;
-	border-radius: @radius-panel;
-	box-shadow: @shadow-panel;
+	border: 1px solid @color-border-soft;
+	border-radius: 12px;
 }
 
 .offer--issued {
@@ -28,13 +30,16 @@
 	border-bottom: 1px solid @color-border-block;
 }
 
+// ⛔ Szara, nie turkusowa. „OFERTA" to etykieta rodzaju dokumentu, a nie nagłówek sekcji —
+// w makiecie kolor akcji noszą wyłącznie nagłówki treści i akcje, a ta linijka mówi tylko,
+// na co się patrzy.
 .offer__kind {
 	margin: 0;
 	font-size: @font-xs;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: @color-panel-title;
+	color: @color-text-muted;
 }
 
 // Numer dokumentu czyta się z sali, więc jest największym obiektem nagłówka. `tabular-nums`,
@@ -98,8 +103,60 @@
 .offer__block__title {
 	margin: 0 0 12px;
 	font-size: @font-lg;
-	font-weight: 600;
-	color: @color-panel-title;
+	font-weight: 700;
+	color: @color-action;
+}
+
+// ── Załącznik jako <details> ──────────────────────────────────────────────────────────────────
+
+// Notatka o wyborze wewnątrz załącznika — odstęp od nagłówka i od treści analizy, bo to trzy
+// osobne rzeczy w jednym dokumencie, a nie ciąg dalszy nagłówka.
+.offer__apk__choice {
+	margin: 16px 0 20px;
+
+	.offer__block__title {
+		font-size: @font-md;
+	}
+}
+
+.offer__apk__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	cursor: pointer;
+	// Domyślny trójkącik przeglądarki znika — rysujemy własny chevron po prawej, jak w makiecie.
+	list-style: none;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid @color-action;
+		outline-offset: 4px;
+		border-radius: 4px;
+	}
+}
+
+// Chevron z dwóch krawędzi kwadratu obróconego o 45° — bez ikony i bez fontu ikonowego,
+// których to demo nie ma (C-10 zdjął Font Awesome).
+.offer__apk__chevron {
+	flex: 0 0 auto;
+	width: 9px;
+	height: 9px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate(45deg);
+	transform-origin: center;
+	transition: transform 0.15s ease;
+	margin-bottom: 4px;
+}
+
+.offer__apk-block[open] .offer__apk__chevron {
+	transform: rotate(225deg);
+	margin-bottom: 0;
+	margin-top: 4px;
 }
 
 .offer__covers {
@@ -270,16 +327,12 @@
 	padding: 16px 18px;
 	border-left: 3px solid @color-success;
 	border-radius: 0 @radius-button @radius-button 0;
-	background: @color-ground;
-}
-
-// Odstąpienie od rekomendacji dostaje ton ostrzegawczy — ten sam, którym mówi się o wyłączeniach.
-.offer__choice--departs {
-	border-left-color: @color-warn;
+	background: @color-surface-muted;
 }
 
 .offer__choice .offer__block__title {
 	margin-bottom: 6px;
+	color: @color-action;
 }
 
 .offer__choice__text {
@@ -294,4 +347,50 @@
 	font-size: @font-sm;
 	line-height: 1.5;
 	color: @color-warn;
+}
+
+// ── Odstąpienie od rekomendacji ───────────────────────────────────────────────────────────────
+//
+// ⛔ PEŁNA RAMKA, nie krecha z boku. Do 2026-09-09 odstąpienie różniło się od zgodności samym
+// kolorem trzypikselowej kreski przy lewej krawędzi — różnica, której nie widać z sali. Makieta
+// robi z tego osobny, bursztynowy blok, i to jest właściwa waga: rek. 9.3 każe odnotować, że
+// klient zszedł poniżej rekomendacji, a nie wspomnieć o tym.
+.offer__choice--departs {
+	border: 1px solid @color-warn-amber-line;
+	border-radius: @radius-button;
+	background: @color-warn-amber;
+
+	.offer__block__title {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: @color-warn-amber-text;
+		font-size: @font-md;
+
+		// Znak ostrzegawczy jest OZDOBĄ — treść niesie tytuł i zdanie pod nim, więc glif rysuje
+		// CSS i nie trafia do drzewa dostępności jako osobny, nic nieznaczący napis.
+		&::before {
+			content: '⚠';
+			font-size: @font-lg;
+			line-height: 1;
+		}
+	}
+
+	.offer__choice__text {
+		color: @color-warn-amber-text;
+		font-size: @font-sm;
+	}
+
+	// Potrzeby bez pokrycia: lista bez punktora, każda pozycja ze znacznikiem braku.
+	.offer__choice__unmet {
+		list-style: none;
+		padding-left: 0;
+		color: @color-warn;
+		font-weight: 600;
+	}
+
+	.offer__choice__unmet li::before {
+		content: '⊗';
+		margin-right: 8px;
+	}
 }

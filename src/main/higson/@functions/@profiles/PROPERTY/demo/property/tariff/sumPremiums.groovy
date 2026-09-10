@@ -24,6 +24,7 @@ if (breakdown == null || breakdown.isEmpty()) {
 }
 def total = 0
 for (def line in breakdown.split(';')) {
-	total = total + new BigDecimal(line.split('=')[1])
+	def amountText = line.split('=')[1]
+	total = total + new BigDecimal(amountText)
 }
 return math.round(total, 2)
