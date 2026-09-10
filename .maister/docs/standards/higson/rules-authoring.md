@@ -42,6 +42,72 @@ BI;BRONZE;yes
 
 *Evidence:* 42 of 43 `.def` files declare `cacheable = true`; 35 of 35 `.mat` files open with the comment; 34 of 35 follow with a header row.
 
+### A Value That Only Records a Structural Split Belongs in Code, Not in Configuration
+
+When a number exists solely to encode a distinction the structure already makes, configuring it adds
+a value to maintain without adding a decision anyone will make. Put it in the application as a named
+constant and say in one place what the structure means.
+
+*Evidence (2026-09-10):* needs declared by the client live on question attributes, needs inferred
+from the subject live in a table; the weight settling collisions between them was first a type
+default plus a column, then two constants — `WEIGHT_DECLARED` / `WEIGHT_INFERRED` — because it never
+varied per question and never could without contradicting where each need comes from.
+
+⛔ This is the **narrow** exception to "pricing and product logic belong in rules". It applies when
+the value has exactly one sensible setting given the structure. A threshold someone might tune, a
+rate, a limit, a sentence the client reads — none of those qualify, however constant they look today.
+
+⚠️ Verify the distinction is real before flattening it: here it settled four collisions and changed
+the outcome in three, always the same direction. Had it changed outcomes in both directions, it would
+have been a genuine dimension and belonged in a table.
+
+### Put the Arithmetic in a Function Bound to `source`, Not in the Application
+
+A decision table cannot divide, so somebody must compute the number a threshold is compared against.
+That somebody is a **small function bound to the level's `source`** — not the application. The table
+then shows one honestly named column, and the reader sees what is compared with what.
+
+```toml
+[[inputLevel]]
+code = "ratio"
+label = "suma wybrana do wyliczonej"
+matcher = "between/ii"
+levelCreator = "$f demo.property.util.sumRatio"
+source = "$f demo.property.util.sumRatio"
+```
+
+⛔ **A column whose meaning changes per row is the symptom to look for.** One table serving several
+subjects, switched by a `family`-style column, ends up with a level named "proportion or count" —
+which is an admission that it cannot be named. Split it: one table per question, each column
+computed by its own function.
+
+⚠️ **Moving a decision out of Java moves its guards too.** An `if (value != null && value > 0)` that
+used to stand before the call must become a **closed lower bound** in the table, because an open
+bound (`* - 0.85`) matches `null` (W-30) — otherwise a client who supplied nothing is told their
+figure is too low.
+
+⚠️ The cost is real and worth stating: this split traded one table for four plus four functions.
+Configuration grew so it could be read without the code — that is the trade, and it is only worth
+making where someone outside the codebase has to understand the result.
+
+### Check `find_usages` BEFORE Deleting, and Publish the Session After Fixing
+
+Two mistakes from one afternoon, both cheap to avoid:
+
+⛔ **`higson_find_usages` before every delete.** A function deleted without it was called by a flow
+two hops away (`apk.recommend` → `apk.covers` → the deleted one), and every request returned HTTP 500.
+The tool answers in one call; `confirm: true` on the delete silences the very check that would have
+caught it.
+
+⛔ **`open` → `get` → `update` is mandatory for matrix edits.** An `UPDATE` whose ids came from a
+`get` without a preceding `higson_open_decision_table` **adds a row instead of replacing it** — and
+the table can keep behaving correctly, because the narrower row still wins, so only reading the
+snapshot reveals it. It happened three times in one pass.
+
+⚠️ **A corrected function does nothing until its work session is published.** `higson_update_function`
+opens a new session; rebuilding and retesting against an unpublished change reproduces the original
+error exactly, which reads as "the fix did not work".
+
 ### A Rule Belongs to One Element — So It Carries No Column Naming That Element
 
 When an element can hold a pointer, give it **its own** table, keyed only by what actually decides

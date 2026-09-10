@@ -1,5 +1,0 @@
-#matrix for parameter demo.property.sum.valueGap
-ratio;reasonCode
-* - 0.85;VALUE_UNDERSTATED
-0.85 - 1.15;VALUE_CONSISTENT
-1.15 - *;VALUE_OVERSTATED

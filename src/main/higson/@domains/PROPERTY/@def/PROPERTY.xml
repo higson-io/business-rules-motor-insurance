@@ -142,7 +142,7 @@
             <profile>PROPERTY</profile>
             <code>NEEDS_ANALYSIS</code>
             <name>Analiza potrzeb klienta</name>
-            <description>Analiza potrzeb jako jeden obiekt. Pytania wisza pod nim w GRUPACH i KAZDE OPISUJE SIE SAMO - lacznie z tym, czy zadajemy je temu klientowi: pytanie warunkowe wskazuje WLASNA regule na swoim atrybucie IS_VISIBLE. Atrybuty tego elementu dotycza CALEJ ankiety: czego wymaga odpowiedz, jak dobiera sie pakiet i czym to uzasadniamy.</description>
+            <description>Analiza potrzeb jako jeden obiekt. Pytania wisza pod nim w GRUPACH. TRZY ATRYBUTY TO TRZY ETAPY, w kolejnosci: z odpowiedzi powstaja POTRZEBY, z potrzeb wybiera sie PAKIET, z porownania potrzeb z pakietem wypisuja sie POWODY decyzji. Kazdy etap to JEDEN ODCZYT jednej tabeli albo diagramu - aplikacja pyta o niego i przepisuje wynik na ekran.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -157,63 +157,33 @@
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>ANSWER_MAP</code>
-                    <name>Czego wymaga odpowiedz</name>
+                    <code>NEEDS</code>
+                    <name>1. Wyznaczenie potrzeb klienta</name>
                     <order>1</order>
                     <groupOrder>1</groupOrder>
-                    <groupName>Od odpowiedzi do potrzeb</groupName>
+                    <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.apk.answer</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>NEEDS</code>
-                    <name>Potrzeby wynikajace z odpowiedzi</name>
-                    <order>2</order>
-                    <groupOrder>1</groupOrder>
-                    <groupName>Od odpowiedzi do potrzeb</groupName>
-                    <defaultRefType>FUNCTION</defaultRefType>
-                    <defaultRefName>demo.property.apk.needs</defaultRefName>
+                    <defaultRefName>demo.property.apk.need</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>RECOMMENDATION</code>
-                    <name>Dobor pakietu - diagram</name>
-                    <order>1</order>
-                    <groupOrder>2</groupOrder>
-                    <groupName>Dobor pakietu</groupName>
+                    <name>2. Dobor pakietu</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>FLOW</defaultRefType>
                     <defaultRefName>demo.property.apk.recommend</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>JUSTIFICATION</code>
-                    <name>Zdania uzasadnienia</name>
-                    <order>1</order>
-                    <groupOrder>3</groupOrder>
-                    <groupName>Uzasadnienie dla klienta</groupName>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.apk.recommendation.reason</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>REASON</code>
-                    <name>Ktore zdanie uzasadnienia ma padac</name>
-                    <order>2</order>
-                    <groupOrder>3</groupOrder>
-                    <groupName>Uzasadnienie dla klienta</groupName>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.apk.reason</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>VALUE_GAP</code>
-                    <name>Oszacowanie klienta wobec wyliczonej sumy</name>
+                    <name>3. Powody decyzji</name>
                     <order>3</order>
-                    <groupOrder>3</groupOrder>
-                    <groupName>Uzasadnienie dla klienta</groupName>
+                    <groupOrder>1</groupOrder>
+                    <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.sum.valueGap</defaultRefName>
+                    <defaultRefName>demo.property.apk.justification</defaultRefName>
                 </typeAttribute>
             </typeAttributes>
         </domainType>
@@ -221,7 +191,7 @@
             <profile>PROPERTY</profile>
             <code>PRODUCT</code>
             <name>Produkt majatkowy</name>
-            <description>Ubezpieczenie domu i mieszkania. Galezie: APK, COVERS, VARIANTS. Atrybuty w kolejnosci procesu: co zbieramy o przedmiocie, co karmi cene, co mowi dokument oferty, co odnotowuje wybor klienta. Pola przedmiotu opisuje TABELA i tam tez stoi ich widocznosc, bo elementami drzewa nie sa - inaczej niz pytania analizy potrzeb, ktore niosa swoja regule na wlasnym atrybucie.</description>
+            <description>Ubezpieczenie domu i mieszkania. Galezie: APK, COVERS, VARIANTS. Atrybuty w kolejnosci procesu: co zbieramy o przedmiocie, co karmi cene, co mowi dokument oferty, co odnotowuje wybor klienta. Pola przedmiotu opisuje TABELA, bo elementami drzewa nie sa; to, co z nich wynika dla klienta, stoi razem z reszta potrzeb w jednej tabeli pod APK.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -386,7 +356,7 @@
             <profile>PROPERTY</profile>
             <code>QUESTION</code>
             <name>Pytanie</name>
-            <description>Pytanie zadawane klientowi. ELEMENT MOWI O PYTANIU WSZYSTKO: o co pytamy, jakiego rodzaju jest odpowiedz, gdzie ona laduje, gdzie stoi w kolejnosci i czy zadajemy je TEMU klientowi. Z czego wybierac, WYNIKA Z RODZAJU: pytanie analizy potrzeb jest tak-albo-nie i innego w tym demie nie ma, wiec osobnej listy opcji nie potrzebuje. IS_VISIBLE to albo true wpisane wprost, albo wskazanie WLASNEJ reguly pytania - a ta nie ma kolumny z jego kodem, bo o kogo chodzi, mowi miejsce w drzewie.</description>
+            <description>Pytanie zadawane klientowi. ELEMENT MOWI O PYTANIU WSZYSTKO: o co pytamy, jakiego rodzaju jest odpowiedz, gdzie ona laduje, gdzie stoi w kolejnosci i czy zadajemy je TEMU klientowi. Z czego wybierac, wynika z KIND. CO Z ODPOWIEDZI WYNIKA, TU NIE STOI: potrzeby wyznacza jedna tabela demo.property.apk.need, ktora kluczuje sie odpowiedziami - i to ona jest jedynym miejscem, gdzie zmiana czegokolwiek zmienia wynik.</description>
             <rootType>false</rootType>
             <typeAttributes>
                 <typeAttribute>
@@ -454,6 +424,7 @@
             <name>Grupa pytan</name>
             <description>Jeden krok ankiety: to, co spis pokazuje jako jedna pozycje. Grupa NIESIE NAZWE DO SPISU, a pytania pod nia niosa swoje tresci. Wiekszosc grup ma jedno pytanie i wtedy ekran pokazuje samo pytanie; grupa z kilkoma pokazuje swoja nazwe jako naglowek, a pytania jako pola. Grupa ma JEDEN atrybut - swoje miejsce w kolejnosci. Czy krok trzeba domknac i czy go zadajemy, wynika z jej PYTAN; osobne atrybuty bylyby ta sama regula zapisana drugi raz.</description>
             <rootType>false</rootType>
+            <typeNature>PRODUCT</typeNature>
             <typeCollections>
                 <typeCollection>
                     <code>QUESTIONS</code>

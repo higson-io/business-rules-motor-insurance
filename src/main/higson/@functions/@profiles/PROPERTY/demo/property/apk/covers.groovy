@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Same kody pokryc wyciagniete z apk.needs - to, czego szuka sie w skladzie pakietu. Istnieje po to, zeby apk.indicated i apk.alternative nie parsowaly listy potrzeb kazda po swojemu."
+description = "Pokrycia, ktorych klient potrzebuje - to, czego szuka sie w skladzie pakietu. Potrzeby powstaja z ATRYBUTOW PYTAN (zgloszone przez klienta) i z tabeli pol przedmiotu (wywnioskowane), wiec skladane sa poza regulami; tutaj przychodza gotowa lista kodow. Funkcja istnieje po to, zeby apk.indicated i apk.alternative nie parsowaly jej kazda po swojemu."
 
 [[arguments]]
 name = "ctx"
@@ -15,15 +15,12 @@ type = "SPECIFIED_CLASS"
 className = "io.higson.runtime.engine.core.context.ParamContext"
 */
 
-def needs = higson.call('demo.property.apk.needs', ctx)
 def covers = new HashSet()
-if (needs.isEmpty()) {
+def raw = ctx.getString('quote.apk.covers')
+if (raw == null || raw.isEmpty()) {
 	return covers
 }
-for (def line in needs.split(';')) {
-	def sep = line.indexOf('|')
-	if (sep > 0) {
-		covers.add(line.substring(0, sep))
-	}
+for (def code in raw.split(',')) {
+	covers.add(code)
 }
 return covers

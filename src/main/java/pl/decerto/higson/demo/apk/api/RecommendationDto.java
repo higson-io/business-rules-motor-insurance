@@ -76,6 +76,7 @@ public class RecommendationDto {
 		private String coverCode;
 		private String text;
 		private int weight;
+		private boolean declared;
 
 		public String getCoverCode() { return coverCode; }
 		public void setCoverCode(String coverCode) { this.coverCode = coverCode; }
@@ -83,12 +84,15 @@ public class RecommendationDto {
 		public void setText(String text) { this.text = text; }
 		public int getWeight() { return weight; }
 		public void setWeight(int weight) { this.weight = weight; }
+		public boolean isDeclared() { return declared; }
+		public void setDeclared(boolean declared) { this.declared = declared; }
 
 		static NeedDto of(Need need) {
 			NeedDto dto = new NeedDto();
 			dto.setCoverCode(need.getCoverCode());
 			dto.setText(need.getText());
 			dto.setWeight(need.getWeight());
+			dto.setDeclared(need.isDeclared());
 			return dto;
 		}
 	}

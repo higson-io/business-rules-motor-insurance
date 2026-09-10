@@ -1,7 +1,6 @@
 package pl.decerto.higson.demo.property.example;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -15,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.higson.runtime.core.HigsonEngine;
+import io.higson.runtime.engine.core.output.MultiValue;
 import io.higson.runtime.engine.core.output.ParamValue;
 import io.higson.runtime.flow.FlowResult;
 import io.higson.runtime.model.DomainObject;
@@ -104,9 +104,8 @@ public class Property {
 	 */
 	private static final String ATTR_SUBJECT_FIELDS = "SUBJECT_FIELDS";
 	private static final String ATTR_RECOMMENDATION = "RECOMMENDATION";
+	private static final String ATTR_NEEDS = "NEEDS";
 	private static final String ATTR_JUSTIFICATION = "JUSTIFICATION";
-	private static final String ATTR_REASON = "REASON";
-	private static final String ATTR_VALUE_GAP = "VALUE_GAP";
 
 	private static final String ATTR_ZONES = "ZONES";
 	private static final String ATTR_SUM_RATE = "SUM_RATE";
@@ -134,6 +133,7 @@ public class Property {
 	 */
 	private static final String ATTR_IS_VISIBLE = "IS_VISIBLE";
 	private static final String ATTR_FIELD_VISIBILITY = "FIELD_VISIBILITY";
+
 	private static final String ATTR_RISK_FACTOR = "RISK_FACTOR";
 	private static final String ATTR_SUM_INSURED = "SUM_INSURED";
 	private static final String ATTR_OFFER_VALIDITY_DAYS = "OFFER_VALIDITY_DAYS";
@@ -146,10 +146,12 @@ public class Property {
 
 	private static final String PATH_BUDGET = "quote.needs.budget";
 	private static final String PATH_SUM_LIABILITY = "quote.sums.liability";
-	private static final String PATH_APK_ANSWERS = "quote.apk.answers";
+	private static final String PATH_APK_COVERS = "quote.apk.covers";
+	private static final String PATH_APK_PROPOSED = "quote.apk.proposed";
+	private static final String PATH_APK_ALTERNATIVE = "quote.apk.alternative";
+	private static final String PATH_APK_PROPOSED_PREMIUM = "quote.apk.proposedPremium";
 	private static final String PATH_PREMIUM_PREFIX = "quote.premium.";
 	private static final String PATH_PROPERTY_VALUE = "quote.needs.propertyValue";
-	private static final String PATH_VALUE_RATIO = "quote.sums.valueRatio";
 	private static final String PATH_AREA = "quote.property.area";
 	private static final String PATH_SUM_BUILDING = "quote.sums.building";
 	private static final String PATH_SUM_SUGGESTED = "quote.sums.suggestedBuilding";
@@ -388,24 +390,6 @@ public class Property {
 	}
 
 
-	/**
-	 * Pytania, które klient WIDZI — jedyne, których odpowiedzi wolno karmić reguły.
-	 *
-	 * ⛔ Pytanie warunkowe można odsłonić, odpowiedzieć i cofnąć odpowiedź, która je odsłoniła.
-	 * Znika wtedy z ekranu, ale jego odpowiedź zostaje zapisana — świadomie, bo prowadzący wraca
-	 * i nie chce jej wpisywać drugi raz. Bez tego filtra wracała do rekomendacji: „wynajem: nie"
-	 * zostawiało potrzebę assistance i pakiet stał na Pełnym z powodu pytania, którego na ekranie
-	 * już nie ma. Ta sama zasada, którą po stronie ekranu trzyma `shownFields`.
-	 */
-	private List<Question> asked(PropertyQuote quote) {
-		List<Question> shown = new ArrayList<>();
-		for (Question question : quote.getQuestions()) {
-			if (question.isVisible()) {
-				shown.add(question);
-			}
-		}
-		return shown;
-	}
 
 
 	/**
@@ -627,13 +611,7 @@ public class Property {
 	 * dla klienta nie ma w tym pliku — wszystkie siedzą w `demo.property.apk.*`.
 	 */
 	private void recommend(PropertyQuote quote) {
-		// ⛔ POTRZEBY LICZY REGUŁA. `demo.property.apk.needs` przechodzi po odpowiedziach, pyta
-		// tabelę, co każda znaczy, i rozstrzyga kolizje: gdy dwie wskazują to samo pokrycie,
-		// wygrywa wyższa waga. Ta ostatnia reguła stała do 7 września 2026 w `ApkAnalysis`, przez
-		// co o treści potrzeby decydowała kolejność pytań na ekranie.
-		PropertyContext ctx = new PropertyContext(quote)
-			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(asked(quote), quote.getAnswers()));
-		List<Need> needs = parseNeeds(attrString(apkElement(), "NEEDS", ctx));
+		List<Need> needs = collectNeeds(quote);
 		quote.setNeeds(needs);
 
 		// Jedna tabela, jeden przebieg, jedna lista. Wyłączenia OWU stykające się z sytuacją
@@ -750,11 +728,19 @@ public class Property {
 			return recommendation;
 		}
 
-		// Kontekst dla reguł rekomendacji: odpowiedzi jako jeden łańcuch i składka każdego
-		// policzonego pakietu pod własną ścieżką. Reguła nie zna listy pytań ani listy pakietów —
+		// Kontekst dla reguł rekomendacji: pokrycia, których klient potrzebuje, i składka każdego
+		// policzonego pakietu pod własną ścieżką. Reguła nie zna listy potrzeb ani listy pakietów —
 		// jedno i drugie czyta z tego, co tu dostanie, i z drzewa.
+		//
+		// ⛔ Potrzeby są tu FAKTEM, a nie wyprowadzeniem: powstały z reguł (atrybuty pytań plus
+		// tabela pól przedmiotu) i są wejściem do doboru pakietu. Liczenie ich drugi raz wewnątrz
+		// reguły byłoby tą samą robotą w dwóch miejscach.
+		List<String> coverCodes = new ArrayList<>();
+		for (Need need : needs) {
+			coverCodes.add(need.getCoverCode());
+		}
 		PropertyContext ctx = new PropertyContext(quote)
-			.withComputed(PATH_APK_ANSWERS, ApkAnalysis.serialize(asked(quote), quote.getAnswers()));
+			.withComputed(PATH_APK_COVERS, String.join(",", coverCodes));
 		for (Variant variant : quote.getVariants()) {
 			if (variant.isAvailable() && variant.getAnnualPremium() != null) {
 				ctx.withComputed(PATH_PREMIUM_PREFIX + variant.getCode(), variant.getAnnualPremium());
@@ -789,141 +775,111 @@ public class Property {
 		// który tabela ustawiała na `true` i nigdy inaczej — bramka, która nigdy nie zamknęła się
 		// ani razu, a wyglądała, jakby coś rozstrzygała. W tym profilu jest jeden reżim (D-17)
 		// i jest nim KNF, więc rek. 8.7 obowiązuje bez wyjątku.
-		recommendation.setJustification(ApkAnalysis.justify(
-			reasons(quote, proposed, score, recommendation),
-			reason -> ruleOf(apkElement(), ATTR_JUSTIFICATION,
-				new PropertyContext(quote).withReason(reason))));
+		recommendation.setJustification(justification(quote, proposed, score, recommendation));
 		return recommendation;
 	}
 
 	/**
-	 * Powody uzasadnienia: kody i liczby. Ani jednego zdania — te są w
-	 * `demo.property.apk.recommendation.reason`, razem z pozycją, która je sortuje.
+	 * ETAP 3 — powody decyzji, gotowe zdania.
+	 *
+	 * ⛔ Jeden odczyt reguły oddaje WARUNEK, TREŚĆ i miejsce w dokumencie — wszystko w jednym
+	 * wierszu, więc czytając tabelę widać, kiedy zdanie pada i jak brzmi. Aplikacja podstawia
+	 * tylko liczby pod `{0}`, `{1}` i układa zdania po `position`. To nie jest decyzja, tylko
+	 * formatowanie.
 	 */
-	private List<ApkAnalysis.Reason> reasons(PropertyQuote quote, Variant proposed,
+	private List<String> justification(PropertyQuote quote, Variant proposed,
 			ApkAnalysis.Score score, Recommendation recommendation) {
 
 		DomainObject product = productElement();
-		List<ApkAnalysis.Reason> reasons = new ArrayList<>();
+		Variant alternative = variantByCode(quote, recommendation.getAlternativeVariantCode());
 
-		// ⛔ KTÓRE ZDANIE PADA, ROZSTRZYGA TABELA. Java liczy stosunek pokrytych potrzeb do
-		// wszystkich — to arytmetyka — i pyta `demo.property.apk.reason`, co z niego wynika.
-		// Do 8 września 2026 stał tu `if (missing.isEmpty())`, więc próg „pokrywa wszystko"
-		// nie dał się poluzować bez wdrożenia.
+		List<String> gaps = new ArrayList<>();
+		if (alternative != null) {
+			for (String cover : ApkAnalysis.score(quote.getNeeds(),
+					alternative.getCovers()::contains).getMissing()) {
+				gaps.add(nameOf(product, COLLECTION_COVERS, cover));
+			}
+		}
 		List<String> missingNames = new ArrayList<>();
 		for (String cover : score.getMissing()) {
 			missingNames.add(nameOf(product, COLLECTION_COVERS, cover));
 		}
-		String coverage = reasonFor(quote, "COVERAGE", ratio(score.getCovered(), score.getTotal()), null);
-		if (coverage != null) {
-			reasons.add(new ApkAnalysis.Reason(coverage,
-				nameOf(product, COLLECTION_VARIANTS, proposed.getCode()),
-				score.getCovered(), score.getTotal(), String.join(", ", missingNames)));
-		}
-
-		PropertyContext ctx = new PropertyContext(quote);
-		reasons.add(new ApkAnalysis.Reason("SUM_COMPUTED", ctx.get(PATH_AREA),
-			ruleOf(product, ATTR_SUM_RATE, new PropertyContext(quote)).getBigDecimal("rate")));
-
-		// Suma podniesiona albo obniżona ręcznie — klient ma wiedzieć, że odszedł od wyliczenia.
-		// ⚠️ Tabela ma pasmo tolerancji 0,99–1,01: różnica poniżej procenta nie jest warta zdania
-		// w dokumencie. Warunek w Javie mówił „jakakolwiek różnica" i nie dało się tego zmienić.
-		BigDecimal chosen = decimalAt(quote, PATH_SUM_BUILDING);
-		BigDecimal suggested = decimalAt(quote, PATH_SUM_SUGGESTED);
-		String manualSum = reasonFor(quote, "MANUAL_SUM", ratio(chosen, suggested), null);
-		if (manualSum != null) {
-			reasons.add(new ApkAnalysis.Reason(manualSum));
-		}
 
 		BigDecimal budget = decimalAt(quote, PATH_BUDGET);
-		String outcome = recommendation.getBudgetOutcome();
-		if (OUTCOME_FIT.equals(outcome)) {
-			reasons.add(new ApkAnalysis.Reason("BUDGET_FIT", money(proposed.getAnnualPremium()), money(budget)));
-		} else if (OUTCOME_EXCEEDED.equals(outcome)) {
-			// Cena PROPONOWANEGO wariantu — a proponowany jest ten najlepiej dopasowany, bo
-			// oczekiwana składka nie obniża zakresu. Zdanie mówi, o ile jesteśmy powyżej.
-			reasons.add(new ApkAnalysis.Reason("BUDGET_EXCEEDED",
-				money(proposed.getAnnualPremium()), money(budget)));
-			Variant alternative = variantByCode(quote, recommendation.getAlternativeVariantCode());
-			List<String> gaps = new ArrayList<>();
-			if (alternative != null) {
-				for (String cover : ApkAnalysis.score(quote.getNeeds(),
-						alternative.getCovers()::contains).getMissing()) {
-					gaps.add(nameOf(product, COLLECTION_COVERS, cover));
-				}
-			}
-			// ⛔ ZDANIE WYBIERA TABELA, wraz z tym, ILE LUK znaczy „żadnych". Do 8 września 2026
-			// przypadek bez luk wstawiał w placeholder polski tekst wpisany w tę metodę — jedyne
-			// zdanie dla klienta rodzące się w Javie. Teraz liczba luk jest wejściem tabeli,
-			// a zero ma własny kod zdania, więc i tekst, i próg są konfiguracją.
-			String alternativeReason = reasonFor(quote, "BUDGET_ALTERNATIVE",
-				BigDecimal.valueOf(gaps.size()), alternative != null);
-			if (alternative == null) {
-				reasons.add(new ApkAnalysis.Reason(alternativeReason, money(budget)));
-			} else if (gaps.isEmpty()) {
-				reasons.add(new ApkAnalysis.Reason(alternativeReason,
-					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
-					money(alternative.getAnnualPremium())));
-			} else {
-				reasons.add(new ApkAnalysis.Reason(alternativeReason,
-					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
-					money(alternative.getAnnualPremium()),
-					String.join(", ", gaps)));
-			}
-		} else {
-			reasons.add(new ApkAnalysis.Reason("BUDGET_ABSENT"));
-		}
-
-		// Rek. 8.2.c — oszacowanie klienta obok sumy z reguł. Zdanie pada także wtedy, gdy obie
-		// liczby się zgadzają: „sprawdziliśmy i się zgadza" jest częścią wykazania zgodności.
 		BigDecimal declared = decimalAt(quote, PATH_PROPERTY_VALUE);
 		BigDecimal computed = decimalAt(quote, PATH_SUM_SUGGESTED);
-		if (declared != null && declared.signum() > 0 && computed != null && computed.signum() > 0) {
-			// ⛔ KOD ZDANIA CZYTAMY, a nie sklejamy. Do 8 września 2026 stało tu `"VALUE_" + gap`,
-			// co wiązało dwa niezależne słowniki konkatenacją: zmiana słowa w kolumnie `outcome`
-			// dawała kod bez wiersza w tabeli zdań, czyli puste zdanie i żadnego błędu.
-			String valueGap = ruleOf(apkElement(), ATTR_VALUE_GAP, new PropertyContext(quote)
-				.withComputed(PATH_VALUE_RATIO, declared.divide(computed, 4, RoundingMode.HALF_UP)))
-				.getString("reasonCode");
-			if (valueGap != null && !valueGap.isEmpty()) {
-				reasons.add(new ApkAnalysis.Reason(valueGap, money(declared), money(computed)));
+		ParamValue flood = ruleOf(product.getChild(COLLECTION_COVERS, COVER_FLOOD),
+			ATTR_DEDUCTIBLE, new PropertyContext(quote));
+		quote.setFloodDeductible(flood.getBigDecimal("minDeductible"));
+		ParamValue waiting = ruleOf(product.getChild(COLLECTION_COVERS, COVER_FLOOD),
+			ATTR_WAITING_PERIOD, new PropertyContext(quote));
+
+		List<String[]> ordered = new ArrayList<>();
+		for (MultiValue row : justificationRows(quote, proposed, alternative)) {
+			Object[] arguments = switch (row.getString("reasonCode")) {
+				case "NEEDS_MATCHED", "NEEDS_PARTIAL" -> new Object[] {
+					nameOf(product, COLLECTION_VARIANTS, proposed.getCode()),
+					score.getCovered(), score.getTotal(), String.join(", ", missingNames) };
+				case "SUM_COMPUTED" -> new Object[] {
+					new PropertyContext(quote).get(PATH_AREA),
+					ruleOf(product, ATTR_SUM_RATE, new PropertyContext(quote)).getBigDecimal("rate") };
+				case "VALUE_UNDERSTATED", "VALUE_CONSISTENT", "VALUE_OVERSTATED" ->
+					new Object[] { money(declared), money(computed) };
+				case "BUDGET_FIT", "BUDGET_EXCEEDED" ->
+					new Object[] { money(proposed.getAnnualPremium()), money(budget) };
+				case "BUDGET_NO_ALTERNATIVE" -> new Object[] { money(budget) };
+				case "BUDGET_ALTERNATIVE_EQUAL" -> new Object[] {
+					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
+					money(alternative.getAnnualPremium()) };
+				case "BUDGET_ALTERNATIVE" -> new Object[] {
+					nameOf(product, COLLECTION_VARIANTS, alternative.getCode()),
+					money(alternative.getAnnualPremium()), String.join(", ", gaps) };
+				case "FLOOD_DEDUCTIBLE" -> new Object[] { money(flood.getBigDecimal("minDeductible")) };
+				case "FLOOD_WAITING" -> new Object[] { waiting.getInteger("days") };
+				default -> new Object[0];
+			};
+			String text = row.getString("text");
+			for (int i = 0; i < arguments.length; i++) {
+				text = text.replace("{" + i + "}", String.valueOf(arguments[i]));
+			}
+			ordered.add(new String[] { String.format("%04d", intOrZero(row.getInteger("position"))), text });
+		}
+
+		ordered.sort(Comparator.comparing(entry -> entry[0]));
+		List<String> lines = new ArrayList<>();
+		for (String[] entry : ordered) {
+			lines.add(entry[1]);
+		}
+		return lines;
+	}
+
+
+	/**
+	 * ETAP 3 — powody decyzji. Wszystkie naraz, bo poziomy tabeli mają `union`.
+	 *
+	 * ⛔ Do kontekstu idą DANE, nie wnioski: potrzeby klienta, kod i cena proponowanego pakietu,
+	 * kod alternatywy. Czy pakiet pokrywa wszystko, czy suma jest niższa od wyliczonej i czy cena
+	 * mieści się w oczekiwanej składce — stwierdzają funkcje podpięte pod `source` kolumn, więc
+	 * porównania są tam, gdzie widać, co z czym jest porównywane.
+	 */
+	private List<MultiValue> justificationRows(PropertyQuote quote, Variant proposed, Variant alternative) {
+		List<String> coverCodes = new ArrayList<>();
+		for (Need need : quote.getNeeds()) {
+			coverCodes.add(need.getCoverCode());
+		}
+		PropertyContext ctx = new PropertyContext(quote)
+			.withComputed(PATH_APK_COVERS, String.join(",", coverCodes))
+			.withComputed(PATH_APK_PROPOSED, proposed.getCode())
+			.withComputed(PATH_APK_PROPOSED_PREMIUM, proposed.getAnnualPremium())
+			.withComputed(PATH_APK_ALTERNATIVE, alternative == null ? null : alternative.getCode());
+
+		List<MultiValue> rows = new ArrayList<>();
+		for (MultiValue row : ruleOf(apkElement(), ATTR_JUSTIFICATION, ctx)) {
+			if (row.getString("reasonCode") != null) {
+				rows.add(row);
 			}
 		}
-
-
-		// ⛔ TABELA DOSTĘPNOŚCI NAZYWA SWÓJ WŁASNY SKUTEK. Ta sama reguła, która mówi, czy pokrycie
-		// wolno sprzedać, mówi też, co powiedzieć klientowi, gdy nie wolno — kolumna `reasonCode`.
-		// Do 8 września 2026 wybierał to `if` w tej metodzie, a tabela niosła trzecią kopię tekstu
-		// w kolumnie, której nikt nie czytał.
-		// ⛔ WŁASNA TABELA POKRYCIA. Powódź ma swoją, bo tylko jej warunki zależą od strefy:
-		// w Z0 i Z1 sprzedajemy normalnie, w Z2 z franszyzą, w ZX wcale. Każde pokrycie ma taką
-		// tabelę, kluczowaną tym, co dla niego naprawdę rozstrzyga.
-		DomainObject floodCover = product.getChild(COLLECTION_COVERS, COVER_FLOOD);
-		ParamValue flood = ruleOf(floodCover, ATTR_DEDUCTIBLE, new PropertyContext(quote));
-		String floodReason = flood.getString("reason");
-		// ⛔ Franszyza strefowa trafia NA WNIOSEK, nie tylko do zdania. Do 9 września 2026 ta sama
-		// liczba szła wyłącznie jako parametr zdania w załączniku, a tabela pokryć w ofercie
-		// pokazywała obok „Franszyza redukcyjna: 0 zł" — bo czytała franszyzę POLISY, której
-		// w tym demie nikt nie ustawia. Jeden ekran mówił dwie sprzeczne rzeczy o tej samej nazwie.
-		quote.setFloodDeductible(flood.getBigDecimal("minDeductible"));
-		if (floodReason != null && !floodReason.isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason(floodReason, money(flood.getBigDecimal("minDeductible"))));
-		}
-		// ⛔ KARENCJĘ NAZYWA TA SAMA TABELA, KTÓRA ZNA LICZBĘ DNI. Do 8 września 2026 kod zdania
-		// jechał z tabeli pokrycia, a liczba dni z tabeli karencji — więc gdy ciągłość ochrony
-		// zniosła karencję, padało zdanie „zaczyna działać po 0 dniach". Zniesiona karencja to
-		// inne zdanie, a nie to samo z zerem, i wie o tym reguła, nie ten kod.
-		ParamValue waitingRow = ruleOf(floodCover, ATTR_WAITING_PERIOD, new PropertyContext(quote));
-		String waiting = waitingRow.getString("reasonCode");
-		if (waiting != null && !waiting.isEmpty()) {
-			reasons.add(new ApkAnalysis.Reason(waiting, waitingRow.getInteger("days")));
-		}
-
-		// ⛔ Bez podstawy prawnej. Uzasadnienie kończyło się zdaniem „Analizę przeprowadziliśmy
-		// zgodnie z: Rekomendacje 8 i 9 — uchwała KNF nr 190/2026" — powołaniem się na przepis
-		// w notatce, którą czyta klient. Reżim i jego podstawa prawna nadal są w modelu i nadal
-		// sterują tym, co wolno zapytać; przestały być zdaniem w dokumencie.
-		return reasons;
+		return rows;
 	}
 
 	/**
@@ -1097,30 +1053,7 @@ public class Property {
 	 * w polskim dokumencie dawało „2912.65 zł" z kropką — w zdaniu, które klient dostaje
 	 * na piśmie. Język jest cechą ekranu, więc i separator dziesiętny jest.
 	 */
-	/**
-	 * Kod zdania, które ma paść — pyta `demo.property.apk.reason`.
-	 *
-	 * ⛔ Java podaje FAKTY: czego dotyczy pytanie, jaki wyszedł stosunek i czy warunek logiczny
-	 * jest spełniony. Nie wie, jaki próg oddziela jedno zdanie od drugiego ani czy w ogóle jakieś
-	 * ma paść — pusta odpowiedź znaczy „milczymy" i jest równie dobrą odpowiedzią jak każda inna.
-	 */
-	private String reasonFor(PropertyQuote quote, String family, BigDecimal ratio, Boolean flag) {
-		String code = ruleOf(apkElement(), ATTR_REASON,
-			new PropertyContext(quote).withReasonTrigger(family, ratio, flag)).getString("reasonCode");
-		return code == null || code.isEmpty() ? null : code;
-	}
 
-	/** Stosunek dwóch liczb, albo `null`, gdy pytanie nie ma sensu. Sama arytmetyka. */
-	private BigDecimal ratio(BigDecimal value, BigDecimal base) {
-		if (value == null || base == null || base.signum() == 0) {
-			return null;
-		}
-		return value.divide(base, 4, RoundingMode.HALF_UP);
-	}
-
-	private BigDecimal ratio(int value, int base) {
-		return base == 0 ? null : ratio(BigDecimal.valueOf(value), BigDecimal.valueOf(base));
-	}
 
 	private String money(BigDecimal value) {
 		if (value == null) {
@@ -1168,22 +1101,35 @@ public class Property {
 	 * ⚠️ Rozdzielamy po PIERWSZYCH dwóch kreskach, nie przez `split` po całości — treść potrzeby
 	 * jest zdaniem dla klienta i nie ma powodu, żeby kod aplikacji dyktował, czego w niej nie ma.
 	 */
-	private List<Need> parseNeeds(String raw) {
-		List<Need> needs = new ArrayList<>();
-		if (raw == null || raw.isEmpty()) {
-			return needs;
-		}
-		for (String line : raw.split(";")) {
-			int cover = line.indexOf('|');
-			int weight = line.lastIndexOf('|');
-			if (cover < 1 || weight <= cover) {
-				continue;
+
+	/**
+	 * ETAP 1 — potrzeby klienta. Jeden odczyt jednej tabeli.
+	 *
+	 * ⛔ Aplikacja nie chodzi po pytaniach, niczego nie skleja i nie rozstrzyga pierwszeństwa.
+	 * Odpowiedzi są już w kontekście pod swoimi ścieżkami, a `demo.property.apk.need` ma je jako
+	 * kolumny — jeden wiersz mówi „z tej odpowiedzi wynika ta potrzeba". Poziomy mają `union`,
+	 * więc jeden odczyt oddaje wszystkie pasujące wiersze naraz.
+	 *
+	 * ⛔ PIERWSZEŃSTWO TO KOLEJNOŚĆ WIERSZY. Dwie odpowiedzi mogą wskazać to samo pokrycie —
+	 * „obawiam się kradzieży" i „nie mam zabezpieczeń" obie dają THEFT — a klient ma usłyszeć
+	 * jedno zdanie. Wygrywa wiersz wyższy, czyli ten, który klient zgłosił sam; widać to
+	 * w tabeli, nie tutaj.
+	 */
+	private List<Need> collectNeeds(PropertyQuote quote) {
+		Map<String, Need> byCover = new LinkedHashMap<>();
+		for (MultiValue row : ruleOf(apkElement(), ATTR_NEEDS, new PropertyContext(quote))) {
+			String cover = row.getString("cover");
+			if (cover != null && !cover.isEmpty() && !byCover.containsKey(cover)) {
+				Need need = new Need(cover, row.getString("need"), 0);
+				// ⛔ Rek. 8.3: klient ma wiedzieć, co powiedział sam, a co my wywnioskowaliśmy.
+				// Ta sama kolumna, która rozstrzyga pierwszeństwo, mówi też, skąd potrzeba jest.
+				need.setDeclared(intOrZero(row.getInteger("priority")) <= 1);
+				byCover.put(cover, need);
 			}
-			needs.add(new Need(line.substring(0, cover), line.substring(cover + 1, weight),
-				intOrZero(asInt(line.substring(weight + 1)))));
 		}
-		return needs;
+		return new ArrayList<>(byCover.values());
 	}
+
 
 	private List<String> split(String raw) {
 		if (raw == null || raw.isEmpty()) {

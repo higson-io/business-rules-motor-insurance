@@ -525,6 +525,70 @@ required and that was wrong, because the outline must be stable while conditiona
 a step. ⚠️ The regression showed up in the baseline diff (six groups at `visible: false`), not in the
 scenarios, which watched questions rather than steps. `QUESTION` ends at **6** attributes,
 `QUESTION_GROUP` at **1**.
+**§50 (2026-09-10)** splits `ANSWER_MAP` by **where a need comes from**: six yes/no survey questions
+carry `NEED_TEXT`/`NEED_COVER` as attributes beside their own text, four subject fields go to
+`demo.property.subject.field.needs`, and `demo.property.apk.answer` is gone. ⛔ The owner asked
+whether the weight could go and every need weigh the same — **checking said no**: it settles four
+collisions, changing the outcome in three, always the same way (the need the client *declared* beats
+the one *inferred* from the property). Without it the first answer by position wins, and subject
+fields sit at 10–120 against 200+ for survey questions, so the inferred one would win systematically
+— in the justification sentences the demo exists to show. ⚙️ What the owner wanted was still
+obtainable: after the split the weight **follows from the structure**, so it stopped being
+configuration at all — it sits in Java as `WEIGHT_DECLARED = 2` / `WEIGHT_INFERRED = 1`, since the
+split between declared and inferred is structural and the number merely records it. `NEED_WEIGHT`
+and the `weight` column are gone; the 1/2/3 ladder flattens to two levels. ⚙️ A duplicate nobody had noticed also went: the Groovy
+`apk.needs` and Java's `ApkAnalysis.deriveNeeds` were **the same rule line for line**; it now lives
+once in `ApkAnalysis.strongestByCover`, shared by all three demos, and motor and life came out
+bit-identical. ⚠️ Two mistakes worth keeping: a function was **deleted without `find_usages`** (a
+flow called it — every request 500'd), and a corrected function did nothing until its **session was
+published**. `NEEDS_ANALYSIS` ends the day at **4** attributes, down from 10, and `QUESTION` at **8**.
+**§51 (2026-09-10)** reads the justification group and finds two of its three pointers are **two
+different questions** that must stay: `REASON` names which *case* holds from facts Java supplies
+(thresholds live in the table, so the application does not know 0.99 is a boundary), `JUSTIFICATION`
+says which *sentence* that case gets and where it stands in the document. ⛔ Merging them is ruled out
+by a count: **10 of the 17 codes never pass through the first floor at all** — Java assigns them
+directly because the case is unambiguous — so a merged table would carry threshold columns filled in
+7 rows and empty in 10, the exact fault §44 found in the question catalogue. The redundancy was the
+third pointer: `sum.valueGap` had the **same shape** as `apk.reason`'s `MANUAL_SUM` family (a number
+in a range yielding a sentence code) and existed separately only because it lacked a `family` column.
+Its three rows moved in as a fourth family; the table, the attribute and the `quote.sums.valueRatio`
+context path are gone, and nine lines of Java became one call. Profile: **28 tables**.
+**§52 (2026-09-10)** answers the owner's real complaint — *this configuration could not be explained
+in a presentation* — and the diagnosis is the same one §48 made: **all three inputs of `apk.reason`
+came from the application's own arithmetic, not from the quote.** `family` was a literal naming the
+call site, `ratio` a number computed two lines earlier (a proportion in three families, a **gap
+count** in the fourth — hence the column called "proportion or count"), `flag` one boolean used by
+one family. It splits into **four tables, one per question**, each with a column whose value comes
+from a **function bound to `source`** (`$f util.coverageRatio`, `sumRatio`, `valueRatio`,
+`alternativeGaps`) — a pattern this profile already used in `offer.choiceKind` but not where it
+obscured most. Java now supplies only facts (needs, proposed package, alternative) and asks for a
+code. ⚠️ **W-30 bit immediately**: an open bound `* - 0.85` matches `null`, so the first version told
+a client who gave no valuation that they had understated it — the guard used to be an `if` in Java
+and must now live in the rule (closed lower bounds). ⚠️ **W-27 three times in one pass**: `UPDATE`
+without a preceding `open_decision_table` **adds a row instead of replacing it**, and the behaviour
+stayed correct because the narrower row won — order is mandatory: **open → get → update**. Profile
+grows to **31 tables, 23 functions**, deliberately: configuration got bigger so it could be read
+without the code.
+**§53 (2026-09-10)** tells the client which needs they stated and which the insurer inferred —
+rec. 8.3 permits inferring a need from what the client said about the property, on condition the
+client is told. ⚙️ **No new rule**: `demo.property.apk.need` already carries `priority`, `1` on rows
+keyed by a survey answer and `2` on rows keyed by a property characteristic, and that line *is* the
+distinction; Java reads the same column a second time into `Need.declared`. ⛔ One column driving
+both the tie-break and the label is deliberate — they cannot drift apart. The wording travels through
+`ApkRecommendationCopy.needInferred`, **optional and empty meaning "this line does not distinguish"**,
+so MOTO and LIFE (whose needs come only from the survey) are untouched and `declared` defaults to
+`true`. The list heading changes from "Potrzeby wynikające z odpowiedzi" to **"Twoje potrzeby"** —
+with inferred rows in it, the old title was false.
+**§54 (2026-09-10)** deletes the `QUESTION` attribute group "Co z tego wynika" (`NEED_TEXT`,
+`NEED_COVER`) the owner pointed at — dead since §52 moved need derivation into the single
+`demo.property.apk.need` table, and dead in the **silent** way: editing `NEED_TEXT` in Studio looked
+like editing a need and changed nothing. Nothing read them — no rule, and in Java two constants
+declared and never used (a third, `ATTR_FIELD_NEEDS`, pointed at a table §52 had already deleted).
+`QUESTION` goes **8 → 6** attributes and its description now says where the consequence of an answer
+lives, so nobody restores them in good faith. ⚠️ W-29 handled deliberately: every listed attribute
+carried `action: NO_CHANGES` **and its own `defaultValue`**, verified by reading an element straight
+after; a domain-TYPE change is not session-scoped, so there is nothing to publish. Zero differences
+across the three demos.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -775,4 +839,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-10 (§49 — a rule belongs to one question; the rest is derived)
+**Last regenerated**: 2026-09-10 (§54 — the dead "what follows from this" group leaves the question)

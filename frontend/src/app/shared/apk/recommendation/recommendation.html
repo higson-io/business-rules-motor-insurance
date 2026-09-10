@@ -64,7 +64,12 @@
 										<span class="reco__need__mark" aria-hidden="true">{{
 											row.covered ? copy().needCovered : copy().needMissing
 										}}</span>
-										<span>{{ row.text }}</span>
+										<span>
+											{{ row.text }}
+											@if (row.inferred && copy().needInferred) {
+												<span class="reco__need__source">{{ copy().needInferred }}</span>
+											}
+										</span>
 									</li>
 								}
 							</ul>

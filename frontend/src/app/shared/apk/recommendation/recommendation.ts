@@ -104,6 +104,7 @@ export class ApkRecommendation {
 			text: need.text,
 			coverCode: need.coverCode,
 			covered: !missing.has(need.coverCode),
+			inferred: need.declared === false,
 		}));
 	});
 }

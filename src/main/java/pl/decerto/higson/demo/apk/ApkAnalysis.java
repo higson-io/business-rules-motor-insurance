@@ -53,18 +53,32 @@ public final class ApkAnalysis {
 			List<Question> questions, Map<String, Answer> answers,
 			BiFunction<String, String, HigsonContext> contextFor) {
 
-		Map<String, Need> byCover = new LinkedHashMap<>();
+		List<Need> found = new ArrayList<>();
 		for (AnswerRef ref : flatten(questions, answers)) {
 			ParamValue row = engine.get(needTable, contextFor.apply(ref.questionCode, ref.value));
 			String need = row.getString(OUT_NEED);
 			if (need == null || need.isEmpty()) {
 				continue;
 			}
-			String cover = row.getString(OUT_COVER);
-			int weight = intOrZero(row.getInteger(OUT_WEIGHT));
-			Need current = byCover.get(cover);
-			if (current == null || current.getWeight() < weight) {
-				byCover.put(cover, new Need(cover, need, weight));
+			found.add(new Need(row.getString(OUT_COVER), need, intOrZero(row.getInteger(OUT_WEIGHT))));
+		}
+		return strongestByCover(found);
+	}
+
+	/**
+	 * Jedna potrzeba na pokrycie — ta o wyższej wadze.
+	 *
+	 * ⛔ Dwie odpowiedzi mogą wskazać TO SAMO pokrycie, a klient ma usłyszeć jedno zdanie i to
+	 * mocniejsze. Waga rozstrzyga między potrzebą, którą klient ZGŁOSIŁ, a tą, którą
+	 * WYWNIOSKOWALIŚMY z jego sytuacji — pierwsza wygrywa. Bez tego decydowałaby kolejność pytań
+	 * na ekranie, czyli przypadek.
+	 */
+	public static List<Need> strongestByCover(List<Need> found) {
+		Map<String, Need> byCover = new LinkedHashMap<>();
+		for (Need need : found) {
+			Need current = byCover.get(need.getCoverCode());
+			if (current == null || current.getWeight() < need.getWeight()) {
+				byCover.put(need.getCoverCode(), need);
 			}
 		}
 		return new ArrayList<>(byCover.values());

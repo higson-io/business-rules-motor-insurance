@@ -4492,3 +4492,265 @@ patrzył na pytania, a nie na kroki.
 
 `QUESTION_GROUP` niósł 4 atrybuty rano, `QUESTION` 12 w szczycie. Wszystkie trzy dema identyczne,
 testy 11 Java i 72 front.
+
+## §50 Potrzeba stoi przy pytaniu, które ją zgłasza (2026-09-10)
+
+`ANSWER_MAP` była jedną tabelą o 12 wierszach, wspólną dla pytań analizy potrzeb i pól przedmiotu,
+i wisiała na `APK[NEEDS]`. Rozdzielona według tego, **skąd potrzeba się bierze**.
+
+### 50.1 Zgłoszona przy pytaniu, wywnioskowana w tabeli pól
+
+Sześć pytań APK to wszystko tak/nie i każde mapuje jedną odpowiedź na jedno pokrycie — więc dostają
+**atrybuty**, nie tabele: `NEED_TEXT` i `NEED_COVER` obok treści pytania. Cztery pola przedmiotu
+(sześć wierszy, dwa z nich wieloznaczne) idą do **`demo.property.subject.field.needs`**, bo
+elementami nie są. Tabela `demo.property.apk.answer` znika.
+
+⛔ Odpowiedź inna niż „tak" nie zgłasza niczego: „nie" nie jest potrzebą przeciwną, tylko brakiem
+potrzeby.
+
+### 50.2 Waga przestaje być liczbą do wpisywania
+
+Właściciel zapytał, czy nie usunąć wagi i dać wszystkim potrzebom równą. **Sprawdzenie pokazało,
+że nie można** — waga rozstrzyga cztery kolizje, w trzech zmieniając wynik, i za każdym razem
+w jedną stronę:
+
+| pokrycie | z wagą (dziś) | bez wagi |
+|---|---|---|
+| BUILDING | „Ochrona murów i mienia przed pożarem…" — klient **zgłosił** | „Ochrona konstrukcji budynku" — **wywnioskowane** |
+| LIABILITY | „Odpowiedzialność za szkody wyrządzone osobom trzecim…" | „Ochrona przy wynajmie lokalu" |
+| THEFT | „Ochrona przed kradzieżą z włamaniem i rabunkiem" | „Ochrona nieruchomości okresowo pustej" |
+
+Bez wagi wygrywa pierwsza odpowiedź w kolejności, a pola przedmiotu mają pozycje 10–120 wobec 200+
+u pytań APK — czyli **systematycznie** wygrywałaby wywnioskowana. To są zdania uzasadnienia
+rekomendacji, więc dokładnie ten materiał, który demo pokazuje.
+
+⚙️ Ale to, o co chodziło, dało się mieć: po rozdzieleniu waga **wynika ze struktury** — i dlatego
+przestała być konfiguracją w ogóle. Najpierw była domyślną wartością typu i kolumną tabeli;
+na wniosek właściciela zeszła **na sztywno do Javy** jako `WEIGHT_DECLARED = 2` i
+`WEIGHT_INFERRED = 1`, bo skoro podział na zgłoszone i wywnioskowane jest strukturalny, liczba tylko
+go zapisuje. Konfigurowana byłaby trzecią wartością do utrzymywania po to, żeby zawsze mieć tę samą.
+Atrybut `NEED_WEIGHT` i kolumna `weight` zniknęły; drabinka 1/2/3 spłaszczyła się do dwóch poziomów.
+⚠️ Waga jest w DTO i **front jej nie renderuje**; jedyna różnica w porównaniu z bazą to `2 → 1`
+przy niezmienionej treści.
+
+### 50.3 Zniknął duplikat, którego nikt nie widział
+
+Funkcja Groovy `demo.property.apk.needs` i java-owe `ApkAnalysis.deriveNeeds` to była **ta sama
+reguła, linia w linię** — „gdy dwie odpowiedzi wskazują to samo pokrycie, wygrywa wyższa waga".
+PROPERTY liczyło ją w Groovym, MOTOR i LIFE w Javie. Reguła wyjechała do
+`ApkAnalysis.strongestByCover(List<Need>)`, wspólnej dla trzech dem; `deriveNeeds` używa jej
+wewnętrznie, więc MOTOR i LIFE wyszły bit w bit identyczne. Funkcja usunięta, razem z atrybutem
+`NEEDS` i z `parseNeeds` w Javie.
+
+⚙️ `apk.covers` przestaje parsować łańcuch potrzeb — dostaje gotową listę kodów pod
+`quote.apk.covers`. ⛔ To **nie** łamie zasady z §39 („kontekst niesie fakty, nie wyprowadzenia"):
+potrzeby są tu faktem, wynikiem reguł i wejściem do doboru pakietu; liczenie ich drugi raz wewnątrz
+reguły byłoby tą samą robotą w dwóch miejscach. Razem z tym znika `quote.apk.answers`.
+
+### 50.4 Dwie pomyłki po drodze
+
+⚠️ **Usunąłem funkcję bez `find_usages`** — `apk.needs` wołał flow `apk.recommend` przez
+`apk.covers`, więc każde `GET /property` poszło na HTTP 500. Narzędzie sprawdzające użycia jest
+i trzeba go używać **przed** kasowaniem, nie po pierwszym błędzie.
+
+⚠️ **Zmiana funkcji nie działa bez publikacji sesji.** Poprawiłem `apk.covers`, przebudowałem
+i dostałem ten sam błąd — bo `update_function` otwarło nową sesję, której nie opublikowałem.
+
+### 50.5 Stan
+
+| typ | atrybutów |
+|---|---|
+| `QUESTION` | **8** — TEXT, KIND, CONTEXT_PATH, REQUIRED, NEED_TEXT, NEED_COVER, IS_VISIBLE, POSITION |
+| `NEEDS_ANALYSIS` | **4** — RECOMMENDATION, JUSTIFICATION, REASON, VALUE_GAP (plus kolekcja grup) |
+| `QUESTION_GROUP` | **1** — POSITION |
+
+Profil: **29 tabel, 19 funkcji**. `NEEDS_ANALYSIS` niósł rano 10 atrybutów; zostały cztery i wszystkie
+dotyczą całej analizy, a nie pojedynczego pytania. Trzy dema porównane: MOTOR i LIFE identyczne,
+w MAJĄTKU jedna waga. Testy: 11 Java, 72 front.
+
+## §51 Uzasadnienie ma dwa piętra, a trzeci atrybut był drugim zapisem pierwszego (2026-09-10)
+
+Grupa „Uzasadnienie dla klienta" niosła trzy wskaźniki. Analiza pokazała, że **dwa z nich to dwa
+różne pytania i zostają**, a trzeci powtarzał kształt jednego z nich.
+
+### 51.1 Jak to działa
+
+**Piętro pierwsze — który przypadek zachodzi.** Java podaje FAKTY (rodzinę, liczbę, warunek
+logiczny), `REASON` nazywa przypadek kodem. Progi siedzą w tabeli, więc aplikacja nie wie, że 0,99
+to granica ani że pasmo 0,99–1,01 znaczy „różnica poniżej procenta nie jest warta zdania".
+
+**Piętro drugie — jakie zdanie temu odpowiada.** `JUSTIFICATION` to katalog 17 zdań: kod → treść
+z parametrami `{0}`, `{1}` i **pozycja**, która sortuje dokument.
+
+⛔ **Tych dwóch pięter nie wolno scalić i to jest liczbowo widoczne: 10 z 17 kodów w ogóle nie
+przechodzi przez pierwsze.** `SUM_COMPUTED`, `BUDGET_FIT`, `BUDGET_ABSENT`, `FLOOD_*` Java nadaje
+wprost albo biorą się z tabel pokrycia, bo przypadek jest jednoznaczny — nie ma tam progu do
+rozstrzygnięcia. Po scaleniu katalog zdań miałby kolumny progów wypełnione w 7 wierszach i puste
+w 10, czyli dokładnie tę wadę, którą §44 znalazło w katalogu pytań.
+
+### 51.2 Co było nadmiarem
+
+`VALUE_GAP` (`demo.property.sum.valueGap`) i `REASON` w rodzinie `MANUAL_SUM` to **ten sam kształt**:
+
+| | `sum.valueGap` | `apk.reason` |
+|---|---|---|
+| wejście | `number`, `between/ii` | `number`, `between/ii` |
+| wyjście | `reasonCode` | `reasonCode` |
+| treść | trzy progi stosunku | trzy progi stosunku |
+
+Osobna tabela istniała wyłącznie dlatego, że nie miała kolumny `family` — obsługiwała jedną rodzinę.
+Trzy wiersze przeniesione do `apk.reason` jako czwarta rodzina `VALUE_GAP`; tabela, atrybut i ścieżka
+kontekstu `quote.sums.valueRatio` usunięte. Java woła teraz to samo `reasonFor(...)` co przy
+pozostałych progach — dziewięć linii z własnym `withComputed` i własnym dzieleniem zeszło do jednej.
+
+### 51.3 Weryfikacja
+
+Trzy progi sprawdzone na żywo (300 000 / 530 000 / 900 000 zł → zaniżone / zgodne / zawyżone),
+zdania identyczne. Trzy dema **identyczne**. Testy: 11 Java, 72 front.
+
+**Profil: 28 tabel.** `NEEDS_ANALYSIS` ma **4** atrybuty (`GROUPS`, `RECOMMENDATION`, `REASON`,
+`JUSTIFICATION`) — rano miał 10.
+
+## §52 Uzasadnienie: cztery reguły, zero liczenia w aplikacji (2026-09-10)
+
+Właściciel: *„java mając odpowiedzi z APK i przedmiotu wysyła je w komplecie w ctx, higson robi
+resztę, zero magii w java — to logika biznesowa, a biznes nie ma dostępu do javy. I maksymalnie
+prosto: tabele z wieloma wejściami, a jeśli trzeba wartość przerobić przed porównaniem, to
+w `source` kolumny funkcja `$f`."* Powodem był konkretny problem: **tej konfiguracji nie dało się
+wytłumaczyć na prezentacji.**
+
+### 52.1 Dlaczego się nie dało
+
+Jedna tabela `apk.reason` obsługiwała cztery niezależne sprawy, przełączane kolumną `family`.
+Wszystkie trzy jej wejścia pochodziły z **obliczeń aplikacji, nie z wniosku**:
+
+- `reason.family` — literał `"COVERAGE"` / `"MANUAL_SUM"` wpisany w Javie w czterech linijkach.
+  Nie cecha klienta ani produktu, tylko **nazwa miejsca w kodzie**, z którego przyszła liczba.
+- `reason.ratio` — liczba policzona dwie linie wcześniej. W trzech rodzinach stosunek, w czwartej
+  **licznik luk** — stąd nazwa kolumny „stosunek albo licznik", czyli przyznanie, że nie da się jej
+  nazwać uczciwie.
+- `reason.flag` — jedno wyliczenie, używane w jednej rodzinie z czterech.
+
+⛔ To jest dokładnie ten wzorzec, który §48 usunęło z odsłaniania pytań: **reguła kluczowana stanem,
+który aplikacja przed chwilą policzyła.** Czytając tabelę w Studio nie dało się dowiedzieć, co
+z czym jest porównywane — trzeba było otworzyć Javę.
+
+### 52.2 Cztery tabele, każda przy swojej sprawie
+
+| tabela | kolumna wejściowa | źródło kolumny |
+|---|---|---|
+| `apk.reason.coverage` | udział pokrytych potrzeb | `$f util.coverageRatio` |
+| `apk.reason.sum` | suma wybrana do wyliczonej | `$f util.sumRatio` |
+| `apk.reason.value` | oszacowanie klienta do wyliczenia | `$f util.valueRatio` |
+| `apk.reason.budget` | czy coś się mieści + ile luk | kontekst + `$f util.alternativeGaps` |
+
+⚙️ **Kolumna bierze wartość z funkcji podpiętej pod `source`** — wzorzec, który w tym profilu już
+działał (`offer.choiceKind` przez `util.choiceDelta`), tylko nie był stosowany tam, gdzie najbardziej
+zaciemniał. Funkcje mają po kilka linii: czytają kontekst, dzielą, oddają liczbę.
+
+Java przestaje liczyć cokolwiek. Podaje **fakty** — potrzeby klienta, kod proponowanego pakietu, kod
+alternatywy i czy alternatywa istnieje — i pyta o kod zdania. `family`, `flag` i cztery działania
+arytmetyczne zniknęły z `Property.java`; zostało podstawianie liczb w `{0}`, `{1}`, czyli
+formatowanie.
+
+### 52.3 W-30 uderzyło natychmiast
+
+⚠️ **Otwarty zakres `* - 0.85` łapie `null`** — a `null` znaczy tu „klient nie podał wartości".
+Pierwsza wersja wypisywała więc zdanie o zaniżonym oszacowaniu klientowi, który niczego nie
+oszacował. Wcześniej chronił przed tym `if` w Javie; po przeniesieniu decyzji do reguły ochrona
+musi być **w regule**: dolne granice są zamknięte (`0.001 - 0.85`, `0 - 0.999`), więc brak wartości
+nie trafia w żaden wiersz i tabela milczy.
+
+⚠️ **W-27 trzykrotnie w jednym przebiegu.** `UPDATE` wiersza bez wcześniejszego
+`higson_open_decision_table` **dokłada wiersz zamiast podmienić** — trzy tabele skończyły
+z duplikatem, a zachowanie pozostało poprawne, bo wygrywał wiersz bardziej szczegółowy. Wykryte
+dopiero przy oglądaniu snapshotu. ⛔ Kolejność jest obowiązkowa: **`open` → `get` → `update`**;
+sam `get` daje id, których zapis nie użyje.
+
+### 52.4 Weryfikacja
+
+Cztery progi wartości sprawdzone osobno — **brak odpowiedzi → milczenie**, 300 000 → zaniżone,
+528 000 → zgodne, 900 000 → zawyżone. Pełny przebieg z siedmioma zdaniami identyczny co do znaku.
+Trzy dema **identyczne**. Testy: 11 Java, 72 front.
+
+**Profil: 31 tabel, 23 funkcje** — o trzy tabele i cztery funkcje więcej niż przed zmianą, i to jest
+świadomy koszt: konfiguracja urosła, żeby dało się ją przeczytać bez kodu.
+
+## §53. Potrzeba zgłoszona a potrzeba wywnioskowana (2026-09-10)
+
+Rekomendacja 8.3 KNF pozwala zakładowi **analizować informacje, których klient nie podał jako
+potrzebę** — ale wymaga, żeby klient wiedział, że tak się stało. Ekran tego nie odróżniał: „chcę
+ubezpieczenie od kradzieży" i „nie ma zabezpieczeń, więc kradzież jest tu pilna" stały obok siebie
+w jednej liście jako to samo.
+
+### 53.1 Rozróżnienie już było w konfiguracji
+
+⚙️ **Zero nowych reguł.** Tabela `demo.property.apk.need` od §50 ma kolumnę `priority` — `1` dla
+wierszy kluczowanych odpowiedzią z ankiety, `2` dla wierszy kluczowanych cechą przedmiotu
+(`propertyKind`, `security`, `occupancy`, `finishStandard`). To jest dokładnie granica
+„zgłoszone / wywnioskowane"; służyła dotąd tylko do tego, żeby przy dwóch wierszach na to samo
+pokrycie wygrywało zdanie klienta. Java czyta tę samą kolumnę drugi raz:
+
+    need.setDeclared(intOrZero(row.getInteger("priority")) <= 1);
+
+⛔ Przez to samo `priority` biznes steruje obiema rzeczami naraz i nie da się ich rozjechać: wiersz
+przestawiony na `1` staje się jednocześnie ważniejszy i podpisany jako zgłoszony przez klienta.
+
+### 53.2 Droga na ekran
+
+`Need.declared` → `NeedDto.declared` → `apk.ts` → `recommendation.ts` (`needRows` niesie
+`inferred`) → dopisek pod treścią potrzeby. Tekst idzie przez `ApkRecommendationCopy.needInferred`,
+jak każde inne słowo tego komponentu — **pole jest opcjonalne i puste znaczy „ta linia nie
+rozróżnia"**. MOTO i ŻYCIE go nie podają, bo ich potrzeby biorą się wyłącznie z ankiety; `declared`
+ma domyślnie `true`, więc obie te ścieżki wyglądają jak przedtem.
+
+Nagłówek listy zmienił się z „Potrzeby wynikające z odpowiedzi" na **„Twoje potrzeby"** — po
+dołożeniu wierszy wywnioskowanych stary tytuł był po prostu nieprawdziwy.
+
+### 53.3 Weryfikacja
+
+Trzy przypadki na żywo: zgłoszona kradzież przy drzwiach (`ZGŁOSZONA THEFT`), brak zabezpieczeń bez
+zgłoszenia (`WYWNIOSKOWANA THEFT — pilna potrzeba…`), oraz oba naraz — wtedy wygrywa zdanie
+klienta, bo wiersz `priority = 1` jest pierwszy. Porównanie pełnych odpowiedzi trzech dem: jedyna
+różnica to nowe pole `declared` (MOTO `true`, ŻYCIE `true`, MAJĄTEK `false` na potrzebie
+wywnioskowanej z rodzaju nieruchomości). Testy: 11 Java, 72 front.
+
+## §54. Martwa sekcja „Co z tego wynika" na pytaniu (2026-09-10)
+
+Właściciel wskazał na ekranie pytania `NEED_FLOOD` grupę atrybutów **„Co z tego wynika"**
+(`NEED_TEXT`, `NEED_COVER`) i orzekł: do usunięcia. Sprawdzenie potwierdziło — i pokazało, że to
+**gorszy rodzaj martwej konfiguracji, bo cichy**: zmiana `NEED_TEXT` w Studio nie zmieniała nic,
+a wyglądała jak zmiana treści potrzeby.
+
+### 54.1 Skąd się wzięła i dlaczego umarła
+
+§50 przeniósł `ANSWER_MAP` na pytania: sześć pytań ankiety dostało `NEED_TEXT`/`NEED_COVER` jako
+własne atrybuty. §52 przebudował etap pierwszy — potrzeby wyznacza **jedna tabela
+`demo.property.apk.need`**, kluczowana bezpośrednio ścieżkami odpowiedzi (10 kolumn wejściowych),
+z kolumnami `need`, `cover` i `priority`. Od tamtej chwili teksty potrzeb żyją w tabeli, a atrybuty
+na pytaniach zostały kopią, której nikt nie czyta.
+
+Dowód, że nikt: `grep` po regułach — zero trafień poza definicją typu i wartościami na elementach;
+`Property.java` — obie stałe **zadeklarowane i nigdzie nie użyte**. Przy okazji poszła trzecia,
+`ATTR_FIELD_NEEDS`, wskazująca na `demo.property.subject.field.needs` — tabelę usuniętą razem
+z §52, atrybutu `FIELD_NEEDS` nie ma dziś w domenie w ogóle.
+
+### 54.2 Co zostało
+
+`QUESTION` schodzi z **8 do 6** atrybutów: `TEXT` (treść), `KIND`/`CONTEXT_PATH`/`REQUIRED`
+(odpowiedź), `IS_VISIBLE`/`POSITION` (miejsce w ankiecie). Opis typu mówi teraz wprost, gdzie
+mieszka to, co z odpowiedzi wynika — żeby nikt nie odtworzył tych atrybutów w dobrej wierze.
+
+⚠️ **W-29 obeszłam świadomie**: `update_domain_type` przy każdym wymienianym atrybucie dostał
+`action: NO_CHANGES` **i swój `defaultValue`**, także tam, gdzie się go nie ruszało; element
+odczytany zaraz po zapisie potwierdził, że `REQUIRED = true`, `IS_VISIBLE = true` i `POSITION = 999`
+przetrwały jako domyślne. Zmiana typu domenowego **nie jest sesyjna** — nie ma czego publikować
+i nie ma czego odrzucić.
+
+### 54.3 Weryfikacja
+
+Porównanie pełnych odpowiedzi trzech dem względem stanu sprzed zmiany: **zero różnic**. Trzy
+scenariusze potrzeb (zgłoszona powódź, brak zabezpieczeń, dom na wynajem) oddają te same zdania co
+przedtem — czyli biorą się z tabeli, nie ze skasowanych atrybutów. Testy: 11 Java, 72 front.
+Snapshot zsynchronizowany eksportem z Studia; różnice w drzewie to dokładnie te dwa atrybuty
+i opis typu.

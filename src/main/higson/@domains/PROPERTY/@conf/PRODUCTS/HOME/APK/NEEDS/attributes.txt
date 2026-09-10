@@ -1,35 +1,17 @@
 [[attr]]
-attributeCode = "ANSWER_MAP"
-attributeName = "Czego wymaga odpowiedz"
-refType = "PARAMETER"
-refName = "demo.property.apk.answer"
-
-[[attr]]
 attributeCode = "JUSTIFICATION"
-attributeName = "Zdania uzasadnienia"
+attributeName = "3. Powody decyzji"
 refType = "PARAMETER"
-refName = "demo.property.apk.recommendation.reason"
+refName = "demo.property.apk.justification"
 
 [[attr]]
 attributeCode = "NEEDS"
-attributeName = "Potrzeby wynikajace z odpowiedzi"
-refType = "FUNCTION"
-refName = "demo.property.apk.needs"
-
-[[attr]]
-attributeCode = "REASON"
-attributeName = "Ktore zdanie uzasadnienia ma padac"
+attributeName = "1. Wyznaczenie potrzeb klienta"
 refType = "PARAMETER"
-refName = "demo.property.apk.reason"
+refName = "demo.property.apk.need"
 
 [[attr]]
 attributeCode = "RECOMMENDATION"
-attributeName = "Dobor pakietu - diagram"
+attributeName = "2. Dobor pakietu"
 refType = "FLOW"
 refName = "demo.property.apk.recommend"
-
-[[attr]]
-attributeCode = "VALUE_GAP"
-attributeName = "Oszacowanie klienta wobec wyliczonej sumy"
-refType = "PARAMETER"
-refName = "demo.property.sum.valueGap"

@@ -1,0 +1,96 @@
+code = "demo.property.apk.justification"
+description = "ETAP 3: co powiedziec klientowi o rekomendacji. Jeden wiersz na zdanie: po lewej WARUNEK, po prawej TRESC i miejsce w dokumencie. Kolumny warunku to fakty o wyniku analizy, kazdy jednym slowem - gwiazdka znaczy nie ma znaczenia. W tresci {0} {1} to liczby, ktore aplikacja podstawia. Poziomy maja UNION, wiec jeden odczyt oddaje wszystkie pasujace wiersze naraz - cale uzasadnienie."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Powody decyzji — kiedy padają i jak brzmią"
+
+[[inputLevel]]
+code = "allCovered"
+label = "czy pakiet pokrywa wszystkie potrzeby"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.allCovered"
+source = "$f demo.property.apk.allCovered"
+union = true
+
+[[inputLevel]]
+code = "sumVsComputed"
+label = "suma wybrana wobec wyliczonej"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.sumVsComputed"
+source = "$f demo.property.apk.sumVsComputed"
+union = true
+
+[[inputLevel]]
+code = "valueVsComputed"
+label = "oszacowanie klienta wobec wyliczonej"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.valueVsComputed"
+source = "$f demo.property.apk.valueVsComputed"
+union = true
+
+[[inputLevel]]
+code = "premiumVsBudget"
+label = "cena wobec oczekiwanej skladki"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.premiumVsBudget"
+source = "$f demo.property.apk.premiumVsBudget"
+union = true
+
+[[inputLevel]]
+code = "alternative"
+label = "co pokrywa tansza alternatywa"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.alternativeCovers"
+source = "$f demo.property.apk.alternativeCovers"
+union = true
+
+[[inputLevel]]
+code = "floodDeductible"
+label = "czy powodz wymaga franszyzy"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.floodDeductible"
+source = "$f demo.property.apk.floodDeductible"
+union = true
+
+[[inputLevel]]
+code = "floodWaiting"
+label = "czy powodz ma karencje"
+type = "string"
+reverseMatcher = false
+levelCreator = "$f demo.property.apk.floodWaiting"
+source = "$f demo.property.apk.floodWaiting"
+union = true
+
+[[outputLevel]]
+code = "reasonCode"
+label = "kod zdania"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "text"
+label = "tresc zdania dla klienta"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "position"
+label = "miejsce w dokumencie"
+type = "integer"
+external = false
+array = false

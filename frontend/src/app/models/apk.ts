@@ -84,6 +84,14 @@ export interface ApkNeedDto {
 	readonly coverCode: string;
 	readonly text: string;
 	readonly weight: number;
+	/**
+	 * Czy klient tę potrzebę ZGŁOSIŁ, czy wynika ona z jego sytuacji.
+	 *
+	 * ⛔ Rek. 8.3 KNF pozwala analizować także informacje, których klient nie podał jako potrzeby,
+	 * ale każe mu powiedzieć, że tak zrobiliśmy. Bez tego rozróżnienia zdanie „pilna potrzeba
+	 * ochrony przed kradzieżą" czyta się jak jego deklaracja, a jest naszym wnioskiem.
+	 */
+	readonly declared: boolean;
 }
 
 
@@ -130,6 +138,14 @@ export interface ApkRecommendationCopy {
 	/** `{0}` pokryte, `{1}` wszystkie. */
 	readonly coverage: string;
 	readonly needsTitle: string;
+	/**
+	 * Dopisek przy potrzebie, której klient nie zgłosił — wynika z jego sytuacji.
+	 *
+	 * ⛔ Rek. 8.3 KNF: wolno analizować informacje, których klient nie podał jako potrzeby,
+	 * ale trzeba mu powiedzieć, że tak zrobiliśmy. Puste znaczy „ta linia nie rozróżnia" —
+	 * moto i życie dziś nie rozróżniają, bo ich potrzeby biorą się wyłącznie z ankiety.
+	 */
+	readonly needInferred?: string;
 	/** `{0}` — lista nazw po przecinku. */
 	readonly missing: string;
 	readonly justificationTitle: string;
