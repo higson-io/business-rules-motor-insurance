@@ -31,32 +31,23 @@ public class PropertyContext extends HigsonContext {
 	private final Map<String, Object> values = new HashMap<>();
 
 	private String questionCode;
-	private String answerValue;
 	private String coverCode;
 	private String variantCode;
-	private String reasonCode;
 	private String choiceKind;
-	private String reasonFamily;
-	private BigDecimal reasonRatio;
-	private Boolean reasonFlag;
 	private String choiceRecommended;
 	private String choiceSelected;
 
 	public PropertyContext(PropertyQuote quote) {
 		this.quote = quote;
-		// ⛔ ODPOWIEDZI PRZED WYLICZENIAMI i nie wolno tego zamienić: `collectComputed` liczy
-		// prefiks kodu pocztowego z odpowiedzi, która musi już leżeć w mapie.
+		// ⛔ ODPOWIEDZI PRZED WYLICZENIAMI i nie wolno tego zamienić: franszyza leży pod jedną
+		// ścieżką i jako odpowiedź klienta, i jako pole wniosku, a wygrać ma odpowiedź —
+		// `collectComputed` dokłada ją przez `putIfAbsent` i tylko w tej kolejności to działa.
 		collectAnswers();
 		collectComputed();
 	}
 
 	public PropertyContext withQuestion(String code) {
 		this.questionCode = code;
-		return this;
-	}
-
-	public PropertyContext withAnswer(String value) {
-		this.answerValue = value;
 		return this;
 	}
 
@@ -67,14 +58,6 @@ public class PropertyContext extends HigsonContext {
 
 	public PropertyContext withVariant(String code) {
 		this.variantCode = code;
-		return this;
-	}
-
-	/** Fakty, z których reguła wyprowadza, które zdanie uzasadnienia ma paść. */
-	public PropertyContext withReasonTrigger(String family, BigDecimal ratio, Boolean flag) {
-		this.reasonFamily = family;
-		this.reasonRatio = ratio;
-		this.reasonFlag = flag;
 		return this;
 	}
 
@@ -102,34 +85,16 @@ public class PropertyContext extends HigsonContext {
 		return this;
 	}
 
-	public PropertyContext withReason(String code) {
-		this.reasonCode = code;
-		return this;
-	}
-
 	@Override
 	public Object get(String path) {
 		if ("question.code".equals(path)) {
 			return questionCode;
-		}
-		if ("answer.value".equals(path)) {
-			return answerValue;
 		}
 		if ("cover.code".equals(path)) {
 			return coverCode;
 		}
 		if ("variant.code".equals(path)) {
 			return variantCode;
-		}
-		// Relacja wyboru klienta do rekomendacji — MATCHES / RICHER / POORER.
-		if ("reason.family".equals(path)) {
-			return reasonFamily;
-		}
-		if ("reason.ratio".equals(path)) {
-			return reasonRatio;
-		}
-		if ("reason.flag".equals(path)) {
-			return reasonFlag;
 		}
 		if ("quote.choice.recommended".equals(path)) {
 			return choiceRecommended;
@@ -140,16 +105,12 @@ public class PropertyContext extends HigsonContext {
 		if ("choice.kind".equals(path)) {
 			return choiceKind;
 		}
-
-		if ("reason.code".equals(path)) {
-			return reasonCode;
-		}
 		return values.get(path);
 	}
 
 	/**
-	 * Odpowiedzi pod ścieżkami, które podał Higson. Pytanie bez ścieżki (wielokrotny wybór) nie
-	 * trafia do kontekstu wcale — jego wartości iterują się po jednej przez answer.value.
+	 * Odpowiedzi pod ścieżkami, które podał Higson. Pytanie bez ścieżki nie trafia do kontekstu
+	 * wcale — dziś każde pytanie tego dema ją ma.
 	 */
 	private void collectAnswers() {
 		for (Question question : quote.getQuestions()) {

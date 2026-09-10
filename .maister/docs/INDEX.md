@@ -608,6 +608,19 @@ not check this**, so both rule tests were green while the app would not start. U
 as the profile already does for W-30. Also: first rule tests for package selection, and the survey
 question's text renders at 22px again (since §35 every question is a *group*, so its text was going
 through the field-label rule).
+**§56 (2026-09-10)** audits the context type: of **40 declared paths, 15 are read by nothing** and
+put there by nothing, while **18 that rules do read are not declared at all** — the declaration had
+drifted both ways because nothing enforces it. Removed: the four `quote.situation.*` (§24/§25), the
+building age and postcode prefix (§39), `renovated` (§38), the three `quote.sums.*` that
+`SUM_BASIS = DERIVED` never reads (a derived cover reads its **reference's** sum), the two
+`quote.apk.*` string blobs, `quote.zone.theft`, and `answer.value`/`reason.code` — whose Java
+builders had **zero callers**. Three whole types go (`Situation`, `Answer`, `Reason`), and
+`PropertyContext` loses three builders and five `get()` branches, `withReasonTrigger` having been
+orphaned by §52. **25 paths remain and every one is read.** ⚙️ A context-type change is **not
+session-scoped** — nothing to publish. ⛔ The scan trap worth keeping: `ctx\.get\w+\(` does not
+match `ctx.get('path')`, which is exactly how `util.buildingAge` reads `quote.policy.startDate` —
+it was reported dead and survived only a by-name check; and paths composed at runtime
+(`'quote.sums.' + code`) are invisible to any literal scan.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -858,4 +871,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-10 (§55 — two sources of a need, two tables; a decision table inside the recommendation flow)
+**Last regenerated**: 2026-09-10 (§56 — the context audit: 25 paths left, every one of them read)

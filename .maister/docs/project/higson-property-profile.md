@@ -4863,3 +4863,54 @@ zsynchronizowaniu snapshotu, więc `SnapshotDataSourceDemoTest` czytał już now
 w Studio krótsza niż w repo, a działająca od 21 godzin aplikacja podawała wersję starszą, bo
 trzymała drzewo w pamięci. Restart to ujawnił. Zmiana wchodzi do repo razem z tą sesją, ale nie
 pochodzi z niej — **aplikacja, która długo stoi, nie jest świadkiem stanu Studia.**
+
+## §56. Audyt kontekstu: 40 ścieżek, z czego 15 nie czytał nikt (2026-09-10)
+
+Typ kontekstu `PROPERTY` deklarował **40 ścieżek**. Skan w trzy strony — poziomy wejściowe tabel,
+odczyty `ctx.*` w funkcjach, argumenty węzłów flow, plus katalog pól przedmiotu i atrybuty
+`CONTEXT_PATH` pytań (bo pod nie lądują odpowiedzi) — pokazał, że **15 nie czyta nic i nic ich nie
+wkłada**, a osobno **18 czytanych nie jest w ogóle zadeklarowanych**. Deklaracja rozjechała się
+w obie strony, bo **nikt jej nie egzekwuje**: reguła czyta ścieżkę spoza deklaracji i działa.
+
+### 56.1 Co wypadło
+
+| ścieżka | dlaczego martwa |
+|---|---|
+| `quote.situation.*` (4) | §24/§25 wycięły wyłączenia |
+| `quote.property.age`, `.postcodeArea` | §39 — wiek liczy funkcja pod `source`, strefy kluczują pełnym kodem |
+| `quote.property.renovated` | §38 zastąpił to pytanie franszyzą |
+| `quote.sums.flood`, `.theft`, `.assistance` | `SUM_BASIS = DERIVED` czyta sumę pokrycia **odniesienia**, `NONE` nie czyta nic |
+| `quote.apk.answers`, `.premiums` | łańcuchy `KOD=WARTOŚĆ` zniesione razem z Groovym w APK |
+| `quote.zone.theft` | tabela stref sama zwraca strefę i czynnik; nikt nie kluczuje po tej ścieżce |
+| `answer.value`, `reason.code` | `withAnswer` i `withReason` w Javie miały **zero wywołań** |
+
+Znikają trzy całe typy (`Situation`, `Answer`, `Reason`) razem z gałęziami w `ROOT`
+i `PropertyQuote`. W `PropertyContext.java` znikają **trzy budowniczych i pięć gałęzi `get()`** —
+`withReasonTrigger` osierocił §52, gdy `apk.reason` rozpadł się na cztery tabele kluczowane
+funkcjami pod `source`. Zostaje **25 ścieżek i każda jest czytana**.
+
+⚙️ Zmiana typu kontekstu **nie jest sesyjna** — jak zmiana typu domenowego (§54): nie ma czego
+publikować ani odrzucać, działa od razu.
+
+### 56.2 Czego świadomie nie dopisano
+
+18 ścieżek jest czytanych, a niezadeklarowanych: wszystkie `quote.needs.*` z ankiety,
+`quote.apk.covers/proposed/alternative/proposedPremium`, `quote.choice.*`, `choice.kind`,
+`quote.needs.budgetRatio` i `quote.premium.<KOD PAKIETU>`. Właściciel wybrał **samo usunięcie
+martwych**; deklaracja jest więc krótsza i prawdziwa w tym, co mówi, ale wciąż niepełna.
+⚠️ Ostatniej z nich i tak nie da się wypisać — sufiksem jest kod pakietu.
+
+### 56.3 Pułapka skanu
+
+⛔ **Pierwsza wersja skanu niedoszacowała.** Wzorzec `ctx\.get\w+\(` nie łapie `ctx.get('ścieżka')`
+bez sufiksu typu — a właśnie tak `demo.property.util.buildingAge` czyta `quote.policy.startDate`.
+Ścieżka wyszła jako martwa i przetrwała tylko dlatego, że sprawdzałam ją ręcznie po nazwie.
+**Do tego dochodzą ścieżki sklejane w locie** (`'quote.sums.' + kod`), których żaden skan po
+literałach nie zobaczy: to one decydują, że `quote.sums.building` żyje, a `quote.sums.theft` nie —
+rozstrzyga o tym atrybut `SUM_BASIS` pokrycia, nie tekst funkcji.
+
+### 56.4 Weryfikacja
+
+Scenariusze A/B/D, ścieżka oferty z wyborem wbrew rekomendacji (`POORER`, niezaspokojona potrzeba
+wypisana), składki trzech pakietów, trzy testy regułowe i 11 testów Javy — bez różnic. MOTOR
+i ŻYCIE nietknięte: mają własne klasy kontekstu i własne profile.

@@ -1,20 +1,12 @@
 @transient
 def /ROOT
-  answer Answer               @desc Wartosc odpowiedzi, element iteracji
   cover Cover                 @desc Pokrycie, element iteracji po COVERS
   question Question           @desc Pytanie APK, element iteracji po QUESTIONS
   quote PropertyQuote         @desc Wniosek majatkowy
-  reason Reason               @desc Powod rekomendacji, element iteracji
   variant Variant             @desc Wariant, element iteracji po VARIANTS
 
 @transient
-def Answer                @desc Wartosc odpowiedzi jako tekst - element iteracji
-  value string                @desc Wartosc odpowiedzi
-
-@transient
-def Apk                   @desc Material wejsciowy analizy potrzeb, skladany przez Jave z udzielonych odpowiedzi
-  answers string              @desc Udzielone odpowiedzi jako KOD=WARTOSC rozdzielone srednikiem
-  premiums string             @desc Wycenione warianty jako KOD=SKLADKA rozdzielone srednikiem
+def Apk                   @desc Material analizy potrzeb skladany przez Jave. UWAGA: sciezki, ktore tu naprawde leca (covers, proposed, alternative, proposedPremium), nie sa zadeklarowane - byly tu za to dwie, ktorych nikt nie czytal, i te usunieto 10 wrzesnia 2026.
 
 @transient
 def Cover                 @desc Pokrycie - element iteracji po COVERS
@@ -32,18 +24,15 @@ def Policy                @desc Parametry polisy
 
 @transient
 def Property              @desc Nieruchomosc podlegajaca ubezpieczeniu
-  age integer                 @desc Wiek budynku na date polisy, wyliczany
   area number                 @desc Powierzchnia uzytkowa w m2
   claims3y integer            @desc Liczba szkod w ostatnich trzech latach
-  constructionYear integer    @desc Rok budowy
+  constructionYear integer    @desc Rok budowy - wiek liczy funkcja pod source poziomu, nie kontekst
   finishStandard string       @desc BASIC STANDARD albo PREMIUM
   floor integer               @desc Pietro, tylko dla mieszkania
   kind string                 @desc HOUSE albo FLAT
   occupancy string            @desc PERMANENT SEASONAL albo RENTED
-  postcode string             @desc Kod pocztowy miejsca ubezpieczenia
-  postcodeArea string         @desc Dwie pierwsze cyfry kodu, klucz obu stref
+  postcode string             @desc Kod pocztowy miejsca ubezpieczenia - klucz OBU stref, w calosci
   priorFloodCover boolean     @desc Ciaglosc ochrony od powodzi, znosi karencje
-  renovated boolean           @desc Czy budynek przeszedl remont
   security string             @desc NONE DOOR ALARM albo MONITORED
   wallMaterial string         @desc BRICK albo WOOD_FRAME
 
@@ -54,7 +43,6 @@ def PropertyQuote         @desc Wniosek majatkowy - korzen modelu kanonicznego
   policy Policy
   property Property
   risk Risk
-  situation Situation
   sums Sums
   zone Zone
 
@@ -63,36 +51,21 @@ def Question              @desc Pytanie APK - element iteracji po katalogu
   code string                 @desc Kod pytania
 
 @transient
-def Reason                @desc Powod rekomendacji - element iteracji
-  code string                 @desc Kod powodu
-
-@transient
 def Risk                  @desc Zlozony czynnik ryzyka
   factor number               @desc Iloczyn czynnikow taryfowych
 
 @transient
-def Situation             @desc Cechy i sytuacja klienta - podstawa konfrontacji z wylaczeniami
-  businessUse boolean         @desc Czy prowadzona jest tam dzialalnosc gospodarcza
-  highValueItems boolean      @desc Czy sa rzeczy o wartosci jednostkowej powyzej 30000 zl
-  inspections boolean         @desc Czy przeglady instalacji sa aktualne
-  vacancy boolean             @desc Czy nieruchomosc bywa pusta dluzej niz 60 dni
-
-@transient
-def Sums                  @desc Sumy ubezpieczenia - wyliczone i wybrane
-  assistance number           @desc Suma assistance, ryczalt
+def Sums                  @desc Sumy ubezpieczenia. Sa tu tylko te, ktore ktos czyta: pokrycie o SUM_BASIS = DERIVED siega po sume pokrycia ODNIESIENIA (powodz po mury, kradziez po ruchomosci), a assistance nie ma sumy wcale.
   building number             @desc Suma murow
   contents number             @desc Suma ruchomosci
   fixtures number             @desc Suma elementow stalych
-  flood number                @desc Suma dla ryzyka powodzi
-  liability number            @desc Suma gwarancyjna OC
-  suggestedBuilding number    @desc Wyliczona suma murow, wartosc odniesienia dla ostrzezenia
-  theft number                @desc Suma dla ryzyka kradziezy
+  liability number            @desc Suma gwarancyjna OC - Java wklada tu atrybut LIABILITY_SUM WARIANTU, osobno dla kazdego pakietu
+  suggestedBuilding number    @desc Wyliczona suma murow. Nie czyta jej zadna regula - czyta ja z powrotem Java, do porownania z suma wybrana przez klienta
 
 @transient
 def Variant               @desc Wariant - element iteracji po VARIANTS
   code string                 @desc Kod wariantu
 
 @transient
-def Zone                  @desc Dwie strefy wyliczone z jednego adresu
+def Zone                  @desc Strefa powodziowa wyliczona z kodu pocztowego. Strefa kradziezowa NIE jest tu, bo nikt nie kluczuje po niej z kontekstu - tabela stref sama zwraca strefe i czynnik, a Java bierze ja do pokazania na ekranie.
   flood string                @desc Z0 Z1 Z2 albo ZX, steruje dostepnoscia powodzi
-  theft string                @desc T1 T2 albo T3, czynnik skladki
