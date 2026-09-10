@@ -5,10 +5,16 @@ refType = "PARAMETER"
 refName = "demo.property.apk.justification"
 
 [[attr]]
-attributeCode = "NEEDS"
-attributeName = "1. Wyznaczenie potrzeb klienta"
+attributeCode = "NEEDS_DECLARED"
+attributeName = "1a. Potrzeby zgloszone w ankiecie"
 refType = "PARAMETER"
-refName = "demo.property.apk.need"
+refName = "demo.property.apk.need.declared"
+
+[[attr]]
+attributeCode = "NEEDS_INFERRED"
+attributeName = "1b. Potrzeby wywnioskowane z przedmiotu ubezpieczenia"
+refType = "PARAMETER"
+refName = "demo.property.apk.need.inferred"
 
 [[attr]]
 attributeCode = "RECOMMENDATION"

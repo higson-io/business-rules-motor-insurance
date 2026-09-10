@@ -1,0 +1,8 @@
+#matrix for parameter demo.property.apk.need.declared
+needsProperty;needTheft;needFlood;needPortable;rentedOut;assistance;cover;need
+*;*;*;*;*;true;ASSISTANCE;Pomoc fachowca przy awarii w domu
+*;*;*;*;true;*;LIABILITY;Odpowiedzialność za szkody wyrządzone osobom trzecim przy wynajmie
+*;*;*;true;*;*;CONTENTS;Ochrona sprzętu przenośnego, także poza mieszkaniem
+*;*;true;*;*;*;FLOOD;Ochrona przed powodzią i zalaniem
+*;true;*;*;*;*;THEFT;Ochrona przed kradzieżą z włamaniem i rabunkiem
+true;*;*;*;*;*;BUILDING;Ochrona murów i mienia przed pożarem oraz innymi zdarzeniami losowymi

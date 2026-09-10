@@ -104,7 +104,8 @@ public class Property {
 	 */
 	private static final String ATTR_SUBJECT_FIELDS = "SUBJECT_FIELDS";
 	private static final String ATTR_RECOMMENDATION = "RECOMMENDATION";
-	private static final String ATTR_NEEDS = "NEEDS";
+	private static final String ATTR_NEEDS_DECLARED = "NEEDS_DECLARED";
+	private static final String ATTR_NEEDS_INFERRED = "NEEDS_INFERRED";
 	private static final String ATTR_JUSTIFICATION = "JUSTIFICATION";
 
 	private static final String ATTR_ZONES = "ZONES";
@@ -1103,31 +1104,43 @@ public class Property {
 	 */
 
 	/**
-	 * ETAP 1 — potrzeby klienta. Jeden odczyt jednej tabeli.
+	 * ETAP 1 — potrzeby klienta. DWIE TABELE, bo są dwa źródła potrzeby.
 	 *
-	 * ⛔ Aplikacja nie chodzi po pytaniach, niczego nie skleja i nie rozstrzyga pierwszeństwa.
-	 * Odpowiedzi są już w kontekście pod swoimi ścieżkami, a `demo.property.apk.need` ma je jako
-	 * kolumny — jeden wiersz mówi „z tej odpowiedzi wynika ta potrzeba". Poziomy mają `union`,
-	 * więc jeden odczyt oddaje wszystkie pasujące wiersze naraz.
+	 * ⛔ Aplikacja nie chodzi po pytaniach i niczego nie skleja. Odpowiedzi są już w kontekście
+	 * pod swoimi ścieżkami, a każda z tabel ma jako kolumny TE ODPOWIEDZI, z których czyta:
+	 * `…need.declared` pyta o ankietę, `…need.inferred` o przedmiot ubezpieczenia. Poziomy mają
+	 * `union`, więc jeden odczyt oddaje wszystkie pasujące wiersze naraz.
 	 *
-	 * ⛔ PIERWSZEŃSTWO TO KOLEJNOŚĆ WIERSZY. Dwie odpowiedzi mogą wskazać to samo pokrycie —
-	 * „obawiam się kradzieży" i „nie mam zabezpieczeń" obie dają THEFT — a klient ma usłyszeć
-	 * jedno zdanie. Wygrywa wiersz wyższy, czyli ten, który klient zgłosił sam; widać to
-	 * w tabeli, nie tutaj.
+	 * ⛔ ŹRÓDŁO POTRZEBY TO TABELA, W KTÓREJ STOI — nie kolumna w niej. Poprzednia wersja miała
+	 * jedną tabelę o dziesięciu kolumnach wejściowych i kolumnie `priority`, w której 1 znaczyło
+	 * „zgłoszona", a 2 „wywnioskowana"; siedem kolumn każdego wiersza było gwiazdkami, bo połowa
+	 * wierszy nie miała nic wspólnego z drugą połową. Rozdzielone, każda tabela ma tylko własne
+	 * pytania, a to, co niosła kolumna, niesie przynależność.
+	 *
+	 * ⛔ PIERWSZEŃSTWO WYNIKA Z KOLEJNOŚCI ODCZYTU: zgłoszone najpierw, więc gdy dwie odpowiedzi
+	 * wskazują to samo pokrycie — „obawiam się kradzieży" i „nie mam zabezpieczeń" obie dają
+	 * THEFT — klient słyszy zdanie o tym, co powiedział sam. Rek. 8.3 wymaga, żeby wiedział,
+	 * które potrzeby wywnioskowaliśmy za niego; to niesie `declared`.
 	 */
 	private List<Need> collectNeeds(PropertyQuote quote) {
 		Map<String, Need> byCover = new LinkedHashMap<>();
-		for (MultiValue row : ruleOf(apkElement(), ATTR_NEEDS, new PropertyContext(quote))) {
+		collectNeedsFrom(quote, ATTR_NEEDS_DECLARED, true, byCover);
+		collectNeedsFrom(quote, ATTR_NEEDS_INFERRED, false, byCover);
+		return new ArrayList<>(byCover.values());
+	}
+
+	/** Jedna potrzeba na pokrycie — wygrywa tabela odczytana wcześniej. */
+	private void collectNeedsFrom(PropertyQuote quote, String attribute, boolean declared,
+			Map<String, Need> byCover) {
+
+		for (MultiValue row : ruleOf(apkElement(), attribute, new PropertyContext(quote))) {
 			String cover = row.getString("cover");
 			if (cover != null && !cover.isEmpty() && !byCover.containsKey(cover)) {
 				Need need = new Need(cover, row.getString("need"), 0);
-				// ⛔ Rek. 8.3: klient ma wiedzieć, co powiedział sam, a co my wywnioskowaliśmy.
-				// Ta sama kolumna, która rozstrzyga pierwszeństwo, mówi też, skąd potrzeba jest.
-				need.setDeclared(intOrZero(row.getInteger("priority")) <= 1);
+				need.setDeclared(declared);
 				byCover.put(cover, need);
 			}
 		}
-		return new ArrayList<>(byCover.values());
 	}
 
 

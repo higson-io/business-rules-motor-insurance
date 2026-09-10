@@ -142,7 +142,7 @@
             <profile>PROPERTY</profile>
             <code>NEEDS_ANALYSIS</code>
             <name>Analiza potrzeb klienta</name>
-            <description>Analiza potrzeb jako jeden obiekt. Pytania wisza pod nim w GRUPACH. TRZY ATRYBUTY TO TRZY ETAPY, w kolejnosci: z odpowiedzi powstaja POTRZEBY, z potrzeb wybiera sie PAKIET, z porownania potrzeb z pakietem wypisuja sie POWODY decyzji. Kazdy etap to JEDEN ODCZYT jednej tabeli albo diagramu - aplikacja pyta o niego i przepisuje wynik na ekran.</description>
+            <description>Analiza potrzeb jako jeden obiekt. Pytania wisza pod nim w GRUPACH. ATRYBUTY TO ETAPY: potrzeby powstaja z DWOCH ZRODEL - z tego, co klient ZGLOSIL w ankiecie, i z tego, co WYWNIOSKOWALISMY z przedmiotu ubezpieczenia - potem z potrzeb wybiera sie PAKIET, a z porownania potrzeb z pakietem wypisuja sie POWODY decyzji. Zrodlem potrzeby jest TABELA, W KTOREJ STOI, a nie kolumna w niej; przy tym samym pokryciu wygrywa potrzeba zgloszona przez klienta.</description>
             <rootType>false</rootType>
             <typeCollections>
                 <typeCollection>
@@ -157,19 +157,29 @@
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
-                    <code>NEEDS</code>
-                    <name>1. Wyznaczenie potrzeb klienta</name>
+                    <code>NEEDS_DECLARED</code>
+                    <name>1a. Potrzeby zgloszone w ankiecie</name>
                     <order>1</order>
                     <groupOrder>1</groupOrder>
                     <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.apk.need</defaultRefName>
+                    <defaultRefName>demo.property.apk.need.declared</defaultRefName>
+                </typeAttribute>
+                <typeAttribute>
+                    <attributeType>business</attributeType>
+                    <code>NEEDS_INFERRED</code>
+                    <name>1b. Potrzeby wywnioskowane z przedmiotu ubezpieczenia</name>
+                    <order>2</order>
+                    <groupOrder>1</groupOrder>
+                    <groupName>Sciezka decyzji</groupName>
+                    <defaultRefType>PARAMETER</defaultRefType>
+                    <defaultRefName>demo.property.apk.need.inferred</defaultRefName>
                 </typeAttribute>
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>RECOMMENDATION</code>
                     <name>2. Dobor pakietu</name>
-                    <order>2</order>
+                    <order>3</order>
                     <groupOrder>1</groupOrder>
                     <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>FLOW</defaultRefType>
@@ -179,7 +189,7 @@
                     <attributeType>business</attributeType>
                     <code>JUSTIFICATION</code>
                     <name>3. Powody decyzji</name>
-                    <order>3</order>
+                    <order>4</order>
                     <groupOrder>1</groupOrder>
                     <groupName>Sciezka decyzji</groupName>
                     <defaultRefType>PARAMETER</defaultRefType>

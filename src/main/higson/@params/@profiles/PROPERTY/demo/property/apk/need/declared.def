@@ -1,0 +1,80 @@
+code = "demo.property.apk.need.declared"
+description = "ETAP 1a: potrzeby, ktore klient ZGLOSIL SAM. Kolumny to odpowiedzi z ankiety APK, gwiazdka znaczy nie ma znaczenia. Poziomy maja UNION, wiec jeden odczyt oddaje wszystkie pasujace wiersze naraz. TABELA NIE MA KOLUMNY PIERWSZENSTWA - to, ze potrzeba jest zgloszona, wynika z tego, ze stoi TUTAJ, a nie w demo.property.apk.need.inferred. Gdy obie tabele wskazuja to samo pokrycie, klient slyszy zdanie stad."
+nullable = true
+dictionary = false
+cacheable = true
+distinct = false
+aiModelSource = false
+eagerReload = false
+hotswapReload = false
+sort = ""
+slave = false
+label = "Potrzeby zgłoszone przez klienta w ankiecie"
+
+[[inputLevel]]
+code = "needsProperty"
+label = "potrzeba ubezpieczenia nieruchomosci"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.property"
+source = "quote.needs.property"
+union = true
+
+[[inputLevel]]
+code = "needTheft"
+label = "obawa o kradziez"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.theft"
+source = "quote.needs.theft"
+union = true
+
+[[inputLevel]]
+code = "needFlood"
+label = "obawa o powodz"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.flood"
+source = "quote.needs.flood"
+union = true
+
+[[inputLevel]]
+code = "needPortable"
+label = "sprzet przenosny"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.portable"
+source = "quote.needs.portable"
+union = true
+
+[[inputLevel]]
+code = "rentedOut"
+label = "wynajem"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.rentedOut"
+source = "quote.needs.rentedOut"
+union = true
+
+[[inputLevel]]
+code = "assistance"
+label = "pomoc fachowca"
+type = "string"
+reverseMatcher = false
+property = "quote.needs.assistance"
+source = "quote.needs.assistance"
+union = true
+
+[[outputLevel]]
+code = "cover"
+label = "pokrycie, ktore zaspokaja potrzebe"
+type = "string"
+external = false
+array = false
+
+[[outputLevel]]
+code = "need"
+label = "tresc potrzeby"
+type = "string"
+external = false
+array = false

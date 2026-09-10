@@ -1,0 +1,8 @@
+#matrix for parameter demo.property.apk.need.inferred
+propertyKind;security;occupancy;finishStandard;cover;need
+*;*;*;PREMIUM;FIXTURES;Ochrona wysokiego standardu wykończenia
+*;*;RENTED;*;LIABILITY;Ochrona przy wynajmie lokalu
+*;*;SEASONAL;*;THEFT;Ochrona nieruchomości okresowo pustej
+*;NONE;*;*;THEFT;Pilna potrzeba ochrony przed kradzieżą — brak zabezpieczeń
+FLAT;*;*;*;FIXTURES;Ochrona lokalu i elementów stałych
+HOUSE;*;*;*;BUILDING;Ochrona konstrukcji budynku
