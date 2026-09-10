@@ -1,0 +1,42 @@
+{
+  "name" : "PROPERTY - dobor pakietu bez oczekiwanej skladki (demo.property.apk.recommend)",
+  "testElements" : [ {
+    "id" : "flow@demo.property.apk.recommend",
+    "expectedValue" : "{\"indicated\":\"STANDARD\",\"budgetOutcome\":\"BUDGET_ABSENT\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "quote.apk.covers",
+    "type" : "string",
+    "value" : "FIXTURES"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.needs.budget",
+    "type" : "number",
+    "value" : "0"
+  }, {
+    "code" : "quote.premium.BASIC",
+    "type" : "number",
+    "value" : "545.29"
+  }, {
+    "code" : "quote.premium.STANDARD",
+    "type" : "number",
+    "value" : "1014.94"
+  }, {
+    "code" : "quote.premium.COMPLETE",
+    "type" : "number",
+    "value" : "3082.75"
+  } ]
+}
