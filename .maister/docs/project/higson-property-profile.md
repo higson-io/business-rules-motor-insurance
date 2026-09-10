@@ -4754,3 +4754,112 @@ scenariusze potrzeb (zgłoszona powódź, brak zabezpieczeń, dom na wynajem) od
 przedtem — czyli biorą się z tabeli, nie ze skasowanych atrybutów. Testy: 11 Java, 72 front.
 Snapshot zsynchronizowany eksportem z Studia; różnice w drzewie to dokładnie te dwa atrybuty
 i opis typu.
+
+## §55. Dwa źródła potrzeby, dwie tabele; rekomendacja jako diagram z tabelą w środku (2026-09-10)
+
+Dwie zmiany tego samego dnia, obie na wniosek właściciela i obie o tym samym: **konfiguracja ma
+dać się przeczytać bez kodu**. Pierwsza rozbija tabelę potrzeb, druga rozgęszcza flow rekomendacji.
+
+### 55.1 `demo.property.apk.need` → `…need.declared` + `…need.inferred`
+
+Tabela miała **10 kolumn wejściowych i 12 wierszy**, a siedem kolumn każdego wiersza było
+gwiazdkami — bo połowa wierszy kluczowała się odpowiedziami z ankiety, a druga cechami przedmiotu
+ubezpieczenia i te dwie połowy nie miały ze sobą nic wspólnego. To ta sama usterka, którą §44
+znalazł w katalogu pytań: **jedna tabela robiąca dwie rzeczy pod jedną nazwą**.
+
+Po rozbiciu: `demo.property.apk.need.declared` — 6 wierszy, 6 kolumn (odpowiedzi ankiety);
+`demo.property.apk.need.inferred` — 6 wierszy, 4 kolumny (rodzaj nieruchomości, zabezpieczenia,
+sposób korzystania, standard wykończenia). Żadna komórka nie jest już gwiazdką „bo tak wypadło".
+
+⚙️ **Kolumna `priority` znika z konfiguracji.** Niosła dwie rzeczy naraz (pierwszeństwo przy tym
+samym pokryciu ORAZ etykietę „zgłoszona/wywnioskowana" z §53) i po rozbiciu obie **wynikają
+ze struktury**: źródłem potrzeby jest tabela, w której wiersz stoi. To dokładnie droga, którą §50
+przeszedł z wagą — wartość, która daje się wyprowadzić, przestaje być konfiguracją. Zniknął też
+`sort = "priority ascending"`.
+
+Java scala **kolejnością odczytu**: `collectNeedsFrom(…, NEEDS_DECLARED, true, …)` przed
+`NEEDS_INFERRED`, pierwszy wpis na pokrycie wygrywa. `declared` jest teraz argumentem wywołania,
+nie odczytem kolumny. Na elemencie `APK[NEEDS]` atrybut `NEEDS` zastępują **`NEEDS_DECLARED`
+i `NEEDS_INFERRED`** (typ `NEEDS_ANALYSIS`: 3 → 4 atrybuty).
+
+⚠️ **Kolejność zwracanych wierszy nie jest kolejnością z pliku `.mat`.** Przy kolizji
+`FLAT + PREMIUM` (obie → FIXTURES) wygrywa wiersz `FLAT`, choć w eksporcie stoi niżej; przy
+`NONE + SEASONAL` (obie → THEFT) wygrywa `NONE`. Zachowanie utrzymuje **względna kolejność
+poziomów wejściowych**, nie wierszy — dlatego w tabeli wywnioskowanych `propertyKind` stoi przed
+`security`, a ten przed `occupancy`, tak jak w tabeli sprzed rozbicia. Zmierzone baseline'em, nie
+założone.
+
+⚠️ **W-25 uderzyło od razu**: `defaultValue` typu PARAMETER podany z przedrostkiem (`$p kod`)
+wsadza ten przedrostek **do wartości** — element dostaje `"$p demo.property.apk.need.declared"`.
+Przez API podaje się **sam kod**; czytaj element zaraz po zapisie.
+
+### 55.2 Flow `demo.property.apk.recommend`: wspólna drabinka i tabela jako węzeł
+
+Przegląd pod kątem „czy to da się opowiedzieć" znalazł rzecz, której nikt nie szukał:
+**`apk.indicated` i `apk.alternative` to była ta sama pętla napisana dwa razy** — filtr
+dostępności z tym samym wąskim kontekstem, skład pakietu, licznik pokrycia, remis po pozycji.
+Jedyna różnica: alternatywa odrzuca pakiety droższe od budżetu. Została jedna funkcja
+`demo.property.apk.bestCovering` z argumentem `maxPremium`, a obie stare zeszły do **1 i 5 linii**
+(z 55 i 45).
+
+Flow z czterech węzłów robi się pięcioma, w tym **węzłem tabeli**:
+
+    n1 FUNKCJA  apk.indicated       → indicated      najlepiej dopasowany pakiet, przy remisie tańszy
+    n2 FUNKCJA  util.budgetRatio    → budgetRatio    składka propozycji / składka oczekiwana
+    n3 TABELA   apk.budget          → budgetOutcome  próg: mieści się / nie / nie ma czego porównywać
+    n4 WARUNEK  budgetOutcome == 'BUDGET_EXCEEDED'
+    n5 FUNKCJA  apk.alternative     → alternative    alternatywa w budżecie — obok, nie zamiast
+
+Funkcja-owijka `demo.property.apk.budgetOutcome`, która budowała sztuczny kontekst i czytała tabelę
+z wnętrza Groovy'ego, **jest usunięta**: dzielenie robi `demo.property.util.budgetRatio`, a próg
+rozstrzyga tabela stojąca w diagramie jako własny krok.
+
+⚙️ **Węzeł `DECISION_TABLE` PRZYJMUJE ARGUMENT, a jego `name` to ŚCIEŻKA KONTEKSTU poziomu** —
+nie nazwa kolumny i nie nazwa zmiennej. Tak tabela bierze liczbę policzoną węzeł wcześniej.
+Wszystkie tabele w `risk.calculate` mają `arguments: []`, więc wyglądało to na ograniczenie
+silnika; rozstrzygnęła sonda na wyrzucenie (osobny flow ze zmienną `ratio = 2` plus test):
+`BUDGET_EXCEEDED` znaczy, że argument się związał, `BUDGET_ABSENT` — że nie. To otwiera wzorzec
+**funkcja liczy, tabela rozstrzyga, warunek rozgałęzia** wszędzie tam, gdzie dotąd Groovy czytał
+tabelę przez `higson.createContext`.
+
+⛔ **W-31: `higson.call(kod, ctx, null)` dociera do silnika jako JEDEN argument.** Null wypada po
+drodze, a walidacja liczby argumentów w runtime kończy to błędem `Expected: 2, Passed: 1` i wywala
+całą wycenę na 500. **Tester Studia tego nie sprawdza** — oba testy regułowe przeszły na zielono,
+a aplikacja po restarcie nie wstała. Sentinel zamiast nulla (tutaj `0 = bez ograniczenia ceny`),
+zgodnie z konwencją, którą profil już ma przy W-30. Rodzina ta sama co `update_function` bez
+`arguments`: **to, co wygląda na brak wartości, w tym silniku bywa brakiem argumentu.**
+
+⛔ Czego świadomie NIE dołożono: drugiej tabeli „co robimy, gdy komplet potrzeb się nie da pokryć"
+(w każdej wersji wychodziła tabela o jednym znaczącym wierszu albo przewidująca to, co algorytm
+i tak liczy — sztuczny jednolinijkowiec z §38) i gałęzi „klient nie zgłosił żadnej potrzeby"
+(nie może wystąpić: `PROPERTY_KIND` jest obowiązkowe, a obie jego wartości mają wiersz w tabeli
+wywnioskowanych — byłaby to gałąź, która nigdy się nie wykona, czyli usterka z §33).
+
+### 55.3 Pierwsze testy doboru pakietu
+
+§34 wprost pisał, że dobór pakietu nie jest pokryty niczym. Są dwa przypadki, oba przypinają
+**całą strukturę zwrotną flow**, jak każdy test w tym repozytorium:
+`bez oczekiwanej składki` → `{indicated: STANDARD, budgetOutcome: BUDGET_ABSENT}` oraz
+`ponad oczekiwaną składkę` → `{indicated: STANDARD, budgetOutcome: BUDGET_EXCEEDED,
+alternative: BASIC}` — ten drugi przechodzi przez gałąź warunkową i przez węzeł tabeli.
+
+### 55.4 Treść pytania na ekranie ankiety
+
+Pytanie renderowało się w **14 px, wagą 500, kolorem wyciszonym** zamiast 22/600 — bo od §35 każde
+pytanie ankiety jest **grupą**, więc jego treść szła regułą pisaną dla *etykiety pola pod nazwą
+grupy*, a nagłówek grupy pokazuje się dopiero od dwóch widocznych pól. Poprawka celuje w grupę
+o jednym polu (`.apk__fields > .apk__field-block:only-child`), więc ekran z kilkoma polami zostaje
+bez zmian. ⚠️ Selektor musi bić regułę trzyklasową — stąd dziecko bezpośrednie z `:only-child`.
+
+### 55.5 Weryfikacja
+
+Pięć scenariuszy porównanych **z baseline'em zebranym przed zmianą**, w tym dwie kolizje potrzeb
+i pełna ankieta: zero różnic, ta sama kolejność potrzeb, te same zdania uzasadnienia. Ścieżka
+budżetowa przez aplikację: `STANDARD / BUDGET_EXCEEDED / BASIC 545,29 zł` — zgodna co do grosza
+z testem regułowym. Testy: **11 Javy, 72 frontu, 2 regułowe**, wszystkie zielone; Java przeszła po
+zsynchronizowaniu snapshotu, więc `SnapshotDataSourceDemoTest` czytał już nowe pliki.
+
+⚠️ Przy synchronizacji snapshotu wyszła **cudza zmiana**: treść pytania `HOME_ASSISTANCE` jest
+w Studio krótsza niż w repo, a działająca od 21 godzin aplikacja podawała wersję starszą, bo
+trzymała drzewo w pamięci. Restart to ujawnił. Zmiana wchodzi do repo razem z tą sesją, ale nie
+pochodzi z niej — **aplikacja, która długo stoi, nie jest świadkiem stanu Studia.**

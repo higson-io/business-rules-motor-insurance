@@ -464,6 +464,20 @@ read from `higson_get_function` first, for any function whose signature is not j
 `GlobalExceptionHandler` covers only the motor exceptions, so a signature mismatch returns a bare
 500 for the entire quote rather than a missing field.
 
+⛔ **`higson.call(code, ctx, null)` reaches the engine as ONE argument.** The null is dropped in
+transit, so a function declaring two arguments fails runtime argument validation with
+`Invalid arguments number. Expected: 2, Passed: 1`, and — since `calculate()` has no `catch` — the
+whole quote comes back HTTP 500. Pass a **sentinel** instead of a null: `0` for "no cap" mirrors the
+same convention the profile already uses for the unbounded-range trap (a `0` ratio meaning "nothing
+to compare").
+
+⚠️ **The Studio Tester does not perform this validation.** Both rule tests over the flow ran green
+while the application would not start against the very same rules. A green Tester result is evidence
+about the rule's logic, never about how the runtime will bind its arguments — confirm a signature
+change by calling the running application.
+
+*Evidence:* `demo.property.apk.indicated` calling `demo.property.apk.bestCovering`, 10 September 2026.
+
 ### Groovy Function Header Contract
 Every Groovy function opens with the generated TOML header block containing `#Full code: <code>` matching the file path, `categories = []`, `logLevel`, and an `[[arguments]]` list whose first entry is always `ctx` of type `SPECIFIED_CLASS` bound to a `ParamContext`. Do not hand-edit the header beyond description and extra arguments. Bodies end with an explicit `return`.
 
@@ -571,6 +585,38 @@ fails later with `conversion not supported for: class io.higson.runtime.flow.Flo
 that needs one number from another flow should take it from the context, where whoever ran that
 flow published it — which usually reveals that the value was being computed more times than it
 had to be.
+
+### A Flow Node Can Feed a Decision Table — Its Argument `name` Is the Level's Context Path
+
+⚙️ **A `DECISION_TABLE` action in a flow does take `arguments`**, and the argument's `name` is the
+**context path of the table's input level** — not the column code, and not the flow variable's name.
+The `value` is the flow variable to bind. So a value computed by an earlier node can be the very
+thing a table keys on.
+
+That is what makes the ordering standard above — decision table first, flow second, function last —
+reachable *inside* a flow. Before this was known, a threshold table could only be read from within a
+Groovy function that fabricated a context with `higson.createContext(...)`, which hides the table
+from the diagram. The pattern to use instead: **a function computes the number → a table node decides
+what the number means → a link condition branches on the table's answer.**
+
+```
+n2 FUNCTION       demo.property.util.budgetRatio   → budgetRatio     # only the division
+n3 DECISION_TABLE demo.property.apk.budget         → budgetOutcome   # the thresholds
+       arguments: [{type: VARIABLE, value: "budgetRatio", name: "quote.needs.budgetRatio"}]
+n4 LINK           budgetOutcome == 'BUDGET_EXCEEDED'
+```
+
+⚠️ Every decision table in `demo.property.risk.calculate` carries `arguments: []`, which makes this
+look like an engine limitation. It is not — those tables simply key on context paths the caller
+already supplies. **Do not infer the limit from the existing flows.**
+
+The capability was established by measurement, not documentation: a throwaway flow with a variable
+`ratio = 2` plus a table node bound as above returned `BUDGET_EXCEEDED`; had the argument not bound,
+the null input would have landed on the `* - 0` row and returned `BUDGET_ABSENT`. Both the flow and
+the test were deleted afterwards.
+
+*Evidence:* `demo.property.apk.recommend` node `n3`, 10 September 2026 — it replaced the Groovy
+wrapper `demo.property.apk.budgetOutcome`, which was deleted.
 
 ### Known Drift: Legacy ParamContext Binding
 New and touched functions should bind `ctx` to `io.higson.runtime.engine.core.context.ParamContext`. 29 of 36 existing functions still bind the legacy `org.smartparam.engine.core.context.ParamContext`. Migrate opportunistically when editing a function; do not open a dedicated sweep.
