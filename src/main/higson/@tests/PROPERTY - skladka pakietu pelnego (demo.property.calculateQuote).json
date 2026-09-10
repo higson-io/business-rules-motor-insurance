@@ -1,0 +1,62 @@
+{
+  "name" : "PROPERTY - skladka pakietu pelnego (demo.property.calculateQuote)",
+  "testElements" : [ {
+    "id" : "flow@demo.property.calculateQuote",
+    "expectedValue" : "{\"instalment\":\"3082.75\",\"breakdown\":\"BUILDING=545.29;FIXTURES=197.59;CONTENTS=250.19;THEFT=307.93;FLOOD=1539.65;LIABILITY=170.1;ASSISTANCE=72.0\",\"available\":\"true\",\"annual\":\"3082.75\"}",
+    "functionArguments" : [ ]
+  } ],
+  "columnDelimiter" : "VERTICAL_BAR",
+  "tolerance" : {
+    "type" : "NO_TOLERANCE",
+    "value" : null
+  },
+  "testParameters" : [ {
+    "code" : "variant.code",
+    "type" : "string",
+    "value" : "COMPLETE"
+  }, {
+    "code" : "quote.property.kind",
+    "type" : "string",
+    "value" : "FLAT"
+  }, {
+    "code" : "quote.property.finishStandard",
+    "type" : "string",
+    "value" : "STANDARD"
+  }, {
+    "code" : "quote.property.security",
+    "type" : "string",
+    "value" : "DOOR"
+  }, {
+    "code" : "quote.zone.flood",
+    "type" : "string",
+    "value" : "Z0"
+  }, {
+    "code" : "quote.zone.theft",
+    "type" : "string",
+    "value" : "T3"
+  }, {
+    "code" : "quote.sums.building",
+    "type" : "number",
+    "value" : "528000"
+  }, {
+    "code" : "quote.sums.fixtures",
+    "type" : "number",
+    "value" : "116160"
+  }, {
+    "code" : "quote.sums.contents",
+    "type" : "number",
+    "value" : "79200"
+  }, {
+    "code" : "quote.sums.liability",
+    "type" : "number",
+    "value" : "2000000"
+  }, {
+    "code" : "quote.risk.factor",
+    "type" : "number",
+    "value" : "1.215"
+  }, {
+    "code" : "quote.policy.periodMonths",
+    "type" : "number",
+    "value" : "12"
+  } ]
+}
