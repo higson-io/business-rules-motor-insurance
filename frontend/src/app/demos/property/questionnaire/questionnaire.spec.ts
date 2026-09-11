@@ -518,38 +518,36 @@ describe('Questionnaire', () => {
 	});
 
 	/**
-	 * ⛔ Pilnuje rzeczy, którą łatwo zepsuć „upraszczając" przeskok: w pytaniu ZŁOŻONYM jedno pole
-	 * nie domyka kroku. To jest kształt pytania o wynajem — jego drugie pole jest WARUNKOWE
-	 * i pojawia się na tym samym ekranie zaraz po odpowiedzi „tak", więc przeskok przeskoczyłby
-	 * pytanie, które właśnie doszło.
+	 * Pytanie złożone z pytaniem WARUNKOWYM — ekran o wynajmie.
 	 *
-	 * ⚠️ Pola muszą być tak/nie, a nie kwotowe. Pierwsza wersja tego testu odpowiadała polem
-	 * kwotowym i przechodziła także po USUNIĘCIU osłony — blokował ją inny warunek („tylko
-	 * odpowiedź klikana"), więc badała nie to, co deklarowała. Wyszło mutacją.
+	 * ⛔ Test ma DWIE połowy i obie są konieczne. Pierwsza: odpowiedź na pytanie widoczne nie
+	 * przenosi dalej, bo odsłania się wtedy pytanie nieobowiązkowe i przeskok by je minął.
+	 * Druga: po odpowiedzi na nie ekran JEDNAK przechodzi dalej. Pierwsza wersja przeskoku
+	 * blokowała pytanie złożone na zawsze — zgłoszone jako usterka 11 września — a test pilnujący
+	 * tylko pierwszej połowy przepuściłby to bez mrugnięcia.
 	 */
-	it('does not skip a compound question when one of its fields is answered', async () => {
-		const wynajem = (assistanceVisible: boolean) =>
+	it('waits for a revealed field, then moves on once it is answered', async () => {
+		const wynajem = (revealed: boolean, rented: string | null, assistance: string | null) =>
 			question({
 				code: 'RENTAL',
 				kind: 'GROUP' as PropertyQuestionDto['kind'],
 				section: 'NEEDS',
 				fields: [
-					question({ code: 'RENTED_OUT', kind: 'BOOLEAN', section: 'NEEDS' }),
+					question({ code: 'RENTED_OUT', kind: 'BOOLEAN', section: 'NEEDS', value: rented }),
 					question({
 						code: 'HOME_ASSISTANCE',
 						kind: 'BOOLEAN',
 						section: 'NEEDS',
 						position: 20,
 						required: false,
-						visible: assistanceVisible,
+						visible: revealed,
+						value: assistance,
 					}),
 				],
 			});
+		const drugie = question({ code: 'NEED_THEFT', kind: 'BOOLEAN', section: 'NEEDS', position: 30 });
 
-		const element = await render(
-			[wynajem(false), question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 30 })],
-			'NEEDS',
-		);
+		const element = await render([wynajem(false, null, null), drugie], 'NEEDS');
 		expect(element.textContent).toContain('Pytanie 1 z 2');
 
 		(
@@ -559,19 +557,43 @@ describe('Questionnaire', () => {
 		).click();
 		httpTesting.expectOne('property/answer/RENTED_OUT').flush(null);
 		await settle();
-		httpTesting.expectOne('property').flush(
-			quote([
-				wynajem(true),
-				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', section: 'NEEDS', position: 30 }),
-			]),
-		);
+		httpTesting.expectOne('property').flush(quote([wynajem(true, 'true', null), drugie]));
 		await settle();
 
-		expect(element.textContent, 'ekran złożony zostaje pod ręką').toContain('Pytanie 1 z 2');
+		expect(element.textContent, 'odsłonięte pytanie zatrzymuje ekran').toContain('Pytanie 1 z 2');
+		expect(element.querySelector('[data-question="HOME_ASSISTANCE"]')).not.toBeNull();
+
+		(
+			element.querySelector(
+				'[data-question="HOME_ASSISTANCE"] mat-button-toggle button',
+			) as HTMLButtonElement
+		).click();
+		httpTesting.expectOne('property/answer/HOME_ASSISTANCE').flush(null);
+		await settle();
+		httpTesting.expectOne('property').flush(quote([wynajem(true, 'true', 'true'), drugie]));
+		await settle();
+
+		expect(element.textContent, 'po domknięciu ekranu idziemy dalej').toContain('Pytanie 2 z 2');
+	});
+
+	/**
+	 * ⛔ O walucie rozstrzyga `kind` z konfiguracji, nie kod pytania — pole kwotowe dodane w Studio
+	 * dostanie „zł" bez ruszania szablonu. Drugie pole w teście pilnuje, że nie dostaje go nic poza
+	 * kwotą.
+	 */
+	it('marks a money field with the currency, and only a money field', async () => {
+		const element = await render([
+			question({ code: 'BUDGET', kind: 'MONEY' }),
+			question({ code: 'CONSTRUCTION_YEAR', kind: 'INTEGER', position: 20 }),
+		]);
+
 		expect(
-			element.querySelector('[data-question="HOME_ASSISTANCE"]'),
-			'pytanie warunkowe doszło na tym samym ekranie',
-		).not.toBeNull();
+			element.querySelector('[data-question="BUDGET"] .apk__currency')?.textContent?.trim(),
+		).toBe('zł');
+		expect(
+			element.querySelector('[data-question="CONSTRUCTION_YEAR"] .apk__currency'),
+			'rok budowy to nie kwota',
+		).toBeNull();
 	});
 
 	it('rebuilds the control when the question changes, so a repeated answer still registers', async () => {

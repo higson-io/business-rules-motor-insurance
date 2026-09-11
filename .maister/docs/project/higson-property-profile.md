@@ -5044,3 +5044,50 @@ w demie życiowym (`shared/apk/questionnaire`) — 11 px kursywą, kolor wyciszo
 i nie został nagięty — zmienił podmiot na regułę, która obowiązuje teraz, i bada OBIE strony:
 pole ze źródłem podpisane, pole bez źródła czyste. Bo kontraktem nie jest „jest napis", tylko
 „o napisie rozstrzyga katalog, nie komponent". Sprawdzone mutacją.
+
+## §60. Usterka przeskoku, waluta przy kwocie (2026-09-11)
+
+### 60.1 Zgłoszenie: „wynajem tak, potem assistance tak — nie przenosi dalej"
+
+⛔ **Usterka była moja i podwójna: w kodzie i w ocenie.** §58 opisał zatrzymanie na ekranie
+złożonym jako zaletę („przeskok świadomie nie strzela") — zobaczyłam je w przeglądarce, uznałam za
+poprawne i tak zameldowałam. Poprawne jest zatrzymanie **do czasu**, aż odsłonięte pytanie dostanie
+odpowiedź; §58 blokował je **na zawsze**, więc po odpowiedzi na oba ekran dalej stał.
+
+Warunek 3 brzmi teraz: **każde odsłonięte pole ekranu ma odpowiedź**. ⛔ To NIE jest `settled()` —
+`settled()` pyta o pola OBOWIĄZKOWE, bo przycisk „Dalej" ma prawo minąć pytanie nieobowiązkowe,
+a kliknięcie takiego prawa nie ma. Pomoc fachowca jest nieobowiązkowa, więc po `settled()` ekran
+uciekłby w tej samej chwili, w której pytanie się pojawiło.
+
+### 60.2 Głębsza przyczyna: decyzja zapadała na starych danych
+
+⛔ Pierwsza poprawka **zepsuła przeskok zupełnie** i to właśnie ona pokazała prawdziwy problem.
+`autoAdvance` biegł w `then()` po zapisie odpowiedzi — czyli **zanim dojechała przeliczona
+ankieta**. Na danych sprzed kliknięcia nie da się stwierdzić ani tego, że pole ma już odpowiedź
+(`value` jest wtedy puste), ani tego, że za chwilę odsłoni się kolejne pytanie.
+
+Decyzja przeniosła się więc tam, gdzie dane są świeże — do `cursor`. Kliknięcie tylko **uzbraja**
+token (`armedAdvance` = numer pytania, na którym stoimy), a przeskok wykonuje się przy najbliższych
+świeżych danych, najwyżej raz. ⛔ To dalej nie jest stan sprzed 9 września: tamten kursor przesuwał
+się po KAŻDYM przeliczeniu, ten — tylko po uzbrojonym kliknięciem, a jawna nawigacja („Dalej",
+„Poprzednie", spis) token **rozbraja**, żeby nie dorzucił drugiego kroku.
+
+⚠️ Zmierzone po poprawce: 1→2→3→4→5 po jednym kliknięciu, „tak" przy wynajmie **zatrzymuje** ekran
+i odsłania pomoc fachowca, odpowiedź na nią przenosi na 6. „Nie" przy wynajmie przenosi od razu,
+bo nic się nie odsłania.
+
+### 60.3 Test, który teraz łapie obie usterki
+
+Test ma dwie połowy i każda odpowiada innej mutacji: bez czekania na odsłonięte pole wywala się
+pierwsza („odsłonięte pytanie zatrzymuje ekran"), po przywróceniu trwałej blokady pytania złożonego
+— druga („po domknięciu ekranu idziemy dalej"). Sprawdzone obiema mutacjami.
+
+### 60.4 Waluta przy polach kwotowych
+
+Pola `MONEY` mają przyrostek **„zł"** — trzy na ekranach: oczekiwana składka, wartość
+nieruchomości, franszyza. ⛔ „zł", nie „PLN": tak brzmi każda inna kwota w tym demie (składka,
+sumy, franszyza w ofercie), a dwa zapisy tej samej waluty na jednym ekranie czytałyby się jak dwie
+różne rzeczy. ⛔ Decyduje `kind` z konfiguracji, nie kod pytania — pole kwotowe dodane w Studio
+dostanie walutę samo.
+
+Testy: 11 Javy, **76** frontu, 3 regułowe.

@@ -6,11 +6,12 @@ import {
 	input,
 	linkedSignal,
 	output,
+	signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatFormField } from '@angular/material/form-field';
+import { MatFormField, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
@@ -51,6 +52,7 @@ const CLICK_ANSWERS = new Set<PropertyQuestionDto['kind']>(['BOOLEAN', 'CHOICE']
 		MatCheckbox,
 		MatFormField,
 		MatInput,
+		MatSuffix,
 		MatOption,
 		MatSelect,
 	],
@@ -104,6 +106,17 @@ export class Questionnaire {
 	 */
 	readonly restart = input(0);
 
+	/**
+	 * Uzbrojenie przeskoku: „kliknięto odpowiedź, stojąc na pytaniu `from`".
+	 *
+	 * ⛔ Sam przeskok NIE dzieje się tutaj i nie może: po zapisie odpowiedzi aplikacja dopiero
+	 * prosi o przeliczoną ankietę, więc w chwili kliknięcia komponent wciąż trzyma dane SPRZED
+	 * odpowiedzi. Na nich nie da się stwierdzić ani tego, że pole ma już odpowiedź, ani tego, że
+	 * zaraz odsłoni się kolejne pytanie. Decyzja zapada więc przy NAJBLIŻSZYCH świeżych danych —
+	 * patrz `cursor`.
+	 */
+	private readonly armedAdvance = signal<number | null>(null);
+
 	/** Zgłaszane, gdy klient domknął ostatnie pytanie ankiety — gospodarz przechodzi dalej. */
 	readonly completed = output<void>();
 
@@ -153,29 +166,35 @@ export class Questionnaire {
 	/**
 	 * Numer pytania oglądanego teraz.
 	 *
-	 * ⛔ **BEZ SAMOPRZESKOKU PO ODPOWIEDZI** (2026-09-09). Do tej daty kursor liczył się jako
-	 * „pierwsze nieudzielone spośród odsłoniętych", więc odpowiedź na pytanie natychmiast
-	 * przesuwała ekran na następne — w 80 ms, zmierzone. Skutek był taki, że klient PATRZYŁ ZAWSZE
-	 * NA PYTANIE NIEUDZIELONE, a przycisk „Następne pytanie" był przez całą ankietę wyszarzały,
-	 * bo istotnie nie było dokąd iść. Zapalał się wyłącznie na ostatnim pytaniu, i to tylko
-	 * dlatego, że jest nieobowiązkowe. Zgłoszone z testów: „ten przycisk był ciągle wyszarzały".
+	 * ⛔ **PRZESKOK TYLKO UZBROJONY KLIKNIĘCIEM** (2026-09-11). Do 9 września kursor liczył się
+	 * jako „pierwsze nieudzielone spośród odsłoniętych", więc ekran przesuwał się po KAŻDYM
+	 * przeliczeniu — w 80 ms, zmierzone — i klient patrzył zawsze na pytanie nieudzielone, a
+	 * przycisk „Następne pytanie" stał wyszarzały przez całą ankietę, bo istotnie nie było dokąd
+	 * iść. Wtedy usunięte; 11 września przeskok wrócił, ale **z innej przyczyny**: nie z przeliczenia,
+	 * tylko z kliknięcia w odpowiedź, przez token `armedAdvance`. Kliknięcie uzbraja, najbliższe
+	 * świeże dane wykonują, i to najwyżej raz.
 	 *
-	 * ⛔ W pliku siedziały przez to DWA SPRZECZNE PROJEKTY: komentarz przy `next()` deklarował
-	 * nawigację jawną („ekran nie może uciec prowadzącemu"), a ten sygnał robił przeskok jako
-	 * efekt uboczny przeliczenia. Osobno każde brzmiało sensownie — stąd nikt tego nie zauważył.
+	 * ⛔ Poprzednio siedziały tu przez to DWA SPRZECZNE PROJEKTY: komentarz przy `next()` deklarował
+	 * nawigację jawną, a ten sygnał robił przeskok jako efekt uboczny przeliczenia. Osobno każde
+	 * brzmiało sensownie — stąd nikt tego nie zauważył. Dziś jedno i drugie mówi to samo: kursorem
+	 * rusza **zdarzenie**, nigdy samo przyjście danych.
 	 *
-	 * Teraz kursor **zostaje tam, gdzie stoi**, dopóki mieści się w zakresie. Liczy się od nowa
-	 * tylko wtedy, gdy nie ma czego utrzymać: przy pierwszym wejściu na krok i po zmianie, która
-	 * skróciła listę odsłoniętych.
+	 * Poza uzbrojonym przeskokiem kursor **zostaje tam, gdzie stoi**, dopóki mieści się w zakresie.
+	 * Liczy się od nowa tylko wtedy, gdy nie ma czego utrzymać: przy pierwszym wejściu na krok
+	 * i po zmianie, która skróciła listę odsłoniętych.
 	 *
 	 * ⚠️ Wtedy „pierwsze NIEUDZIELONE", nie „ostatnie odsłonięte" — wejście na krok z częściowo
 	 * wypełnioną ankietą ma postawić klienta tam, gdzie skończył, a nie na końcu listy.
 	 */
 	private readonly cursor = linkedSignal<
-		{ reached: readonly PropertyQuestionDto[]; restart: number },
+		{ reached: readonly PropertyQuestionDto[]; restart: number; armed: number | null },
 		number
 	>({
-		source: () => ({ reached: this.reachable(), restart: this.restart() }),
+		source: () => ({
+			reached: this.reachable(),
+			restart: this.restart(),
+			armed: this.armedAdvance(),
+		}),
 		computation: (now, previous) => {
 			// ⛔ Nowy proces wraca na PIERWSZE pytanie — dosłownie zero, a nie „pierwsze
 			// nieudzielone". To nie jest uproszczenie, tylko jedyna wersja odporna na kolejność:
@@ -187,6 +206,23 @@ export class Questionnaire {
 				return 0;
 			}
 			const kept = previous?.value;
+
+			// ⛔ Przeskok po kliknięciu odpowiedzi rozstrzyga się TUTAJ, bo dopiero tu widać dane
+			// po przeliczeniu: czy pole naprawdę ma odpowiedź i czy nie doszło pytanie warunkowe.
+			// Warunek „dane się zmieniły" odróżnia przyjście nowej ankiety od samego uzbrojenia
+			// tokenu, które też rusza źródłem.
+			const fresh = previous !== undefined && previous.source.reached !== now.reached;
+			if (
+				fresh &&
+				now.armed !== null &&
+				kept !== undefined &&
+				now.armed === kept &&
+				kept < now.reached.length - 1 &&
+				this.everyShownFieldAnswered(now.reached[kept])
+			) {
+				return kept + 1;
+			}
+
 			if (kept !== undefined && kept < now.reached.length) {
 				return kept;
 			}
@@ -255,6 +291,7 @@ export class Questionnaire {
 	goToQuestion(code: string): void {
 		const index = this.reachable().findIndex((question) => question.code === code);
 		if (index >= 0) {
+			this.armedAdvance.set(null);
 			this.cursor.set(index);
 		}
 	}
@@ -297,6 +334,9 @@ export class Questionnaire {
 		if (!this.canAdvance()) {
 			return;
 		}
+		// ⛔ Jawne przejście rozbraja przeskok, inaczej uzbrojony token dorzuciłby drugi krok przy
+		// najbliższym przeliczeniu i ekran przeskoczyłby o dwa pytania naraz.
+		this.armedAdvance.set(null);
 		// ⚠️ Nie przeskakuj poza to, co odsłonięte — łańcuch może prowadzić inaczej niż kolejność.
 		if (this.cursor() < this.reachable().length - 1) {
 			this.cursor.update((value) => value + 1);
@@ -306,6 +346,7 @@ export class Questionnaire {
 	}
 
 	previous(): void {
+		this.armedAdvance.set(null);
 		this.cursor.update((value) => Math.max(value - 1, 0));
 	}
 
@@ -333,47 +374,38 @@ export class Questionnaire {
 		return question.values.includes(option);
 	}
 
-	answer(question: PropertyQuestionDto, value: string): void {
-		const from = this.cursor();
-		void this.store
-			.commit(firstValueFrom(this.propertyService.updateAnswer(question.code, value)))
-			.then(() => this.autoAdvance(question, from));
-	}
-
 	/**
 	 * Kliknięcie odpowiedzi przenosi na następne pytanie — rytm ankiety, nie formularza.
 	 *
-	 * ⛔ To NIE jest powrót do stanu sprzed 9 września. Wtedy przeskok był efektem ubocznym
-	 * PRZELICZENIA: kursor liczył się od nowa po każdym odświeżeniu wyceny i uciekał także wtedy,
-	 * gdy nikt nic nie kliknął. Tutaj jest skutkiem KLIKNIĘCIA, w obsłudze zdarzenia, i dlatego
-	 * daje się ograniczyć czterema warunkami, z których każdy ma powód:
+	 * ⛔ To NIE jest powrót do stanu sprzed 9 września. Wtedy kursor liczył się od nowa po KAŻDYM
+	 * przeliczeniu wyceny i ekran uciekał także wtedy, gdy nikt nic nie kliknął. Tutaj przeskok
+	 * jest UZBRAJANY kliknięciem i wykonuje się najwyżej raz, przy najbliższych świeżych danych.
 	 *
-	 * 1. tylko ankieta (`NEEDS`) — krok przedmiotu pokazuje wszystkie pola naraz, nie ma dokąd iść;
-	 * 2. tylko odpowiedź KLIKANA (`BOOLEAN`, `CHOICE`) — pole kwoty i tekstu emituje `change`
-	 *    przy utracie ogniska, więc przeskok wyrywałby ekran w trakcie pisania;
-	 * 3. tylko pytanie PROSTE — w pytaniu złożonym jedno pole nie domyka kroku;
-	 * 4. tylko gdy prowadzący nie ruszył kursora sam w międzyczasie.
-	 *
-	 * ⛔ Na ostatnim pytaniu przeskoku NIE MA. Krok kończy się przyciskiem, świadomie.
-	 *
-	 * ⚠️ Przesunięcie następuje PO domknięciu zapisu, żeby łańcuch odsłaniania zdążył się
-	 * przeliczyć: odpowiedź „tak" na pytanie o wynajem odsłania pytanie o pomoc fachowca, które
-	 * wchodzi na listę tuż za nim.
+	 * ⛔ Uzbrojenie, a nie przeskok od razu, bo w chwili kliknięcia komponent trzyma jeszcze
+	 * ankietę SPRZED odpowiedzi: pole nie ma tam wartości, a pytanie warunkowe jeszcze się nie
+	 * odsłoniło. Warunki, których nie da się sprawdzić na starych danych, sprawdza `cursor`.
 	 */
-	private autoAdvance(answered: PropertyQuestionDto, from: number): void {
-		const question = this.current();
-		if (
-			this.group() !== 'NEEDS' ||
-			question === null ||
-			question.fields.length > 1 ||
-			!CLICK_ANSWERS.has(answered.kind) ||
-			this.cursor() !== from
-		) {
-			return;
+	answer(question: PropertyQuestionDto, value: string): void {
+		if (this.group() === 'NEEDS' && CLICK_ANSWERS.has(question.kind)) {
+			this.armedAdvance.set(this.cursor());
 		}
-		if (this.cursor() < this.reachable().length - 1) {
-			this.cursor.update((value) => value + 1);
-		}
+		void this.store.commit(firstValueFrom(this.propertyService.updateAnswer(question.code, value)));
+	}
+
+	/**
+	 * Czy na ekranie nie został ani jeden pytajnik bez odpowiedzi — łącznie z nieobowiązkowymi.
+	 *
+	 * ⛔ Nieobowiązkowe liczy się TUTAJ, choć nie liczy się w `settled()`. Różnica jest sednem
+	 * usterki zgłoszonej 11 września: pytanie o wynajem odsłania pomoc fachowca, która jest
+	 * NIEOBOWIĄZKOWA — po `settled()` ekran uciekłby w tej samej chwili, w której pytanie się
+	 * pojawiło, a pierwsza poprawka blokowała przeskok na każdym pytaniu złożonym NA ZAWSZE, więc
+	 * po odpowiedzi na oba ekran dalej stał. Zatrzymanie ma trwać do odpowiedzi, nie bez końca.
+	 */
+	private everyShownFieldAnswered(question: PropertyQuestionDto): boolean {
+		const shown = this.fieldsOf(question);
+		return shown.length === 0
+			? this.settled(question)
+			: shown.every((field) => this.settled(field));
 	}
 
 	toggle(question: PropertyQuestionDto, option: string, checked: boolean): void {

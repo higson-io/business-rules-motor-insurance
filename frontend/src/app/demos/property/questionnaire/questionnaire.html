@@ -77,6 +77,18 @@
 					[attr.aria-labelledby]="'q-' + question.code"
 					(change)="answer(question, $any($event.target).value)"
 				/>
+				<!--
+					Waluta przy polu kwotowym. ⛔ „zł", nie „PLN" — tak brzmi KAŻDA inna kwota na
+					tych ekranach (składka, sumy ubezpieczenia, franszyza w ofercie), a dwa zapisy
+					tej samej waluty na jednym ekranie czytałyby się jak dwie różne rzeczy.
+
+					⛔ Przyrostek, nie część etykiety: etykieta przychodzi z reguł i nie wolno jej
+					doklejać w szablonie — a rodzaj odpowiedzi (`MONEY`) też jest konfiguracją,
+					więc pole kwotowe dodane w Studio dostanie „zł" samo.
+				-->
+				@if (question.kind === 'MONEY') {
+					<span matTextSuffix class="apk__currency">zł</span>
+				}
 			</mat-form-field>
 		}
 	}

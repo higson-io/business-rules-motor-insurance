@@ -660,6 +660,20 @@ nothing without needing a guard, since survey questions have no source. ⚠️ A
 caption's ABSENCE and said "do not restore without a decision" — it was neither deleted nor bent:
 its subject changed to the rule that holds now, and it checks **both** sides, because the contract
 is "the catalogue decides", not "there is a caption".
+**§60 (2026-09-11)** fixes §58's advance and adds the currency suffix. ⛔ The defect was **mine
+twice over**: §58 described the stop on a compound screen as a feature, having seen it in the
+browser and rationalised it. The stop is right **until the revealed question is answered**, not
+forever. Condition three now reads "every shown field has an answer" — ⛔ deliberately **not**
+`settled()`, which asks only about REQUIRED fields, because the revealed assistance question is
+optional and `settled()` would let the screen run away the moment it appeared. ⛔ The first fix
+broke the advance completely, and that is what exposed the real cause: it ran in a `then()` after
+the save, i.e. **before the recalculated questionnaire arrived**, so it judged both answeredness and
+reveals on pre-click data. The decision moved to where the data is fresh — a click now only **arms**
+a token and the cursor performs the jump at most once, on the next fresh data; explicit navigation
+disarms it. ⚠️ Measured after: 1→2→3→4→5 on single clicks, "yes" to rental holds the screen and
+reveals the assistance question, answering it moves to 6, "no" moves straight on. The test has two
+halves and each catches its own mutation. `MONEY` fields now carry **"zł"** (not "PLN" — every other
+amount in the demo reads that way), driven by `kind` from the catalogue.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -910,4 +924,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§59 — provenance captions return on four fields of thirteen)
+**Last regenerated**: 2026-09-11 (§60 — the advance waits for a revealed question, and money fields say zł)
