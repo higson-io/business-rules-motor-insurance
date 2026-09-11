@@ -5021,3 +5021,26 @@ zostawionym przez przeliczenie. Przeskok dzieje się w mikrozadaniu (`then` po z
 `tick()` też nie wystarcza — potrzebny jest `settle()`: dwa `await Promise.resolve()` plus `tick()`.
 
 Testy: 11 Javy, **75** frontu (dwa nowe, oba sprawdzone mutacją), 3 regułowe.
+
+## §59. Podpis o źródle wraca — na czworo pól z trzynastu (2026-09-11)
+
+⚙️ Rek. 8.3 wraca na ekran przedmiotu ubezpieczenia: pole wypełnione za klienta mówi, skąd wzięła
+się wartość. 9 września podpis zniknął, bo przy trzynastu polach wyglądał na drobny druk pod
+połową ekranu — dziś wraca dlatego, że źródło niesie **czworo pól z trzynastu**, i to właśnie ta
+proporcja jest treścią: trzy mówią „z Twojej poprzedniej polisy" (metraż, adres, zakres ochrony od
+powodzi), jedno — „z bazy UFG" (historia szkód).
+
+⛔ **Nie było potrzeby zmieniać reguł ani wybierać pól w kodzie.** §22 zdjął sam podpis, zostawiając
+kolumnę `prefill` w katalogu `demo.property.subject.field` nietkniętą — wybór czterech pól stał tam
+przez cały czas. Dołożenie albo zdjęcie podpisu to **jedna komórka w Studio**, a puste znaczy
+„klient podał sam", nie „nie wiem".
+
+W kroku pierwszym nie pokazuje się nic i nie pilnuje tego żaden warunek w kodzie: pytania ankiety
+nie mają źródła, bo nikt za klienta nie odpowiada, czego on potrzebuje. Miara i kolor są te same co
+w demie życiowym (`shared/apk/questionnaire`) — 11 px kursywą, kolor wyciszony, 5,18:1 na bieli.
+`.apk__foot` nie wróciła: stopka niosła też „nie chcę podać", a to zdjął §22.
+
+⚠️ **Test przypinał BRAK tego podpisu** i mówił wprost „nie przywracać bez decyzji". Nie zniknął
+i nie został nagięty — zmienił podmiot na regułę, która obowiązuje teraz, i bada OBIE strony:
+pole ze źródłem podpisane, pole bez źródła czyste. Bo kontraktem nie jest „jest napis", tylko
+„o napisie rozstrzyga katalog, nie komponent". Sprawdzone mutacją.

@@ -82,18 +82,27 @@
 	}
 
 	<!--
-		⛔ BEZ PODPISU „Podpowiedziane: …". Usunięty 2026-09-09 na decyzję właściciela dema.
+		⚙️ PODPIS PRZYWRÓCONY 2026-09-11, po tym jak 9 września zniknął.
 
-		⚠️ To była treść z rek. 8.3 — informacja, SKĄD wzięliśmy wartość, której klient nie wpisał
-		— i §21 zostawił ją świadomie, odróżniając od skasowanej wtedy autoreklamy narzędzia.
-		Wypada z demo element, który tę rekomendację pokazywał; przy trzynastu polach przedmiotu
-		ubezpieczenia trzy takie podpisy dokładały wiersza tekstu pod polami, których nikt nie
-		czyta w trakcie pokazu.
+		Rek. 8.3: jeśli wartość wzięła się skądinąd niż od klienta, klient ma o tym wiedzieć.
+		Wtedy znikł, bo wyglądał na drobny druk pod polami, których nikt na pokazie nie czyta;
+		wraca, bo źródło niesie **czworo pól z trzynastu** i to właśnie ono jest treścią: trzy
+		mówią „z Twojej poprzedniej polisy", jedno — „z bazy UFG".
 
-		⚠️ `prefillSource` ZOSTAJE na drucie i w katalogu reguł — zniknął tylko podpis. Przywrócenie
-		to ten `@if`, nic więcej. Moto i życie mają ten sam podpis przez komponent wspólny
-		(`shared/apk/questionnaire`) i nie były ruszane.
+		⛔ O tym, KTÓRE pola mają podpis, nie decyduje ten plik ani żaden warunek w kodzie, tylko
+		kolumna `prefill` w katalogu `demo.property.subject.field`. Puste znaczy „klient podał sam",
+		a nie „nie wiem" — dołożenie albo zdjęcie podpisu to jedna komórka w Studio.
+
+		⚠️ W kroku pierwszym nie pokaże się nic i nie trzeba tego pilnować warunkiem: pytania
+		ankiety nie mają źródła, bo nikt za klienta nie odpowiada, czego on potrzebuje.
+
+		Moto i życie mają ten sam podpis przez komponent wspólny — teraz znów tak samo brzmi.
 	-->
+	@if (question.prefillSource) {
+		<p class="apk__prefill" data-testid="apk-prefill">
+			Podpowiedziane: {{ question.prefillSource }}
+		</p>
+	}
 </ng-template>
 
 @if (ready()) {

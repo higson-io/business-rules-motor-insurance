@@ -650,6 +650,16 @@ appeared. ⚠️ The test for that guard first answered with a **money** field a
 guard deleted — a different condition was blocking it; caught by mutation, rewritten with a yes/no
 field. ⚠️ `whenStable()` deadlocks on the GET a recalculation leaves behind, and `tick()` alone does
 not flush the microtask the advance runs in.
+**§59 (2026-09-11)** puts the provenance caption back on the subject step — rec. 8.3, on **four
+fields out of thirteen**: three from the previous policy (area, address, flood cover) and one from
+the **UFG claims database**. ⛔ No rule changed and no field was picked in code: §22 removed only the
+caption and left the catalogue's `prefill` column intact, so the choice of those four had been
+sitting in `demo.property.subject.field` the whole time — adding or dropping one is **a single cell
+in Studio**, and an empty one means "the client said so themselves", not "unknown". Step one shows
+nothing without needing a guard, since survey questions have no source. ⚠️ A test pinned the
+caption's ABSENCE and said "do not restore without a decision" — it was neither deleted nor bent:
+its subject changed to the rule that holds now, and it checks **both** sides, because the contract
+is "the catalogue decides", not "there is a caption".
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -900,4 +910,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§58 — a clicked answer carries the survey forward)
+**Last regenerated**: 2026-09-11 (§59 — provenance captions return on four fields of thirteen)

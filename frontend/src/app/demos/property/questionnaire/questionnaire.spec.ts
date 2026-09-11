@@ -217,17 +217,27 @@ describe('Questionnaire', () => {
 	 * i nadal jest w katalogu reguł, więc dopisanie podpisu z powrotem jest jedną linijką
 	 * w szablonie — i wyglądałoby jak naprawa brakującej funkcji, a nie cofnięcie decyzji.
 	 */
-	it('does not print the prefill source, even when the server sends one', async () => {
+	/**
+	 * ⚙️ Odwrotność testu, który stał tu do 11 września 2026 („nie przywracać bez decyzji").
+	 * Decyzja zapadła — podpis wraca, ale kontrakt jest mocniejszy niż „jest napis": o tym, KTÓRE
+	 * pole go dostaje, rozstrzyga katalog reguł, a nie ten komponent. Dlatego jeden test bada
+	 * OBIE strony: pole ze źródłem podpisane, pole bez źródła czyste.
+	 */
+	it('prints the prefill source where the catalogue gives one, and nowhere else', async () => {
 		const element = await render([
 			question({ code: 'AREA', prefillSource: 'Metraż z poprzedniej polisy' }),
 			question({ code: 'POSTCODE', position: 20 }),
 		]);
 
-		expect(element.querySelector('[data-question="AREA"]')).not.toBeNull();
+		const zPodpisem = element.querySelector('[data-question="AREA"] [data-testid="apk-prefill"]');
+		expect(zPodpisem?.textContent, 'źródło z katalogu trafia na ekran').toContain(
+			'Metraż z poprzedniej polisy',
+		);
+
 		expect(
-			element.textContent,
-			'źródło podpowiedzi zdjęte z ekranu — nie przywracać bez decyzji',
-		).not.toContain('Metraż z poprzedniej polisy');
+			element.querySelector('[data-question="POSTCODE"] [data-testid="apk-prefill"]'),
+			'puste źródło znaczy „klient podał sam" — bez podpisu',
+		).toBeNull();
 	});
 
 	/**

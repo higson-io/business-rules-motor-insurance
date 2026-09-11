@@ -308,9 +308,18 @@
 	width: auto;
 }
 
-// ⛔ `.apk__foot` i `.apk__prefill` USUNIĘTE 2026-09-09 razem z podpisem „Podpowiedziane: …"
-// (patrz komentarz w szablonie). Stopka pytania nie ma już czego nieść: „nie chcę podać" zdjął
-// §22, a źródło podpowiedzi — decyzja właściciela dema.
+// ⚙️ `.apk__prefill` WRÓCIŁ 2026-09-11 — patrz komentarz w szablonie. `.apk__foot` nie wrócił:
+// stopka niosła też „nie chcę podać", a to zdjął §22, więc podpis stoi dziś sam.
+//
+// ⛔ Ta sama miara i ten sam kolor co w demie życiowym (`shared/apk/questionnaire`). Trzeci wzór
+// dla tej samej rzeczy byłby różnicą, której nikt nie umie uzasadnić.
+.apk__prefill {
+	margin: 6px 0 0;
+	font-size: 0.6875rem;
+	font-style: italic;
+	line-height: 1.4;
+	color: @color-text-muted;
+}
 
 
 
