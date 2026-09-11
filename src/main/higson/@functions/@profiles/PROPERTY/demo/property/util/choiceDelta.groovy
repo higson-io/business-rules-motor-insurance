@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Util do zrodla poziomu tabeli demo.property.offer.choiceKind. Zwraca ROZNICE pozycji w drabince pakietow: ujemna gdy klient wybral wezszy pakiet niz rekomendowany, zero gdy ten sam, dodatnia gdy szerszy. Null, gdy ktorejkolwiek strony jeszcze nie ma. Sama odejmowanie - co ta roznica ZNACZY, mowi tabela."
+description = "Util do zrodla poziomu tabeli demo.property.offer.choiceKind. Zwraca ROZNICE LICZBY POKRYC miedzy pakietem wybranym a rekomendowanym: ujemna gdy klient wzial wezszy zakres, zero gdy ten sam, dodatnia gdy szerszy. Do 11 wrzesnia liczyla roznice POZYCJI w drabince - a pozycja to umowa o kolejnosci na ekranie, nie miara zakresu: przestawienie jej zmienialo notatke w ofercie, nie zmieniajac ochrony. Null, gdy ktorejkolwiek strony jeszcze nie ma. Samo odejmowanie - co ta roznica ZNACZY, mowi tabela."
 
 [[arguments]]
 name = "ctx"
@@ -21,14 +21,12 @@ if (recommended == null || chosen == null) {
 	return null
 }
 
-def positionOf = { code ->
-	def variant = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + code + ']')
-	variant.getAttrDecimal('POSITION', ctx)
+// ⛔ Liczba pokryc PAKIETU, a nie liczba pokryc spelniajacych potrzebe. Rekomendacja jest
+// z definicji najtanszym pakietem pokrywajacym WSZYSTKIE potrzeby, wiec pakiet szerszy spelnia
+// ich dokladnie tyle samo - po tej drugiej mierze roznica zawsze wychodzilaby zerowa i przypadek
+// RICHER nie moglby nigdy paść, choc to wlasnie on opisuje zakres wykraczajacy poza analize.
+def coverCount = { code ->
+	domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + code + ']').getAll('COVERS').size()
 }
 
-def recommendedPosition = positionOf(recommended)
-def chosenPosition = positionOf(chosen)
-if (recommendedPosition == null || chosenPosition == null) {
-	return null
-}
-return chosenPosition - recommendedPosition
+return coverCount(chosen) - coverCount(recommended)

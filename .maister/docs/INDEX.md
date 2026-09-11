@@ -688,6 +688,17 @@ it became a three-line read of the element's `SUM`. Assistance has **no `SUM` at
 `getAttribute('SUM') == null` in Groovy and `attrDecimal` in Java, since an empty attribute is never
 created and a raw read NPEs. Sums, premiums and limits identical to the baseline. ⚠️ A domain type's
 description is capped at **512 characters**.
+**§62 (2026-09-11)** measures scope by covers, not by ladder position. `choiceDelta` fed the offer's
+"wider/narrower than recommended" note from the difference in `POSITION` — ⛔ but position is a
+convention about screen order, so moving a package in the ladder changed the wording of the offer
+document without changing a single cover. The delta now comes from the **number of covers** (1/4/7),
+and the table's closed ranges cover both, so the matrix was untouched. ⛔ The other candidate
+measure — covers that meet a need — was rejected for a checkable reason: the recommendation is by
+construction the cheapest package covering **all** needs, so a wider package meets exactly as many,
+the delta would always be zero and the **RICHER case could never fire** — though its sentence exists
+precisely for it. ⚠️ Two packages with equal cover counts but different composition would read as
+MATCHES; impossible today (1 ⊂ 4 ⊂ 7) and recorded in the function's description rather than guarded
+by a branch that cannot run.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -938,4 +949,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§61 — a cover’s sum points at its own rule)
+**Last regenerated**: 2026-09-11 (§62 — wider or narrower is counted in covers)

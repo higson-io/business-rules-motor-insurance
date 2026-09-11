@@ -5147,3 +5147,38 @@ przez `limit.effective` bez potknięcia. Oba testy regułowe zielone, scenariusz
 
 ⚠️ Opis typu domenowego ma limit **512 znaków** — pierwsza wersja miała 517 i wróciła błędem
 walidacji. Zmiana typu **nie jest sesyjna**, więc działa od razu i nie ma czego publikować.
+
+## §62. Zakres mierzy się pokryciami, nie pozycją w drabince (2026-09-11)
+
+⛔ `demo.property.util.choiceDelta` liczyła różnicę **pozycji** pakietów, a nota w ofercie mówi
+o **zakresie ochrony**. `POSITION` to umowa o kolejności na ekranie: przestawienie pakietu
+w drabince zmieniało zdanie w dokumencie oferty, nie zmieniając ani jednego pokrycia. Delta bierze
+się teraz z **liczby pokryć w pakiecie** (1 / 4 / 7), więc różnice to ±3 i ±6 zamiast ±10 i ±20.
+
+⚙️ Zakresy w tabeli (`-999 - -1`, `0 - 0`, `1 - 999`) obsługują jedno i drugie, więc macierz
+została nietknięta — sprawdzona od razu po zmianie kolumn (W-27).
+
+### 62.1 Dlaczego NIE „liczba pokryć spełniających potrzebę"
+
+Właściciel podał dwie możliwe miary. Druga wygasiłaby przypadek **RICHER całkowicie**:
+rekomendacja jest z definicji najtańszym pakietem pokrywającym **wszystkie** potrzeby, więc pakiet
+szerszy spełnia ich dokładnie tyle samo — różnica zawsze zerowa, czyli „wybór zgodny
+z rekomendacją". A zdanie RICHER („wszystkie potrzeby pokryte, **zakres wykracza poza to, co
+wynikało z analizy**") opisuje właśnie tę sytuację i nie mogłoby nigdy paść. To, ile potrzeb
+zostaje bez pokrycia, niesie osobno `unmetNeeds` i uzasadnienie.
+
+### 62.2 Ograniczenie wpisane w opis
+
+⚠️ Przy dwóch pakietach o **tej samej liczbie pokryć, ale innym składzie** różnica wyjdzie zerowa
+i nota powie „zgodny z rekomendacją". Dziś nie może się zdarzyć — pakiety są zagnieżdżone (1 ⊂ 4 ⊂ 7)
+— a gałąź na przypadek, którego nie ma, to martwa konfiguracja z §33. Gdyby taki pakiet powstał,
+trzeba porównać **zbiory** pokryć, nie ich liczność; stoi to w opisie funkcji.
+
+`POSITION` zostaje tam, gdzie naprawdę znaczy kolejność: układ drabinki na ekranie i remis
+„przy równym pokryciu wygrywa tańszy" w `bestCovering`.
+
+### 62.3 Weryfikacja
+
+Trzy wybory przez aplikację, zgodne z baseline'em sprzed zmiany: BASIC → `POORER` (z żądaniem
+potwierdzenia i wypisaną niepokrytą potrzebą „Elementy stałe"), STANDARD → `MATCHES`,
+COMPLETE → `RICHER`.
