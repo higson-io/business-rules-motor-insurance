@@ -4914,3 +4914,73 @@ rozstrzyga o tym atrybut `SUM_BASIS` pokrycia, nie tekst funkcji.
 Scenariusze A/B/D, ścieżka oferty z wyborem wbrew rekomendacji (`POORER`, niezaspokojona potrzeba
 wypisana), składki trzech pakietów, trzy testy regułowe i 11 testów Javy — bez różnic. MOTOR
 i ŻYCIE nietknięte: mają własne klasy kontekstu i własne profile.
+
+## §57. Narzędzia prowadzącego: odśwież i zacznij od nowa (2026-09-11)
+
+Ergonomia pokazu, nie funkcja produktu. Trzy rzeczy na wyraźne życzenie właściciela: swobodne
+przechodzenie między zakładkami, przycisk odświeżenia konfiguracji i przycisk czyszczenia stanu —
+wszystko po to, żeby dało się pokazać **dołożenie nowego pakietu w Studio na żywo**.
+
+### 57.1 Pasek kroków bez bramki
+
+⛔ **Odwrócenie decyzji z 2026-09-09.** Pasek bramkował ruch w przód: na ofertę nie wpuszczał,
+dopóki klient nie wybrał wariantu, bo skok w przód pokazywał gotowy dokument. Bramka wypada, bo
+prowadzący musi móc wejść w dowolny ekran i wyjść z niego, nie przechodząc procesu od nowa — a to
+jest częstsze niż mylące wrażenie z jednego ekranu.
+
+⚠️ Cena jest realna i zmierzona: wejście na „Ofertę" bez odpowiedzi **wystawia dokument**
+(numer oferty rośnie, wariant Standardowy, 1014,94 zł). Bramki wewnątrz kroków zostają — „Dalej"
+na przedmiocie dalej czeka na komplet pól, a wejście na ofertę przyciskiem na wybór wariantu.
+Odblokowana jest **droga prowadzącego**, nie droga klienta; te dwie rzeczy przestają być tym samym.
+
+### 57.2 Dwa przyciski w rogu
+
+`app-demo-tools` — mały, wyciszony, przyklejony do rogu OKNA (nie do końca treści, bo ekrany mają
+różną wysokość). ⛔ Bez potwierdzenia przy resecie: okno „na pewno?" w trakcie pokazu kosztuje
+więcej niż przypadkowe wyczyszczenie.
+
+**Odśwież z Higsona** to `store.recalculate()`, czyli ten sam ponowny GET, który leci po każdej
+odpowiedzi — **odpowiedzi zostają**. Front nie wie, co się zmieniło, i nie powinien wiedzieć:
+serwer przy każdym żądaniu czyta drzewo domeny i reguły od nowa.
+
+**Zacznij od nowa** to `startNewProcess()` plus powrót na pierwszy krok.
+
+### 57.3 Dowód: pakiet dołożony w Studio pojawia się bez restartu
+
+Zmierzone end-to-end 11 września 2026. Nowy element `VARIANTS[ESSENTIAL]` („Niezbędny",
+`POSITION = 15`, `LIABILITY_SUM = 100 000`, dwa pokrycia jako referencje), publikacja, kliknięcie
+**Odśwież**:
+
+- pakiet **pojawił się** w porównaniu, **we właściwym miejscu drabinki** (Podstawowy → Niezbędny →
+  Standardowy → Pełny), bo o kolejności decyduje `POSITION`;
+- dostał **policzoną składkę 556,23 zł** = 545,29 (mury) + 10,94 (OC: 100 000 × 0,09‰ × 1,215),
+  czyli przeszedł cały flow wyceny bez jednej linii kodu;
+- **krok i odpowiedzi zostały nietknięte** — ankieta stała dalej na swoim pytaniu.
+
+Usunięcie pakietu i ponowne odświeżenie zdejmuje go tak samo, więc mechanizm działa w obie strony.
+⚙️ To samo, co §44 pokazał na atrybucie, działa na **całym elemencie domeny**.
+
+### 57.4 Usterka, którą zrobiłam i naprawiłam po drodze
+
+⛔ **Reset czyścił serwer, a nie ankietę.** Kursor ankiety to `linkedSignal`, który CELOWO zostaje
+na miejscu przy przeliczeniu — a wyczyszczenie odpowiedzi jest przeliczeniem: lista pytań ma tę
+samą długość, więc ekran pokazywał „Pytanie 2 z 6" nad ankietą bez ani jednej odpowiedzi. Rozróżnić
+„przeliczono" od „nowy proces" da się tylko z zewnątrz, stąd wejście `restart` — licznik ponownych
+startów.
+
+⚠️ **Pierwsza wersja poprawki też była zła, i to z powodu KOLEJNOŚCI.** Kursor liczył wtedy
+„pierwsze nieudzielone", ale licznik rośnie, gdy `PUT /reset` już wrócił, a wyczyszczona wycena
+jeszcze **nie** — więc „pierwsze nieudzielone" liczyło się na starych odpowiedziach i reset lądował
+na pytaniu drugim. Nowy proces wraca dziś na **pytanie pierwsze dosłownie**, co jest zarazem
+prostszym kontraktem i jedyną wersją odporną na kolejność.
+
+⚠️ Test na to zachowanie omal nie powstał jako pusty: `ng test --filter=questionnaire` dopasowuje
+**nazwy testów**, a słowo „questionnaire" trafiło w starszy test i mój nie uruchomił się ani razu.
+Filtrować po własnej frazie z nazwy i sprawdzać licznik uruchomionych. Test jest sprawdzony
+mutacją — pod starą wersją wywala się na „Pytanie 1 z 3".
+
+### 57.5 Zakres
+
+Narzędzia są **tylko w demie majątkowym**: moto i życie mają `recalculate()`, ale **nie mają
+endpointu resetu**, więc ten sam pasek wymagałby najpierw roboty po stronie serwera.
+Testy: 11 Javy, **73** frontu (jeden nowy), 3 regułowe.

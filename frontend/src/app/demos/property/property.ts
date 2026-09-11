@@ -4,6 +4,7 @@ import { ApkRecommendationCopy } from '../../models/apk';
 import { PropertyStore } from '../../core/property-store';
 import { isBranchComplete } from '../../core/question-state';
 import { ApkRecommendation } from '../../shared/apk/recommendation/recommendation';
+import { DemoTools } from '../../shared/demo-tools/demo-tools';
 import { ErrorBanner } from '../../shared/error-banner/error-banner';
 import { Step, StepBar } from '../../shared/step-bar/step-bar';
 import { Comparison } from './comparison/comparison';
@@ -49,6 +50,7 @@ const RECOMMENDATION_COPY: ApkRecommendationCopy = {
 		ApkRecommendation,
 		Client,
 		Comparison,
+		DemoTools,
 		ErrorBanner,
 		Offer,
 		Questionnaire,
@@ -104,20 +106,6 @@ export class Property {
 	];
 
 	/**
-	 * Czy analiza potrzeb jest domknięta.
-	 *
-	 * ⛔ „Wszystkie widoczne odsłonięte i każde obowiązkowe udzielone" — patrz `isBranchComplete`.
-	 * Nieudzielone pytanie obowiązkowe łapie się tu przez łańcuch: dopóki nie ma na nie odpowiedzi,
-	 * następne nie jest odsłonięte, więc warunek „wszystkie odsłonięte" jest fałszywy. Ekran nie
-	 * musi więc znać łańcucha ani go powtarzać.
-	 */
-	readonly apkComplete = computed(() =>
-		isBranchComplete(
-			(this.loaded()?.questions ?? []).filter((q) => q.section === 'NEEDS'),
-		),
-	);
-
-	/**
 	 * Czy przedmiot ubezpieczenia jest wypełniony.
 	 *
 	 * ⚠️ Pola przedmiotu pokazują się wszystkie naraz, ale nie wszystkie zawsze: dwa mają warunek
@@ -146,31 +134,20 @@ export class Property {
 	readonly variantChosen = computed(() => this.loaded()?.variantChosen === true);
 
 	/**
-	 * Kroki z policzoną dostępnością.
+	 * Kroki paska — WSZYSTKIE osiągalne.
 	 *
-	 * ⛔ **BRAMKUJEMY WYŁĄCZNIE RUCH W PRZÓD.** Krok już domknięty zostaje klikalny na zawsze —
-	 * bez tego znika rzecz, dla której to demo istnieje: cofnąć się do jednej odpowiedzi
-	 * i pokazać, jak przestawia się propozycja.
+	 * ⛔ ODWRÓCENIE DECYZJI z 2026-09-09, na wyraźne życzenie właściciela (2026-09-11). Pasek
+	 * bramkował ruch w przód: na ofertę nie wpuszczał, dopóki klient nie wybrał wariantu, bo
+	 * skok w przód pokazywał gotowy dokument i czytało się to jak „polisa już wystawiona".
+	 * Powód, dla którego bramka wypada mimo to: na pokazie prowadzący musi móc wejść w dowolny
+	 * ekran i wyjść z niego, nie przechodząc całego procesu od nowa — a to jest częstsze i
+	 * kosztowniejsze niż mylące wrażenie z jednego ekranu.
 	 *
-	 * ⚠️ Do 2026-09-09 wszystkie kroki były osiągalne zawsze i było to uzasadnione. Zmienione na
-	 * wyraźne życzenie właściciela: skok w przód pokazywał gotową ofertę, zanim klient cokolwiek
-	 * wybrał, i to czytało się jak „polisa już wystawiona".
+	 * ⚠️ Bramki w SAMYCH krokach zostają: „Dalej" na przedmiocie dalej czeka na komplet pól,
+	 * a wejście na ofertę przyciskiem — na wybór wariantu. Odblokowany jest PASEK, czyli droga
+	 * prowadzącego, a nie droga klienta; te dwie rzeczy celowo przestają być tym samym.
 	 */
-	readonly steps = computed<readonly Step[]>(() => {
-		const open = [
-			true,
-			this.apkComplete(),
-			this.apkComplete() && this.subjectComplete(),
-			this.apkComplete() && this.subjectComplete() && this.variantChosen(),
-		];
-		const current = this.stepLabels.findIndex((step) => step.key === this.step());
-		return this.stepLabels.map((step, index) => ({
-			...step,
-			// Krok już odwiedzony albo bieżący zostaje otwarty, choćby warunek przestał być
-			// spełniony — inaczej zmiana odpowiedzi wstecz zatrzaskiwałaby klienta na miejscu.
-			locked: !open[index] && index > current,
-		}));
-	});
+	readonly steps = computed<readonly Step[]>(() => this.stepLabels.map((step) => ({ ...step })));
 
 	/**
 	 * Składka proponowanego wariantu — rek. 8.2.d, patrz `ApkRecommendationCopy.premiumLabel`.
@@ -188,6 +165,42 @@ export class Property {
 	goTo(step: string): void {
 		this.step.set(step);
 	}
+
+	/**
+	 * Odświeżenie: to samo, co po każdej odpowiedzi — ponowny GET wyceny.
+	 *
+	 * ⛔ Nie ma tu nic o pakietach ani o Studiu i nie powinno być. Serwer przy każdym takim
+	 * żądaniu czyta drzewo domeny i reguły od nowa, więc pakiet dołożony w Studio pojawia się
+	 * sam. Gdyby front musiał wiedzieć, CO doszło, przestałoby to być demo konfiguracji.
+	 *
+	 * ⚠️ `recalculate()`, nie `startNewProcess()`: odpowiedzi mają zostać. Cała wartość tego
+	 * przycisku polega na tym, że ten sam klient z tymi samymi odpowiedziami dostaje inną ofertę,
+	 * bo zmieniła się konfiguracja.
+	 */
+	refreshFromHigson(): void {
+		this.store.recalculate();
+	}
+
+	/**
+	 * Licznik ponownych startów — ankieta odróżnia po nim „przeliczono" od „zaczynamy od nowa".
+	 *
+	 * ⚠️ Sam `startNewProcess()` nie wystarczy: czyści odpowiedzi na serwerze, ale lista pytań ma
+	 * po tym tę samą długość, więc kursor ankiety zostaje tam, gdzie stał — i ekran pokazuje
+	 * „Pytanie 2 z 6" nad ankietą bez ani jednej odpowiedzi. Zmierzone, nie przewidziane.
+	 */
+	private readonly restartCount = signal(0);
+
+	readonly restartToken = this.restartCount.asReadonly();
+
+	/** Czysty stan przed kolejnym przejściem — wniosek porzucony, ekran wraca na pierwszy krok. */
+	async resetProcess(): Promise<void> {
+		await this.store.startNewProcess();
+		this.restartCount.update((value) => value + 1);
+		this.step.set('apk');
+	}
+
+	/** Żądanie w locie — przyciski prowadzącego milkną, żeby dwa kliknięcia nie poszły podwójnie. */
+	readonly busy = computed(() => this.store.quote.isLoading());
 
 	/** ⚠️ `hasValue()` first — a resource in the error state throws from `value()`. */
 	private readonly loaded = computed(() =>

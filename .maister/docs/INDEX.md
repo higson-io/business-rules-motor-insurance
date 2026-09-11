@@ -621,6 +621,23 @@ session-scoped** — nothing to publish. ⛔ The scan trap worth keeping: `ctx\.
 match `ctx.get('path')`, which is exactly how `util.buildingAge` reads `quote.policy.startDate` —
 it was reported dead and survived only a by-name check; and paths composed at runtime
 (`'quote.sums.' + code`) are invisible to any literal scan.
+**§57 (2026-09-11)** adds presenter ergonomics and, with them, the proof the demo rests on.
+⛔ The step bar's forward gate — added 2026-09-09 so a jump ahead could not show a finished offer —
+is **reversed**: a presenter has to enter any screen without walking the process again. ⚠️ The cost
+is real and measured: entering "Oferta" with nothing answered **issues a document**. Gates *inside*
+the steps stay, so the presenter's path and the client's path stop being the same thing. A small
+`app-demo-tools` pair sits in the window corner: **Odśwież z Higsona** is `recalculate()` — the same
+GET that follows every answer, so **answers survive** — and **Zacznij od nowa** is
+`startNewProcess()`. ⚙️ Measured end to end: a **brand-new `VARIANTS` element** published in Studio
+appears after one click, in the right ladder position (`POSITION`), with a **premium computed by the
+pricing flow** (556.23 = 545.29 + 100 000 × 0.09‰ × 1.215), with the step and the answers untouched
+— and disappears again the same way. §44 showed this for an attribute; it holds for a whole domain
+element. ⛔ The defect found on the way: reset cleared the server but not the survey, because the
+cursor is a `linkedSignal` that deliberately holds its position through a recalculation — and
+clearing answers *is* one. ⚠️ The first fix was wrong too, on **ordering**: the restart counter rises
+while the cleared quote is still in flight, so "first unanswered" was computed on the old answers.
+A restart now returns to the first question literally. ⚠️ `ng test --filter=` matches **test names**,
+not files — "questionnaire" hit an older test and the new one never ran; it is mutation-proven now.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -871,4 +888,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-10 (§56 — the context audit: 25 paths left, every one of them read)
+**Last regenerated**: 2026-09-11 (§57 — presenter tools, and a new variant proven to appear without a restart)

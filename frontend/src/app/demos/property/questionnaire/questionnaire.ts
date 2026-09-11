@@ -88,6 +88,16 @@ export class Questionnaire {
 	 */
 	readonly group = input.required<'NEEDS' | 'SUBJECT'>();
 
+	/**
+	 * Licznik ponownych startów procesu — rośnie, gdy prowadzący czyści wniosek.
+	 *
+	 * ⛔ Potrzebny, bo kursor CELOWO nie rusza się przy przeliczeniu (patrz niżej), a wyczyszczenie
+	 * odpowiedzi przeliczeniem właśnie jest: lista pytań ma tę samą długość, więc kursor zostawał
+	 * na pytaniu, na którym stał, nad ankietą bez ani jednej odpowiedzi. Rozróżnienia „to samo
+	 * przeliczenie" od „nowy proces" nie da się wyczytać z samych pytań — musi przyjść z zewnątrz.
+	 */
+	readonly restart = input(0);
+
 	/** Zgłaszane, gdy klient domknął ostatnie pytanie ankiety — gospodarz przechodzi dalej. */
 	readonly completed = output<void>();
 
@@ -155,15 +165,27 @@ export class Questionnaire {
 	 * ⚠️ Wtedy „pierwsze NIEUDZIELONE", nie „ostatnie odsłonięte" — wejście na krok z częściowo
 	 * wypełnioną ankietą ma postawić klienta tam, gdzie skończył, a nie na końcu listy.
 	 */
-	private readonly cursor = linkedSignal<readonly PropertyQuestionDto[], number>({
-		source: this.reachable,
-		computation: (reached, previous) => {
+	private readonly cursor = linkedSignal<
+		{ reached: readonly PropertyQuestionDto[]; restart: number },
+		number
+	>({
+		source: () => ({ reached: this.reachable(), restart: this.restart() }),
+		computation: (now, previous) => {
+			// ⛔ Nowy proces wraca na PIERWSZE pytanie — dosłownie zero, a nie „pierwsze
+			// nieudzielone". To nie jest uproszczenie, tylko jedyna wersja odporna na kolejność:
+			// licznik ponownych startów rośnie, gdy PUT /reset już wrócił, ale wyczyszczona wycena
+			// jeszcze nie — „pierwsze nieudzielone" liczyło się wtedy na STARYCH odpowiedziach
+			// i reset lądował na pytaniu drugim. Zmierzone, nie przewidziane.
+			const restarted = previous !== undefined && previous.source.restart !== now.restart;
+			if (restarted) {
+				return 0;
+			}
 			const kept = previous?.value;
-			if (kept !== undefined && kept < reached.length) {
+			if (kept !== undefined && kept < now.reached.length) {
 				return kept;
 			}
-			const pending = reached.findIndex((question) => !this.settled(question));
-			return pending >= 0 ? pending : Math.max(reached.length - 1, 0);
+			const pending = now.reached.findIndex((question) => !this.settled(question));
+			return pending >= 0 ? pending : Math.max(now.reached.length - 1, 0);
 		},
 	});
 

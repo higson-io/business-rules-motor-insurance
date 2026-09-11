@@ -402,6 +402,45 @@ describe('Questionnaire', () => {
 		expect(next.disabled, 'bez odpowiedzi nie ma dokąd przejść').toBe(true);
 	});
 
+	/**
+	 * ⛔ Odpowiedzi są tu CELOWO jeszcze stare w chwili zmiany licznika — tak właśnie wygląda
+	 * kolejność u gospodarza: `PUT /reset` już wrócił, wyczyszczona wycena jeszcze nie. Kursor
+	 * liczony wtedy jako „pierwsze nieudzielone" ląduje na pytaniu trzecim, i dokładnie to
+	 * zdarzyło się na żywo. Test trzyma kontrakt mocniejszy i niewrażliwy na kolejność:
+	 * nowy proces zaczyna się od pierwszego pytania.
+	 */
+	it('rewinds the survey to its first question when the process starts anew', async () => {
+		const fixture = TestBed.createComponent(Questionnaire);
+		fixture.componentRef.setInput('group', 'NEEDS');
+		TestBed.tick();
+		httpTesting.expectOne('property').flush(
+			quote([
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', section: 'NEEDS', value: 'true' }),
+				question({
+					code: 'NEED_THEFT',
+					kind: 'BOOLEAN',
+					section: 'NEEDS',
+					position: 20,
+					value: 'true',
+				}),
+				question({ code: 'NEED_FLOOD', kind: 'BOOLEAN', section: 'NEEDS', position: 30 }),
+			]),
+		);
+		await TestBed.inject(ApplicationRef).whenStable();
+		fixture.detectChanges();
+
+		const element = fixture.nativeElement as HTMLElement;
+		expect(element.textContent, 'dwa pytania domknięte, stoimy na trzecim').toContain(
+			'Pytanie 3 z 3',
+		);
+
+		fixture.componentRef.setInput('restart', 1);
+		fixture.detectChanges();
+
+		expect(element.textContent, 'nowy proces wraca na początek').toContain('Pytanie 1 z 3');
+		expect(element.querySelector('[data-question="NEEDS_PROPERTY"]')).not.toBeNull();
+	});
+
 	it('ends the step from the last question rather than scrolling on', async () => {
 		const element = await render(
 			[

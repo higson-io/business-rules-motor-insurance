@@ -20,6 +20,16 @@
 -->
 <app-property-client />
 
+<!--
+	⛔ Narzędzia PROWADZĄCEGO, nie klienta — róg ekranu, najmniejszy krój, obrys zamiast
+	wypełnienia. Stoją poza `.property`, bo są przyklejone do okna, a nie do treści kroku.
+-->
+<app-demo-tools
+	[busy]="busy()"
+	(refresh)="refreshFromHigson()"
+	(reset)="resetProcess()"
+/>
+
 <app-step-bar
 	[steps]="steps()"
 	[current]="step()"
@@ -41,7 +51,11 @@
 					zgadywać, który z nich przewija pytanie, a który kończy krok. Gospodarz dowiaduje
 					się o końcu ankiety zdarzeniem.
 				-->
-				<app-property-questionnaire group="NEEDS" (completed)="goTo('subject')" />
+				<app-property-questionnaire
+					group="NEEDS"
+					[restart]="restartToken()"
+					(completed)="goTo('subject')"
+				/>
 			}
 
 			@case ('subject') {
@@ -51,7 +65,7 @@
 					rozmywała to, o co w kroku pierwszym chodzi. Które sekcje tu trafiają, mówi atrybut
 					`KIND` sekcji w Higsonie.
 				-->
-				<app-property-questionnaire group="SUBJECT" />
+				<app-property-questionnaire group="SUBJECT" [restart]="restartToken()" />
 
 				<div class="step-nav">
 					<button type="button" class="step-nav__back" (click)="goTo('apk')">
