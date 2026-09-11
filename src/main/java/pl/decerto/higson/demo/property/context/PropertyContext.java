@@ -33,7 +33,6 @@ public class PropertyContext extends HigsonContext {
 	private String questionCode;
 	private String coverCode;
 	private String variantCode;
-	private String choiceKind;
 	private String choiceRecommended;
 	private String choiceSelected;
 
@@ -68,11 +67,6 @@ public class PropertyContext extends HigsonContext {
 		return this;
 	}
 
-	public PropertyContext withChoice(String kind) {
-		this.choiceKind = kind;
-		return this;
-	}
-
 	/**
 	 * Wartość policzona na potrzeby JEDNEGO odczytu, pod ścieżką, której nie ma w modelu wniosku.
 	 *
@@ -101,9 +95,6 @@ public class PropertyContext extends HigsonContext {
 		}
 		if ("quote.choice.selected".equals(path)) {
 			return choiceSelected;
-		}
-		if ("choice.kind".equals(path)) {
-			return choiceKind;
 		}
 		return values.get(path);
 	}

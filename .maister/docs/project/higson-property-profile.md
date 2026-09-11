@@ -5182,3 +5182,40 @@ trzeba porównać **zbiory** pokryć, nie ich liczność; stoi to w opisie funkc
 Trzy wybory przez aplikację, zgodne z baseline'em sprzed zmiany: BASIC → `POORER` (z żądaniem
 potwierdzenia i wypisaną niepokrytą potrzebą „Elementy stałe"), STANDARD → `MATCHES`,
 COMPLETE → `RICHER`.
+
+## §63. Notatka o wyborze klienta w jednej tabeli (2026-09-11)
+
+Dwie tabele stały jedna za drugą: `offer.choiceKind` nazywała rodzaj wyboru (POORER / MATCHES /
+RICHER), a `offer.choice` po tym kodzie dobierała nagłówek, zdanie i flagę potwierdzenia. Scalone
+w jedną — `demo.property.offer.choice` — z jednym wejściem (różnica liczby pokryć) i czterema
+wyjściami.
+
+### 63.1 Dlaczego tu wolno, a w §51 nie było wolno
+
+⛔ To jest **odwrotność przypadku z §51**, i właśnie ta różnica rozstrzyga. Tam 10 z 17 kodów
+uzasadnienia nie przechodziło przez pierwsze piętro — Java przypisywała je wprost — więc scalona
+tabela miałaby kolumny progów wypełnione w 7 wierszach i puste w 10, czyli dokładnie usterkę, którą
+§44 znalazł w katalogu pytań. Tutaj **3 z 3** rodzajów biorą się z delty i druga tabela miała
+dokładnie te trzy wiersze. Kod istniał wyłącznie po to, żeby przejść do drugiej tabeli.
+
+### 63.2 Co zniknęło razem z nim
+
+Java czyta **cały wiersz jednym odczytem** (`ruleOf(product, CHOICE_RELATION, …)`), więc znika
+drugi odczyt, atrybut `CHOICE_NOTE` (`PRODUCT` 13 → **12**), `withChoice()` w `PropertyContext`
+oraz ścieżka kontekstu `choice.kind` — czyli wartość, którą aplikacja odkładała do kontekstu tylko
+po to, żeby zaraz samej sobie ją podać. `CHOICE_RELATION` nazywa się teraz „Relacja wyboru do
+rekomendacji **i notatka do oferty**", bo tyle zwraca.
+
+⚠️ Tabela została **przemianowana** `offer.choiceKind` → `offer.choice`: nazwa „rodzaj" przestała
+opisywać zawartość. Higson realizuje rename jako DELETE + CREATE w sesji, a usunięcie starej tabeli
+jest sesyjne — rename koliduje, dopóki poprzedniczka o tej nazwie nie zostanie **opublikowana** jako
+usunięta. Stąd dwie publikacje zamiast jednej.
+
+⚠️ Nowe kolumny wychodzą **puste, nie gwiazdkowe** (W-27) — trzeba je wypełnić, a macierz przeczytać
+świeżo po zmianie struktury.
+
+### 63.3 Weryfikacja
+
+Trzy wybory przez aplikację, identyczne z baseline'em: BASIC → POORER z żądaniem potwierdzenia
+i wypisaną potrzebą „Elementy stałe", STANDARD → MATCHES, COMPLETE → RICHER. Sumy i składki bez
+zmian, testy regułowe zielone, 11 testów Javy.

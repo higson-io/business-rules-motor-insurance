@@ -112,7 +112,6 @@ public class Property {
 	private static final String ATTR_SUM_RATE = "SUM_RATE";
 	private static final String ATTR_COVER_PERIOD = "COVER_PERIOD";
 	private static final String ATTR_CHOICE_RELATION = "CHOICE_RELATION";
-	private static final String ATTR_CHOICE_NOTE = "CHOICE_NOTE";
 
 	private static final String ATTR_PREMIUM = "PREMIUM";
 	private static final String ATTR_LIABILITY_SUM = "LIABILITY_SUM";
@@ -962,15 +961,20 @@ public class Property {
 		// ⛔ ROZSTRZYGA REGUŁA, nie Java. Do 7 września 2026 stało tu porównanie pozycji obu
 		// wariantów — czyli zdanie „klient wybrał szerzej niż rekomendowaliśmy", które trafia do
 		// dokumentu oferty (rek. 9.3), rodziło się w kodzie aplikacji.
+		//
+		// ⛔ JEDEN ODCZYT, CAŁY WIERSZ. Do 11 września 2026 czytały się tu dwie reguły: pierwsza
+		// nazywała rodzaj wyboru, druga po tym kodzie dobierała zdania. Każdy z trzech rodzajów
+		// przechodził przez obie, więc kod istniał wyłącznie po to, żeby przejść do drugiej
+		// tabeli — a Java odkładała go do kontekstu, żeby sama sobie go potem podać.
 		DomainObject product = productElement();
-		String kind = ruleOf(product, ATTR_CHOICE_RELATION,
-			new PropertyContext(quote).withChoiceVariants(recommended, chosen)).getString("kind");
+		ParamValue note = ruleOf(product, ATTR_CHOICE_RELATION,
+			new PropertyContext(quote).withChoiceVariants(recommended, chosen));
+		String kind = note.getString("kind");
 		if (kind == null) {
 			offer.setChoiceKind(null);
 			return;
 		}
 
-		ParamValue note = ruleOf(product, ATTR_CHOICE_NOTE, new PropertyContext(quote).withChoice(kind));
 		offer.setChoiceKind(kind);
 		offer.setChoiceLabel(note.getString("label"));
 		offer.setChoiceText(note.getString("text"));

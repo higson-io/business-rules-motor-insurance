@@ -1,14 +1,8 @@
 [[attr]]
-attributeCode = "CHOICE_NOTE"
-attributeName = "Tresc notatki o wyborze"
+attributeCode = "CHOICE_RELATION"
+attributeName = "Relacja wyboru do rekomendacji i notatka do oferty"
 refType = "PARAMETER"
 refName = "demo.property.offer.choice"
-
-[[attr]]
-attributeCode = "CHOICE_RELATION"
-attributeName = "Jak wybor klienta ma sie do rekomendacji"
-refType = "PARAMETER"
-refName = "demo.property.offer.choiceKind"
 
 [[attr]]
 attributeCode = "COVER_PERIOD"

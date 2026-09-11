@@ -699,6 +699,18 @@ the delta would always be zero and the **RICHER case could never fire** — thou
 precisely for it. ⚠️ Two packages with equal cover counts but different composition would read as
 MATCHES; impossible today (1 ⊂ 4 ⊂ 7) and recorded in the function's description rather than guarded
 by a branch that cannot run.
+**§63 (2026-09-11)** folds the offer's choice note into **one** table. `offer.choiceKind` named the
+kind and `offer.choice` turned that code into a heading, a sentence and an acknowledgement flag;
+they are now one table with one input and four outputs. ⛔ This is the **mirror image of §51**, and
+the difference is what licenses it: there, 10 of 17 justification codes never passed the first
+floor, so a merge would have left threshold columns filled in 7 rows and empty in 10 — here it is
+**3 of 3**, and the code existed only to reach the second table. Java reads the whole row in one
+call, so the second read, the `CHOICE_NOTE` attribute (`PRODUCT` 13 → **12**), `withChoice()` and
+the `choice.kind` context path all go — the last being a value the application parked in the context
+only to hand back to itself. ⚠️ The table was **renamed** to `offer.choice`; Higson performs a rename
+as DELETE + CREATE, and since deleting the old namesake is session-scoped, the rename collides until
+that deletion is **published** — two publishes, not one. ⚠️ New columns arrive **empty, not
+wildcard** (W-27).
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -949,4 +961,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§62 — wider or narrower is counted in covers)
+**Last regenerated**: 2026-09-11 (§63 — the offer’s choice note in a single table)

@@ -1,5 +1,5 @@
 #matrix for parameter demo.property.offer.choice
-kind;label;text;requiresAcknowledgement
-*;Wybór zgodny z rekomendacją;Klient wybrał wariant, który rekomendowaliśmy na podstawie analizy potrzeb.;false
-POORER;Wybór węższy niż rekomendacja;Klient wybrał wariant węższy niż rekomendowany i został poinformowany, które ze zgłoszonych potrzeb pozostają bez pokrycia.;true
-RICHER;Wybór szerszy niż rekomendacja;Klient wybrał wariant szerszy niż rekomendowany. Wszystkie zgłoszone potrzeby są pokryte<#s#> zakres wykracza poza to, co wynikało z analizy.;false
+delta;kind;label;text;requiresAcknowledgement
+-999 - -1;POORER;Wybór węższy niż rekomendacja;Klient wybrał wariant węższy niż rekomendowany i został poinformowany, które ze zgłoszonych potrzeb pozostają bez pokrycia.;true
+0 - 0;MATCHES;Wybór zgodny z rekomendacją;Klient wybrał wariant, który rekomendowaliśmy na podstawie analizy potrzeb.;false
+1 - 999;RICHER;Wybór szerszy niż rekomendacja;Klient wybrał wariant szerszy niż rekomendowany. Wszystkie zgłoszone potrzeby są pokryte<#s#> zakres wykracza poza to, co wynikało z analizy.;false

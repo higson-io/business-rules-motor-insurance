@@ -324,18 +324,8 @@
                 <typeAttribute>
                     <attributeType>business</attributeType>
                     <code>CHOICE_RELATION</code>
-                    <name>Jak wybor klienta ma sie do rekomendacji</name>
+                    <name>Relacja wyboru do rekomendacji i notatka do oferty</name>
                     <order>1</order>
-                    <groupOrder>4</groupOrder>
-                    <groupName>Notatka o wyborze klienta</groupName>
-                    <defaultRefType>PARAMETER</defaultRefType>
-                    <defaultRefName>demo.property.offer.choiceKind</defaultRefName>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>CHOICE_NOTE</code>
-                    <name>Tresc notatki o wyborze</name>
-                    <order>2</order>
                     <groupOrder>4</groupOrder>
                     <groupName>Notatka o wyborze klienta</groupName>
                     <defaultRefType>PARAMETER</defaultRefType>
