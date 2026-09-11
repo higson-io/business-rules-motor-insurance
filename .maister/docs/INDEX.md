@@ -638,6 +638,18 @@ clearing answers *is* one. ⚠️ The first fix was wrong too, on **ordering**: 
 while the cleared quote is still in flight, so "first unanswered" was computed on the old answers.
 A restart now returns to the first question literally. ⚠️ `ng test --filter=` matches **test names**,
 not files — "questionnaire" hit an older test and the new one never ran; it is mutation-proven now.
+**§58 (2026-09-11)** makes a clicked answer carry the survey to the next question — ⛔ a reversal of
+the 9 September decision but **not** a return to it: that version advanced as a side effect of
+**recalculation** (the cursor recomputed on every quote reload and ran away when nobody clicked),
+this one is the effect of the **click**, in the event handler, and therefore fenced by four
+conditions — survey step only, click answers only (`BOOLEAN`/`CHOICE`, since a money field emits
+`change` on blur), simple questions only, and only while the presenter has not moved the cursor.
+⛔ The step still ends only by button. ⚙️ Condition three earns its place live: "yes" to the rental
+question **reveals a conditional question on the same screen**, so advancing would skip what just
+appeared. ⚠️ The test for that guard first answered with a **money** field and passed even with the
+guard deleted — a different condition was blocking it; caught by mutation, rewritten with a yes/no
+field. ⚠️ `whenStable()` deadlocks on the GET a recalculation leaves behind, and `tick()` alone does
+not flush the microtask the advance runs in.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -888,4 +900,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§57 — presenter tools, and a new variant proven to appear without a restart)
+**Last regenerated**: 2026-09-11 (§58 — a clicked answer carries the survey forward)

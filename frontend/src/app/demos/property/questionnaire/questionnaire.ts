@@ -35,6 +35,12 @@ import { PropertyService } from '../../../services/property-service';
  * gdzie jedna reguła kluczowana odpowiedziami mówi, o co pytamy tego klienta. Filtr po własnej
  * regule cicho odebrałby konfiguracji tę decyzję.
  */
+/**
+ * Rodzaje odpowiedzi udzielanych JEDNYM KLIKNIĘCIEM — tylko one przenoszą na następne pytanie.
+ * Pole kwoty i tekstu emituje zdarzenie przy utracie ogniska, co nie jest kliknięciem w odpowiedź.
+ */
+const CLICK_ANSWERS = new Set<PropertyQuestionDto['kind']>(['BOOLEAN', 'CHOICE']);
+
 @Component({
 	selector: 'app-property-questionnaire',
 	imports: [
@@ -280,10 +286,12 @@ export class Questionnaire {
 	});
 
 	/**
-	 * ⛔ Nawigacja jest JAWNA, bez samoczynnego przeskoku po kliknięciu odpowiedzi. Na prezentacji
-	 * ekran nie może uciec prowadzącemu w chwili, w której zaczyna mówić o tym, co się właśnie
-	 * przeliczyło — a przy pytaniach z polem tekstowym samoprzewijanie i tak nie miałoby czego
-	 * nasłuchiwać.
+	 * Jawne przejście dalej — przyciskiem albo klawiaturą.
+	 *
+	 * ⛔ To JEDYNE miejsce, które może zakończyć krok (`completed`). Samoczynny przeskok po
+	 * kliknięciu odpowiedzi (patrz `autoAdvance`) przesuwa się tylko między pytaniami i na
+	 * ostatnim zatrzymuje się — przejście do następnego ekranu zostaje decyzją prowadzącego,
+	 * bo tam zaskoczenie kosztuje najwięcej.
 	 */
 	next(): void {
 		if (!this.canAdvance()) {
@@ -326,7 +334,46 @@ export class Questionnaire {
 	}
 
 	answer(question: PropertyQuestionDto, value: string): void {
-		void this.store.commit(firstValueFrom(this.propertyService.updateAnswer(question.code, value)));
+		const from = this.cursor();
+		void this.store
+			.commit(firstValueFrom(this.propertyService.updateAnswer(question.code, value)))
+			.then(() => this.autoAdvance(question, from));
+	}
+
+	/**
+	 * Kliknięcie odpowiedzi przenosi na następne pytanie — rytm ankiety, nie formularza.
+	 *
+	 * ⛔ To NIE jest powrót do stanu sprzed 9 września. Wtedy przeskok był efektem ubocznym
+	 * PRZELICZENIA: kursor liczył się od nowa po każdym odświeżeniu wyceny i uciekał także wtedy,
+	 * gdy nikt nic nie kliknął. Tutaj jest skutkiem KLIKNIĘCIA, w obsłudze zdarzenia, i dlatego
+	 * daje się ograniczyć czterema warunkami, z których każdy ma powód:
+	 *
+	 * 1. tylko ankieta (`NEEDS`) — krok przedmiotu pokazuje wszystkie pola naraz, nie ma dokąd iść;
+	 * 2. tylko odpowiedź KLIKANA (`BOOLEAN`, `CHOICE`) — pole kwoty i tekstu emituje `change`
+	 *    przy utracie ogniska, więc przeskok wyrywałby ekran w trakcie pisania;
+	 * 3. tylko pytanie PROSTE — w pytaniu złożonym jedno pole nie domyka kroku;
+	 * 4. tylko gdy prowadzący nie ruszył kursora sam w międzyczasie.
+	 *
+	 * ⛔ Na ostatnim pytaniu przeskoku NIE MA. Krok kończy się przyciskiem, świadomie.
+	 *
+	 * ⚠️ Przesunięcie następuje PO domknięciu zapisu, żeby łańcuch odsłaniania zdążył się
+	 * przeliczyć: odpowiedź „tak" na pytanie o wynajem odsłania pytanie o pomoc fachowca, które
+	 * wchodzi na listę tuż za nim.
+	 */
+	private autoAdvance(answered: PropertyQuestionDto, from: number): void {
+		const question = this.current();
+		if (
+			this.group() !== 'NEEDS' ||
+			question === null ||
+			question.fields.length > 1 ||
+			!CLICK_ANSWERS.has(answered.kind) ||
+			this.cursor() !== from
+		) {
+			return;
+		}
+		if (this.cursor() < this.reachable().length - 1) {
+			this.cursor.update((value) => value + 1);
+		}
 	}
 
 	toggle(question: PropertyQuestionDto, option: string, checked: boolean): void {

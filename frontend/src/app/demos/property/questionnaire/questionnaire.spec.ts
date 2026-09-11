@@ -466,6 +466,104 @@ describe('Questionnaire', () => {
 	 * Test pilnuje przyczyny, nie objawu: kontrolka bieżącego pytania ma być INNYM węzłem DOM
 	 * niż kontrolka poprzedniego. Dopóki to zachodzi, Material nie ma czego pamiętać.
 	 */
+	/**
+	 * Domknięcie zapisu i przeliczenia.
+	 *
+	 * ⛔ BEZ `whenStable()`. Przeliczenie zostawia po sobie `GET`, na którym `whenStable()` się
+	 * zakleszcza (patrz `standards/testing/test-writing.md`) — a przeskok po kliknięciu dzieje się
+	 * w `then()`, czyli w mikrozadaniu, więc samo `tick()` też nie wystarcza.
+	 */
+	async function settle(): Promise<void> {
+		await Promise.resolve();
+		await Promise.resolve();
+		TestBed.tick();
+	}
+
+	it('moves to the next question the moment an answer is clicked', async () => {
+		const element = await render(
+			[
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 20 }),
+			],
+			'NEEDS',
+		);
+		expect(element.textContent).toContain('Pytanie 1 z 2');
+
+		(
+			element.querySelector(
+				'[data-question="NEEDS_PROPERTY"] mat-button-toggle button',
+			) as HTMLButtonElement
+		).click();
+		httpTesting.expectOne('property/answer/NEEDS_PROPERTY').flush(null);
+		await settle();
+		httpTesting.expectOne('property').flush(
+			quote([
+				question({ code: 'NEEDS_PROPERTY', kind: 'BOOLEAN', section: 'NEEDS', value: 'true' }),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', section: 'NEEDS', position: 20 }),
+			]),
+		);
+		await settle();
+
+		expect(element.textContent, 'kliknięcie przenosi dalej').toContain('Pytanie 2 z 2');
+	});
+
+	/**
+	 * ⛔ Pilnuje rzeczy, którą łatwo zepsuć „upraszczając" przeskok: w pytaniu ZŁOŻONYM jedno pole
+	 * nie domyka kroku. To jest kształt pytania o wynajem — jego drugie pole jest WARUNKOWE
+	 * i pojawia się na tym samym ekranie zaraz po odpowiedzi „tak", więc przeskok przeskoczyłby
+	 * pytanie, które właśnie doszło.
+	 *
+	 * ⚠️ Pola muszą być tak/nie, a nie kwotowe. Pierwsza wersja tego testu odpowiadała polem
+	 * kwotowym i przechodziła także po USUNIĘCIU osłony — blokował ją inny warunek („tylko
+	 * odpowiedź klikana"), więc badała nie to, co deklarowała. Wyszło mutacją.
+	 */
+	it('does not skip a compound question when one of its fields is answered', async () => {
+		const wynajem = (assistanceVisible: boolean) =>
+			question({
+				code: 'RENTAL',
+				kind: 'GROUP' as PropertyQuestionDto['kind'],
+				section: 'NEEDS',
+				fields: [
+					question({ code: 'RENTED_OUT', kind: 'BOOLEAN', section: 'NEEDS' }),
+					question({
+						code: 'HOME_ASSISTANCE',
+						kind: 'BOOLEAN',
+						section: 'NEEDS',
+						position: 20,
+						required: false,
+						visible: assistanceVisible,
+					}),
+				],
+			});
+
+		const element = await render(
+			[wynajem(false), question({ code: 'NEED_THEFT', kind: 'BOOLEAN', position: 30 })],
+			'NEEDS',
+		);
+		expect(element.textContent).toContain('Pytanie 1 z 2');
+
+		(
+			element.querySelector(
+				'[data-question="RENTED_OUT"] mat-button-toggle button',
+			) as HTMLButtonElement
+		).click();
+		httpTesting.expectOne('property/answer/RENTED_OUT').flush(null);
+		await settle();
+		httpTesting.expectOne('property').flush(
+			quote([
+				wynajem(true),
+				question({ code: 'NEED_THEFT', kind: 'BOOLEAN', section: 'NEEDS', position: 30 }),
+			]),
+		);
+		await settle();
+
+		expect(element.textContent, 'ekran złożony zostaje pod ręką').toContain('Pytanie 1 z 2');
+		expect(
+			element.querySelector('[data-question="HOME_ASSISTANCE"]'),
+			'pytanie warunkowe doszło na tym samym ekranie',
+		).not.toBeNull();
+	});
+
 	it('rebuilds the control when the question changes, so a repeated answer still registers', async () => {
 		const element = await render(
 			[

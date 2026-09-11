@@ -4984,3 +4984,40 @@ mutacją — pod starą wersją wywala się na „Pytanie 1 z 3".
 Narzędzia są **tylko w demie majątkowym**: moto i życie mają `recalculate()`, ale **nie mają
 endpointu resetu**, więc ten sam pasek wymagałby najpierw roboty po stronie serwera.
 Testy: 11 Javy, **73** frontu (jeden nowy), 3 regułowe.
+
+## §58. Kliknięcie odpowiedzi przenosi na następne pytanie (2026-09-11)
+
+⛔ **Odwrócenie decyzji z 9 września**, ale nie powrót do tamtego stanu — i ta różnica jest całą
+treścią tej zmiany. Wtedy przeskok był **efektem ubocznym PRZELICZENIA**: kursor liczył się od nowa
+po każdym odświeżeniu wyceny i uciekał także wtedy, gdy nikt nic nie kliknął, przez co w pliku
+siedziały dwa sprzeczne projekty naraz. Teraz przeskok jest **skutkiem KLIKNIĘCIA**, w obsłudze
+zdarzenia — i dlatego daje się ograniczyć czterema warunkami, z których każdy ma powód:
+
+1. tylko ankieta (`NEEDS`) — krok przedmiotu pokazuje wszystkie pola naraz, nie ma dokąd iść;
+2. tylko odpowiedź **klikana** (`BOOLEAN`, `CHOICE`) — pole kwoty i tekstu emituje `change` przy
+   utracie ogniska, więc przeskok wyrywałby ekran w trakcie pisania;
+3. tylko pytanie **proste** — w pytaniu złożonym jedno pole nie domyka kroku;
+4. tylko gdy prowadzący nie ruszył kursora sam w międzyczasie.
+
+⛔ **Krok kończy się wyłącznie przyciskiem.** Na ostatnim pytaniu przeskoku nie ma: przejście na
+następny ekran zostaje decyzją prowadzącego, bo tam zaskoczenie kosztuje najwięcej.
+
+### 58.1 Warunek 3 okazał się ważniejszy, niż wyglądał
+
+⚙️ Zmierzone: „tak" przy wynajmie **odsłania pytanie warunkowe na tym samym ekranie** (grupa
+`RENTAL` pokazuje wtedy dwa pytania pod nagłówkiem), więc przeskok przeskoczyłby pytanie, które
+właśnie doszło. Osłona pytania złożonego trzyma to niezależnie od kolejności zdarzeń, bo `fields`
+w DTO niesie oba pola od początku — także zanim drugie stanie się widoczne.
+
+### 58.2 Test, który badał nie to, co deklarował
+
+⚠️ Pierwsza wersja testu osłony odpowiadała **polem kwotowym** i przechodziła także po USUNIĘCIU
+osłony — blokował ją warunek 2, nie warunek 3. Wyszło dopiero mutacją; test odpowiada dziś polem
+tak/nie i pod usuniętą osłoną wywala się. To jest argument za regułą ze standardu w najostrzejszej
+postaci: **test, który przechodzi pod mutacją, którą miał złapać, bada coś innego, niż ma w nazwie.**
+
+⚠️ Drugi raz tego samego dnia potwierdziło się, że `whenStable()` **zakleszcza się** na `GET`
+zostawionym przez przeliczenie. Przeskok dzieje się w mikrozadaniu (`then` po zapisie), więc samo
+`tick()` też nie wystarcza — potrzebny jest `settle()`: dwa `await Promise.resolve()` plus `tick()`.
+
+Testy: 11 Javy, **75** frontu (dwa nowe, oba sprawdzone mutacją), 3 regułowe.
