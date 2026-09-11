@@ -674,6 +674,20 @@ disarms it. ⚠️ Measured after: 1→2→3→4→5 on single clicks, "yes" to 
 reveals the assistance question, answering it moves to 6, "no" moves straight on. The test has two
 halves and each catches its own mutation. `MONEY` fields now carry **"zł"** (not "PLN" — every other
 amount in the demo reads that way), driven by `kind` from the catalogue.
+**§61 (2026-09-11)** removes `SUM_BASIS` and `SUM_REFERENCE` from `COVER` (14 → **12** attributes).
+They had to live somewhere — a table is barred by D-23 and the §30/§31.3 history, and hard-coding
+would teach the rules the cover catalogue — but not as attributes *explaining a third one*. Each
+cover's `SUM` now points at its own one-line rule, and ⚙️ the pointer says what the second attribute
+used to explain: flood shows `sum.building`, so **it visibly insures the walls**. Four functions,
+not seven, because flood shares the walls' sum and theft the contents'. ⛔ `COMPUTED` and `NONE`
+carried nothing: one meant "read `quote.sums.<code>`", the other "read nothing", and for assistance
+that path does not exist anyway — three genuinely different cases remained. ⚠️ `cover.sum` could
+**not** be deleted: `find_usages` found `cover.premium` and `limit.effective` calling it by code, so
+it became a three-line read of the element's `SUM`. Assistance has **no `SUM` attribute at all**
+(better than a zero, which reads as "cover for 0 zł"), which costs two guards —
+`getAttribute('SUM') == null` in Groovy and `attrDecimal` in Java, since an empty attribute is never
+created and a raw read NPEs. Sums, premiums and limits identical to the baseline. ⚠️ A domain type's
+description is capped at **512 characters**.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -924,4 +938,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§60 — the advance waits for a revealed question, and money fields say zł)
+**Last regenerated**: 2026-09-11 (§61 — a cover’s sum points at its own rule)

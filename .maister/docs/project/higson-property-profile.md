@@ -5091,3 +5091,59 @@ różne rzeczy. ⛔ Decyduje `kind` z konfiguracji, nie kod pytania — pole kwo
 dostanie walutę samo.
 
 Testy: 11 Javy, **76** frontu, 3 regułowe.
+
+## §61. Suma pokrycia mówi sama, na czym stoi (2026-09-11)
+
+Właściciel wskazał na ekranie pokrycia grupę „Suma ubezpieczenia" — trzy atrybuty, z czego dwa
+tłumaczące trzeci — i zapytał, czy `SUM_BASIS` i `SUM_REFERENCE` muszą być atrybutami. Muszą być
+gdzieś (tabela odpada przez D-23 i historię z §30/§31.3, zaszycie w Groovym znałoby katalog
+pokryć), ale **nie muszą być osobnymi atrybutami**. Propozycja właściciela: własna reguła per
+pokrycie.
+
+### 61.1 Cztery funkcje zamiast dwóch atrybutów na siedmiu pokryciach
+
+Wyszło **czterema funkcjami, nie siedmioma**, bo dwa pokrycia ubezpieczają to samo co inne:
+
+| pokrycie | `SUM` |
+|---|---|
+| Mury, **Powódź** | `demo.property.sum.building` |
+| Ruchomości, **Kradzież** | `demo.property.sum.contents` |
+| Elementy stałe | `demo.property.sum.fixtures` |
+| OC | `demo.property.sum.liability` |
+| Assistance | **brak atrybutu** |
+
+⚙️ Wskaźnik mówi teraz to, co przedtem tłumaczył drugi atrybut: powódź pokazuje `sum.building`,
+więc **widać, że ubezpiecza mury**. Każda z trzech pierwszych funkcji to jedna linia. `COVER`
+schodzi z **14 na 12 atrybutów**, a czterodrożny switch po `SUM_BASIS` znika.
+
+⛔ `COMPUTED` i `NONE` nie niosły niczego: jedno znaczyło „czytaj `quote.sums.<kod>`", drugie „nie
+czytaj nic" — a dla assistance ta ścieżka i tak nie istnieje (§56 usunął ją jako nieczytaną), więc
+oba dawały ten sam wynik. Zostały **trzy naprawdę różne przypadki**, wszystkie widoczne we
+wskaźniku.
+
+### 61.2 Czego nie dało się skasować
+
+⚠️ **`demo.property.cover.sum` NIE jest wołana tylko przez atrybut.** `find_usages` pokazał dwóch
+innych wołających: `cover.premium` i `limit.effective` sięgają po nią **kodem**. Zamiast skasowania
+została przepisana na trzy linie: odczyt atrybutu `SUM` z pokrycia nazwanego w `cover.code`. Gdyby
+nie to sprawdzenie, zniknęłaby wycena i limity — dokładnie pomyłka, która w §50 wywaliła każde
+żądanie na 500.
+
+### 61.3 Pokrycie bez sumy
+
+Assistance **nie ma atrybutu `SUM`**, bo nie ma sumy — i to jest lepsze niż funkcja zwracająca
+zero, bo zero czyta się jak „ochrona na 0 zł" (ta sama różnica co w §43). Kosztuje dwie osłony:
+`getAttribute('SUM') == null` w Groovym (sprawdzone Testerem przed publikacją — zwraca pusto, nie
+wyjątek) oraz `attrDecimal` zamiast `getAttrDecimal` w Javie, bo **pusty atrybut nie powstaje**,
+a surowy odczyt leci wtedy NPE bez nazwy atrybutu w komunikacie.
+
+### 61.4 Weryfikacja
+
+Sumy, składki i limity porównane z baseline'em sprzed zmiany: **bez różnic** — 528 000 / 116 160 /
+79 200, kradzież 79 200, powódź 528 000, OC 200 000 (pakiet standardowy) i 2 000 000 (pełny),
+assistance pusto. Limit assistance nadal 3 000 zł, co dowodzi, że pokrycie **bez sumy** przechodzi
+przez `limit.effective` bez potknięcia. Oba testy regułowe zielone, scenariusze potrzeb bez zmian,
+11 testów Javy.
+
+⚠️ Opis typu domenowego ma limit **512 znaków** — pierwsza wersja miała 517 i wróciła błędem
+walidacji. Zmiana typu **nie jest sesyjna**, więc działa od razu i nie ma czego publikować.

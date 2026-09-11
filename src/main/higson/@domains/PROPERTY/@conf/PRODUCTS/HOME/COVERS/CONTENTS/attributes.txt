@@ -56,10 +56,4 @@ refName = "SUM"
 attributeCode = "SUM"
 attributeName = "Suma ubezpieczenia"
 refType = "FUNCTION"
-refName = "demo.property.cover.sum"
-
-[[attr]]
-attributeCode = "SUM_BASIS"
-attributeName = "Skad bierze sie suma"
-refType = "LITERAL"
-refName = "COMPUTED"
+refName = "demo.property.sum.contents"

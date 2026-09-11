@@ -517,8 +517,13 @@ public class Property {
 			// ⛔ SUMA POKRYCIA JEST ATRYBUTEM, nie switchem po kodzie. Do 7 września 2026 stał
 			// tu `sumFor`, a razem z nim trzy przypisania na sztywno w `computeDerived`:
 			// kradzież = suma ruchomości, powódź = suma murów, assistance = zero. To jest kształt
-			// produktu, a nie mechanika, więc rozstrzyga go teraz `atrybut `SUM_BASIS` na pokryciu.
-			cover.setSum(definition.getAttrDecimal("SUM", ctx));
+			// produktu, a nie mechanika, więc rozstrzyga go dziś WSKAŹNIK `SUM` na pokryciu:
+			// powódź pokazuje `sum.building`, kradzież `sum.contents` — czyli wprost mówi, co
+			// ubezpiecza, zamiast tłumaczyć to drugim atrybutem.
+			//
+			// ⚠️ `attrDecimal`, nie `getAttrDecimal`: assistance NIE MA sumy i nie ma tego
+			// atrybutu wcale, a pusty atrybut nie powstaje — surowy odczyt leci wtedy NPE.
+			cover.setSum(attrDecimal(definition, "SUM", ctx));
 			covers.add(cover);
 		}
 		covers.sort(Comparator.comparingInt(Cover::getPosition));

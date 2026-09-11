@@ -6,9 +6,8 @@
             <profile>PROPERTY</profile>
             <code>COVER</code>
             <name>Pokrycie</name>
-            <description>Przedmiot albo ryzyko, ktore klient kupuje. ELEMENT MOWI O POKRYCIU WSZYSTKO: czy przysluguje, na jakich warunkach, na jaka sume, za ile i do jakiego limitu. Wartoscia atrybutu jest LICZBA ALBO ZDANIE tam, gdzie to stala pokrycia, i WSKAZANIE WLASNEJ TABELI demo.property.cover.KOD tam, gdzie zmienia sie z jej kluczem. Franszyza i karencja maja wlasne atrybuty - to osobna odpowiedz, ktorej z dostepnosci nie wyczytasz. POWODU ODMOWY nie ma tu wcale.</description>
+            <description>Przedmiot albo ryzyko, ktore klient kupuje. ELEMENT MOWI O POKRYCIU WSZYSTKO: czy przysluguje, na jakich warunkach, na jaka sume, za ile i do jakiego limitu. Wartoscia atrybutu jest LICZBA ALBO ZDANIE tam, gdzie to stala, i WSKAZANIE REGULY tam, gdzie sie zmienia. SUMA nie ma atrybutow tlumaczacych, skad sie bierze - wskaznik mowi to sam: powodz pokazuje sum.building, bo ubezpiecza mury, a assistance nie ma tego atrybutu, bo nie ma sumy. Franszyza i karencja maja wlasne. POWODU ODMOWY nie ma tu wcale.</description>
             <rootType>false</rootType>
-            <typeNature>PRODUCT</typeNature>
             <typeAttributes>
                 <typeAttribute>
                     <attributeType>business</attributeType>
@@ -42,24 +41,6 @@
                     <code>SUM</code>
                     <name>Suma ubezpieczenia</name>
                     <order>1</order>
-                    <groupOrder>2</groupOrder>
-                    <groupName>Suma ubezpieczenia</groupName>
-                    <defaultRefType>LITERAL</defaultRefType>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>SUM_BASIS</code>
-                    <name>Skad bierze sie suma</name>
-                    <order>2</order>
-                    <groupOrder>2</groupOrder>
-                    <groupName>Suma ubezpieczenia</groupName>
-                    <defaultRefType>LITERAL</defaultRefType>
-                </typeAttribute>
-                <typeAttribute>
-                    <attributeType>business</attributeType>
-                    <code>SUM_REFERENCE</code>
-                    <name>Pokrycie odniesienia dla sumy pochodnej</name>
-                    <order>3</order>
                     <groupOrder>2</groupOrder>
                     <groupName>Suma ubezpieczenia</groupName>
                     <defaultRefType>LITERAL</defaultRefType>

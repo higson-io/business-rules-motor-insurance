@@ -51,15 +51,3 @@ attributeCode = "RATE_BASIS"
 attributeName = "Podstawa stawki - promile sumy albo kwota"
 refType = "LITERAL"
 refName = "FLAT"
-
-[[attr]]
-attributeCode = "SUM"
-attributeName = "Suma ubezpieczenia"
-refType = "FUNCTION"
-refName = "demo.property.cover.sum"
-
-[[attr]]
-attributeCode = "SUM_BASIS"
-attributeName = "Skad bierze sie suma"
-refType = "LITERAL"
-refName = "NONE"

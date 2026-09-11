@@ -7,7 +7,7 @@
 
 categories = []
 logLevel = "INFO"
-description = "Suma ubezpieczenia JEDNEGO pokrycia. Bierze kod pokrycia ze sciezki cover.code, bo wisi na pokryciu jako atrybut SUM, a atrybut wola funkcje z samym kontekstem. Skad bierze sie suma, mowi atrybut SUM_BASIS: COMPUTED z metrazu, DERIVED na sumie innego pokrycia (kradziez na ruchomosciach, powodz na murach), CATALOGUE z sumy gwarancyjnej pakietu, NONE zadna."
+description = "Suma pokrycia nazwanego w cover.code - JEDEN ODCZYT ATRYBUTU. O tym, skad suma sie bierze, mowi wskaznik SUM na samym pokryciu: mury i powodz pokazuja sum.building, ruchomosci i kradziez sum.contents, OC sum.liability. Assistance nie ma tego atrybutu wcale, bo nie ma sumy - i dlatego odczyt musi znosic jego brak. Do 11 wrzesnia 2026 stal tu czterodrozny switch po atrybutach SUM_BASIS i SUM_REFERENCE; oba usuniete, bo tlumaczyly to, co wskaznik mowi sam."
 
 [[arguments]]
 name = "ctx"
@@ -21,29 +21,7 @@ if (coverCode == null) {
 }
 
 def cover = domain.get('PROPERTY', '/PRODUCTS[HOME]/COVERS[' + coverCode + ']')
-def basis = cover.getAttrString('SUM_BASIS', ctx)
-
-if ('COMPUTED' == basis) {
-	def ownSumPath = 'quote.sums.' + coverCode.toLowerCase()
-	return ctx.getDecimal(ownSumPath)
+if (cover.getAttribute('SUM') == null) {
+	return null
 }
-
-if ('DERIVED' == basis) {
-	def reference = cover.getAttrString('SUM_REFERENCE', ctx)
-	if (reference == null || reference.isEmpty()) {
-		throw new RuntimeException('Pokrycie ' + coverCode + ' ma sume pochodna, ale nie wskazano od czego')
-	}
-	def referencedSumPath = 'quote.sums.' + reference.toLowerCase()
-	return ctx.getDecimal(referencedSumPath)
-}
-
-if ('CATALOGUE' == basis) {
-	def variantCode = ctx.getString('variant.code')
-	if (variantCode == null) {
-		return null
-	}
-	def variant = domain.get('PROPERTY', '/PRODUCTS[HOME]/VARIANTS[' + variantCode + ']')
-	return variant.getAttrDecimal('LIABILITY_SUM', ctx)
-}
-
-return null
+return cover.getAttrDecimal('SUM', ctx)
