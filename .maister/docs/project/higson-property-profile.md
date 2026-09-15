@@ -5219,3 +5219,45 @@ usunięta. Stąd dwie publikacje zamiast jednej.
 Trzy wybory przez aplikację, identyczne z baseline'em: BASIC → POORER z żądaniem potwierdzenia
 i wypisaną potrzebą „Elementy stałe", STANDARD → MATCHES, COMPLETE → RICHER. Sumy i składki bez
 zmian, testy regułowe zielone, 11 testów Javy.
+
+## §64. Stosunek składek jako źródło kolumny, nie osobny węzeł (2026-09-15)
+
+Flow `demo.property.apk.recommend` miał dwa węzły jeden za drugim: funkcja
+`demo.property.util.budgetRatio` liczyła stosunek składki propozycji do oczekiwanej, a tabela
+`demo.property.apk.budget` rozstrzygała, co ten stosunek znaczy. Teraz to **jeden węzeł tabeli**,
+a funkcja jest podpięta jako źródło jej kolumny: `source = "$f demo.property.util.budgetRatio"`.
+Diagram: START → pakiet → próg → romb → alternatywa.
+
+### 64.1 Skąd funkcja bierze pakiet
+
+Funkcja miała sygnaturę `(ctx, indicated)`, bo w chwili wywołania pakiet wybrał dopiero poprzedni
+węzeł. Funkcja w `source` dostaje tylko `ctx`. Pakiet wchodzi więc **argumentem węzła tabeli** pod
+ścieżką `quote.apk.proposed` — tą samą, pod którą Java i `apk.allCovered` trzymają proponowany
+pakiet — a funkcja czyta go z kontekstu.
+
+⚙️ To nie było wiadome: §55 sprawdził, że argument węzła trafia do **poziomu** o pasującej ścieżce,
+nie że widzi go funkcja `$f` liczona dla innego poziomu. Rozstrzygnęła próba na elementach
+jednorazowych (usuniętych): budżet 600, `STANDARD` 1014,94 → `BUDGET_EXCEEDED`. Gdyby argument nie
+doszedł, funkcja zwróciłaby `0` i wyszłoby `BUDGET_ABSENT` — **bez błędu**, dlatego test „bez
+oczekiwanej składki" niczego tu nie dowodzi, rozstrzyga test „ponad".
+
+Zniknęło: węzeł `n2`, zmienna `budgetRatio`, argument funkcji i ścieżka `quote.needs.budgetRatio`,
+która istniała wyłącznie w tym jednym argumencie (ten sam wzór co w §48 i §52: kontekst niesie fakt,
+nie wyprowadzenie). Znika też ryzyko W-31. Wiersze tabeli bez zmian.
+
+### 64.2 Wypadek przy wdrożeniu
+
+⚠️ **Edytor flow otwarty w Studio nadpisał zmianę zrobioną przez MCP.** Funkcja, tabela i flow
+zostały opublikowane razem, ale flow wszedł w wersji z przeglądarki — starej strukturze z `n2`,
+z nowymi etykietami — więc flow podawał funkcji dwa argumenty, a funkcja przyjmowała jeden:
+`InvalidFunctionArgumentsNumberException: Expected: 1, Passed: 2`, każda wycena property → HTTP 500.
+Naprawione drugą publikacją samego flow, z zachowaniem etykiet z przeglądarki. Wniosek: **przed
+zmianą flow przez MCP zamknij (Cancel) jego edytor w Studio**, a po publikacji przeczytaj flow
+ponownie — status `SUCCESS` nie mówi, czyja wersja weszła.
+
+### 64.3 Weryfikacja
+
+Oba testy regułowe flow zielone. Działająca aplikacja: brak oczekiwanej składki → STANDARD,
+`BUDGET_ABSENT`; 600 zł → `BUDGET_EXCEEDED` z alternatywą BASIC 545,29; 5000 zł → `BUDGET_FIT`.
+Baseline'u „przed" nie było — w chwili pomiaru aplikacja już zwracała 500 (§64.2) — więc wyniki
+porównano z semantyką tabeli i testami, nie z zapisaną odpowiedzią.

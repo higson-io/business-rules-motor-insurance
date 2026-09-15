@@ -711,6 +711,13 @@ only to hand back to itself. ⚠️ The table was **renamed** to `offer.choice`;
 as DELETE + CREATE, and since deleting the old namesake is session-scoped, the rename collides until
 that deletion is **published** — two publishes, not one. ⚠️ New columns arrive **empty, not
 wildcard** (W-27).
+**§64 (2026-09-15)** folds the budget ratio into the threshold table: `demo.property.util.budgetRatio`
+stops being a flow node and becomes the table's `$f` level source, reading the proposed package from
+`quote.apk.proposed`, which the table node now receives as its argument. ⚙️ Proven by a throwaway
+probe: a flow-node argument **is** visible to a `$f` source function, not only to a level of the same
+path. ⚠️ An open Studio flow editor overwrote the MCP change at publish — the flow went live with the
+old two-argument call against the new one-argument function, and every property quote returned 500
+until the flow was republished. Close the editor first; re-read after publishing.
 **Read before** touching the property demo's rules, the APK question catalogue, or the domain
 tree — a PARAMETER `defaultValue` written through the API doubles its `$p` prefix, which only
 breaks the *next* element someone adds (**W-25**), and the region-inheritance trap (**W-24**) is
@@ -961,4 +968,4 @@ When making development decisions, follow this priority order:
 ---
 
 **Maintained by**: Documentation Manager skill
-**Last regenerated**: 2026-09-11 (§63 — the offer’s choice note in a single table)
+**Last regenerated**: 2026-09-15 (§64 — the budget ratio as a `$f` level source)

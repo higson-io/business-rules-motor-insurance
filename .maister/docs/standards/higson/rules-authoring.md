@@ -600,11 +600,20 @@ from the diagram. The pattern to use instead: **a function computes the number �
 what the number means → a link condition branches on the table's answer.**
 
 ```
-n2 FUNCTION       demo.property.util.budgetRatio   → budgetRatio     # only the division
+n1 FUNCTION       demo.property.apk.indicated      → indicated       # picks the package
 n3 DECISION_TABLE demo.property.apk.budget         → budgetOutcome   # the thresholds
-       arguments: [{type: VARIABLE, value: "budgetRatio", name: "quote.needs.budgetRatio"}]
+       arguments: [{type: VARIABLE, value: "indicated", name: "quote.apk.proposed"}]
+       level ratio: source = "$f demo.property.util.budgetRatio"      # only the division
 n4 LINK           budgetOutcome == 'BUDGET_EXCEEDED'
 ```
+
+⚙️ **The argument lands in the context the table evaluates, not only on a matching level** — so a
+function bound as a level `source` (`$f`) reads it with `ctx.getString(name)`. That removes the
+separate function node: the number is computed *inside* the table's own column, and the flow passes
+only a **fact** (the chosen package) under a real context path, instead of a derived value under a
+path invented for it (`quote.needs.budgetRatio` existed nowhere but in that one argument). The
+function loses its extra argument, so W-31 (`higson.call` dropping a null) cannot bite either.
+Prefer this shape whenever a function node exists only to feed the next table node.
 
 ⚠️ Every decision table in `demo.property.risk.calculate` carries `arguments: []`, which makes this
 look like an engine limitation. It is not — those tables simply key on context paths the caller
@@ -616,7 +625,11 @@ the null input would have landed on the `* - 0` row and returned `BUDGET_ABSENT`
 the test were deleted afterwards.
 
 *Evidence:* `demo.property.apk.recommend` node `n3`, 10 September 2026 — it replaced the Groovy
-wrapper `demo.property.apk.budgetOutcome`, which was deleted.
+wrapper `demo.property.apk.budgetOutcome`, which was deleted. On 15 September 2026 the function node
+`n2` was folded into the table's `$f` source; a throwaway probe (flow variable `indicated = STANDARD`,
+table keyed on `$f` reading `quote.apk.proposed`, budget 600) returned `BUDGET_EXCEEDED` — an unbound
+argument would have produced `0` and `BUDGET_ABSENT` — and the running application then returned all
+three outcomes (absent / 600 → exceeded with BASIC as alternative / 5000 → fit).
 
 ### Known Drift: Legacy ParamContext Binding
 New and touched functions should bind `ctx` to `io.higson.runtime.engine.core.context.ParamContext`. 29 of 36 existing functions still bind the legacy `org.smartparam.engine.core.context.ParamContext`. Migrate opportunistically when editing a function; do not open a dedicated sweep.

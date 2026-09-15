@@ -17,8 +17,8 @@ label = "skladka propozycji / oczekiwana skladka (0 = nie ma czego porownywac)"
 type = "number"
 matcher = "between/ei"
 reverseMatcher = false
-property = "quote.needs.budgetRatio"
-source = "quote.needs.budgetRatio"
+levelCreator = "$f demo.property.util.budgetRatio"
+source = "$f demo.property.util.budgetRatio"
 union = false
 
 [[outputLevel]]
